@@ -662,6 +662,67 @@ gemini "your prompt"
 
 ---
 
+### DR-013: Agent Configuration Distribution via GitHub (2025-01-04)
+
+**Decision:** Fetch agent configurations from GitHub during `start init` rather than embedding in binary
+
+**Structure:**
+
+Agent configs stored in repository:
+```
+start/
+├── assets/
+│   ├── agents/
+│   │   ├── claude.toml
+│   │   ├── gemini.toml
+│   │   ├── aichat.toml
+│   │   └── ...
+│   ├── tasks/
+│   └── roles/
+```
+
+**Init behavior:**
+1. Fetch agent list from GitHub API: `GET /repos/grantcarthew/start/contents/assets/agents`
+2. Auto-detect installed agents using `command -v`
+3. Download config files for selected agents
+4. Merge into user's `~/.config/start/config.toml`
+
+**Technical details:**
+- API endpoint: `https://api.github.com/repos/grantcarthew/start/contents/assets/agents`
+- Timeout: 10 seconds
+- No caching between runs
+- Network required (error if offline)
+- Rate limit: 60 requests/hour (unauthenticated)
+
+**Rationale:**
+
+**Why fetch instead of embed:**
+- Model names change frequently (claude-3-5 → claude-3-7 → claude-4)
+- Agent command flags evolve over time
+- New agents emerge regularly
+- Embedding means stale configs until next release
+- Users get current configs without waiting for release
+
+**Trade-offs accepted:**
+- Requires network during init (acceptable for one-time setup)
+- Dependency on GitHub availability (agents need network anyway)
+- No offline init (manual config documented as alternative)
+
+**Update workflow:**
+- Model names stale? Update TOML file in repo
+- New agent released? Add new config file
+- Flag changes? Update command template
+- No code changes or releases needed
+
+**Community benefits:**
+- Easy to contribute new agent configs (PR a TOML file)
+- Clear separation: code vs configuration data
+- Living documentation (configs show current best practices)
+
+**Supersedes:** DR-011's embedded assets approach for agent configs. Tasks and roles may still be embedded (TBD).
+
+---
+
 ## Pending Decisions
 
 No major decisions remaining. Ready to begin implementation.

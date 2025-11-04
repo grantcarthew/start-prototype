@@ -8,15 +8,15 @@
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Design Decisions](./docs/design-record.md) (12 DRs) | [Tasks](./docs/task.md)
+**Links:** [Vision](./docs/vision.md) | [Design Decisions](./docs/design-record.md) (13 DRs) | [Tasks](./docs/task.md)
 
 ## Command Status
 
 ### Core Commands
 - ✅ `start` - [docs/cli/start.md](./docs/cli/start.md) - Launch with all context
 - ✅ `start prompt [text]` - [docs/cli/start-prompt.md](./docs/cli/start-prompt.md) - Launch with required context + optional custom prompt
-- 🚧 `start init` - Interactive wizard, agent selection, document detection
-- 🚧 `start task <name> [instructions]` - Predefined workflows (need task listing design)
+- ✅ `start init` - [docs/cli/start-init.md](./docs/cli/start-init.md) - Interactive wizard, GitHub fetch, agent detection
+- ✅ `start task <name> [instructions]` - [docs/cli/start-task.md](./docs/cli/start-task.md) - Predefined workflows with roles and content commands
 
 ### Management Commands
 - 🚧 `start agent add|list|test|remove|edit` - Agent configuration management
@@ -46,7 +46,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 ## Open Questions
 
 ### High Priority
-1. **Task listing:** Subcommand (`start task list`) or flag (`start task --list`)?
+1. ~~**Task listing:** Subcommand (`start task list`) or flag (`start task --list`)?~~ ✅ Resolved: `start task` with no args + `--help`
 2. **Agent testing:** What does `start agent test` actually validate?
 3. **Config editing:** Validation behavior on save - error or warn?
 
