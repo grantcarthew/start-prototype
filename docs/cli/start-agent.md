@@ -545,20 +545,42 @@ Exit code: 1 (configuration errors take precedence over binary not found)
 
 ### start agent edit
 
-Edit agent configuration interactively or in editor.
+Edit agent configuration interactively.
 
 **Synopsis:**
 ```bash
-start agent edit              # Open config in $EDITOR
-start agent edit <name>       # Edit specific agent interactively
+start agent edit              # Select from list
+start agent edit <name>       # Edit specific agent
 ```
 
 **Behavior:**
 
-**Without agent name:**
-Opens `~/.config/start/config.toml` in $EDITOR. Same as `start config edit`.
+**Without agent name (interactive selection):**
 
-**With agent name:**
+Shows list of configured agents for selection:
+
+```bash
+start agent edit
+```
+
+Output:
+```
+Edit agent
+─────────────────────────────────────────────────
+
+Select agent to edit:
+  1) claude
+  2) gemini
+  3) aichat
+  4) my-custom-agent
+
+Select [1-4] (or 'q' to quit): 1
+
+(continues to interactive edit flow for 'claude')
+```
+
+**With agent name (interactive edit):**
+
 Interactive prompts to edit specific agent. Shows current values as defaults - press enter to keep current value.
 
 1. **Description** - Current value shown in brackets
@@ -661,26 +683,6 @@ Saving changes to ~/.config/start/config.toml...
 ✓ Agent 'simple-agent' updated successfully
 ```
 
-**Open in editor (no agent name):**
-
-```bash
-start agent edit
-```
-
-Output:
-```
-Opening config in editor...
-  File: ~/.config/start/config.toml
-  Editor: vim
-
-(opens ~/.config/start/config.toml in $EDITOR)
-```
-
-When editor closes:
-- If modified: Validates TOML syntax
-- If valid: Saved automatically
-- If invalid: Shows error, asks to re-edit or discard
-
 **Exit codes:**
 - 0 - Success (agent edited)
 - 1 - Validation error (invalid name, invalid command)
@@ -719,36 +721,6 @@ Continue anyway? [y/N]: n
 
 Command template [claude '{prompt}']: claude --model {model} '{prompt}'
 ✓ Valid command template
-```
-
-**No $EDITOR set (edit without agent name):**
-```
-Error: $EDITOR environment variable not set.
-
-Set your editor:
-  export EDITOR=vim
-  export EDITOR=nano
-  export EDITOR=code
-
-Or edit specific agent:
-  start agent edit <name>
-```
-
-Exit code: 1
-
-**Invalid TOML after editor (edit without agent name):**
-```
-Error: Configuration has invalid TOML syntax after editing.
-
-Line 42: unexpected token
-
-Options:
-  1) Re-edit to fix errors
-  2) Discard changes (restore backup)
-
-Select [1-2]: 1
-
-(reopens in editor)
 ```
 
 **Model management details:**
