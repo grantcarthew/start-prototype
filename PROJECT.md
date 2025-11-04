@@ -8,7 +8,7 @@
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Design Decisions](./docs/design-record.md) (13 DRs) | [Tasks](./docs/task.md)
+**Links:** [Vision](./docs/vision.md) | [Design Decisions](./docs/design-record.md) (13 DRs) | [Tasks](./docs/task.md) | [Agent Docs](./docs/cli/start-agent.md)
 
 ## Command Status
 
@@ -19,7 +19,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - ✅ `start task <name> [instructions]` - [docs/cli/start-task.md](./docs/cli/start-task.md) - Predefined workflows with roles and content commands
 
 ### Management Commands
-- 🚧 `start agent add|list|test|remove|edit` - Agent configuration management
+- ✅ `start agent add|list|test|remove|edit|default` - [docs/cli/start-agent.md](./docs/cli/start-agent.md) - Agent configuration management
 - 🚧 `start config show|edit|path|validate` - Config file management
 
 ### Optional Commands (TBD)
@@ -32,7 +32,8 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - Configuration: TOML with global + local merge
 - Context documents: Named with `path`, `prompt`, `required` fields
 - Document order: Config definition order (TOML preserves order)
-- Agents: Global only, flexible model aliases
+- Agents: Global only, flexible model aliases, metadata fields (description, url, models_url)
+- Agent management: list, add, test, edit, remove, default subcommands
 - Tasks: Role + prompt template + optional content_command
 - CLI Framework: Cobra with dynamic task loading
 
@@ -47,7 +48,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ### High Priority
 1. ~~**Task listing:** Subcommand (`start task list`) or flag (`start task --list`)?~~ ✅ Resolved: `start task` with no args + `--help`
-2. **Agent testing:** What does `start agent test` actually validate?
+2. ~~**Agent testing:** What does `start agent test` actually validate?~~ ✅ Resolved: Binary availability (exec.LookPath), config validation, dry-run display
 3. **Config editing:** Validation behavior on save - error or warn?
 
 ### Medium Priority
@@ -62,12 +63,12 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 ## Success Criteria
 
 CLI design is complete when:
-- [ ] All core commands fully specified (start, prompt, init, task)
-- [ ] All management commands specified (agent, config)
-- [ ] All high-priority questions resolved
-- [ ] Error cases documented across commands
-- [ ] Output formats specified consistently
-- [ ] Patterns consistent across all commands
+- [x] All core commands fully specified (start, prompt, init, task)
+- [ ] All management commands specified (agent ✅, config 🚧)
+- [ ] All high-priority questions resolved (2 of 3 done)
+- [x] Error cases documented across commands
+- [x] Output formats specified consistently
+- [x] Patterns consistent across all commands
 
 ## Reference
 
