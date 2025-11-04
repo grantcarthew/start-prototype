@@ -63,11 +63,11 @@ See [vision.md](./vision.md) for the product vision and goals.
 ```toml
 [context.documents.environment]
 path = "~/reference/ENVIRONMENT.md"
-suffix = "Read {file} for environment context."
+prompt = "Read {file} for environment context."
 
 [context.documents.project]
 path = "./PROJECT.md"
-suffix = "Read {file}. Respond with summary."
+prompt = "Read {file}. Respond with summary."
 ```
 
 **Rationale:**
@@ -85,9 +85,9 @@ suffix = "Read {file}. Respond with summary."
 
 ---
 
-### DR-004: Agent Configuration Scope (2025-01-03)
+### DR-004: Agent Configuration Scope (2025-01-03, Updated 2025-01-04)
 
-**Decision:** Agents are global-only configuration
+**Decision:** Agents are global-only configuration with flexible model aliases
 
 **Structure:**
 
@@ -97,18 +97,28 @@ default_agent = "claude"
 
 [agents.claude]
 command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
+default_model = "sonnet"  # Default alias to use
 
   [agents.claude.models]
-  fast = "claude-3-5-haiku-20241022"
-  mid = "claude-3-7-sonnet-20250219"
-  pro = "claude-opus-4-20250514"
+  haiku = "claude-3-5-haiku-20241022"
+  sonnet = "claude-3-7-sonnet-20250219"
+  opus = "claude-opus-4-20250514"
 
 [agents.gemini]
 command = "gemini --model {model} '{prompt}'"
+default_model = "flash"
 
   [agents.gemini.models]
-  default = "gemini-2.0-flash-exp"
+  flash = "gemini-2.0-flash-exp"
+  pro-exp = "gemini-2.0-pro-exp"
 ```
+
+**Model alias behavior:**
+
+- Alias names are user-defined (not hardcoded tiers)
+- Each agent has its own set of model aliases
+- `default_model` specifies which alias to use when `--model` flag not provided
+- Users can use `--model <alias>` or `--model <full-model-name>`
 
 **Rationale:**
 
@@ -117,11 +127,16 @@ command = "gemini --model {model} '{prompt}'"
 - Self-documenting - clear which agents are available
 - No need for per-project agent definitions
 - Simplifies merge logic (only context documents merge)
+- Flexible aliases allow users to name models meaningfully for their workflow
 
 **Local config impact:**
 
 - Local `./.start/config.toml` cannot define or override agents
 - Local config only affects context documents and settings
+
+**Update (2025-01-04):**
+
+Changed from hardcoded tier names (fast/mid/pro) to flexible user-defined aliases. Each agent defines its own model aliases appropriate for that tool. This allows Claude users to use "haiku/sonnet/opus" while Gemini users use "flash/pro-exp", etc.
 
 ---
 
@@ -137,7 +152,7 @@ path = "./ROLE.md"
 
 [context.documents.environment]
 path = "~/reference/ENVIRONMENT.md"
-suffix = "Read {file} for environment context."
+prompt = "Read {file} for environment context."
 ```
 
 **Rationale:**
@@ -252,7 +267,7 @@ command = "gemini --model {model} --include-directories ~/reference '{prompt}'"
 
 [context.documents.environment]
 path = "~/reference/ENVIRONMENT.md"
-suffix = "Read {file} for environment context."
+prompt = "Read {file} for environment context."
 ```
 
 **Substitution behavior:**
@@ -571,6 +586,79 @@ If none exist, only add `./AGENTS.md` (most common local file)
 - Automatic backup prevents accidental config loss
 - Interactive wizard better UX than manual config editing
 - Agent order reflects popularity and completeness
+
+---
+
+### DR-012: Context Document Required Field and Order (2025-01-04)
+
+**Decision:** Add optional `required` field to context documents to control inclusion behavior; documents appear in config definition order
+
+**Structure:**
+
+```toml
+[context.documents.environment]  # First in prompt
+path = "~/reference/ENVIRONMENT.md"
+prompt = "Read {file} for environment context."
+required = true    # Always included
+
+[context.documents.index]        # Second in prompt
+path = "~/reference/INDEX.csv"
+prompt = "Read {file} for documentation index."
+required = true    # Always included
+
+[context.documents.agents]       # Third in prompt
+path = "./AGENTS.md"
+prompt = "Read {file} for repository context."
+required = true    # Always included
+
+[context.documents.project]      # Fourth in prompt
+path = "./PROJECT.md"
+prompt = "Read {file}. Respond with summary."
+required = false   # Optional (default) - excluded from start prompt
+```
+
+**Behavior by command:**
+
+- `start` (root) → Includes ALL documents (required + optional)
+- `start prompt` → Includes ONLY required documents
+- `start task` → Includes documents specified in task's `documents` array (ignores `required` field)
+
+**Default value:**
+
+- If `required` field is omitted, defaults to `false` (optional document)
+
+**Document order:**
+
+- Documents appear in prompt in the order they are defined in config file
+- TOML preserves declaration order within sections
+- Users control order by arranging config file
+- Predictable and explicit - no alphabetical or other automatic sorting
+- Consistent across all commands (start, start prompt, tasks)
+
+**Rationale:**
+
+- `start` provides full context for comprehensive sessions (all documents)
+- `start prompt` provides minimal context for focused queries (required only)
+- Allows users to designate "essential" vs "nice-to-have" context
+- Reduces noise for one-off questions while maintaining critical context
+- Tasks maintain full control via explicit `documents` array
+- Definition order gives users control over context priority
+
+**Use cases:**
+
+- `~/reference/ENVIRONMENT.md` marked required: Always provides user/environment context (first)
+- `~/reference/INDEX.csv` marked required: Always provides documentation index (second)
+- `AGENTS.md` marked required: Always provides repository overview (third)
+- `PROJECT.md` marked optional: Included for full sessions, excluded for quick queries
+- `./DESIGN.md` marked optional: Only for comprehensive reviews
+
+**Zero context scenario:**
+
+Users wanting ONLY custom prompt (no context at all) should use agent directly:
+```bash
+claude "your prompt"
+gemini "your prompt"
+```
 
 ---
 

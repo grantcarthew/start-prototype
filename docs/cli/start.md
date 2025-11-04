@@ -7,23 +7,19 @@ start - Launch AI agent with project context
 ## Synopsis
 
 ```bash
-start [prompt] [flags]
+start [flags]
 ```
 
 ## Description
 
-Launches an AI agent with automatically detected project context. Reads configured context documents, builds an intelligent initial prompt, and delegates to the configured AI agent tool (claude, gemini, etc.).
+Launches an AI agent with automatically detected project context. Reads ALL configured context documents (both required and optional), builds an intelligent initial prompt, and delegates to the configured AI agent tool (claude, gemini, etc.).
 
-When run without arguments, uses default context documents and launches interactive session. When run with a custom prompt argument, includes that prompt along with context.
+**Context document behavior:**
+- Includes ALL context documents (required + optional)
+- Missing files are skipped with notification
+- Use `start prompt` for required documents only
 
-## Arguments
-
-**prompt** (optional)
-: Custom prompt to send to the agent. If provided, this becomes the initial prompt along with context document instructions.
-
-```bash
-start "analyze this codebase for security vulnerabilities"
-```
+This is the primary command for launching an AI session with full context. For custom prompts with minimal context, use `start prompt` subcommand. For predefined workflows, use `start task` subcommand.
 
 ## Global Flags
 
@@ -36,13 +32,13 @@ These flags work on all `start` commands.
 start --agent gemini
 ```
 
-**--model** *tier|name*
+**--model** *alias|name*
 : Model to use. Accepts either:
-- Tier names: `fast`, `mid`, `pro` (uses agent's configured model for that tier)
-- Full model names: `claude-3-5-haiku-20241022`, `gemini-2.0-flash-exp`
+- Model alias: User-defined aliases from agent's config (e.g., `sonnet`, `haiku`, `opus`)
+- Full model name: Complete model identifier (e.g., `claude-3-5-haiku-20241022`, `gemini-2.0-flash-exp`)
 
 ```bash
-start --model fast                      # Use fast tier
+start --model sonnet                    # Use alias from config
 start --model claude-3-5-haiku-20241022 # Use specific model
 ```
 
@@ -71,35 +67,71 @@ start -d ~/my-project
 
 ## Behavior
 
-### Default Execution (No Arguments)
+### Execution Flow
 
 1. Load global config (`~/.config/start/config.toml`)
 2. Load local config (`./.start/config.toml`) if exists
 3. Merge configs (local overrides global)
-4. Detect context documents (check which files exist)
-5. Build prompt from document suffixes
+4. Detect ALL context documents (check which files exist)
+   - Includes both `required = true` and `required = false` documents
+   - Missing files are skipped (not errors)
+   - Order determined by config definition order (see below)
+5. Build prompt from document prompts
 6. Resolve placeholders in agent command template
 7. Display context summary (unless `--quiet`)
 8. Execute agent command
 
-### Custom Prompt Execution (With Argument)
+### Document Order
 
-1-6. Same as above
-7. Prepend custom prompt to document instructions
-8. Display context summary (unless `--quiet`)
-9. Execute agent command
+Context documents appear in the prompt in the **order they are defined in the config file**.
+
+**Example config:**
+```toml
+[context.documents.environment]  # First
+path = "~/reference/ENVIRONMENT.md"
+prompt = "Read {file} for environment context."
+
+[context.documents.index]        # Second
+path = "~/reference/INDEX.csv"
+prompt = "Read {file} for documentation index."
+
+[context.documents.agents]       # Third
+path = "./AGENTS.md"
+prompt = "Read {file} for repository overview."
+
+[context.documents.project]      # Fourth
+path = "./PROJECT.md"
+prompt = "Read {file} for current project status."
+```
+
+**Resulting prompt order:**
+```
+Read ~/reference/ENVIRONMENT.md for environment context.
+Read ~/reference/INDEX.csv for documentation index.
+Read ./AGENTS.md for repository overview.
+Read ./PROJECT.md for current project status.
+```
+
+**Controlling order:**
+- Rearrange document definitions in config file
+- TOML preserves declaration order within sections
+- No alphabetical or other automatic sorting
 
 ### Model Flag Resolution
 
-When `--model fast` (tier name):
-1. Look up agent's `models.fast` value from config
-2. Use that model name
-3. Error if tier not configured for agent
+**When using alias** (`--model sonnet`):
+1. Look up agent's `models.sonnet` value from config
+2. Use the resolved model name
+3. Error if alias not defined for agent
 
-When `--model claude-3-5-haiku-20241022` (full name):
+**When using full model name** (`--model claude-3-5-haiku-20241022`):
 1. Use exact model name provided
-2. Bypass tier configuration
+2. Bypass alias resolution
 3. Agent must support this model
+
+**When no `--model` flag**:
+1. Use agent's `default_model` alias from config
+2. Error if no default_model configured
 
 ### Verbosity Levels
 
@@ -116,6 +148,7 @@ Agent: claude (model: claude-3-7-sonnet-20250219)
 
 Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
+  ✓ index           ~/reference/INDEX.csv
   ✓ agents          ./AGENTS.md
   ✗ project         ./PROJECT.md (not found)
 
@@ -134,10 +167,11 @@ Loading configuration...
 
 Resolving agent: claude (default)
   Command template: claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'
-  Model tier: mid → claude-3-7-sonnet-20250219
+  Model alias: sonnet → claude-3-7-sonnet-20250219
 
 Detecting context documents (working directory: /Users/gcarthew/Projects/my-app):
   environment: ~/reference/ENVIRONMENT.md → /Users/gcarthew/reference/ENVIRONMENT.md (exists)
+  index: ~/reference/INDEX.csv → /Users/gcarthew/reference/INDEX.csv (exists)
   agents: ./AGENTS.md → /Users/gcarthew/Projects/my-app/AGENTS.md (exists)
   project: ./PROJECT.md → /Users/gcarthew/Projects/my-app/PROJECT.md (not found, skipped)
 
@@ -146,9 +180,9 @@ Loading system prompt:
   Size: 1.2 KB
 
 Building prompt:
-  Document suffixes: 2 documents
+  Document prompts: 3 documents
   Custom prompt: (none)
-  Final prompt size: 450 characters
+  Final prompt size: 520 characters
 
 Starting AI Agent
 ===============================================================================================
@@ -156,6 +190,7 @@ Agent: claude (model: claude-3-7-sonnet-20250219)
 
 Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
+  ✓ index           ~/reference/INDEX.csv
   ✓ agents          ./AGENTS.md
   ✗ project         ./PROJECT.md (not found)
 
@@ -169,57 +204,26 @@ Executing command...
 ```
 [DEBUG] Config loader initialized
 [DEBUG] Reading global config: ~/.config/start/config.toml
-[DEBUG] Global config loaded: 245 lines, 3 sections (settings, agents, context)
+[DEBUG] Global config loaded: 245 lines, 3 sections
 [DEBUG] Reading local config: ./.start/config.toml
-[DEBUG] Local config loaded: 12 lines, 1 section (context)
+[DEBUG] Local config loaded: 12 lines, 1 section
 [DEBUG] Merging configs...
-[DEBUG]   settings.default_agent: "claude" (from global)
-[DEBUG]   agents.claude: (from global)
-[DEBUG]   context.documents.environment: (from global)
-[DEBUG]   context.documents.agents: "AGENTS.md" → "./AGENTS.md" (overridden by local)
-[DEBUG]   context.documents.project: (from global)
+[DEBUG]   context.documents.agents: "./AGENTS.md" (overridden by local)
+[DEBUG]   ... (other merge details)
 
 [DEBUG] Agent resolution:
-[DEBUG]   Requested: (none, using default)
 [DEBUG]   Default agent: claude
 [DEBUG]   Command template: claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'
-[DEBUG]   Environment variables: (none)
 
 [DEBUG] Model resolution:
-[DEBUG]   Requested: (none, using default)
-[DEBUG]   Default tier: mid
-[DEBUG]   Agent tiers: fast=claude-3-5-haiku-20241022, mid=claude-3-7-sonnet-20250219, pro=claude-opus-4-20250514
+[DEBUG]   Default alias: sonnet
 [DEBUG]   Resolved model: claude-3-7-sonnet-20250219
 
-[DEBUG] Working directory: /Users/gcarthew/Projects/my-app
-
 [DEBUG] Context document detection:
-[DEBUG]   environment:
-[DEBUG]     Configured path: ~/reference/ENVIRONMENT.md
-[DEBUG]     Expanded path: /Users/gcarthew/reference/ENVIRONMENT.md
-[DEBUG]     Exists: true
-[DEBUG]     Suffix: "Read {file} for environment context."
-[DEBUG]   agents:
-[DEBUG]     Configured path: ./AGENTS.md
-[DEBUG]     Resolved path: /Users/gcarthew/Projects/my-app/AGENTS.md
-[DEBUG]     Exists: true
-[DEBUG]     Suffix: "Read {file} for repository overview."
-[DEBUG]   project:
-[DEBUG]     Configured path: ./PROJECT.md
-[DEBUG]     Resolved path: /Users/gcarthew/Projects/my-app/PROJECT.md
-[DEBUG]     Exists: false (skipped)
-
-[DEBUG] System prompt resolution:
-[DEBUG]   Configured path: ./ROLE.md
-[DEBUG]   Resolved path: /Users/gcarthew/Projects/my-app/ROLE.md
-[DEBUG]   Exists: true
-[DEBUG]   Size: 1247 bytes
-
-[DEBUG] Prompt construction:
-[DEBUG]   Custom prompt: (none)
-[DEBUG]   Document 1: "Read /Users/gcarthew/reference/ENVIRONMENT.md for environment context."
-[DEBUG]   Document 2: "Read /Users/gcarthew/Projects/my-app/AGENTS.md for repository overview."
-[DEBUG]   Final prompt: "Read /Users/gcarthew/reference/ENVIRONMENT.md for...[448 chars total]"
+[DEBUG]   environment: ~/reference/ENVIRONMENT.md → /Users/gcarthew/reference/ENVIRONMENT.md (exists)
+[DEBUG]   index: ~/reference/INDEX.csv → /Users/gcarthew/reference/INDEX.csv (exists)
+[DEBUG]   agents: ./AGENTS.md → /Users/gcarthew/Projects/my-app/AGENTS.md (exists)
+[DEBUG]   project: ./PROJECT.md → /Users/gcarthew/Projects/my-app/PROJECT.md (not found)
 
 [DEBUG] Placeholder resolution:
 [DEBUG]   {model} → "claude-3-7-sonnet-20250219"
@@ -227,15 +231,13 @@ Executing command...
 [DEBUG]   {prompt} → "[448 chars]"
 [DEBUG]   {date} → "2025-11-03T16:30:45+10:00"
 
-[DEBUG] Final command:
-[DEBUG]   claude --model claude-3-7-sonnet-20250219 --append-system-prompt 'You are a senior...[truncated]' 'Read /Users/gcarthew/reference...[truncated]'
-
 Starting AI Agent
 ===============================================================================================
 Agent: claude (model: claude-3-7-sonnet-20250219)
 
 Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
+  ✓ index           ~/reference/INDEX.csv
   ✓ agents          ./AGENTS.md
   ✗ project         ./PROJECT.md (not found)
 
@@ -246,9 +248,9 @@ Executing command...
 
 [DEBUG] Executing command in shell
 [DEBUG] Working directory: /Users/gcarthew/Projects/my-app
-[DEBUG] Environment inherited from parent
-[DEBUG] Executing...
 ```
+
+**Note:** Debug output shows detailed information for each step including config merging, path resolution, and placeholder substitution. Useful for troubleshooting configuration issues. Documents appear in config definition order.
 
 ## Examples
 
@@ -259,11 +261,6 @@ Launch with default configuration:
 start
 ```
 
-Launch with custom prompt:
-```bash
-start "analyze this codebase for security vulnerabilities"
-```
-
 ### Agent Selection
 
 Use specific agent:
@@ -272,18 +269,13 @@ start --agent gemini
 start --agent opencode
 ```
 
-Custom prompt with specific agent:
-```bash
-start --agent gemini "review the API design"
-```
-
 ### Model Selection
 
-Use tier name:
+Use model alias (from config):
 ```bash
-start --model fast
-start --model mid
-start --model pro
+start --model haiku
+start --model sonnet
+start --model opus
 ```
 
 Use full model name:
@@ -292,9 +284,9 @@ start --model claude-3-5-haiku-20241022
 start --model gemini-2.0-flash-exp
 ```
 
-Combined:
+Combined with agent:
 ```bash
-start --agent claude --model pro "comprehensive code review"
+start --agent claude --model sonnet
 ```
 
 ### Directory Override
@@ -308,7 +300,7 @@ start -d ~/projects/work/api-server
 Useful when running from outside project:
 ```bash
 cd ~
-start --directory ~/my-project "what is the project status?"
+start --directory ~/my-project
 ```
 
 ### Verbosity Control
@@ -334,12 +326,12 @@ start --debug
 
 Full power:
 ```bash
-start --agent gemini --model pro --directory ~/my-project --verbose "review architecture"
+start --agent claude --model opus --directory ~/my-project --verbose
 ```
 
 Quick and quiet:
 ```bash
-start --agent claude --model fast --quiet
+start --agent gemini --model flash --quiet
 ```
 
 ## Output
@@ -416,15 +408,15 @@ Use 'start agent list' to see details.
 
 Exit code: 2
 
-### Invalid Model Tier
+### Invalid Model Alias
 
-If tier not configured for agent:
+If alias not configured for agent:
 ```
-Error: Model tier 'pro' not configured for agent 'claude'.
+Error: Model alias 'pro' not configured for agent 'gemini'.
 
-Available tiers for claude:
-  - fast: claude-3-5-haiku-20241022
-  - mid: claude-3-7-sonnet-20250219
+Available aliases for gemini:
+  - flash: gemini-2.0-flash-exp
+  - pro-exp: gemini-2.0-pro-exp
 
 Update config or use full model name with --model.
 ```
@@ -457,29 +449,120 @@ Exit code: 3
 
 ## Notes
 
-### Custom Prompt + Context Documents
+### Edge Cases
 
-When providing a custom prompt, context documents are still included. The final prompt structure:
+**No context documents configured:**
 
+If the `[context.documents]` section is empty or missing:
 ```
-{custom_prompt}
-
-{document_suffix_1}
-{document_suffix_2}
-...
+Context documents: (none configured)
 ```
 
-To launch with ONLY custom prompt (no context), use a task with empty `documents` array.
+The agent launches with no context document instructions - only system prompt (if configured).
+
+**No system prompt:**
+
+If `[context.system_prompt]` is not configured or the file doesn't exist:
+```
+System prompt: (none)
+```
+
+The agent launches without a system prompt. This is valid - not all agents require system prompts.
+
+**No configuration files:**
+
+If neither global (`~/.config/start/config.toml`) nor local (`./.start/config.toml`) exists:
+```
+Error: No configuration found.
+
+Run 'start init' to create initial configuration.
+```
+
+**Local config only:**
+
+If local `./.start/config.toml` exists but no global config:
+```
+Error: No global configuration found at ~/.config/start/config.toml
+
+Run 'start init' to create global configuration, or ensure
+agents are defined in local config.
+```
+
+Note: Agents must be defined in global config (per DR-004). Local config alone is insufficient unless it includes agent definitions (not recommended).
+
+**All context documents missing:**
+
+If all configured documents don't exist:
+```
+Context documents:
+  ✗ environment    ~/reference/ENVIRONMENT.md (not found)
+  ✗ index          ~/reference/INDEX.csv (not found)
+  ✗ agents         ./AGENTS.md (not found)
+  ✗ project        ./PROJECT.md (not found)
+```
+
+The agent launches with no context. This is valid - useful for general AI sessions.
+
+### Context Document Configuration
+
+Documents can be marked as `required` to control which commands include them:
+
+```toml
+[context.documents.environment]
+path = "~/reference/ENVIRONMENT.md"
+prompt = "Read {file} for environment context."
+required = true    # Always included
+
+[context.documents.index]
+path = "~/reference/INDEX.csv"
+prompt = "Read {file} for documentation index."
+required = true    # Always included
+
+[context.documents.agents]
+path = "./AGENTS.md"
+prompt = "Read {file} for repository context."
+required = true    # Always included
+
+[context.documents.project]
+path = "./PROJECT.md"
+prompt = "Read {file}. Respond with summary."
+required = false   # Optional - included by start, excluded by start prompt
+```
+
+**Behavior by command:**
+- `start` (root) → Includes ALL documents (required + optional)
+- `start prompt` → Includes ONLY required documents
+- `start task` → Includes documents specified in task's `documents` array (ignores required field)
+
+**Default value:**
+- If `required` field is omitted, defaults to `false` (optional)
+
+**Document order:**
+- Documents appear in prompt in the order defined in config file
+- See "Document Order" section above for details
 
 ### Model Override Behavior
 
-The `--model` flag overrides the default model tier but respects the agent. If you want to use a specific model with a specific agent:
+The `--model` flag overrides the default model but respects the agent. Each agent has its own model aliases defined in config.
+
+**Agent-specific aliases:**
+- Claude: `haiku`, `sonnet`, `opus`
+- Gemini: `flash`, `pro-exp`
+- Other agents: user-defined
+
+When using an alias, it must be defined for the selected agent:
 
 ```bash
-start --agent claude --model pro
+start --agent claude --model opus     # ✓ Works if opus defined for claude
+start --agent gemini --model opus     # ✗ Error if opus not defined for gemini
+start --agent gemini --model flash    # ✓ Works if flash defined for gemini
 ```
 
-If the model name doesn't match agent's expected format, the agent may error. Use model names appropriate for the selected agent.
+When using full model names, the agent must support that model:
+
+```bash
+start --agent claude --model claude-opus-4-20250514  # Agent must support this
+```
 
 ### Tilde Expansion
 
@@ -499,7 +582,8 @@ Absolute paths and `~` paths resolve independently of working directory.
 
 ## See Also
 
-- start-init(1) - Initialize configuration
+- start-prompt(1) - Launch with custom prompt
 - start-task(1) - Run predefined tasks
+- start-init(1) - Initialize configuration
 - start-agent(1) - Manage agents
 - start-config(1) - Manage configuration
