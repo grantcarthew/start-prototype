@@ -1,14 +1,14 @@
-# Project: start - CLI Design Phase
+# Project: start - Configuration Design Phase
 
-**Status:** Design Phase - Command-Line Interface Specification
+**Status:** Design Phase - Configuration Structure & Patterns
 **Date Started:** 2025-01-03
-**Current Phase:** Core command specifications
+**Current Phase:** Unified Template Design (UTD) implementation
 
 ## Overview
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [Design Decisions](./docs/design-record.md) (13 DRs) | [Tasks](./docs/task.md) | [Agent Docs](./docs/cli/start-agent.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/unified-template-design.md) | [Design Decisions](./docs/design-record.md) (13 DRs) | [Tasks](./docs/task.md)
 
 ## Command Status
 
@@ -59,9 +59,10 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ### Medium Priority
 
-4. **JSON output:** Which commands should support `--json` flag?
+4. ~~**JSON output:** Which commands should support `--json` flag?~~ ✅ Resolved: Not needed, human-facing tool
 5. **Context management:** Build `start context` commands or skip?
 6. **Role management:** Build `start role` commands or skip?
+7. **Task structure:** Finalize task config with system_prompt_* fields and UTD
 
 ### Low Priority
 
@@ -86,6 +87,35 @@ CLI design is complete when:
 **Key Documents:**
 
 - [docs/vision.md](./docs/vision.md) - Product vision and goals
-- [docs/design-record.md](./docs/design-record.md) - All design decisions (DR-001 through DR-012)
+- [docs/config.md](./docs/config.md) - Complete configuration reference
+- [docs/unified-template-design.md](./docs/unified-template-design.md) - UTD pattern (file/command/prompt)
+- [docs/design-record.md](./docs/design-record.md) - All design decisions (DR-001 through DR-013+)
 - [docs/task.md](./docs/task.md) - Task configuration details
 - [docs/archive/](./docs/archive/) - Design discussion history
+
+## Recent Progress
+
+### Configuration Design (2025-01-05)
+
+**Unified Template Design (UTD):**
+- Created `docs/unified-template-design.md` - Consistent pattern for file/command/prompt across all sections
+- Fields: `file`, `command`, `prompt` with `{file}` and `{command}` placeholders
+- Shell configuration: Global `shell` setting, per-section override, supports bash/node/python/bun/deno/etc
+- Command timeout: Global `command_timeout`, per-section override
+
+**Config Sections Completed:**
+- ✅ `[settings]` - default_agent, log_level, shell, command_timeout
+- ✅ `[agents.<name>]` - Full design with models, env, validation
+- ✅ `[system_prompt]` - Uses UTD pattern
+- ✅ `[context.<name>]` - Uses UTD pattern with required/description fields
+- 🚧 `[tasks.<name>]` - In progress, adding system_prompt_* fields with UTD
+- ❓ `[roles.<name>]` - Evaluate if still needed
+
+**Config Section Naming:**
+- Changed `[context.documents.<name>]` → `[context.<name>]`
+- Renamed `path` attribute → `file` (UTD standard)
+- Renamed `verbosity` → `log_level`
+
+**Updated Documentation:**
+- `docs/config.md` now references UTD, removed duplication
+- All examples updated to use new field names
