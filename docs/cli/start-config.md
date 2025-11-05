@@ -8,7 +8,7 @@ start config - Manage configuration files
 
 ```bash
 start config show
-start config edit [--global|--local]
+start config edit [scope]
 start config path
 start config validate
 ```
@@ -229,8 +229,16 @@ Open configuration file in editor.
 **Synopsis:**
 
 ```bash
-start config edit [--global|--local]
+start config edit [scope]
 ```
+
+**Arguments:**
+
+**[scope]** (optional)
+: Which config to edit. If omitted, edit will detect and ask.
+
+- `global` - Edit `~/.config/start/config.toml`
+- `local` - Edit `./.start/config.toml`
 
 **Behavior:**
 
@@ -245,24 +253,16 @@ Opens the configuration file in your preferred editor:
 
 2. **Config selection:**
 
-   - With `--global`: Edit `~/.config/start/config.toml`
-   - With `--local`: Edit `./.start/config.toml`
-   - No flag, both exist: Ask which to edit
-   - No flag, only one exists: Edit that one
-   - No flag, neither exists: Ask which to create
+   - With `global`: Edit `~/.config/start/config.toml`
+   - With `local`: Edit `./.start/config.toml`
+   - No scope, both exist: Ask which to edit
+   - No scope, only one exists: Edit that one
+   - No scope, neither exists: Ask which to create
 
 3. **After editing:**
    - Validates config syntax and semantics
    - Shows warnings for issues (soft warnings, file already saved)
    - Does not prevent saving or re-open editor
-
-**Flags:**
-
-**--global**
-: Edit global config (`~/.config/start/config.toml`)
-
-**--local**
-: Edit local config (`./.start/config.toml`)
 
 **Interactive selection (both configs exist):**
 
@@ -289,7 +289,7 @@ Set $EDITOR to use your preferred editor.
 **Edit specific config:**
 
 ```bash
-start config edit --global
+start config edit global
 ```
 
 Output:
@@ -334,7 +334,7 @@ Agent 'broken':
 **Config file doesn't exist:**
 
 ```bash
-start config edit --local
+start config edit local
 ```
 
 Output:
@@ -356,7 +356,7 @@ Opening ./.start/config.toml in nvim...
 **Editor not configured:**
 
 ```bash
-start config edit --global
+start config edit global
 ```
 
 (When `$VISUAL` and `$EDITOR` not set)
@@ -389,7 +389,7 @@ Opening ~/.config/start/config.toml in vi...
 **Directory not writable:**
 
 ```bash
-start config edit --local
+start config edit local
 ```
 
 Output:
@@ -406,7 +406,7 @@ Exit code: 2
 **Editor command failed:**
 
 ```bash
-start config edit --global
+start config edit global
 ```
 
 (When `$EDITOR="badeditor"`)
@@ -445,8 +445,8 @@ Configuration file locations:
 Global: ~/.config/start/config.toml ✓
 Local:  ./.start/config.toml ✓
 
-Use 'start config edit --global' to edit global config.
-Use 'start config edit --local' to edit local config.
+Use 'start config edit global' to edit global config.
+Use 'start config edit local' to edit local config.
 ```
 
 **Output (only global exists):**
@@ -457,8 +457,8 @@ Configuration file locations:
 Global: ~/.config/start/config.toml ✓
 Local:  ./.start/config.toml (not found)
 
-Use 'start config edit --global' to edit global config.
-Use 'start config edit --local' to create local config.
+Use 'start config edit global' to edit global config.
+Use 'start config edit local' to create local config.
 ```
 
 **Output (neither exists):**
@@ -628,11 +628,11 @@ Local: ./.start/config.toml
 ✗ Configuration has errors
   Fix errors before using 'start'.
 
-  Use 'start config edit --global' to fix global config.
-  Use 'start config edit --local' to fix local config.
+  Use 'start config edit global' to fix global config.
+  Use 'start config edit local' to fix local config.
 ```
 
-**Output (local defines agents - violation of DR-004):**
+**Output (duplicate agents with warnings):**
 
 ```
 Validating configuration...
@@ -641,19 +641,22 @@ Validating configuration...
 Global: ~/.config/start/config.toml
   ✓ TOML syntax valid
   ✓ Agents section valid (2 agents)
+    ✓ claude
+    ✓ gemini
 
 Local: ./.start/config.toml
   ✓ TOML syntax valid
-  ✗ Agents section present in local config
-    Per DR-004, agents must only be defined in global config.
+  ✓ Agents section valid (1 agent)
+    ⚠ claude
+      Also defined in global config
+      Local will override global for this agent
 
-    Found agents in local config:
-      - custom-agent
+Merged configuration:
+  ✓ 2 agents available (claude from local, gemini from global)
+  ✓ Default agent set: claude
 
-    Move these agents to global config:
-      ~/.config/start/config.toml
-
-✗ Configuration violates design constraints
+⚠ Configuration has 1 warning (see above)
+  Local agent 'claude' overrides global definition.
 ```
 
 **Verbose output:**
@@ -710,7 +713,7 @@ Line 23: expected '=' after key, found ']'
   25 | [agents.gemini]
 
 Fix the syntax error and run validation again.
-Use 'start config edit --global' to edit the file.
+Use 'start config edit global' to edit the file.
 ```
 
 Exit code: 2
@@ -741,7 +744,7 @@ See effective configuration after global + local merge.
 ### Edit Global Config
 
 ```bash
-start config edit --global
+start config edit global
 ```
 
 Open global config in your editor (uses `$EDITOR` or `vi`).
@@ -749,7 +752,7 @@ Open global config in your editor (uses `$EDITOR` or `vi`).
 ### Edit Local Config
 
 ```bash
-start config edit --local
+start config edit local
 ```
 
 Open local project config in your editor.
@@ -886,12 +889,13 @@ default_agent = "claude"   # From global (not overridden)
 
 ### Agent Configuration Scope
 
-Per DR-004, agents are **global-only**:
+Per DR-004 (updated 2025-01-05), agents can be defined in **both global and local** configs:
 
-- Defined in `~/.config/start/config.toml`
-- Cannot be defined or overridden in `./.start/config.toml`
-- `start config validate` reports error if local config defines agents
-- Rationale: Agents are system-wide tools, not project-specific
+- Global: `~/.config/start/config.toml` - Personal agent configurations
+- Local: `./.start/config.toml` - Team/project agent configurations (can be committed)
+- Merge behavior: Local overrides global for same agent name
+- `start config validate` warns if local agent overrides global
+- Rationale: Enables team standardization via committed configs while maintaining personal preferences
 
 ### Backup Files
 

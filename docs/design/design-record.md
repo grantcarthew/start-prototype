@@ -85,9 +85,9 @@ prompt = "Read {file}. Respond with summary."
 
 ---
 
-### DR-004: Agent Configuration Scope (2025-01-03, Updated 2025-01-04)
+### DR-004: Agent Configuration Scope (2025-01-03, Updated 2025-01-05)
 
-**Decision:** Agents are global-only configuration with flexible model aliases
+**Decision:** Agents can be defined in both global and local configs with merge behavior
 
 **Structure:**
 
@@ -96,7 +96,7 @@ prompt = "Read {file}. Respond with summary."
 default_agent = "claude"
 
 [agents.claude]
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
 default_model = "sonnet"  # Default alias to use
 
   [agents.claude.models]
@@ -122,21 +122,75 @@ default_model = "flash"
 
 **Rationale:**
 
-- Users typically have 3-5 agents configured - manageable in global config
-- Agent names are the actual tool names (claude, gemini, opencode) not arbitrary aliases (alpha, beta, gamma)
+- Agent names are the actual tool names (claude, gemini, opencode) not arbitrary aliases
 - Self-documenting - clear which agents are available
-- No need for per-project agent definitions
-- Simplifies merge logic (only context documents merge)
 - Flexible aliases allow users to name models meaningfully for their workflow
 
-**Local config impact:**
+**Scope:**
 
-- Local `./.start/config.toml` cannot define or override agents
-- Local config only affects context documents and settings
+**Global agents:** `~/.config/start/config.toml`
+- Personal agent configurations
+- Individual preferences (model aliases, default models)
+- Private configurations
+
+**Local agents:** `./.start/config.toml`
+- Team-standardized configurations (can be committed to git)
+- Project-specific agent wrappers or custom tools
+- Consistent team experience (clone and go)
+
+**Merge behavior:**
+
+- Global + local agents are combined
+- Same agent name: **local overrides global**
+- Enables team standardization while allowing personal overrides
+- Local config in version control ensures consistent team setup
+
+**Example scenario:**
+
+```toml
+# Global: ~/.config/start/config.toml (personal preference)
+[agents.claude]
+default_model = "haiku"  # Fast model for personal use
+
+# Local: ./.start/config.toml (team standard, committed)
+[agents.claude]
+command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+default_model = "sonnet"  # Team uses better model
+  [agents.claude.models]
+  sonnet = "claude-3-7-sonnet-20250219"
+  opus = "claude-opus-4-20250514"
+
+# Result: Local overrides global when working in this project
+```
+
+**Benefits:**
+
+- Team can commit `.start/` directory for consistent configuration
+- New team members: clone repo and `start` works immediately (if agents installed)
+- Personal global configs for individual workflows
+- Project-specific agents for custom tooling
+
+**Security note:**
+
+Don't commit secrets in local agent configs. Use environment variable references:
+
+```toml
+# Bad
+[agents.custom.env]
+API_KEY = "sk-1234567890"  # DON'T COMMIT
+
+# Good
+[agents.custom.env]
+API_KEY = "${CUSTOM_API_KEY}"  # Reference user's env var
+```
 
 **Update (2025-01-04):**
 
-Changed from hardcoded tier names (fast/mid/pro) to flexible user-defined aliases. Each agent defines its own model aliases appropriate for that tool. This allows Claude users to use "haiku/sonnet/opus" while Gemini users use "flash/pro-exp", etc.
+Changed from hardcoded tier names (fast/mid/pro) to flexible user-defined aliases.
+
+**Update (2025-01-05):**
+
+Changed from global-only to allowing both global and local agents. Enables team standardization via committed `.start/` directory while maintaining personal preferences in global config.
 
 ---
 

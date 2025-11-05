@@ -7,22 +7,27 @@ start init - Initialize start configuration
 ## Synopsis
 
 ```bash
-start init [flags]
+start init [scope]
 ```
 
 ## Description
 
-Interactive wizard to create initial `start` configuration. Detects installed AI agents, fetches current agent configurations from GitHub, and creates a working config file.
+Interactive wizard to create `start` configuration. Detects installed AI agents, fetches current agent configurations from GitHub, and creates a working config file.
+
+**Scopes:**
+- **global** - Personal config at `~/.config/start/config.toml` (default, recommended)
+- **local** - Project config at `./.start/config.toml` (for team use)
 
 **What init does:**
 
 1. Checks for existing configuration (offers backup if found)
-2. Fetches latest agent configurations from GitHub
-3. Auto-detects installed agents in PATH
-4. Prompts for additional agents to configure
-5. Prompts for default agent selection
-6. Creates config at `~/.config/start/config.toml`
-7. Adds default context document configuration
+2. Asks where to create config (global or local) if scope not specified
+3. Fetches latest agent configurations from GitHub
+4. Auto-detects installed agents in PATH
+5. Prompts for additional agents to configure
+6. Prompts for default agent selection
+7. Creates config at chosen location
+8. Adds default context document configuration
 
 **When to run init:**
 
@@ -32,6 +37,20 @@ Interactive wizard to create initial `start` configuration. Detects installed AI
 
 **Network requirement:**
 Init requires network access to fetch agent configurations from GitHub. If offline, see manual configuration documentation.
+
+## Arguments
+
+**[scope]** (optional)
+: Where to create the configuration. If omitted, init will ask interactively.
+
+- `global` - Create `~/.config/start/config.toml` (personal, default)
+- `local` - Create `./.start/config.toml` (project, can be committed)
+
+```bash
+start init          # Interactive: asks where to create
+start init global   # Create global config
+start init local    # Create local config
+```
 
 ## Flags
 
@@ -53,16 +72,89 @@ start init --force
 
 ## Behavior
 
-### Execution Flow
+### Smart Behavior (No Scope Argument)
 
-**With existing config:**
+When run without scope argument, init detects existing configs and asks where to create.
 
-1. Check if `~/.config/start/config.toml` exists
-2. Prompt: "Backup and reinitialize? [y/N]"
-   - If N: Exit with message
-   - If Y (or `--force`): Continue
-3. Backup existing config to `config.YYYY-MM-DD-HHMMSS.toml`
-4. Continue to main wizard
+**Scenario 1: No global, no local (first-time user)**
+
+```
+Initialize start configuration
+
+No existing configuration found.
+
+Where should this configuration be created?
+  1) Global (~/.config/start/config.toml) [RECOMMENDED]
+     Personal config across all projects
+  2) Local (./.start/config.toml)
+     Project config (for team use)
+
+Select [1-2] (default: 1):
+```
+
+Press Enter → Creates global (default)
+
+**Scenario 2: Global exists, no local**
+
+```
+Initialize start configuration
+
+Existing global config found: ~/.config/start/config.toml
+
+What would you like to do?
+  1) Replace global config [BACKUP WILL BE CREATED]
+  2) Create local config for this project
+  3) Cancel
+
+Select [1-3] (default: 1):
+```
+
+Option 1 → Backup to `config.YYYY-MM-DD-HHMMSS.toml`, create new global
+Option 2 → Create local, keep global untouched
+Option 3 → Exit
+
+**Scenario 3: Global exists, local exists**
+
+```
+Initialize start configuration
+
+Existing configs found:
+  Global: ~/.config/start/config.toml
+  Local:  ./.start/config.toml
+
+Which would you like to replace? [BACKUP WILL BE CREATED]
+  1) Replace global config
+  2) Replace local config
+  3) Cancel
+
+Select [1-3] (default: 1):
+```
+
+**Scenario 4: No global, local exists**
+
+```
+Initialize start configuration
+
+Existing local config found: ./.start/config.toml
+
+What would you like to do?
+  1) Create global config [RECOMMENDED]
+  2) Replace local config [BACKUP WILL BE CREATED]
+  3) Cancel
+
+Select [1-3] (default: 1):
+```
+
+### Explicit Scope Behavior
+
+When scope argument provided, skip prompts and create specified config:
+
+```bash
+start init global    # Force global (backup if exists)
+start init local     # Force local (backup if exists)
+```
+
+Both create backups automatically if replacing existing config.
 
 **Main wizard:**
 
@@ -143,7 +235,7 @@ GET https://api.github.com/repos/grantcarthew/start/contents/assets/agents
 
 ## Examples
 
-### First Time Setup
+### First Time Setup (Interactive)
 
 ```bash
 start init
@@ -152,6 +244,18 @@ start init
 Output:
 
 ```
+Initialize start configuration
+
+No existing configuration found.
+
+Where should this configuration be created?
+  1) Global (~/.config/start/config.toml) [RECOMMENDED]
+     Personal config across all projects
+  2) Local (./.start/config.toml)
+     Project config (for team use)
+
+Select [1-2] (default: 1): 1
+
 Welcome to start!
 
 Fetching latest agent configurations from GitHub...
@@ -188,6 +292,44 @@ Default context documents configured:
   ./AGENTS.md
   ./PROJECT.md
 
+Run 'start config show' to see your configuration.
+Run 'start' to launch!
+```
+
+### Create Global Config (Explicit)
+
+```bash
+start init global
+```
+
+Skips scope prompt, creates global config directly.
+
+### Create Local Config (Explicit)
+
+```bash
+start init local
+```
+
+Output:
+
+```
+Welcome to start!
+
+Fetching latest agent configurations from GitHub...
+✓ Found 6 agent configurations
+
+[...agent detection and wizard...]
+
+Creating configuration at ./.start/config.toml...
+✓ Configuration created
+
+Default context documents configured:
+  ~/reference/ENVIRONMENT.md (required)
+  ~/reference/INDEX.csv
+  ./AGENTS.md
+  ./PROJECT.md
+
+Local config created. This can be committed to git for team consistency.
 Run 'start config show' to see your configuration.
 Run 'start' to launch!
 ```

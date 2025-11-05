@@ -8,7 +8,7 @@
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/unified-template-design.md) | [Design Decisions](./docs/design-record.md) (13 DRs) | [Tasks](./docs/task.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (13 DRs) | [Tasks](./docs/tasks.md)
 
 ## Command Status
 
@@ -34,11 +34,12 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 ### Completed
 
 - Configuration: TOML with global + local merge
-- Context documents: Named with `path`, `prompt`, `required` fields
+- Context documents: Named with `file`, `command`, `prompt`, `required` fields using UTD
 - Document order: Config definition order (TOML preserves order)
-- Agents: Global only, flexible model aliases, metadata fields (description, url, models_url)
+- Agents: Global + local (team standardization), flexible model aliases, metadata fields (description, url, models_url)
 - Agent management: list, add, test, edit, remove, default subcommands
-- Tasks: Role + prompt template + optional content_command
+- Tasks: Full UTD pattern for system_prompt and task prompt, auto-includes required contexts
+- Command pattern: Positional scope arguments (`start init [scope]`, `start config edit [scope]`)
 - CLI Framework: Cobra with dynamic task loading
 
 ### Key Design
@@ -60,9 +61,9 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 ### Medium Priority
 
 4. ~~**JSON output:** Which commands should support `--json` flag?~~ ✅ Resolved: Not needed, human-facing tool
-5. **Context management:** Build `start context` commands or skip?
-6. **Role management:** Build `start role` commands or skip?
-7. **Task structure:** Finalize task config with system_prompt_* fields and UTD
+5. ~~**Task structure:** Finalize task config with system_prompt_* fields and UTD~~ ✅ Resolved: Full UTD for both system_prompt and task prompt
+6. **Context management:** Build `start context` commands or skip?
+7. **Role management:** Build `start role` commands or skip? (roles section not currently used)
 
 ### Low Priority
 
@@ -105,11 +106,10 @@ CLI design is complete when:
 
 **Config Sections Completed:**
 - ✅ `[settings]` - default_agent, log_level, shell, command_timeout
-- ✅ `[agents.<name>]` - Full design with models, env, validation
-- ✅ `[system_prompt]` - Uses UTD pattern
+- ✅ `[agents.<name>]` - Full design with models, env, validation (global + local)
+- ✅ `[system_prompt]` - Uses UTD pattern (file, command, prompt)
 - ✅ `[context.<name>]` - Uses UTD pattern with required/description fields
-- 🚧 `[tasks.<name>]` - In progress, adding system_prompt_* fields with UTD
-- ❓ `[roles.<name>]` - Evaluate if still needed
+- ✅ `[tasks.<name>]` - Full UTD for system_prompt_* and task prompt, auto-includes required contexts
 
 **Config Section Naming:**
 - Changed `[context.documents.<name>]` → `[context.<name>]`
@@ -119,3 +119,47 @@ CLI design is complete when:
 **Updated Documentation:**
 - `docs/config.md` now references UTD, removed duplication
 - All examples updated to use new field names
+
+### Tasks Design & Documentation Updates (2025-01-05)
+
+**Tasks Configuration Finalized:**
+- ✅ Full UTD pattern for `system_prompt_*` fields (file, command, prompt)
+- ✅ Full UTD pattern for task prompt fields (file, command, prompt)
+- ✅ Auto-includes contexts where `required = true` (no `documents` array)
+- ✅ `{instructions}` placeholder only in task prompts, not system prompts
+- ✅ Tasks can be in both global and local configs (merge/override)
+- ✅ Alias conflict resolution: First in TOML order wins
+- ✅ Updated `docs/tasks.md` with complete specification
+
+**Agent Scope Updated (DR-004):**
+- ✅ Changed from global-only to global + local support
+- ✅ Enables team standardization via committed `.start/` directory
+- ✅ Local agents override global for same name (merge behavior)
+- ✅ Security note: Don't commit secrets, use env var references
+- ✅ Updated `docs/design/design-record.md` DR-004
+
+**Command Pattern Finalized:**
+- ✅ Positional scope arguments: `start init [scope]` and `start config edit [scope]`
+- ✅ Scopes: `global` (default) or `local`
+- ✅ Smart behavior when no scope: Interactive prompts with recommendations
+- ✅ Explicit scope skips prompts for scripting/automation
+
+**Smart Init Behavior:**
+- ✅ Scenario 1: No configs → Ask, default to global
+- ✅ Scenario 2: Global exists → Ask to replace global or create local
+- ✅ Scenario 3: Both exist → Ask which to replace
+- ✅ Scenario 4: Local exists → Ask to create global or replace local
+- ✅ Always recommends global as default/safe choice
+
+**Documentation Updates (In Progress - 2/5 complete):**
+- ✅ `docs/cli/start-init.md` - Added scope argument, smart behavior, local support
+- ✅ `docs/cli/start-config.md` - Changed flags to positional args, updated agent scope info
+- 🚧 `docs/config.md` - Agent section (local scope), task section (UTD fields)
+- 🚧 `docs/cli/start-task.md` - Task field updates if needed
+
+**Remaining Work:**
+- Update `docs/config.md` sections for agents (local allowed) and tasks (UTD fields)
+- Evaluate `start context` command necessity (vs direct config editing)
+- Evaluate `start role` command necessity (roles section not currently used)
+- Determine shell completion requirements (bash/zsh/fish)
+- Define non-interactive mode flags for CI/automation
