@@ -23,6 +23,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 - ✅ `start agent add|list|test|remove|edit|default` - [docs/cli/start-agent.md](./docs/cli/start-agent.md) - Agent configuration management
 - ✅ `start config show|edit|path|validate` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Config file management
+- ❓ `start update` - System health check and update management (TBD)
 
 ### Optional Commands (TBD)
 
