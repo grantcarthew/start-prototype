@@ -655,6 +655,7 @@ required = false   # Optional (default) - excluded from start prompt
 **Zero context scenario:**
 
 Users wanting ONLY custom prompt (no context at all) should use agent directly:
+
 ```bash
 claude "your prompt"
 gemini "your prompt"
@@ -669,6 +670,7 @@ gemini "your prompt"
 **Structure:**
 
 Agent configs stored in repository:
+
 ```
 start/
 ├── assets/
@@ -682,12 +684,14 @@ start/
 ```
 
 **Init behavior:**
+
 1. Fetch agent list from GitHub API: `GET /repos/grantcarthew/start/contents/assets/agents`
 2. Auto-detect installed agents using `command -v`
 3. Download config files for selected agents
 4. Merge into user's `~/.config/start/config.toml`
 
 **Technical details:**
+
 - API endpoint: `https://api.github.com/repos/grantcarthew/start/contents/assets/agents`
 - Timeout: 10 seconds
 - No caching between runs
@@ -697,6 +701,7 @@ start/
 **Rationale:**
 
 **Why fetch instead of embed:**
+
 - Model names change frequently (claude-3-5 → claude-3-7 → claude-4)
 - Agent command flags evolve over time
 - New agents emerge regularly
@@ -704,17 +709,20 @@ start/
 - Users get current configs without waiting for release
 
 **Trade-offs accepted:**
+
 - Requires network during init (acceptable for one-time setup)
 - Dependency on GitHub availability (agents need network anyway)
 - No offline init (manual config documented as alternative)
 
 **Update workflow:**
+
 - Model names stale? Update TOML file in repo
 - New agent released? Add new config file
 - Flag changes? Update command template
 - No code changes or releases needed
 
 **Community benefits:**
+
 - Easy to contribute new agent configs (PR a TOML file)
 - Clear separation: code vs configuration data
 - Living documentation (configs show current best practices)

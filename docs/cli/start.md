@@ -15,6 +15,7 @@ start [flags]
 Launches an AI agent with automatically detected project context. Reads ALL configured context documents (both required and optional), builds an intelligent initial prompt, and delegates to the configured AI agent tool (claude, gemini, etc.).
 
 **Context document behavior:**
+
 - Includes ALL context documents (required + optional)
 - Missing files are skipped with notification
 - Use `start prompt` for required documents only
@@ -25,15 +26,16 @@ This is the primary command for launching an AI session with full context. For c
 
 These flags work on all `start` commands.
 
-**--agent** *name*
+**--agent** _name_
 : Which agent to use. Overrides default agent from config.
 
 ```bash
 start --agent gemini
 ```
 
-**--model** *alias|name*
+**--model** _alias|name_
 : Model to use. Accepts either:
+
 - Model alias: User-defined aliases from agent's config (e.g., `sonnet`, `haiku`, `opus`)
 - Full model name: Complete model identifier (e.g., `claude-3-5-haiku-20241022`, `gemini-2.0-flash-exp`)
 
@@ -42,7 +44,7 @@ start --model sonnet                    # Use alias from config
 start --model claude-3-5-haiku-20241022 # Use specific model
 ```
 
-**--directory** *path*, **-d** *path*
+**--directory** _path_, **-d** _path_
 : Working directory for context detection. Relative paths in config resolve to this directory. Default: current directory (pwd).
 
 ```bash
@@ -86,6 +88,7 @@ start -d ~/my-project
 Context documents appear in the prompt in the **order they are defined in the config file**.
 
 **Example config:**
+
 ```toml
 [context.documents.environment]  # First
 path = "~/reference/ENVIRONMENT.md"
@@ -105,6 +108,7 @@ prompt = "Read {file} for current project status."
 ```
 
 **Resulting prompt order:**
+
 ```
 Read ~/reference/ENVIRONMENT.md for environment context.
 Read ~/reference/INDEX.csv for documentation index.
@@ -113,6 +117,7 @@ Read ./PROJECT.md for current project status.
 ```
 
 **Controlling order:**
+
 - Rearrange document definitions in config file
 - TOML preserves declaration order within sections
 - No alphabetical or other automatic sorting
@@ -120,27 +125,32 @@ Read ./PROJECT.md for current project status.
 ### Model Flag Resolution
 
 **When using alias** (`--model sonnet`):
+
 1. Look up agent's `models.sonnet` value from config
 2. Use the resolved model name
 3. Error if alias not defined for agent
 
 **When using full model name** (`--model claude-3-5-haiku-20241022`):
+
 1. Use exact model name provided
 2. Bypass alias resolution
 3. Agent must support this model
 
 **When no `--model` flag**:
+
 1. Use agent's `default_model` alias from config
 2. Error if no default_model configured
 
 ### Verbosity Levels
 
 **--quiet** (minimal):
+
 ```
 (no output - launches agent directly)
 ```
 
 **Normal** (default):
+
 ```
 Starting AI Agent
 ===============================================================================================
@@ -159,6 +169,7 @@ Executing command...
 ```
 
 **--verbose** (detailed):
+
 ```
 Loading configuration...
   Global: ~/.config/start/config.toml
@@ -201,6 +212,7 @@ Executing command...
 ```
 
 **--debug** (everything):
+
 ```
 [DEBUG] Config loader initialized
 [DEBUG] Reading global config: ~/.config/start/config.toml
@@ -257,6 +269,7 @@ Executing command...
 ### Basic Usage
 
 Launch with default configuration:
+
 ```bash
 start
 ```
@@ -264,6 +277,7 @@ start
 ### Agent Selection
 
 Use specific agent:
+
 ```bash
 start --agent gemini
 start --agent opencode
@@ -272,6 +286,7 @@ start --agent opencode
 ### Model Selection
 
 Use model alias (from config):
+
 ```bash
 start --model haiku
 start --model sonnet
@@ -279,12 +294,14 @@ start --model opus
 ```
 
 Use full model name:
+
 ```bash
 start --model claude-3-5-haiku-20241022
 start --model gemini-2.0-flash-exp
 ```
 
 Combined with agent:
+
 ```bash
 start --agent claude --model sonnet
 ```
@@ -292,12 +309,14 @@ start --agent claude --model sonnet
 ### Directory Override
 
 Work from different directory:
+
 ```bash
 start --directory ~/my-project
 start -d ~/projects/work/api-server
 ```
 
 Useful when running from outside project:
+
 ```bash
 cd ~
 start --directory ~/my-project
@@ -306,18 +325,21 @@ start --directory ~/my-project
 ### Verbosity Control
 
 Quiet mode (no output):
+
 ```bash
 start --quiet
 start -q
 ```
 
 Verbose mode:
+
 ```bash
 start --verbose
 start -v
 ```
 
 Debug mode:
+
 ```bash
 start --debug
 ```
@@ -325,11 +347,13 @@ start --debug
 ### Combined Examples
 
 Full power:
+
 ```bash
 start --agent claude --model opus --directory ~/my-project --verbose
 ```
 
 Quick and quiet:
+
 ```bash
 start --agent gemini --model flash --quiet
 ```
@@ -343,20 +367,24 @@ See **Verbosity Levels** section above for detailed output examples.
 **0** - Success (agent launched successfully)
 
 **1** - Configuration error
+
 - Config file syntax error
 - Invalid TOML
 - Missing required fields
 
 **2** - Agent error
+
 - Agent not found in config
 - Agent command template invalid
 - Model tier not configured
 
 **3** - File error
+
 - Working directory doesn't exist
 - Config file permissions error
 
 **4** - Runtime error
+
 - Agent tool not installed
 - Agent command failed to execute
 
@@ -384,6 +412,7 @@ See **Verbosity Levels** section above for detailed output examples.
 ### Missing Config
 
 If no config files exist:
+
 ```
 Error: No configuration found.
 
@@ -395,6 +424,7 @@ Exit code: 1
 ### Invalid Agent
 
 If specified agent not in config:
+
 ```
 Error: Agent 'foo' not found in configuration.
 
@@ -411,6 +441,7 @@ Exit code: 2
 ### Invalid Model Alias
 
 If alias not configured for agent:
+
 ```
 Error: Model alias 'pro' not configured for agent 'gemini'.
 
@@ -426,6 +457,7 @@ Exit code: 2
 ### Agent Tool Not Found
 
 If agent binary not in PATH:
+
 ```
 Error: Agent tool 'gemini' not found.
 
@@ -439,6 +471,7 @@ Exit code: 4
 ### Invalid Working Directory
 
 If `--directory` path doesn't exist:
+
 ```
 Error: Working directory not found: ~/nonexistent
 
@@ -454,6 +487,7 @@ Exit code: 3
 **No context documents configured:**
 
 If the `[context.documents]` section is empty or missing:
+
 ```
 Context documents: (none configured)
 ```
@@ -463,6 +497,7 @@ The agent launches with no context document instructions - only system prompt (i
 **No system prompt:**
 
 If `[context.system_prompt]` is not configured or the file doesn't exist:
+
 ```
 System prompt: (none)
 ```
@@ -472,6 +507,7 @@ The agent launches without a system prompt. This is valid - not all agents requi
 **No configuration files:**
 
 If neither global (`~/.config/start/config.toml`) nor local (`./.start/config.toml`) exists:
+
 ```
 Error: No configuration found.
 
@@ -481,6 +517,7 @@ Run 'start init' to create initial configuration.
 **Local config only:**
 
 If local `./.start/config.toml` exists but no global config:
+
 ```
 Error: No global configuration found at ~/.config/start/config.toml
 
@@ -493,6 +530,7 @@ Note: Agents must be defined in global config (per DR-004). Local config alone i
 **All context documents missing:**
 
 If all configured documents don't exist:
+
 ```
 Context documents:
   ✗ environment    ~/reference/ENVIRONMENT.md (not found)
@@ -530,14 +568,17 @@ required = false   # Optional - included by start, excluded by start prompt
 ```
 
 **Behavior by command:**
+
 - `start` (root) → Includes ALL documents (required + optional)
 - `start prompt` → Includes ONLY required documents
 - `start task` → Includes documents specified in task's `documents` array (ignores required field)
 
 **Default value:**
+
 - If `required` field is omitted, defaults to `false` (optional)
 
 **Document order:**
+
 - Documents appear in prompt in the order defined in config file
 - See "Document Order" section above for details
 
@@ -546,6 +587,7 @@ required = false   # Optional - included by start, excluded by start prompt
 The `--model` flag overrides the default model but respects the agent. Each agent has its own model aliases defined in config.
 
 **Agent-specific aliases:**
+
 - Claude: `haiku`, `sonnet`, `opus`
 - Gemini: `flash`, `pro-exp`
 - Other agents: user-defined
@@ -567,6 +609,7 @@ start --agent claude --model claude-opus-4-20250514  # Agent must support this
 ### Tilde Expansion
 
 Paths with `~` are expanded to user's home directory. This happens for:
+
 - Config paths
 - Context document paths
 - System prompt path
@@ -575,6 +618,7 @@ Paths with `~` are expanded to user's home directory. This happens for:
 ### Relative Path Resolution
 
 Relative paths in config (e.g., `./AGENTS.md`) resolve relative to:
+
 - Working directory (default: `pwd`)
 - `--directory` path if specified
 

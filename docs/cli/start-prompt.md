@@ -15,15 +15,18 @@ start prompt [text] [flags]
 Launches an AI agent with an optional custom prompt combined with required project context documents. This is useful for one-off queries or exploratory sessions.
 
 **Context document behavior:**
+
 - Only **required** context documents are included (documents with `required = true`)
 - Optional documents (default behavior) are excluded
 - This keeps the prompt focused for specific queries
 
 **The final prompt sent to the agent:**
+
 1. Required context document instructions (from config)
 2. Your custom prompt text (if provided, appended last)
 
 **If you want ONLY a custom prompt with no context:**
+
 - Don't use `start` - use your agent directly: `claude "your prompt"`
 
 ## Arguments
@@ -40,13 +43,13 @@ start prompt  # Launch with required context only, no custom prompt
 
 All global flags from `start` command are supported:
 
-**--agent** *name*
+**--agent** _name_
 : Which agent to use
 
-**--model** *tier|name*
+**--model** _tier|name_
 : Model to use (tier name or full model name)
 
-**--directory** *path*, **-d** *path*
+**--directory** _path_, **-d** _path_
 : Working directory for context detection
 
 **--quiet**, **-q**
@@ -90,12 +93,14 @@ Read /Users/gcarthew/Projects/my-app/AGENTS.md for repository overview.
 ```
 
 **Note:**
+
 - Only documents with `required = true` are included
 - Documents appear in config definition order
 - Document prompts come from your config's `prompt` field with `{file}` replaced by actual paths
 - Custom prompt is appended LAST
 
 Example config:
+
 ```toml
 [context.documents.environment]
 path = "~/reference/ENVIRONMENT.md"
@@ -135,16 +140,19 @@ start prompt "analyze this codebase"
 ### Basic Usage
 
 No custom prompt (required context only):
+
 ```bash
 start prompt
 ```
 
 Simple prompt with required context:
+
 ```bash
 start prompt "analyze security vulnerabilities"
 ```
 
 Multi-line prompt (using quotes):
+
 ```bash
 start prompt "Review this codebase and:
 1. Identify security issues
@@ -155,6 +163,7 @@ start prompt "Review this codebase and:
 ### With Agent Selection
 
 Use specific agent:
+
 ```bash
 start prompt "review the API design" --agent gemini
 start prompt "optimize this algorithm" --agent claude
@@ -163,12 +172,14 @@ start prompt "optimize this algorithm" --agent claude
 ### With Model Selection
 
 Use specific model tier:
+
 ```bash
 start prompt "quick code review" --model fast
 start prompt "comprehensive analysis" --model pro
 ```
 
 Use full model name:
+
 ```bash
 start prompt "review auth flow" --model claude-opus-4-20250514
 ```
@@ -176,6 +187,7 @@ start prompt "review auth flow" --model claude-opus-4-20250514
 ### With Directory Override
 
 Analyze different project:
+
 ```bash
 start prompt "what is this project about?" --directory ~/other-project
 ```
@@ -183,11 +195,13 @@ start prompt "what is this project about?" --directory ~/other-project
 ### Combined Flags
 
 Full example:
+
 ```bash
 start prompt "security audit" --agent claude --model pro --directory ~/api-server --verbose
 ```
 
 Quiet mode:
+
 ```bash
 start prompt "review error handling" --quiet
 ```
@@ -289,11 +303,13 @@ start prompt "review memory usage patterns"
 ### vs `start` (root command)
 
 **`start`** - ALL context documents (required + optional), no custom prompt
+
 ```bash
 start  # Launches with all context documents
 ```
 
 **`start prompt`** - ONLY required context documents, optional custom prompt
+
 ```bash
 start prompt                      # Required context only, no custom prompt
 start prompt "analyze security"   # Required context + custom prompt
@@ -304,22 +320,26 @@ start prompt "analyze security"   # Required context + custom prompt
 ### vs `start task`
 
 **`start prompt`** - One-off custom prompt with required context
+
 ```bash
 start prompt "review this specific function"
 ```
 
 **`start task`** - Reusable workflow with predefined prompt template and configurable documents
+
 ```bash
 start task code-review  # Uses predefined template and specified documents
 ```
 
 **When to use `start prompt`:**
+
 - Exploratory questions with minimal context
 - One-off analysis
 - Custom requests not covered by tasks
 - When you want required context only (not all documents)
 
 **When to use `start task`:**
+
 - Repeatable workflows
 - Standardized reviews
 - When you want dynamic content (e.g., git diff)
@@ -335,6 +355,7 @@ start task code-review  # Uses predefined template and specified documents
 **To include all documents:** Use `start` (root command) instead.
 
 **To include no documents:** Use your agent directly:
+
 ```bash
 claude "your prompt here"
 gemini "your prompt here"
@@ -345,11 +366,13 @@ gemini "your prompt here"
 ### Prompt Length Limits
 
 Be aware of:
+
 - Shell command line length limits (~100KB on most systems)
 - Agent-specific prompt length limits
 - Model context windows
 
 Very long prompts may need to be:
+
 - Split into multiple messages
 - Put into a file and referenced via task's `content_command`
 - Sent through the agent's native interface instead

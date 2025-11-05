@@ -10,7 +10,6 @@
 - I want it to be able to use a prompt writer prompt to create role documents on the fly
 - I want to support common workflows such as a "git diff review" and others.
 
-
 Tasks:
 
 - git diff review

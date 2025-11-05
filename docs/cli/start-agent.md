@@ -20,6 +20,7 @@ start agent default [name]
 Manages AI agent configurations in the global config file (`~/.config/start/config.toml`). Agents define how `start` delegates to different AI tools (claude, gemini, aichat, etc.).
 
 **Agent management operations:**
+
 - **list** - Display all configured agents with details
 - **add** - Add new agent interactively
 - **test** - Test agent configuration and availability
@@ -74,6 +75,7 @@ default_model = "sonnet"
 Display all configured agents with their details.
 
 **Synopsis:**
+
 ```bash
 start agent list
 ```
@@ -81,6 +83,7 @@ start agent list
 **Behavior:**
 
 Lists all agents defined in `~/.config/start/config.toml` with:
+
 - Agent name
 - Description
 - Documentation URL
@@ -142,6 +145,7 @@ use 'start agent add' to add an agent manually.
 ```
 
 **Exit codes:**
+
 - 0 - Success (agents listed)
 - 1 - No config file exists
 
@@ -150,6 +154,7 @@ use 'start agent add' to add an agent manually.
 Interactively add a new agent to the global configuration.
 
 **Synopsis:**
+
 ```bash
 start agent add
 ```
@@ -159,34 +164,41 @@ start agent add
 Prompts for agent details and adds to `~/.config/start/config.toml`:
 
 1. **Agent name** (required)
+
    - Validation: lowercase alphanumeric with hyphens
    - Pattern: `/^[a-z0-9]+(-[a-z0-9]+)*$/`
    - Must be unique (not already exist)
    - Examples: `claude`, `gemini`, `my-custom-agent`
 
 2. **Description** (optional)
+
    - Human-readable description
    - Press enter to skip
 
 3. **URL** (optional)
+
    - Documentation or homepage URL
    - Press enter to skip
 
 4. **Models URL** (optional)
+
    - Model documentation URL
    - Press enter to skip
 
 5. **Command template** (required)
+
    - Must contain `{prompt}` placeholder
    - Warns on unknown placeholders (typos)
    - Valid placeholders: `{model}`, `{system_prompt}`, `{prompt}`, `{date}`
 
 6. **Add models?** (yes/no)
+
    - If yes, loop to add multiple models
    - Each model: alias name + full model name
    - Type "done" to finish adding models
 
 7. **Default model** (if models added)
+
    - Shows numbered list of added models
    - Select which to use as default
    - Can skip (uses first model)
@@ -287,6 +299,7 @@ command = "simple-agent '{prompt}'"
 ```
 
 **Exit codes:**
+
 - 0 - Success (agent added)
 - 1 - Validation error (invalid name, duplicate agent, invalid command)
 - 3 - File system error (cannot write config, backup failed)
@@ -294,6 +307,7 @@ command = "simple-agent '{prompt}'"
 **Error handling:**
 
 **Invalid agent name:**
+
 ```
 Agent name: My-Agent
 ✗ Invalid agent name. Use lowercase alphanumeric with hyphens.
@@ -304,6 +318,7 @@ Agent name: my-agent
 ```
 
 **Duplicate agent:**
+
 ```
 Agent name: claude
 ✗ Agent 'claude' already exists.
@@ -314,6 +329,7 @@ Use 'start agent edit claude' to modify existing agent.
 Exit code: 1
 
 **Invalid command template (missing {prompt}):**
+
 ```
 Command template: my-agent --model {model}
 ✗ Command template must contain {prompt} placeholder.
@@ -324,6 +340,7 @@ Command template: my-agent --model {model} '{prompt}'
 ```
 
 **Unknown placeholder warning:**
+
 ```
 Command template: my-agent --model {mdoel} '{prompt}'
 ⚠ Warning: Unknown placeholder {mdoel} (did you mean {model}?)
@@ -336,6 +353,7 @@ Command template: my-agent --model {model} '{prompt}'
 ```
 
 **Backup failed:**
+
 ```
 Backing up config to config.2025-01-04-143022.toml...
 ✗ Failed to backup config: permission denied
@@ -351,6 +369,7 @@ Exit code: 3
 Test agent configuration and availability.
 
 **Synopsis:**
+
 ```bash
 start agent test <name>
 ```
@@ -360,10 +379,12 @@ start agent test <name>
 Validates agent configuration without executing it. Performs three checks:
 
 1. **Binary availability**
+
    - Uses Go's `exec.LookPath()` to check if agent binary is in PATH
    - Reports: found (with path) or not found
 
 2. **Configuration validation**
+
    - Command template contains required `{prompt}` placeholder
    - Unknown placeholders detected (likely typos)
    - Model aliases defined (if `{model}` used in template)
@@ -506,6 +527,7 @@ Dry-run command:
 ```
 
 **Exit codes:**
+
 - 0 - Success (agent valid and binary found)
 - 1 - Configuration error (invalid config)
 - 2 - Agent not found in config
@@ -514,6 +536,7 @@ Dry-run command:
 **Error handling:**
 
 **Agent not in config:**
+
 ```
 Error: Agent 'nonexistent' not found in configuration.
 
@@ -524,6 +547,7 @@ Use 'start agent add' to add a new agent.
 Exit code: 2
 
 **Multiple errors:**
+
 ```
 Testing agent: broken
 ─────────────────────────────────────────────────
@@ -548,6 +572,7 @@ Exit code: 1 (configuration errors take precedence over binary not found)
 Edit agent configuration interactively.
 
 **Synopsis:**
+
 ```bash
 start agent edit              # Select from list
 start agent edit <name>       # Edit specific agent
@@ -564,6 +589,7 @@ start agent edit
 ```
 
 Output:
+
 ```
 Edit agent
 ─────────────────────────────────────────────────
@@ -684,6 +710,7 @@ Saving changes to ~/.config/start/config.toml...
 ```
 
 **Exit codes:**
+
 - 0 - Success (agent edited)
 - 1 - Validation error (invalid name, invalid command)
 - 2 - Agent not found
@@ -692,6 +719,7 @@ Saving changes to ~/.config/start/config.toml...
 **Error handling:**
 
 **Agent not found:**
+
 ```
 Error: Agent 'nonexistent' not found in configuration.
 
@@ -702,6 +730,7 @@ Use 'start agent add' to add a new agent.
 Exit code: 2
 
 **Invalid command template (missing {prompt}):**
+
 ```
 Command template [claude --model {model}]: claude --other-flag
 ✗ Command template must contain {prompt} placeholder.
@@ -712,6 +741,7 @@ Command template [claude --model {model}]: claude --model {model} '{prompt}'
 ```
 
 **Unknown placeholder warning:**
+
 ```
 Command template [claude '{prompt}']: claude --model {mdoel} '{prompt}'
 ⚠ Warning: Unknown placeholder {mdoel} (did you mean {model}?)
@@ -726,11 +756,13 @@ Command template [claude '{prompt}']: claude --model {model} '{prompt}'
 **Model management details:**
 
 **Adding models:**
+
 - Validates alias name (same rules as agent names: lowercase, alphanumeric, hyphens)
 - Doesn't validate full model name (too variable across agents)
 - Detects duplicate aliases
 
 **Removing models:**
+
 ```
 Remove models? [y/N]: y
 
@@ -745,6 +777,7 @@ Select models to remove (space to select, enter to continue):
 If default_model is removed, user must select new default from remaining models.
 
 **No changes made:**
+
 ```
 No changes detected.
 
@@ -758,6 +791,7 @@ Exit code: 0 (no backup created, no write)
 Remove agent from global configuration.
 
 **Synopsis:**
+
 ```bash
 start agent remove           # Select from list
 start agent remove <name>    # Remove specific agent
@@ -799,6 +833,7 @@ start agent remove gemini
 ```
 
 Output:
+
 ```
 Remove agent 'gemini'? [y/N]: y
 
@@ -820,6 +855,7 @@ start agent remove claude
 ```
 
 Output:
+
 ```
 ⚠ Warning: 'claude' is currently your default agent.
 
@@ -839,6 +875,7 @@ Use 'start agent list' to see remaining agents.
 ```
 
 **Behavior when removing default:**
+
 - Removes agent from config
 - Removes `default_agent` setting from `[settings]` section
 - `start` command will use first agent in config (TOML order)
@@ -855,6 +892,7 @@ Agent 'gemini' not removed.
 Exit code: 0
 
 **Exit codes:**
+
 - 0 - Success (agent removed, or user declined)
 - 1 - No agents configured
 - 2 - Agent not found
@@ -863,6 +901,7 @@ Exit code: 0
 **Error handling:**
 
 **Agent not found:**
+
 ```
 Error: Agent 'nonexistent' not found in configuration.
 
@@ -872,6 +911,7 @@ Use 'start agent list' to see available agents.
 Exit code: 2
 
 **No agents configured:**
+
 ```
 No agents configured.
 
@@ -881,6 +921,7 @@ Use 'start agent add' to add an agent.
 Exit code: 1
 
 **Only one agent configured:**
+
 ```
 Warning: 'claude' is the only configured agent.
 
@@ -898,6 +939,7 @@ Use 'start init' to set up agents automatically.
 ```
 
 **Backup failed:**
+
 ```
 Remove agent 'gemini'? [y/N]: y
 
@@ -915,6 +957,7 @@ Exit code: 3
 Set default agent interactively or directly.
 
 **Synopsis:**
+
 ```bash
 start agent default          # Select from list
 start agent default <name>   # Set specific default
@@ -931,6 +974,7 @@ start agent default
 ```
 
 Output:
+
 ```
 Set default agent
 ─────────────────────────────────────────────────
@@ -955,6 +999,7 @@ Use 'start' to launch with new default.
 ```
 
 **If no default_agent currently set:**
+
 ```
 Set default agent
 ─────────────────────────────────────────────────
@@ -980,6 +1025,7 @@ Use 'start' to launch with new default.
 ```
 
 **Quitting without changes:**
+
 ```
 Select [1-4] (or 'q' to quit): q
 
@@ -997,6 +1043,7 @@ start agent default gemini
 ```
 
 Output:
+
 ```
 Backing up config to config.2025-01-04-151023.toml...
 ✓ Backup created
@@ -1009,11 +1056,13 @@ Use 'start agent default' to confirm.
 ```
 
 **Updating existing default:**
+
 ```bash
 start agent default opus
 ```
 
 Output:
+
 ```
 Current default: claude
 
@@ -1027,6 +1076,7 @@ Use 'start' to launch with new default.
 ```
 
 **Exit codes:**
+
 - 0 - Success (default shown or set)
 - 1 - No agents configured
 - 2 - Agent not found
@@ -1035,6 +1085,7 @@ Use 'start' to launch with new default.
 **Error handling:**
 
 **Agent not found:**
+
 ```
 Error: Agent 'nonexistent' not found in configuration.
 
@@ -1049,6 +1100,7 @@ Use 'start agent list' for details.
 Exit code: 2
 
 **No agents configured:**
+
 ```
 Error: No agents configured.
 
@@ -1088,6 +1140,7 @@ start agent list --verbose
 ```
 
 Output:
+
 ```
 Loading configuration from: ~/.config/start/config.toml
 
@@ -1143,6 +1196,7 @@ Exit code: 1
 Per DR-004, agents are defined only in the global config (`~/.config/start/config.toml`). Local project configs (`./.start/config.toml`) cannot define or override agents.
 
 **Rationale:**
+
 - Agents are tools installed system-wide
 - Agent names are the actual tool names (claude, gemini, etc.)
 - Simplifies configuration management
@@ -1151,11 +1205,13 @@ Per DR-004, agents are defined only in the global config (`~/.config/start/confi
 ### Default Model Behavior
 
 When `default_model` is omitted:
+
 1. Uses first model in `[agents.<name>.models]` table
 2. TOML preserves declaration order within tables
 3. If no models defined, agent must be used with `--model <full-name>`
 
 **Example:**
+
 ```toml
 [agents.claude]
 command = "claude --model {model} '{prompt}'"
@@ -1171,6 +1227,7 @@ Default model: `claude-3-5-haiku-20241022` (haiku)
 ### Model Aliases
 
 Model aliases are agent-specific and user-defined:
+
 - Not hardcoded (no enforced tier names)
 - Each agent defines its own aliases
 - Aliases can be any meaningful name (haiku, sonnet, opus, flash, quick, best, etc.)
@@ -1188,6 +1245,7 @@ Agent commands support these placeholders:
 - `{date}` - Current timestamp (ISO 8601)
 
 **Example templates:**
+
 ```toml
 # Placeholder in flag value
 command = "claude --model {model} '{prompt}'"

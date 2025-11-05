@@ -17,6 +17,7 @@ start task <name> [instructions] [flags]
 Executes predefined AI workflow tasks configured in `config.toml`. Tasks are reusable workflows with specific roles, prompt templates, context documents, and optional dynamic content from shell commands.
 
 **Task components:**
+
 - **Role** - System prompt specific to the task
 - **Documents** - Subset of context documents to include
 - **Content command** - Optional shell command (e.g., `git diff --staged`)
@@ -24,6 +25,7 @@ Executes predefined AI workflow tasks configured in `config.toml`. Tasks are reu
 - **Alias** - Optional short name for quick access
 
 **Common use cases:**
+
 - Code reviews with specific focus
 - Git diff analysis
 - Documentation reviews
@@ -54,14 +56,14 @@ start task code-review "check error handling"
 
 All global flags from `start` command are supported except `--quiet`.
 
-**--agent** *name*
+**--agent** _name_
 : Override agent for this task. Overrides task's agent setting and default agent.
 
 ```bash
 start task code-review --agent gemini
 ```
 
-**--model** *alias|name*
+**--model** _alias|name_
 : Model to use. Accepts either model alias or full model name.
 
 ```bash
@@ -69,7 +71,7 @@ start task gdr --model opus
 start task gdr --model claude-opus-4-20250514
 ```
 
-**--directory** *path*, **-d** *path*
+**--directory** _path_, **-d** _path_
 : Working directory for context detection and content_command execution.
 
 ```bash
@@ -84,6 +86,7 @@ start task gdr --directory ~/my-project
 
 **--help**, **-h**
 : Show help. Behavior depends on usage:
+
 - `start task --help` - Show general task command help
 - `start task <name> --help` - Show specific task configuration and usage
 
@@ -145,7 +148,7 @@ Displays task configuration including role, documents, content command, and usag
 
 Tasks are defined in `config.toml`:
 
-```toml
+````toml
 [task.git-diff-review]
 alias = "gdr"
 description = "Review git diff changes"
@@ -161,9 +164,11 @@ Review the following changes:
 ## Changes
 ```diff
 {content}
-```
+````
+
 """
-```
+
+````
 
 See [task.md](../task.md) for complete configuration documentation.
 
@@ -173,9 +178,10 @@ See [task.md](../task.md) for complete configuration documentation.
 
 ```bash
 start task
-```
+````
 
 Output:
+
 ```
 Available tasks:
   code-review (cr)      - Review code for quality and best practices
@@ -194,6 +200,7 @@ start task code-review
 ```
 
 Output:
+
 ```
 Starting Task: code-review
 ===============================================================================================
@@ -235,6 +242,7 @@ start task git-diff-review
 ```
 
 Output:
+
 ```
 Starting Task: git-diff-review
 ===============================================================================================
@@ -281,6 +289,7 @@ start task code-review --help
 ```
 
 Output:
+
 ```
 Task: code-review (alias: cr)
 
@@ -307,6 +316,7 @@ start task gdr --verbose
 ```
 
 Output:
+
 ```
 Loading configuration...
   Global: ~/.config/start/config.toml
@@ -404,21 +414,25 @@ See: https://github.com/grantcarthew/start#tasks
 **0** - Success (task executed successfully)
 
 **1** - Configuration error
+
 - No tasks configured
 - Invalid task configuration
 - Config file syntax error
 
 **2** - Task/agent error
+
 - Task not found
 - Agent not found in config
 - Model not configured
 
 **3** - File error
+
 - Role file not found
 - Working directory doesn't exist
 - Config file permissions error
 
 **4** - Runtime error
+
 - Content command failed
 - Agent tool not installed
 - Agent command execution failed
@@ -497,6 +511,7 @@ Exit code: 1
 ### Task vs Root Command Differences
 
 **`start task <name>`:**
+
 - Uses task's specific role (not `[context.system_prompt]`)
 - Includes only documents listed in task's `documents` array
 - Can run content_command for dynamic content
@@ -504,6 +519,7 @@ Exit code: 1
 - `{instructions}` placeholder available
 
 **`start` (root):**
+
 - Uses `[context.system_prompt]` (if configured)
 - Includes ALL context documents (required + optional)
 - No content_command
@@ -515,10 +531,12 @@ Exit code: 1
 Task prompt templates support these placeholders:
 
 **Task-specific:**
+
 - `{instructions}` - User's command-line arguments (or "None")
 - `{content}` - Output from content_command (or empty string)
 
 **Global:**
+
 - `{model}` - Model name
 - `{system_prompt}` - Role file contents
 - `{date}` - Current timestamp (ISO 8601)
@@ -527,12 +545,14 @@ Task prompt templates support these placeholders:
 ### Document Handling
 
 **Document resolution:**
+
 1. Task specifies: `documents = ["environment", "agents", "project"]`
 2. Each name resolves to `[context.documents.<name>]` section in config
 3. If document name not found in config → skip silently (no error)
 4. If document file doesn't exist → skip with status display (same as `start` command)
 
 **Document order in prompt:**
+
 - Documents appear in order specified in task's `documents` array
 - Document prompts appear BEFORE task's prompt template
 - Example: environment prompts, agents prompts, then task prompt
@@ -540,10 +560,12 @@ Task prompt templates support these placeholders:
 ### Role File Location
 
 By convention, task role files are stored in:
+
 - Global: `~/.config/start/tasks/*.md`
 - Local (per-project): `./.start/tasks/*.md` or `./tasks/*.md`
 
 Example task configuration:
+
 ```toml
 [task.code-review]
 role = "./tasks/code-reviewer.md"  # Project-specific role
@@ -552,6 +574,7 @@ role = "~/.config/start/tasks/code-reviewer.md"  # Shared role
 ```
 
 Role can also be inline:
+
 ```toml
 [task.quick-review]
 role = """
@@ -563,17 +586,20 @@ Focus on critical issues only.
 ### Content Command Execution
 
 **Working directory:**
+
 - Defaults to current directory (`pwd`)
 - Override with `--directory` flag
 - Paths in config resolve relative to working directory
 
 **Command execution:**
+
 - Runs in shell (same as `bash -c "command"`)
 - Environment variables inherited
 - Timeout: None (command runs to completion)
 - Exit code: Non-zero = error and task stops
 
 **Common content commands:**
+
 - `git diff --staged` - Staged changes
 - `git diff HEAD~1` - Last commit
 - `git log --oneline -n 10` - Recent commits
@@ -590,6 +616,7 @@ Focus on critical issues only.
 4. **doc-review (dr)** - Documentation review
 
 **Customization:**
+
 - Override defaults by defining tasks with same name in config
 - Add custom tasks
 - Tasks defined in local `./.start/config.toml` override global
@@ -597,11 +624,13 @@ Focus on critical issues only.
 ### Task Discovery
 
 Tasks are discovered from:
+
 1. Default tasks (embedded in binary)
 2. Global config: `~/.config/start/config.toml`
 3. Local config: `./.start/config.toml`
 
 **Merge behavior:**
+
 - Local tasks override global tasks (same name)
 - All tasks from all sources combined
 - Alphabetically sorted in task list
@@ -609,18 +638,23 @@ Tasks are discovered from:
 ### Instructions Handling
 
 **With instructions:**
+
 ```bash
 start task gdr "focus on security"
 ```
+
 `{instructions}` → `"focus on security"`
 
 **Without instructions:**
+
 ```bash
 start task gdr
 ```
+
 `{instructions}` → `"None"`
 
 **Multi-word instructions:**
+
 ```bash
 # ✓ Correct - quoted
 start task gdr "check error handling and logging"
@@ -634,6 +668,7 @@ start task gdr check error handling
 The `--quiet` flag is accepted but silently ignored for tasks. Tasks always display summary output before launching the agent.
 
 **Rationale:**
+
 - Tasks involve dynamic content (content_command output)
 - Users need visibility into what content is being analyzed
 - Summary is already concise

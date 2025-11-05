@@ -15,6 +15,7 @@ start init [flags]
 Interactive wizard to create initial `start` configuration. Detects installed AI agents, fetches current agent configurations from GitHub, and creates a working config file.
 
 **What init does:**
+
 1. Checks for existing configuration (offers backup if found)
 2. Fetches latest agent configurations from GitHub
 3. Auto-detects installed agents in PATH
@@ -24,6 +25,7 @@ Interactive wizard to create initial `start` configuration. Detects installed AI
 7. Adds default context document configuration
 
 **When to run init:**
+
 - First time setup
 - Reset configuration to defaults
 - Add newly installed agents
@@ -54,6 +56,7 @@ start init --force
 ### Execution Flow
 
 **With existing config:**
+
 1. Check if `~/.config/start/config.toml` exists
 2. Prompt: "Backup and reinitialize? [y/N]"
    - If N: Exit with message
@@ -62,6 +65,7 @@ start init --force
 4. Continue to main wizard
 
 **Main wizard:**
+
 1. Fetch agent configs from GitHub (`assets/agents/*.toml`)
    - Timeout: 10 seconds
    - Endpoint: `https://api.github.com/repos/grantcarthew/start/contents/assets/agents`
@@ -80,6 +84,7 @@ start init --force
 
 **Default context documents:**
 These documents are always added to the config:
+
 1. `~/reference/ENVIRONMENT.md` (required = true)
 2. `~/reference/INDEX.csv`
 3. `./AGENTS.md`
@@ -101,32 +106,38 @@ command -v aichat      # Not found
 ```
 
 **Auto-configuration:**
+
 - All detected agents are automatically configured
 - No user prompt for detected agents
 - Fetched configs from GitHub provide command templates and model aliases
 
 **Unknown agents:**
 If `command -v` finds a binary but no config exists in GitHub:
+
 - Agent is skipped
 - User can select "Other..." to see manual configuration docs
 
 ### GitHub Fetch Details
 
 **API endpoint:**
+
 ```
 GET https://api.github.com/repos/grantcarthew/start/contents/assets/agents
 ```
 
 **Fetched for each agent:**
+
 - Command template with placeholders
 - Model aliases mapping
 - Default model selection
 
 **Rate limits:**
+
 - Unauthenticated: 60 requests/hour
 - Init uses 1-2 requests total
 
 **Timeout:**
+
 - 10 seconds for API calls
 - Error and exit if timeout reached
 
@@ -139,6 +150,7 @@ start init
 ```
 
 Output:
+
 ```
 Welcome to start!
 
@@ -187,6 +199,7 @@ start init
 ```
 
 Output:
+
 ```
 Configuration already exists at ~/.config/start/config.toml
 
@@ -214,6 +227,7 @@ start init --verbose
 ```
 
 Output:
+
 ```
 Checking for existing configuration...
   Path: ~/.config/start/config.toml
@@ -300,15 +314,18 @@ No config file created. Exit code: 0
 **0** - Success (config created or user chose not to proceed)
 
 **1** - Configuration error
+
 - Invalid TOML from GitHub
 - Config validation failed
 
 **3** - File system error
+
 - Cannot create config directory
 - Cannot write config file
 - Backup failed
 
 **4** - Network/runtime error
+
 - Cannot reach GitHub
 - API timeout (10 seconds)
 - GitHub API rate limit exceeded
@@ -319,6 +336,7 @@ No config file created. Exit code: 0
 ### Network Errors
 
 **Cannot reach GitHub:**
+
 ```
 Error: Failed to fetch agent configurations from GitHub.
 
@@ -330,6 +348,7 @@ See https://github.com/grantcarthew/start#configuration for manual setup.
 Exit code: 4
 
 **API timeout:**
+
 ```
 Error: Request to GitHub timed out (10 seconds).
 
@@ -339,6 +358,7 @@ Check your network connection and try again.
 Exit code: 4
 
 **GitHub API rate limit:**
+
 ```
 Error: GitHub API rate limit exceeded.
 
@@ -351,6 +371,7 @@ Exit code: 4
 ### File System Errors
 
 **Cannot create config directory:**
+
 ```
 Error: Failed to create config directory: ~/.config/start/
 
@@ -360,6 +381,7 @@ Permission denied. Check directory permissions.
 Exit code: 3
 
 **Cannot write config file:**
+
 ```
 Error: Failed to write config file: ~/.config/start/config.toml
 
@@ -369,6 +391,7 @@ Permission denied. Check file permissions.
 Exit code: 3
 
 **Backup fails:**
+
 ```
 Error: Failed to backup existing config.
 
@@ -398,6 +421,7 @@ Init continues with other agents. Does not exit.
 ### First Time vs Reinitialize
 
 **Backup prompt behavior:**
+
 - Shown only if `~/.config/start/config.toml` exists
 - Skipped with `--force` flag
 - Answer 'N' exits gracefully (exit code 0)
@@ -468,11 +492,13 @@ prompt = "Read {file} for current project status."
 After running init:
 
 1. **Edit model aliases** - Update model names to current versions:
+
    ```bash
    start config edit
    ```
 
 2. **Create context documents** - Add the files referenced in config:
+
    ```bash
    # Example
    mkdir -p ~/reference
@@ -500,11 +526,13 @@ See: https://github.com/grantcarthew/start#configuration
 ### Re-running Init
 
 Running `start init` multiple times is safe:
+
 - Always prompts for backup (unless `--force`)
 - Previous backups preserved (timestamped)
 - Fetches latest agent configs from GitHub
 
 **Common reasons to re-run:**
+
 - Add newly installed agents
 - Reset to defaults after config errors
 - Update agent templates from GitHub
@@ -512,6 +540,7 @@ Running `start init` multiple times is safe:
 ### Agent Detection Limitations
 
 `command -v` only finds agents in PATH. If an agent is installed but not in PATH:
+
 - Not auto-detected
 - Select manually from "Additional agents" list
 - Or select "Other..." for custom configuration
@@ -519,11 +548,13 @@ Running `start init` multiple times is safe:
 ### GitHub Repository Structure
 
 Init fetches from:
+
 ```
 https://github.com/grantcarthew/start/tree/main/assets/agents/
 ```
 
 Repository structure:
+
 ```
 start/
 ├── assets/

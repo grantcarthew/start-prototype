@@ -16,7 +16,7 @@ Tasks allow you to run common AI-assisted workflows with a single command. Each 
 
 Tasks are defined in `config.toml`:
 
-```toml
+````toml
 [task.code-review]
 alias = "cr"
 description = "Review code changes"
@@ -45,7 +45,8 @@ Generate a commit message for the following changes.
 
 ```diff
 {content}
-```
+````
+
 """
 
 [task.git-diff-review]
@@ -66,8 +67,10 @@ Analyze the following git diff and act as a code reviewer.
 ```diff
 {content}
 ```
+
 """
-```
+
+````
 
 ## Configuration Fields
 
@@ -93,7 +96,7 @@ The `role` field supports two formats:
 ```toml
 [task.code-review]
 role = "./roles/code-reviewer.md"
-```
+````
 
 If the value is a valid file path, the file contents are used as the system prompt.
 
@@ -142,6 +145,7 @@ Task prompts support placeholders that get replaced at runtime:
 ### Task-Specific Placeholders
 
 - **{instructions}** - User's command-line arguments after task name
+
   - If no arguments: replaced with "None"
   - Usage: `start task gdr "focus on security"` → `{instructions}` = "focus on security"
 
@@ -152,6 +156,7 @@ Task prompts support placeholders that get replaced at runtime:
 ### Global Placeholders
 
 All global placeholders are also available:
+
 - **{model}** - Model name
 - **{system_prompt}** - System prompt content
 - **{date}** - Current timestamp
@@ -160,7 +165,7 @@ All global placeholders are also available:
 
 The optional `content_command` field runs a shell command and makes its output available via the `{content}` placeholder:
 
-```toml
+````toml
 [task.git-diff-review]
 content_command = "git diff --staged"
 prompt = """
@@ -168,9 +173,11 @@ Review this diff:
 
 ```diff
 {content}
-```
+````
+
 """
-```
+
+````
 
 The command runs in the working directory before the AI agent is launched.
 
@@ -192,7 +199,7 @@ suffix = "Read {file} for repository context."
 [task.code-review]
 role = "./roles/code-reviewer.md"
 documents = ["environment", "agents"]  # Include these two
-```
+````
 
 ## Usage
 
@@ -268,7 +275,9 @@ Generate changelog entries for the following commits.
 ## Recent Commits
 
 ```
+
 {content}
+
 ```
 
 Format the output as markdown suitable for CHANGELOG.md.
