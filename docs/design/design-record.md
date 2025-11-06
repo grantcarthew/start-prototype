@@ -27,6 +27,8 @@ See [vision.md](../vision.md) for the product vision and goals.
 | [DR-017](./decisions/dr-017-cli-reorganization.md) | CLI Command Reorganization | CLI Design | 2025-01-06 |
 | [DR-018](./decisions/dr-018-init-update-integration.md) | Init/Update Command Integration | Asset Management | 2025-01-06 |
 | [DR-019](./decisions/dr-019-task-loading.md) | Task Loading & Merging Algorithm | Tasks | 2025-01-06 |
+| [DR-020](./decisions/dr-020-version-injection.md) | Binary Version Injection Strategy | Build & Distribution | 2025-01-06 |
+| [DR-021](./decisions/dr-021-github-version-check.md) | GitHub Version Checking | Version Management | 2025-01-06 |
 
 ## By Category
 
@@ -69,18 +71,26 @@ Asset distribution and updates:
 - **[DR-016](./decisions/dr-016-asset-discovery.md)** - Each feature checks its own directory
 - **[DR-018](./decisions/dr-018-init-update-integration.md)** - Init and update share implementation
 
-### Distribution (DR-011, DR-013)
+### Build & Distribution (DR-011, DR-013, DR-020)
 
 How the tool and its content are distributed:
 
 - **[DR-011](./decisions/dr-011-asset-distribution.md)** - Assets fetched from GitHub, updateable without releases
 - **[DR-013](./decisions/dr-013-agent-templates.md)** - Agent configurations as GitHub content
+- **[DR-020](./decisions/dr-020-version-injection.md)** - Binary version via ldflags at build time
 
 ### Runtime Behavior (DR-008)
 
 How the tool behaves during execution:
 
 - **[DR-008](./decisions/dr-008-file-handling.md)** - Path resolution and missing file handling
+
+### Version Management (DR-020, DR-021)
+
+Version tracking and update checking:
+
+- **[DR-020](./decisions/dr-020-version-injection.md)** - Binary version via ldflags at build time
+- **[DR-021](./decisions/dr-021-github-version-check.md)** - GitHub Releases API check with no caching
 
 ## Key Patterns
 

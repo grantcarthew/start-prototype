@@ -4,11 +4,13 @@
 **Date Started:** 2025-01-03
 **Current Phase:** Asset management system design, CLI reorganization, implementation details
 
+**Working Mode:** Interactive design sessions - walk through each implementation task collaboratively, discussing design choices before creating design records.
+
 ## Overview
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (18 DRs) | [Tasks](./docs/tasks.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (21 DRs) | [Tasks](./docs/tasks.md)
 
 ## Command Status
 
@@ -40,7 +42,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ## Architecture Decisions
 
-### Completed (19 Design Records)
+### Completed (21 Design Records)
 
 **Core Configuration (DR-001 to DR-008):**
 - DR-001: TOML for configuration format
@@ -59,13 +61,15 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-012: Context document required field and order
 - DR-013: Agent configuration distribution via GitHub
 
-**Asset Management & CLI (DR-014 to DR-019):**
+**Asset Management & CLI (DR-014 to DR-021):**
 - DR-014: GitHub Tree API with SHA-based caching for incremental updates
 - DR-015: Atomic update mechanism with rollback capability
 - DR-016: Asset discovery - each feature checks its own directory
 - DR-017: CLI reorganization - `start config` for all configuration management
 - DR-018: Init and update command integration - shared implementation, no conditional logic
 - DR-019: Task loading and merging - global + local only, assets as templates, local precedence
+- DR-020: Binary version injection - ldflags at build time with git-based versioning
+- DR-021: GitHub version checking - Releases API with no caching, integrated into doctor and update commands
 
 **Implementation:**
 - Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
@@ -338,8 +342,8 @@ func UpdateAssets() error {
 - [x] **Task 12h:** Create `start-config-role.md` spec (NEW command)
 
 *Version Tracking & Checking:*
-- [ ] **Task 13a:** Define binary version source (build-time injection strategy)
-- [ ] **Task 13b:** Design GitHub version checking (API endpoint, rate limiting, caching)
+- [x] **Task 13a:** Define binary version source (build-time injection strategy) → DR-020: ldflags with git tags
+- [x] **Task 13b:** Design GitHub version checking (API endpoint, rate limiting, caching) → DR-021: Releases API, no caching
 - [ ] **Task 13c:** Define commit SHA retrieval strategy (releases vs commits)
 
 *Doctor Implementation:*
