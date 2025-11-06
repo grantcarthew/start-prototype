@@ -719,7 +719,7 @@ The `--quiet` flag is accepted but silently ignored for tasks. Tasks always disp
 
 **Rationale:**
 
-- Tasks involve dynamic content (content_command output)
+- Tasks involve dynamic content (command output)
 - Users need visibility into what content is being analyzed
 - Summary is already concise
 - Use `--verbose` or `--debug` for more detail if needed

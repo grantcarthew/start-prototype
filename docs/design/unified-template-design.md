@@ -481,13 +481,13 @@ command = "git status --short"
 prompt = "Repository state:\n{command}"
 ```
 
-### [tasks.\<name\>] - Role Field
+### [tasks.\<name\>] - System Prompt Override
 
 ```toml
 [tasks.code-review]
-role_file = "./roles/reviewer.md"
-role_command = "echo 'Focus on security'"
-role_prompt = """
+system_prompt_file = "./roles/reviewer.md"
+system_prompt_command = "echo 'Focus on security'"
+system_prompt = """
 {file}
 
 Special instructions: {command}
@@ -495,19 +495,20 @@ Special instructions: {command}
 # ... other task fields
 ```
 
-Note: Tasks use prefixed field names (`role_file`, `role_command`, `role_prompt`) to distinguish role UTD from task prompt UTD.
+Note: Tasks use prefixed field names (`system_prompt_file`, `system_prompt_command`, `system_prompt`) to distinguish system prompt UTD from task prompt UTD.
 
-### [tasks.\<name\>] - Prompt Field
+### [tasks.\<name\>] - Task Prompt
 
 ```toml
 [tasks.git-review]
 # Standard task prompt fields
-prompt_command = "git diff --staged"
-prompt_prompt = "Review this diff:\n{command}"
+file = "./prompts/review-template.md"
+command = "git diff --staged"
+prompt = "Review this diff:\n{command}"
 # ... other task fields
 ```
 
-Note: Tasks use prefixed field names (`prompt_file`, `prompt_command`, `prompt_prompt`).
+Note: Task prompt fields use standard UTD field names (`file`, `command`, `prompt`).
 
 ## Implementation Notes
 

@@ -169,8 +169,8 @@ Both create backups automatically if replacing existing config.
 6. Create config file structure:
    - `[settings]` section with default_agent
    - `[agents.*]` sections for each selected agent
-   - `[context.system_prompt]` section
-   - `[context.documents.*]` sections (4 default documents)
+   - `[system_prompt]` section
+   - `[context.*]` sections (4 default documents)
 7. Write config to `~/.config/start/config.toml`
 8. Display success message
 
@@ -606,24 +606,24 @@ default_model = "flash"
   flash = "gemini-2.0-flash-exp"
   pro-exp = "gemini-2.0-pro-exp"
 
-[context.system_prompt]
-path = "./ROLE.md"
+[system_prompt]
+file = "./ROLE.md"
 
-[context.documents.environment]
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true
 
-[context.documents.index]
-path = "~/reference/INDEX.csv"
+[context.index]
+file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 
-[context.documents.agents]
-path = "./AGENTS.md"
+[context.agents]
+file = "./AGENTS.md"
 prompt = "Read {file} for repository context."
 
-[context.documents.project]
-path = "./PROJECT.md"
+[context.project]
+file = "./PROJECT.md"
 prompt = "Read {file} for current project status."
 ```
 

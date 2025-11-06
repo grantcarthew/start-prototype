@@ -88,10 +88,10 @@ required = false
 
 # Roles
 [roles.coder]
-path = "~/.config/start/roles/coder.md"
+file = "~/.config/start/roles/coder.md"
 
 [roles.reviewer]
-path = "~/.config/start/roles/reviewer.md"
+file = "~/.config/start/roles/reviewer.md"
 ```
 
 ### Local Config (./.start/config.toml)
@@ -157,7 +157,7 @@ When both configs exist, the effective configuration combines them:
 
 **Purpose:**
 - Agent configurations (command templates, models)
-- Global settings (default agent, verbosity)
+- Global settings (default agent, log_level)
 - Shared context documents (ENVIRONMENT.md, INDEX.csv, etc.)
 - Role templates
 - User-wide defaults
@@ -988,10 +988,10 @@ required = false
 
 # Roles
 [roles.coder]
-path = "~/.config/start/roles/coder.md"
+file = "~/.config/start/roles/coder.md"
 
 [roles.reviewer]
-path = "~/.config/start/roles/reviewer.md"
+file = "~/.config/start/roles/reviewer.md"
 ```
 
 ### Local Config (./.start/config.toml)
@@ -999,7 +999,7 @@ path = "~/.config/start/roles/reviewer.md"
 ```toml
 # Project-specific settings
 [settings]
-verbosity = "verbose"
+log_level = "verbose"
 
 # Override system prompt for this project
 [system_prompt]
@@ -1028,7 +1028,7 @@ When both configs exist, the effective configuration is:
 
 **Settings:**
 - `default_agent = "claude"` (from global)
-- `verbosity = "verbose"` (from local, overrides global)
+- `log_level = "verbose"` (from local, overrides global)
 
 **Agents:**
 - claude, gemini, aichat (from global; local can override or add agents)
@@ -1089,7 +1089,7 @@ required = true
 
 # Nice to have, but not essential
 [context.changelog]
-path = "CHANGELOG.md"
+file = "CHANGELOG.md"
 prompt = "Recent changes in {file}"
 required = false
 ```
@@ -1142,7 +1142,7 @@ log_level = "normal"
 ```toml
 # Local: Override when needed
 [settings]
-verbosity = "verbose"  # This project needs detailed output
+log_level = "verbose"  # This project needs detailed output
 ```
 
 ### File Organization

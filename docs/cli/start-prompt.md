@@ -46,8 +46,8 @@ All global flags from `start` command are supported:
 **--agent** _name_
 : Which agent to use
 
-**--model** _tier|name_
-: Model to use (tier name or full model name)
+**--model** _alias|name_
+: Model to use (alias or full model name)
 
 **--directory** _path_, **-d** _path_
 : Working directory for context detection
@@ -102,23 +102,23 @@ Read /Users/gcarthew/Projects/my-app/AGENTS.md for repository overview.
 Example config:
 
 ```toml
-[context.documents.environment]
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true    # Included
 
-[context.documents.index]
-path = "~/reference/INDEX.csv"
+[context.index]
+file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 required = true    # Included
 
-[context.documents.agents]
-path = "./AGENTS.md"
+[context.agents]
+file = "./AGENTS.md"
 prompt = "Read {file} for repository overview."
 required = true    # Included
 
-[context.documents.project]
-path = "./PROJECT.md"
+[context.project]
+file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 # required = false (default) - NOT included with start prompt
 ```
@@ -361,7 +361,7 @@ claude "your prompt here"
 gemini "your prompt here"
 ```
 
-**To include specific documents:** Use `start task` with customized `documents` array.
+**To include specific documents:** Use `start task` (auto-includes all contexts where `required = true`).
 
 ### Prompt Length Limits
 
@@ -374,7 +374,7 @@ Be aware of:
 Very long prompts may need to be:
 
 - Split into multiple messages
-- Put into a file and referenced via task's `content_command`
+- Put into a file and referenced via task's `command`
 - Sent through the agent's native interface instead
 
 ### Escaping Special Characters

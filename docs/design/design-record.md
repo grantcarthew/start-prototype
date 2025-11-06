@@ -61,12 +61,12 @@ See [vision.md](./vision.md) for the product vision and goals.
 **Structure:**
 
 ```toml
-[context.documents.environment]
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 
-[context.documents.project]
-path = "./PROJECT.md"
+[context.project]
+file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 ```
 
@@ -201,11 +201,11 @@ Changed from global-only to allowing both global and local agents. Enables team 
 **Structure:**
 
 ```toml
-[context.system_prompt]
-path = "./ROLE.md"
+[system_prompt]
+file = "./ROLE.md"
 
-[context.documents.environment]
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 ```
 
@@ -227,8 +227,8 @@ prompt = "Read {file} for environment context."
 
 ```toml
 # Local ./.start/config.toml
-[context.system_prompt]
-path = "~/shared-roles/senior-go-dev.md"
+[system_prompt]
+file = "~/shared-roles/senior-go-dev.md"
 ```
 
 ---
@@ -271,7 +271,7 @@ start config edit                  # Open config in editor
 
 ```bash
 --agent <name>        # Which agent to use (overrides default)
---model <tier>        # Model tier: fast, mid, pro
+--model <alias>       # Model alias or full model name
 --directory <path>    # Working directory (default: pwd)
 ```
 
@@ -319,8 +319,8 @@ command = "gemini --model {model} --include-directories ~/reference '{prompt}'"
   [agents.gemini.env]
   GEMINI_SYSTEM_MD = "{system_prompt}"
 
-[context.documents.environment]
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 ```
 
@@ -362,10 +362,10 @@ prompt = "Read {file} for environment context."
 **Path equivalence:**
 
 ```toml
-path = "./AGENTS.md"   # Same
-path = "AGENTS.md"     # Same
-path = "/absolute/path/file.md"  # Absolute
-path = "~/reference/file.md"     # Home-relative
+file = "./AGENTS.md"   # Same
+file = "AGENTS.md"     # Same
+file = "/absolute/path/file.md"  # Absolute
+file = "~/reference/file.md"     # Home-relative
 ```
 
 **Missing file behavior:**
@@ -432,7 +432,7 @@ alias = "gdr"
 description = "Review git diff changes"
 role = "./roles/code-reviewer.md"
 documents = ["environment", "agents"]
-content_command = "git diff --staged"
+command = "git diff --staged"
 prompt = """
 Analyze the following git diff and act as a code reviewer.
 
@@ -455,7 +455,7 @@ Analyze the following git diff and act as a code reviewer.
 - **description** (optional) - Help text
 - **role** (required) - System prompt (file path or inline text)
 - **documents** (optional) - Array of named context documents to include
-- **content_command** (optional) - Shell command to run, output becomes {content}
+- **command** (optional) - Shell command to run, output becomes {content}
 - **prompt** (required) - Prompt template (file path or inline text)
 
 **Task-specific placeholders:**
@@ -463,8 +463,8 @@ Analyze the following git diff and act as a code reviewer.
   - Value: User's arguments or "None" if not provided
   - Usage: `start task gdr "focus on security"` → `{instructions}` = "focus on security"
   - Usage: `start task gdr` → `{instructions}` = "None"
-- `{content}` - Output from `content_command`
-  - Value: Command output or empty string if no content_command
+- `{content}` - Output from `command`
+  - Value: Command output or empty string if no command
   - Example: `git diff --staged` output
 
 **Prompt field format:**
@@ -501,7 +501,7 @@ start task gdr --agent gemini "check for performance issues"
 **Rationale:**
 
 - Mirrors existing bash script pattern (gdr, ucl, etc.)
-- Flexible: simple tasks don't need content_command or instructions
+- Flexible: simple tasks don't need command or instructions
 - Clear placeholder names ({instructions}, {content})
 - "None" default matches existing bash script behavior
 - Supports both dynamic content (git diff) and static prompts
@@ -731,23 +731,23 @@ start
 **Structure:**
 
 ```toml
-[context.documents.environment]  # First in prompt
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]  # First in prompt
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true    # Always included
 
-[context.documents.index]        # Second in prompt
-path = "~/reference/INDEX.csv"
+[context.index]        # Second in prompt
+file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 required = true    # Always included
 
-[context.documents.agents]       # Third in prompt
-path = "./AGENTS.md"
+[context.agents]       # Third in prompt
+file = "./AGENTS.md"
 prompt = "Read {file} for repository context."
 required = true    # Always included
 
-[context.documents.project]      # Fourth in prompt
-path = "./PROJECT.md"
+[context.project]      # Fourth in prompt
+file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 required = false   # Optional (default) - excluded from start prompt
 ```

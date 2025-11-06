@@ -90,20 +90,20 @@ Context documents appear in the prompt in the **order they are defined in the co
 **Example config:**
 
 ```toml
-[context.documents.environment]  # First
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]  # First
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 
-[context.documents.index]        # Second
-path = "~/reference/INDEX.csv"
+[context.index]        # Second
+file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 
-[context.documents.agents]       # Third
-path = "./AGENTS.md"
+[context.agents]       # Third
+file = "./AGENTS.md"
 prompt = "Read {file} for repository overview."
 
-[context.documents.project]      # Fourth
-path = "./PROJECT.md"
+[context.project]      # Fourth
+file = "./PROJECT.md"
 prompt = "Read {file} for current project status."
 ```
 
@@ -496,7 +496,7 @@ The agent launches with no context document instructions - only system prompt (i
 
 **No system prompt:**
 
-If `[context.system_prompt]` is not configured or the file doesn't exist:
+If `[system_prompt]` is not configured or the file doesn't exist:
 
 ```
 System prompt: (none)
@@ -546,23 +546,23 @@ The agent launches with no context. This is valid - useful for general AI sessio
 Documents can be marked as `required` to control which commands include them:
 
 ```toml
-[context.documents.environment]
-path = "~/reference/ENVIRONMENT.md"
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true    # Always included
 
-[context.documents.index]
-path = "~/reference/INDEX.csv"
+[context.index]
+file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 required = true    # Always included
 
-[context.documents.agents]
-path = "./AGENTS.md"
+[context.agents]
+file = "./AGENTS.md"
 prompt = "Read {file} for repository context."
 required = true    # Always included
 
-[context.documents.project]
-path = "./PROJECT.md"
+[context.project]
+file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 required = false   # Optional - included by start, excluded by start prompt
 ```
@@ -571,7 +571,7 @@ required = false   # Optional - included by start, excluded by start prompt
 
 - `start` (root) → Includes ALL documents (required + optional)
 - `start prompt` → Includes ONLY required documents
-- `start task` → Includes documents specified in task's `documents` array (ignores required field)
+- `start task` → Auto-includes all contexts where `required = true`
 
 **Default value:**
 
