@@ -1,48 +1,76 @@
 # Project: start - Configuration Design Phase
 
-**Status:** Design Phase - Configuration Structure & Patterns
+**Status:** Design Phase - Implementation Details & Command Specs
 **Date Started:** 2025-01-03
-**Current Phase:** Unified Template Design (UTD) implementation
+**Current Phase:** Asset management system design, CLI reorganization, implementation details
 
 ## Overview
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (13 DRs) | [Tasks](./docs/tasks.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (17 DRs) | [Tasks](./docs/tasks.md)
 
 ## Command Status
 
-### Core Commands
+### Execution Commands
 
 - ✅ `start` - [docs/cli/start.md](./docs/cli/start.md) - Launch with all context
-- ✅ `start prompt [text]` - [docs/cli/start-prompt.md](./docs/cli/start-prompt.md) - Launch with required context + optional custom prompt
-- ✅ `start init` - [docs/cli/start-init.md](./docs/cli/start-init.md) - Interactive wizard, GitHub fetch, agent detection
-- ✅ `start task <name> [instructions]` - [docs/cli/start-task.md](./docs/cli/start-task.md) - Predefined workflows with roles and content commands
+- ✅ `start prompt [text]` - [docs/cli/start-prompt.md](./docs/cli/start-prompt.md) - Launch with required context + custom prompt
+- ✅ `start task <name> [inst]` - [docs/cli/start-task.md](./docs/cli/start-task.md) - Run predefined task
 
-### Management Commands
+### Configuration Management
 
-- ✅ `start agent add|list|test|remove|edit|default` - [docs/cli/start-agent.md](./docs/cli/start-agent.md) - Agent configuration management
-- ✅ `start config show|edit|path|validate` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Config file management
-- ✅ `start doctor` - [docs/cli/start-doctor.md](./docs/cli/start-doctor.md) - Diagnose installation and configuration health
-- ✅ `start update` - [docs/cli/start-update.md](./docs/cli/start-update.md) - Update asset library from GitHub
+**File Operations:**
+- ✅ `start config show` - [docs/cli/start-config.md](./docs/cli/start-config.md) - View merged config
+- ✅ `start config edit [scope]` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Edit config file
+- ✅ `start config path` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Show config paths
+- ✅ `start config validate` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Validate config
 
-### Optional Commands (TBD)
+**Configuration Sections:**
+- ✅ `start config agent` - [docs/cli/start-agent.md](./docs/cli/start-agent.md) - Manage agents (MOVED from `start agent`)
+- ✅ `start config context` - [docs/cli/start-config-context.md](./docs/cli/start-config-context.md) - Manage contexts
+- ✅ `start config task` - [docs/cli/start-config-task.md](./docs/cli/start-config-task.md) - Manage tasks
+- ✅ `start config role` - [docs/cli/start-config-role.md](./docs/cli/start-config-role.md) - Manage system prompts
 
-- ❓ `start context` - Context document management (needed or just edit config?)
-- ❓ `start role` - Role template management (needed or just file operations?)
+### Utility Commands
+
+- ✅ `start init [scope]` - [docs/cli/start-init.md](./docs/cli/start-init.md) - Initialize configuration
+- ✅ `start doctor` - [docs/cli/start-doctor.md](./docs/cli/start-doctor.md) - Diagnose installation
+- ✅ `start update` - [docs/cli/start-update.md](./docs/cli/start-update.md) - Update asset library
 
 ## Architecture Decisions
 
-### Completed
+### Completed (17 Design Records)
 
-- Configuration: TOML with global + local merge
-- Context documents: Named with `file`, `command`, `prompt`, `required` fields using UTD
+**Core Configuration (DR-001 to DR-008):**
+- DR-001: TOML for configuration format
+- DR-002: Global + local config file structure with merge
+- DR-003: Named context documents (not arrays)
+- DR-004: Agents in both global and local configs
+- DR-005: System prompt handling (separate and optional)
+- DR-006: Cobra CLI with subcommands
+- DR-007: Command interpolation and placeholders
+- DR-008: Context file detection and handling
+
+**Tasks & Commands (DR-009 to DR-013):**
+- DR-009: Task structure and placeholders
+- DR-010: Four default interactive review tasks
+- DR-011: Asset distribution and update system (GitHub-fetched)
+- DR-012: Context document required field and order
+- DR-013: Agent configuration distribution via GitHub
+
+**Asset Management & CLI (DR-014 to DR-017):**
+- DR-014: GitHub Tree API with SHA-based caching for incremental updates
+- DR-015: Atomic update mechanism with rollback capability
+- DR-016: Asset discovery - each feature checks its own directory
+- DR-017: CLI reorganization - `start config` for all configuration management
+
+**Implementation:**
+- Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
 - Document order: Config definition order (TOML preserves order)
-- Agents: Global + local (team standardization), flexible model aliases, metadata fields (description, url, models_url)
-- Agent management: list, add, test, edit, remove, default subcommands
-- Tasks: Full UTD pattern for system_prompt and task prompt, auto-includes required contexts
 - Command pattern: Positional scope arguments (`start init [scope]`, `start config edit [scope]`)
 - CLI Framework: Cobra with dynamic task loading
+- Asset file: `asset-version.toml` tracks commit SHA + file SHAs
 
 ### Key Design
 
@@ -54,23 +82,22 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ## Open Questions
 
-### High Priority
+### Resolved
+1. ✅ **Task listing:** `start task` with no args + `--help`
+2. ✅ **Agent testing:** Binary availability, config validation, dry-run display
+3. ✅ **Config editing:** Soft warnings (non-blocking)
+4. ✅ **JSON output:** Not needed, human-facing tool
+5. ✅ **Task structure:** Full UTD for system_prompt and task prompt
+6. ✅ **Context management:** `start config context` (DR-017)
+7. ✅ **Role management:** `start config role` (DR-017)
 
-1. ~~**Task listing:** Subcommand (`start task list`) or flag (`start task --list`)?~~ ✅ Resolved: `start task` with no args + `--help`
-2. ~~**Agent testing:** What does `start agent test` actually validate?~~ ✅ Resolved: Binary availability (exec.LookPath), config validation, dry-run display
-3. ~~**Config editing:** Validation behavior on save - error or warn?~~ ✅ Resolved: Soft warnings (non-blocking, user already saved)
+### Remaining
 
-### Medium Priority
-
-4. ~~**JSON output:** Which commands should support `--json` flag?~~ ✅ Resolved: Not needed, human-facing tool
-5. ~~**Task structure:** Finalize task config with system_prompt_* fields and UTD~~ ✅ Resolved: Full UTD for both system_prompt and task prompt
-6. **Context management:** Build `start context` commands or skip?
-7. **Role management:** Build `start role` commands or skip? (roles section not currently used)
-
-### Low Priority
-
-7. **Shell completion:** Generate for bash/zsh/fish?
-8. **Non-interactive mode:** What flags needed for CI/automation?
+8. **Shell completion:** Generate for bash/zsh/fish?
+9. **Non-interactive mode:** What flags needed for CI/automation?
+10. **Version tracking:** Build-time injection strategy
+11. **Asset staleness:** Local-only check vs GitHub comparison
+12. **Security:** Trust model for downloaded assets
 
 ## Success Criteria
 
@@ -175,12 +202,19 @@ CLI design is complete when:
 - ✅ Scenario 4: Local exists → Ask to create global or replace local
 - ✅ Always recommends global as default/safe choice
 
-### Asset Management System (2025-01-06)
+### Asset Management System & CLI Reorganization (2025-01-06)
+
+**CLI Command Reorganization (DR-017):**
+- ✅ Identified inconsistency: `start agent` (config) vs `start task` (execution)
+- ✅ Decided: Configuration management under `start config`, execution at top level
+- ✅ New structure: `start config agent|context|task|role` for all config management
+- ✅ Benefits: Clear separation of purpose, consistent patterns, better discoverability
+- ✅ Breaking change acceptable (design phase, no existing users)
 
 **Asset Library Design:**
 - ✅ Assets fetched from GitHub repository (not embedded in binary)
 - ✅ Stored in `~/.config/start/assets/` directory
-- ✅ Version tracked in `.asset-version` file (commit SHA + timestamp)
+- ✅ Version tracked in `asset-version.toml` file (commit SHA + file SHAs)
 - ✅ `start init` performs initial asset download
 - ✅ `start update` refreshes asset library from GitHub
 - ✅ `start doctor` checks asset age and reports if stale (> 30 days)
@@ -221,9 +255,16 @@ CLI design is complete when:
 **Implementation Details to Design:**
 
 *Asset Update Mechanism:*
-- [ ] **Task 12a:** Decide GitHub download strategy (API calls, manifest format, file discovery)
-- [ ] **Task 12b:** Design atomic update mechanism (temp directory, swap, partial failure recovery)
-- [ ] **Task 12c:** Define asset discovery system (how start knows what asset types exist)
+- [x] **Task 12a:** Decide GitHub download strategy → DR-014: GitHub Tree API with SHA caching
+- [x] **Task 12b:** Design atomic update mechanism → DR-015: SHA-filtered incremental + batch atomic install
+- [x] **Task 12c:** Define asset discovery system → DR-016: No discovery system, each feature checks its directory
+
+*Command Reorganization:*
+- [x] **Task 12d:** CLI command reorganization → DR-017: `start config` for all configuration management
+- [x] **Task 12e:** Update `start-agent.md` to reflect `start config agent` (path change only)
+- [x] **Task 12f:** Create `start-config-context.md` spec (NEW command)
+- [x] **Task 12g:** Create `start-config-task.md` spec (NEW command)
+- [x] **Task 12h:** Create `start-config-role.md` spec (NEW command)
 
 *Version Tracking & Checking:*
 - [ ] **Task 13a:** Define binary version source (build-time injection strategy)
@@ -251,7 +292,7 @@ CLI design is complete when:
 - [ ] **Task 17c:** Design commit/tag pinning strategy
 
 *Remaining High-Level Design:*
-- [ ] **Task 18:** Evaluate `start context` command necessity (vs direct config editing)
-- [ ] **Task 19:** Evaluate `start role` command necessity (roles section not currently used)
+- [x] **Task 18:** Evaluate `start context` command necessity → Resolved: `start config context` created (Task 12f)
+- [x] **Task 19:** Evaluate `start role` command necessity → Resolved: `start config role` created (Task 12h)
 - [ ] **Task 20:** Determine shell completion requirements (bash/zsh/fish)
 - [ ] **Task 21:** Define non-interactive mode flags for CI/automation

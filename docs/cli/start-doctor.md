@@ -165,7 +165,7 @@ Version
 
 Assets
   Location: ~/.config/start/assets/
-  Version file: ~/.config/start/.asset-version
+  Version file: ~/.config/start/asset-version.toml
   Last updated: 2024-11-22T14:23:10Z (45 days ago)
   Commit: abc123def456
 
@@ -287,7 +287,7 @@ Compares local version against latest GitHub release.
 Verifies age and completeness of asset library.
 
 **What it checks:**
-- `.asset-version` exists and is readable
+- `asset-version.toml` exists and is readable
 - Asset age (warns if > 30 days)
 - Asset directory structure intact
 - All expected subdirectories present

@@ -32,7 +32,7 @@ Downloads the latest asset library from GitHub repository, replacing the local a
 
 - Fetches from GitHub repository default branch
 - Overwrites existing asset directory completely
-- Updates `.asset-version` file with timestamp and commit SHA
+- Updates `asset-version.toml` file with timestamp and commit SHA
 - Reports what changed (new, updated, removed files)
 
 **Use cases:**
@@ -74,7 +74,7 @@ start update
 2. Fetch asset manifest from GitHub
 3. Download all asset files
 4. Overwrite `~/.config/start/assets/`
-5. Update `.asset-version` file
+5. Update `asset-version.toml` file
 6. Report changes
 
 **Output:**
@@ -172,7 +172,7 @@ Installing assets:
   ✓ Installed 28 files (45.2 KB total)
 
 Updating version file:
-  ✓ Written: /Users/grant/.config/start/.asset-version
+  ✓ Written: /Users/grant/.config/start/asset-version.toml
   Commit: abc123def456
   Timestamp: 2025-01-06T10:30:00Z
 
@@ -440,13 +440,21 @@ Asset version file NOT updated (prevents false "up to date").
 
 ### Format
 
-`.asset-version` is a simple text file:
+`asset-version.toml` tracks downloaded assets:
 
-```
-commit=abc123def456
-timestamp=2025-01-06T10:30:00Z
-repository=github.com/grantcarthew/start
-branch=main
+```toml
+# Asset version tracking - managed by 'start update'
+# Last updated: 2025-01-06T10:30:00Z
+
+commit = "abc123def456"
+timestamp = "2025-01-06T10:30:00Z"
+repository = "github.com/grantcarthew/start"
+branch = "main"
+
+[files]
+"agents/claude.toml" = "a1b2c3d4e5f6..."
+"agents/gemini.toml" = "e5f6g7h8i9j0..."
+"roles/code-reviewer.md" = "i9j0k1l2m3n4..."
 ```
 
 ### Purpose
@@ -458,7 +466,7 @@ branch=main
 
 ### Location
 
-`~/.config/start/.asset-version`
+`~/.config/start/asset-version.toml`
 
 Same directory as `config.toml`, not inside `assets/`.
 

@@ -1,18 +1,18 @@
-# start agent
+# start config agent
 
 ## Name
 
-start agent - Manage AI agent configurations
+start config agent - Manage AI agent configurations
 
 ## Synopsis
 
 ```bash
-start agent list
-start agent add
-start agent test <name>
-start agent edit [name]
-start agent remove [name]
-start agent default [name]
+start config agent list
+start config agent add
+start config agent test <name>
+start config agent edit [name]
+start config agent remove [name]
+start config agent default [name]
 ```
 
 ## Description
@@ -28,7 +28,7 @@ Manages AI agent configurations in the global config file (`~/.config/start/conf
 - **remove** - Delete agent from configuration
 - **default** - Set or show default agent
 
-**Note:** Per DR-004, agents are global-only configuration. These commands only modify `~/.config/start/config.toml` and do not interact with local project configs.
+**Note:** These commands only modify `~/.config/start/config.toml` (global configuration). Per DR-004, agents can also be defined in local configs (`./.start/config.toml`), but those must be edited manually.
 
 ## Agent Configuration Structure
 
@@ -70,14 +70,14 @@ default_model = "sonnet"
 
 ## Subcommands
 
-### start agent list
+### start config agent list
 
 Display all configured agents with their details.
 
 **Synopsis:**
 
 ```bash
-start agent list
+start config agent list
 ```
 
 **Behavior:**
@@ -141,7 +141,7 @@ opencode
 No agents configured.
 
 Run 'start init' to set up agents, or
-use 'start agent add' to add an agent manually.
+use 'start config agent add' to add an agent manually.
 ```
 
 **Exit codes:**
@@ -149,14 +149,14 @@ use 'start agent add' to add an agent manually.
 - 0 - Success (agents listed)
 - 1 - No config file exists
 
-### start agent add
+### start config agent add
 
 Interactively add a new agent to the global configuration.
 
 **Synopsis:**
 
 ```bash
-start agent add
+start config agent add
 ```
 
 **Behavior:**
@@ -246,7 +246,7 @@ Backing up config to config.2025-01-04-143022.toml...
 Saving agent 'my-agent' to ~/.config/start/config.toml...
 ✓ Agent added successfully
 
-Use 'start agent list' to see all agents.
+Use 'start config agent list' to see all agents.
 Use 'start --agent my-agent' to test.
 ```
 
@@ -272,7 +272,7 @@ Backing up config to config.2025-01-04-143105.toml...
 Saving agent 'simple-agent' to ~/.config/start/config.toml...
 ✓ Agent added successfully
 
-Use 'start agent list' to see all agents.
+Use 'start config agent list' to see all agents.
 Use 'start --agent simple-agent' to test.
 ```
 
@@ -323,7 +323,7 @@ Agent name: my-agent
 Agent name: claude
 ✗ Agent 'claude' already exists.
 
-Use 'start agent edit claude' to modify existing agent.
+Use 'start config agent edit claude' to modify existing agent.
 ```
 
 Exit code: 1
@@ -364,14 +364,14 @@ Agent not added.
 
 Exit code: 3
 
-### start agent test
+### start config agent test
 
 Test agent configuration and availability.
 
 **Synopsis:**
 
 ```bash
-start agent test <name>
+start config agent test <name>
 ```
 
 **Behavior:**
@@ -476,13 +476,13 @@ Configuration:
   ✗ No default_model specified
 
 ✗ Agent 'broken-agent' has configuration errors
-  Fix configuration: start agent edit broken-agent
+  Fix configuration: start config agent edit broken-agent
 ```
 
 **Verbose output:**
 
 ```bash
-start agent test claude --verbose
+start config agent test claude --verbose
 ```
 
 ```
@@ -540,8 +540,8 @@ Dry-run command:
 ```
 Error: Agent 'nonexistent' not found in configuration.
 
-Use 'start agent list' to see available agents.
-Use 'start agent add' to add a new agent.
+Use 'start config agent list' to see available agents.
+Use 'start config agent add' to add a new agent.
 ```
 
 Exit code: 2
@@ -567,15 +567,15 @@ Configuration:
 
 Exit code: 1 (configuration errors take precedence over binary not found)
 
-### start agent edit
+### start config agent edit
 
 Edit agent configuration interactively.
 
 **Synopsis:**
 
 ```bash
-start agent edit              # Select from list
-start agent edit <name>       # Edit specific agent
+start config agent edit              # Select from list
+start config agent edit <name>       # Edit specific agent
 ```
 
 **Behavior:**
@@ -585,7 +585,7 @@ start agent edit <name>       # Edit specific agent
 Shows list of configured agents for selection:
 
 ```bash
-start agent edit
+start config agent edit
 ```
 
 Output:
@@ -673,8 +673,8 @@ Backing up config to config.2025-01-04-144512.toml...
 Saving changes to ~/.config/start/config.toml...
 ✓ Agent 'claude' updated successfully
 
-Use 'start agent list' to see changes.
-Use 'start agent test claude' to validate.
+Use 'start config agent list' to see changes.
+Use 'start config agent test claude' to validate.
 ```
 
 **Interactive flow (minimal changes):**
@@ -723,8 +723,8 @@ Saving changes to ~/.config/start/config.toml...
 ```
 Error: Agent 'nonexistent' not found in configuration.
 
-Use 'start agent list' to see available agents.
-Use 'start agent add' to add a new agent.
+Use 'start config agent list' to see available agents.
+Use 'start config agent add' to add a new agent.
 ```
 
 Exit code: 2
@@ -786,15 +786,15 @@ Agent 'claude' not modified.
 
 Exit code: 0 (no backup created, no write)
 
-### start agent remove
+### start config agent remove
 
 Remove agent from global configuration.
 
 **Synopsis:**
 
 ```bash
-start agent remove           # Select from list
-start agent remove <name>    # Remove specific agent
+start config agent remove           # Select from list
+start config agent remove <name>    # Remove specific agent
 ```
 
 **Behavior:**
@@ -822,7 +822,7 @@ Backing up config to config.2025-01-04-150212.toml...
 Removing agent 'gemini' from ~/.config/start/config.toml...
 ✓ Agent 'gemini' removed successfully
 
-Use 'start agent list' to see remaining agents.
+Use 'start config agent list' to see remaining agents.
 ```
 
 **With agent name:**
@@ -843,7 +843,7 @@ Backing up config to config.2025-01-04-150245.toml...
 Removing agent 'gemini' from ~/.config/start/config.toml...
 ✓ Agent 'gemini' removed successfully
 
-Use 'start agent list' to see remaining agents.
+Use 'start config agent list' to see remaining agents.
 ```
 
 **Removing default agent:**
@@ -870,8 +870,8 @@ Removing agent 'claude' from ~/.config/start/config.toml...
 
 Your default agent is now the first configured agent: gemini
 
-Use 'start agent default <name>' to set a new default.
-Use 'start agent list' to see remaining agents.
+Use 'start config agent default <name>' to set a new default.
+Use 'start config agent list' to see remaining agents.
 ```
 
 **Behavior when removing default:**
@@ -879,7 +879,7 @@ Use 'start agent list' to see remaining agents.
 - Removes agent from config
 - Removes `default_agent` setting from `[settings]` section
 - `start` command will use first agent in config (TOML order)
-- User can set new default with `start agent default <name>`
+- User can set new default with `start config agent default <name>`
 
 **Declining confirmation:**
 
@@ -905,7 +905,7 @@ Exit code: 0
 ```
 Error: Agent 'nonexistent' not found in configuration.
 
-Use 'start agent list' to see available agents.
+Use 'start config agent list' to see available agents.
 ```
 
 Exit code: 2
@@ -915,7 +915,7 @@ Exit code: 2
 ```
 No agents configured.
 
-Use 'start agent add' to add an agent.
+Use 'start config agent add' to add an agent.
 ```
 
 Exit code: 1
@@ -934,7 +934,7 @@ Removing agent 'claude' from ~/.config/start/config.toml...
 ✓ Agent 'claude' removed successfully
 ⚠ No agents remaining in configuration
 
-Use 'start agent add' to add an agent.
+Use 'start config agent add' to add an agent.
 Use 'start init' to set up agents automatically.
 ```
 
@@ -952,15 +952,15 @@ Agent not removed.
 
 Exit code: 3
 
-### start agent default
+### start config agent default
 
 Set default agent interactively or directly.
 
 **Synopsis:**
 
 ```bash
-start agent default          # Select from list
-start agent default <name>   # Set specific default
+start config agent default          # Select from list
+start config agent default <name>   # Set specific default
 ```
 
 **Behavior:**
@@ -970,7 +970,7 @@ start agent default <name>   # Set specific default
 Shows list of configured agents for selection:
 
 ```bash
-start agent default
+start config agent default
 ```
 
 Output:
@@ -1039,7 +1039,7 @@ Exit code: 0
 Sets the default agent in `[settings]` section directly:
 
 ```bash
-start agent default gemini
+start config agent default gemini
 ```
 
 Output:
@@ -1052,13 +1052,13 @@ Setting default agent to 'gemini'...
 ✓ Default agent set to 'gemini'
 
 Use 'start' to launch with default agent.
-Use 'start agent default' to confirm.
+Use 'start config agent default' to confirm.
 ```
 
 **Updating existing default:**
 
 ```bash
-start agent default opus
+start config agent default opus
 ```
 
 Output:
@@ -1094,7 +1094,7 @@ Available agents:
   - gemini
   - aichat
 
-Use 'start agent list' for details.
+Use 'start config agent list' for details.
 ```
 
 Exit code: 2
@@ -1104,7 +1104,7 @@ Exit code: 2
 ```
 Error: No agents configured.
 
-Use 'start agent add' to add an agent.
+Use 'start config agent add' to add an agent.
 Use 'start init' to set up agents automatically.
 ```
 
@@ -1112,7 +1112,7 @@ Exit code: 1
 
 ## Global Flags
 
-These flags work on all `start agent` subcommands where applicable.
+These flags work on all `start config agent` subcommands where applicable.
 
 **--help**, **-h**
 : Show help for the subcommand.
@@ -1128,7 +1128,7 @@ These flags work on all `start agent` subcommands where applicable.
 ### List All Agents
 
 ```bash
-start agent list
+start config agent list
 ```
 
 Show all configured agents with details.
@@ -1136,7 +1136,7 @@ Show all configured agents with details.
 ### List with Verbose Output
 
 ```bash
-start agent list --verbose
+start config agent list --verbose
 ```
 
 Output:
@@ -1162,7 +1162,7 @@ claude
 ## Files
 
 **~/.config/start/config.toml**
-: Global configuration file containing agent definitions. This is the only file modified by `start agent` commands.
+: Global configuration file containing agent definitions. This is the only file modified by `start config agent` commands.
 
 ## Error Handling
 
@@ -1191,16 +1191,24 @@ Exit code: 1
 
 ## Notes
 
-### Global-Only Configuration
+### Agent Configuration Scope
 
-Per DR-004, agents are defined only in the global config (`~/.config/start/config.toml`). Local project configs (`./.start/config.toml`) cannot define or override agents.
+Per DR-004, agents can be defined in both global and local configs with merge behavior:
 
-**Rationale:**
+**Global agents:** `~/.config/start/config.toml`
+- Personal agent configurations
+- Managed by `start config agent` commands
+- Individual preferences (model aliases, default models)
 
-- Agents are tools installed system-wide
-- Agent names are the actual tool names (claude, gemini, etc.)
-- Simplifies configuration management
-- No ambiguity about which agent is used
+**Local agents:** `./.start/config.toml`
+- Team-standardized configurations (can be committed to git)
+- Manually edited (not managed by `start config agent` commands)
+- Project-specific agent wrappers or custom tools
+
+**Merge behavior:**
+- Global + local agents are combined
+- Same agent name: local overrides global
+- Enables team standardization while allowing personal overrides
 
 ### Default Model Behavior
 
@@ -1274,5 +1282,9 @@ Both URLs are optional but recommended for discoverability and self-documentatio
 - start(1) - Launch with context
 - start-init(1) - Initialize configuration
 - start-config(1) - Manage configuration files
+- start-config-context(1) - Manage context documents
+- start-config-task(1) - Manage task configurations
+- start-config-role(1) - Manage system prompts
 - DR-004 - Agent configuration scope design decision
 - DR-007 - Command interpolation and placeholders
+- DR-017 - CLI command reorganization
