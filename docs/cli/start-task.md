@@ -14,15 +14,15 @@ start task <name> [instructions] [flags]
 
 ## Description
 
-Executes predefined AI workflow tasks configured in `config.toml`. Tasks are reusable workflows with specific roles, prompt templates, context documents, and optional dynamic content from shell commands.
+Executes predefined AI workflow tasks configured in `config.toml`. Tasks are reusable workflows with optional system prompt overrides, automatic required context inclusion, and dynamic content from shell commands.
 
 **Task components:**
 
-- **Role** - System prompt specific to the task
-- **Documents** - Subset of context documents to include
-- **Content command** - Optional shell command (e.g., `git diff --staged`)
-- **Prompt template** - Template with placeholders for instructions and content
+- **System prompt override** - Optional UTD fields to override global/local system prompt (`system_prompt_file`, `system_prompt_command`, `system_prompt`)
+- **Required contexts** - Automatically includes all contexts where `required = true`
+- **Task prompt** - UTD fields for prompt template (`file`, `command`, `prompt`)
 - **Alias** - Optional short name for quick access
+- **Shell config** - Optional shell and timeout overrides
 
 **Common use cases:**
 
@@ -72,14 +72,14 @@ start task gdr --model claude-opus-4-20250514
 ```
 
 **--directory** _path_, **-d** _path_
-: Working directory for context detection and content_command execution.
+: Working directory for context detection and command execution.
 
 ```bash
 start task gdr --directory ~/my-project
 ```
 
 **--verbose**, **-v**
-: Show detailed output including config resolution, document detection, and content_command execution.
+: Show detailed output including config resolution, context detection, and command execution.
 
 **--debug**
 : Debug mode. Shows all internal operations, placeholder resolution, and command construction.
@@ -114,25 +114,27 @@ start task <name> [instructions]
 1. Load and merge configuration (global + local)
 2. Find task by name or alias
 3. Determine agent (task override, `--agent` flag, or default)
-4. Load role/system prompt:
-   - If `role` is file path → read file contents
-   - If `role` is inline text → use directly
-   - Error if file path doesn't exist
-5. Load documents specified in task's `documents` array:
-   - Resolves document names to `[context.documents.*]` config
-   - Skips undefined document names (no error)
+4. Load system prompt using UTD pattern:
+   - If task has `system_prompt_*` fields → Use task's system prompt (UTD)
+   - Otherwise → Use global/local `[system_prompt]` (if configured)
+   - UTD supports: file, command, prompt with placeholders
+5. Load required contexts:
+   - Auto-includes all contexts where `required = true`
+   - No `documents` array needed
    - Skips missing files (same as `start` command behavior)
-   - Order: As listed in task's `documents` array
-6. Run `content_command` if configured:
+   - Order: Config definition order
+6. Run task `command` if configured (UTD):
    - Execute in working directory
    - Capture stdout and stderr
    - Error and exit if command fails (non-zero exit code)
-7. Build prompt from task's prompt template:
-   - Insert context documents first (with their prompts)
-   - Append task prompt template
+7. Build prompt from task's prompt template using UTD:
+   - Load from `file` if specified
+   - Execute `command` if specified
+   - Process `prompt` template with placeholders
    - Replace `{instructions}` with user's args (or "None")
-   - Replace `{content}` with content_command output (or empty string)
-   - Replace global placeholders ({model}, {system_prompt}, {date})
+   - Replace `{command}` with command output (or empty string)
+   - Replace global placeholders ({model}, {date})
+   - Insert required context document prompts first
 8. Display task summary (unless verbose/debug)
 9. Execute agent command
 
@@ -142,19 +144,27 @@ start task <name> [instructions]
 start task <name> --help
 ```
 
-Displays task configuration including role, documents, content command, and usage examples.
+Displays task configuration including system prompt override, required contexts, command, and usage examples.
 
 ## Task Configuration
 
-Tasks are defined in `config.toml`:
+Tasks are defined in `config.toml` using the **Unified Template Design (UTD)** pattern:
 
 ````toml
-[task.git-diff-review]
+[tasks.git-diff-review]
 alias = "gdr"
 description = "Review git diff changes"
-role = "./tasks/code-reviewer.md"
-documents = ["environment", "agents"]
-content_command = "git diff --staged"
+
+# System prompt override (optional, UTD)
+system_prompt_file = "~/.config/start/roles/code-reviewer.md"
+system_prompt = """
+{file}
+
+Focus on security and maintainability.
+"""
+
+# Task prompt (UTD - at least one required)
+command = "git diff --staged"
 prompt = """
 Review the following changes:
 
@@ -163,12 +173,18 @@ Review the following changes:
 
 ## Changes
 ```diff
-{content}
+{command}
 ````
 
 """
 
+# Shell config (optional)
+shell = "bash"
+command_timeout = 30
+
 ````
+
+**Note:** Tasks automatically include all contexts where `required = true`. No `documents` array needed.
 
 See [task.md](../task.md) for complete configuration documentation.
 
@@ -206,12 +222,12 @@ Starting Task: code-review
 ===============================================================================================
 Agent: claude (model: claude-3-7-sonnet-20250219)
 
-Task documents:
+Required contexts:
   ✓ environment     ~/reference/ENVIRONMENT.md
-  ✓ agents          ./AGENTS.md
+  ✓ index           ~/reference/INDEX.csv
 
-Role: ./tasks/code-reviewer.md
-Content: (none)
+System prompt: (from task - code-reviewer.md)
+Command output: (none)
 Instructions: None
 
 Executing command...
@@ -235,7 +251,7 @@ start task gdr "ignore formatting changes"
 
 Instructions replace `{instructions}` placeholder in task's prompt template.
 
-### Task with Content Command
+### Task with Command
 
 ```bash
 start task git-diff-review
@@ -248,12 +264,12 @@ Starting Task: git-diff-review
 ===============================================================================================
 Agent: claude (model: claude-3-7-sonnet-20250219)
 
-Task documents:
+Required contexts:
   ✓ environment     ~/reference/ENVIRONMENT.md
-  ✓ agents          ./AGENTS.md
+  ✓ index           ~/reference/INDEX.csv
 
-Role: ./tasks/code-reviewer.md
-Content: git diff --staged (127 lines)
+System prompt: (from task - code-reviewer.md)
+Command output: git diff --staged (127 lines)
 Instructions: None
 
 Executing command...
@@ -280,7 +296,7 @@ start task gdr --model claude-3-5-haiku-20241022
 start task gdr --directory ~/other-project
 ```
 
-Context documents and content_command execute relative to specified directory.
+Required contexts and task command execute relative to specified directory.
 
 ### Task-Specific Help
 
@@ -297,9 +313,9 @@ Description:
   Review code for quality and best practices
 
 Configuration:
-  Role: ./tasks/code-reviewer.md
-  Documents: environment, agents
-  Content command: (none)
+  System prompt: (from task configuration)
+  Required contexts: Auto-included (environment, index, etc.)
+  Command: (none)
 
 Usage:
   start task code-review
@@ -324,40 +340,41 @@ Loading configuration...
 
 Resolving task: git-diff-review (alias: gdr)
   Description: Review git diff changes
-  Role: ./tasks/code-reviewer.md
-  Documents: environment, agents
-  Content command: git diff --staged
+  System prompt override: code-reviewer.md with template
+  Task command: git diff --staged
+  Auto-includes required contexts
 
-Loading role...
-  Path: ./tasks/code-reviewer.md → /Users/gcarthew/Projects/my-app/tasks/code-reviewer.md
+Loading system prompt (UTD)...
+  File: ~/.config/start/roles/code-reviewer.md → /Users/gcarthew/.config/start/roles/code-reviewer.md
   Size: 847 bytes
+  Template: Applied with framing text
 
-Detecting task documents:
+Detecting required contexts:
   environment: ~/reference/ENVIRONMENT.md → /Users/gcarthew/reference/ENVIRONMENT.md (exists)
-  agents: ./AGENTS.md → /Users/gcarthew/Projects/my-app/AGENTS.md (exists)
+  index: ~/reference/INDEX.csv → /Users/gcarthew/reference/INDEX.csv (exists)
 
-Executing content command...
+Executing task command...
   Command: git diff --staged
   Working directory: /Users/gcarthew/Projects/my-app
   Output: 127 lines
 
-Building prompt...
-  Document prompts: 2 documents
+Building prompt (UTD)...
+  Required context prompts: 2 documents
   Task prompt template: 487 characters
   Instructions: "None"
-  Content: 3.2 KB (git diff output)
+  Command output: 3.2 KB (git diff)
   Final prompt size: 4.1 KB
 
 Starting Task: git-diff-review
 ===============================================================================================
 Agent: claude (model: claude-3-7-sonnet-20250219)
 
-Task documents:
+Required contexts:
   ✓ environment     ~/reference/ENVIRONMENT.md
-  ✓ agents          ./AGENTS.md
+  ✓ index           ~/reference/INDEX.csv
 
-Role: ./tasks/code-reviewer.md
-Content: git diff --staged (127 lines)
+System prompt: (from task - code-reviewer.md)
+Command output: git diff --staged (127 lines)
 Instructions: None
 
 Executing command...
@@ -386,12 +403,12 @@ Starting Task: <name>
 ===============================================================================================
 Agent: <agent> (model: <model>)
 
-Task documents:
+Required contexts:
   ✓ <name>     <path>
   ✗ <name>     <path> (not found)
 
-Role: <path>
-Content: <command> (<lines> lines) | (none)
+System prompt: <source>
+Command output: <command> (<lines> lines) | (none)
 Instructions: <text> | None
 
 Executing command...
@@ -427,13 +444,13 @@ See: https://github.com/grantcarthew/start#tasks
 
 **3** - File error
 
-- Role file not found
+- System prompt file not found (if using `system_prompt_file`)
 - Working directory doesn't exist
 - Config file permissions error
 
 **4** - Runtime error
 
-- Content command failed
+- Task command failed
 - Agent tool not installed
 - Agent command execution failed
 
@@ -468,10 +485,10 @@ See: https://github.com/grantcarthew/start#tasks
 
 Exit code: 1
 
-### Content Command Failed
+### Task Command Failed
 
 ```
-Error: Content command failed: git diff --staged
+Error: Task command failed: git diff --staged
 
 Command output:
 fatal: not a git repository
@@ -483,12 +500,12 @@ Exit code: 4
 
 Task execution stops. Agent is not launched.
 
-### Role File Not Found
+### System Prompt File Not Found
 
 ```
-Error: Role file not found: ./tasks/code-reviewer.md
+Error: System prompt file not found: ./tasks/code-reviewer.md
 
-Task 'code-review' references missing file.
+Task 'code-review' references missing file in system_prompt_file.
 Update task configuration or create the file.
 ```
 
@@ -499,7 +516,7 @@ Exit code: 3
 ```
 Error: Task 'code-review' has invalid configuration.
 
-Missing required field: 'role'
+Task prompt must have at least one of: file, command, or prompt
 
 Update configuration: start config edit
 ```
@@ -512,19 +529,19 @@ Exit code: 1
 
 **`start task <name>`:**
 
-- Uses task's specific role (not `[context.system_prompt]`)
-- Includes only documents listed in task's `documents` array
-- Can run content_command for dynamic content
-- Prompt template from task configuration
-- `{instructions}` placeholder available
+- Can override system prompt with task-specific `system_prompt_*` fields (UTD)
+- Auto-includes ONLY contexts where `required = true`
+- Can run task `command` for dynamic content (UTD)
+- Task prompt from UTD fields (`file`, `command`, `prompt`)
+- `{instructions}` and `{command}` placeholders available
 
 **`start` (root):**
 
-- Uses `[context.system_prompt]` (if configured)
+- Uses `[system_prompt]` from config (if configured)
 - Includes ALL context documents (required + optional)
-- No content_command
-- Simple document prompt concatenation
-- No instructions placeholder
+- No dynamic command execution
+- Simple context document prompt concatenation
+- No task-specific placeholders
 
 ### Task Placeholders
 
@@ -533,57 +550,78 @@ Task prompt templates support these placeholders:
 **Task-specific:**
 
 - `{instructions}` - User's command-line arguments (or "None")
-- `{content}` - Output from content_command (or empty string)
+- `{command}` - Output from task `command` field (or empty string)
 
 **Global:**
 
 - `{model}` - Model name
-- `{system_prompt}` - Role file contents
 - `{date}` - Current timestamp (ISO 8601)
-- `{file}` - Document file path (in document prompts only)
+- `{file}` - File contents (in UTD file fields)
 
-### Document Handling
+**System prompt placeholders:**
 
-**Document resolution:**
+In task `system_prompt_*` templates:
+- `{file}` - Content from `system_prompt_file`
+- `{command}` - Output from `system_prompt_command`
 
-1. Task specifies: `documents = ["environment", "agents", "project"]`
-2. Each name resolves to `[context.documents.<name>]` section in config
-3. If document name not found in config → skip silently (no error)
-4. If document file doesn't exist → skip with status display (same as `start` command)
+**Task prompt placeholders:**
 
-**Document order in prompt:**
+In task prompt (`file`, `command`, `prompt`):
+- `{file}` - Content from task `file`
+- `{command}` - Output from task `command`
+- `{instructions}` - User's arguments
 
-- Documents appear in order specified in task's `documents` array
-- Document prompts appear BEFORE task's prompt template
-- Example: environment prompts, agents prompts, then task prompt
+### Required Context Handling
 
-### Role File Location
+**Automatic inclusion:**
 
-By convention, task role files are stored in:
+Tasks automatically include all contexts where `required = true`. No `documents` array needed in task configuration.
 
-- Global: `~/.config/start/tasks/*.md`
-- Local (per-project): `./.start/tasks/*.md` or `./tasks/*.md`
+**Context resolution:**
 
-Example task configuration:
+1. Task loads all `[context.<name>]` sections where `required = true`
+2. Contexts resolved from merged global + local config
+3. If context file doesn't exist → skip with status display (same as `start` command)
+
+**Context order in prompt:**
+
+- Contexts appear in config definition order (global first, then local)
+- Context prompts appear BEFORE task's prompt template
+- Example: environment, index, then task prompt
+
+### System Prompt File Location
+
+By convention, task system prompt files are stored in:
+
+- Global: `~/.config/start/roles/*.md`
+- Local (per-project): `./.start/roles/*.md` or `./roles/*.md`
+
+Example task configuration with system prompt override:
 
 ```toml
-[task.code-review]
-role = "./tasks/code-reviewer.md"  # Project-specific role
-# or
-role = "~/.config/start/tasks/code-reviewer.md"  # Shared role
-```
+[tasks.code-review]
+# File only
+system_prompt_file = "~/.config/start/roles/code-reviewer.md"
 
-Role can also be inline:
+# File with template framing
+system_prompt_file = "~/.config/start/roles/code-reviewer.md"
+system_prompt = """
+{file}
 
-```toml
-[task.quick-review]
-role = """
+Additional context: Focus on security.
+"""
+
+# Inline only
+system_prompt = """
 You are a code reviewer.
 Focus on critical issues only.
 """
+
+# No override - uses global/local [system_prompt]
+# (omit all system_prompt_* fields)
 ```
 
-### Content Command Execution
+### Task Command Execution
 
 **Working directory:**
 
@@ -593,12 +631,24 @@ Focus on critical issues only.
 
 **Command execution:**
 
-- Runs in shell (same as `bash -c "command"`)
+- Runs in configured shell (default: global `shell` setting or auto-detected)
+- Override shell per-task with `shell` field
 - Environment variables inherited
-- Timeout: None (command runs to completion)
+- Timeout: Configurable via `command_timeout` (default: 30 seconds or global setting)
 - Exit code: Non-zero = error and task stops
 
-**Common content commands:**
+**Shell configuration:**
+
+```toml
+[tasks.git-review]
+command = "git diff --staged"
+shell = "bash"
+command_timeout = 10
+```
+
+See [UTD shell configuration](../design/unified-template-design.md#shell-configuration) for supported shells.
+
+**Common task commands:**
 
 - `git diff --staged` - Staged changes
 - `git diff HEAD~1` - Last commit

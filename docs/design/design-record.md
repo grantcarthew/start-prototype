@@ -546,34 +546,68 @@ start task gdr --agent gemini "check for performance issues"
 
 ---
 
-### DR-011: Asset Distribution and Init Command (2025-01-03)
+### DR-011: Asset Distribution and Update System (2025-01-03, updated 2025-01-06)
 
-**Decision:** Embed assets in binary; `start init` extracts to user config directory
+**Decision:** Assets fetched from GitHub repository; `start init` downloads on first run; `start update` refreshes asset library
 
 **Asset structure in repo:**
 
 ```
 start/
-├── assets/
-│   ├── config.toml          # Default configuration template
-│   ├── documents.json       # Default document paths for detection
-│   ├── tasks/               # Task prompt templates
-│   │   ├── code-review.md
-│   │   ├── git-diff-review.md
-│   │   ├── comment-tidy.md
-│   │   └── doc-review.md
-│   └── roles/               # Role templates
-│       ├── code-reviewer.md
-│       └── ...
+└── assets/
+    ├── agents/              # Agent configuration templates
+    │   ├── claude.toml
+    │   ├── gemini.toml
+    │   ├── aichat.toml
+    │   ├── openai.toml
+    │   └── deepseek.toml
+    ├── roles/               # System prompt markdown files
+    │   ├── code-reviewer.md
+    │   ├── doc-reviewer.md
+    │   ├── security-reviewer.md
+    │   └── ...
+    ├── tasks/               # Default task configurations
+    │   ├── code-review.toml
+    │   ├── git-diff-review.toml
+    │   ├── comment-tidy.toml
+    │   ├── doc-review.toml
+    │   └── security-review.toml
+    └── examples/            # Example configuration files
+        ├── global-config.toml
+        └── local-config.toml
+```
+
+**Asset installation location:**
+
+```
+~/.config/start/
+├── config.toml              # User's global config
+├── .asset-version           # Track asset library version
+└── assets/                  # Downloaded asset library
+    ├── agents/
+    ├── roles/
+    ├── tasks/
+    └── examples/
 ```
 
 **Distribution:**
 
-- Assets embedded in binary using `go:embed`
-- No network calls required
-- Works offline
-- New release = new assets automatically
-- Works with `go install` and `brew install`
+- Assets stored in GitHub repository (`/assets` directory)
+- Downloaded on-demand (not embedded in binary)
+- Updateable without new release
+- `start init` performs initial download
+- `start update` refreshes asset library
+- Network required for download (can work offline after initial setup)
+
+**Asset version tracking:**
+
+`.asset-version` file format:
+```
+commit=abc123def456
+timestamp=2025-01-06T10:30:00Z
+repository=github.com/grantcarthew/start
+branch=main
+```
 
 **`start init` behavior:**
 
@@ -632,11 +666,52 @@ Check these paths, add to config if they exist:
 
 If none exist, only add `./AGENTS.md` (most common local file)
 
+**Asset usage patterns:**
+
+**Agent templates:**
+- Located in `~/.config/start/assets/agents/`
+- Used during `start agent add` to pre-fill configurations
+- User selects template, values are copied to `config.toml`
+
+**Role files:**
+- Located in `~/.config/start/assets/roles/`
+- Referenced in config: `file = "~/.config/start/assets/roles/code-reviewer.md"`
+- Updates flow automatically when `start update` is run
+
+**Task definitions:**
+- Located in `~/.config/start/assets/tasks/`
+- Merged with user's task definitions (user tasks take precedence)
+- New tasks available immediately after `start update`
+
+**Example configs:**
+- Located in `~/.config/start/assets/examples/`
+- Reference only, not automatically loaded
+- Users manually copy sections to their config
+
+**Update workflow:**
+
+```bash
+# Check for updates
+start doctor
+# Shows: "⚠ Assets are 45 days old. Run 'start update'"
+
+# Update assets
+start update
+# Downloads latest from GitHub, reports changes
+
+# Assets auto-update next run
+start
+# References to roles/* automatically use new content
+```
+
 **Rationale:**
 
-- Embedded assets simpler than GitHub fetching
-- No network dependency, no cache management
-- Users get latest assets with each release
+- Assets updateable without binary release
+- New agent configs, roles, tasks available immediately
+- Network dependency acceptable (one-time per update)
+- Offline work after initial download
+- Separation: binary vs content
+- Users control update timing (not forced)
 - Automatic backup prevents accidental config loss
 - Interactive wizard better UX than manual config editing
 - Agent order reflects popularity and completeness

@@ -23,7 +23,8 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 - ✅ `start agent add|list|test|remove|edit|default` - [docs/cli/start-agent.md](./docs/cli/start-agent.md) - Agent configuration management
 - ✅ `start config show|edit|path|validate` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Config file management
-- ❓ `start update` - System health check and update management (TBD)
+- ✅ `start doctor` - [docs/cli/start-doctor.md](./docs/cli/start-doctor.md) - Diagnose installation and configuration health
+- ✅ `start update` - [docs/cli/start-update.md](./docs/cli/start-update.md) - Update asset library from GitHub
 
 ### Optional Commands (TBD)
 
@@ -97,6 +98,28 @@ CLI design is complete when:
 
 ## Recent Progress
 
+### Documentation Updates - config.md (2025-01-06)
+
+**Agent Section Updates:**
+- Updated to reflect DR-004 change allowing agents in both global and local configs
+- Documented merge behavior: local overrides global for same agent name
+- Added use case: teams can commit `.start/` with standard configs
+- Updated all scope references and validation rules
+
+**Task Section Updates:**
+- Completely rewrote to use Unified Template Design (UTD) pattern
+- Documented system prompt override: `system_prompt_file`, `system_prompt_command`, `system_prompt`
+- Updated task prompt fields: `file`, `command`, `prompt` (UTD)
+- Added shell configuration: `shell`, `command_timeout`
+- Documented auto-inclusion of `required = true` contexts (no `documents` array)
+- Removed old field references: `role`, `documents`, `content_command`
+
+**Consistency Fixes:**
+- Fixed placeholder documentation (`{command}` not `{content}` for tasks)
+- Updated path examples (consistent use of `file` field)
+- Updated validation rules for contexts (UTD pattern)
+- Verified merge behavior sections throughout
+
 ### Configuration Design (2025-01-05)
 
 **Unified Template Design (UTD):**
@@ -152,15 +175,83 @@ CLI design is complete when:
 - ✅ Scenario 4: Local exists → Ask to create global or replace local
 - ✅ Always recommends global as default/safe choice
 
-**Documentation Updates (In Progress - 2/5 complete):**
+### Asset Management System (2025-01-06)
+
+**Asset Library Design:**
+- ✅ Assets fetched from GitHub repository (not embedded in binary)
+- ✅ Stored in `~/.config/start/assets/` directory
+- ✅ Version tracked in `.asset-version` file (commit SHA + timestamp)
+- ✅ `start init` performs initial asset download
+- ✅ `start update` refreshes asset library from GitHub
+- ✅ `start doctor` checks asset age and reports if stale (> 30 days)
+
+**Asset Types:**
+- ✅ **Agents** (`assets/agents/*.toml`) - Templates used during `start agent add`
+- ✅ **Roles** (`assets/roles/*.md`) - Referenced in config, updates flow automatically
+- ✅ **Tasks** (`assets/tasks/*.toml`) - Merged with user tasks, user tasks take precedence
+- ✅ **Examples** (`assets/examples/*.toml`) - Reference configs, not auto-loaded
+
+**Update Flow:**
+- ✅ User runs `start doctor` → Sees "Assets 45 days old"
+- ✅ User runs `start update` → Downloads latest from GitHub
+- ✅ Role file references automatically use updated content
+- ✅ New tasks immediately available in `start task` list
+- ✅ User config never modified automatically
+
+**Design Decisions:**
+- ✅ Updated DR-011 to reflect GitHub-fetched assets
+- ✅ Separation of binary (code) vs content (assets)
+- ✅ Users control update timing (not forced)
+- ✅ Offline work after initial download
+- ✅ Network dependency acceptable for updates
+
+**Documentation Updates (Complete - 6/6):**
 - ✅ `docs/cli/start-init.md` - Added scope argument, smart behavior, local support
 - ✅ `docs/cli/start-config.md` - Changed flags to positional args, updated agent scope info
-- 🚧 `docs/config.md` - Agent section (local scope), task section (UTD fields)
-- 🚧 `docs/cli/start-task.md` - Task field updates if needed
+- ✅ `docs/config.md` - Updated agent section (local scope support), task section (UTD fields), merge behaviors, validation rules
+- ✅ `docs/cli/start-task.md` - Updated to UTD pattern (system_prompt_*, command, {command} placeholder, auto-include required contexts)
+- ✅ `docs/cli/start-doctor.md` - Comprehensive health check command (version, assets, config, agents, contexts, environment)
+- ✅ `docs/cli/start-update.md` - Asset library update from GitHub (agents, roles, tasks, examples)
+- ✅ `docs/design/design-record.md` DR-011 - Updated to reflect GitHub-fetched assets (not embedded)
 
-**Remaining Work:**
-- Update `docs/config.md` sections for agents (local allowed) and tasks (UTD fields)
-- Evaluate `start context` command necessity (vs direct config editing)
-- Evaluate `start role` command necessity (roles section not currently used)
-- Determine shell completion requirements (bash/zsh/fish)
-- Define non-interactive mode flags for CI/automation
+**High-Level Design Complete:**
+- ✅ Review/update `docs/cli/start-task.md` for task UTD fields
+- ✅ Design `start doctor` and `start update` commands (user-facing behavior)
+
+**Implementation Details to Design:**
+
+*Asset Update Mechanism:*
+- [ ] **Task 12a:** Decide GitHub download strategy (API calls, manifest format, file discovery)
+- [ ] **Task 12b:** Design atomic update mechanism (temp directory, swap, partial failure recovery)
+- [ ] **Task 12c:** Define asset discovery system (how start knows what asset types exist)
+
+*Version Tracking & Checking:*
+- [ ] **Task 13a:** Define binary version source (build-time injection strategy)
+- [ ] **Task 13b:** Design GitHub version checking (API endpoint, rate limiting, caching)
+- [ ] **Task 13c:** Define commit SHA retrieval strategy (releases vs commits)
+
+*Doctor Implementation:*
+- [ ] **Task 14a:** Design asset staleness checking (local-only vs GitHub comparison)
+- [ ] **Task 14b:** Define exit code priority system (multiple simultaneous issues)
+- [ ] **Task 14c:** Design automatic check frequency and caching strategy
+
+*Integration & Offline Support:*
+- [ ] **Task 15a:** Define start init + start update relationship (does init call update?)
+- [ ] **Task 15b:** Design offline fallback strategy (manual asset installation)
+- [ ] **Task 15c:** Define behavior when network unavailable
+
+*Task Merging Implementation:*
+- [ ] **Task 16a:** Design task loading and merging algorithm (assets + user config)
+- [ ] **Task 16b:** Define source metadata tracking ([default] vs [user] labels)
+- [ ] **Task 16c:** Specify precedence rules implementation details
+
+*Security & Trust:*
+- [ ] **Task 17a:** Define trust model for downloaded assets
+- [ ] **Task 17b:** Decide on signature verification (if any)
+- [ ] **Task 17c:** Design commit/tag pinning strategy
+
+*Remaining High-Level Design:*
+- [ ] **Task 18:** Evaluate `start context` command necessity (vs direct config editing)
+- [ ] **Task 19:** Evaluate `start role` command necessity (roles section not currently used)
+- [ ] **Task 20:** Determine shell completion requirements (bash/zsh/fish)
+- [ ] **Task 21:** Define non-interactive mode flags for CI/automation

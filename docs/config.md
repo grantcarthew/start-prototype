@@ -11,10 +11,10 @@ Complete reference for `start` configuration files.
 
 **Merge behavior:**
 - Settings: Local values override global values
-- Agents: Global only (local cannot define agents - see DR-004)
+- Agents: Combined (global + local), local overrides global for same name
 - Contexts: Combined (global + local, names must be unique)
 - Roles: Global only
-- Tasks: Global only (defined via embedded assets)
+- Tasks: Combined (global + local), local overrides global for same name
 
 ## Complete Example
 
@@ -131,7 +131,7 @@ When both configs exist, the effective configuration combines them:
 - `log_level = "debug"` (from local, overrides global "normal")
 
 **Agents:**
-- claude, gemini, aichat (from global only - local cannot define agents)
+- claude, gemini, aichat (from global; local can override or add agents)
 
 **System prompt:**
 - `./ROLE.md` (from local, overrides global `~/.config/start/roles/default.md`)
@@ -251,7 +251,7 @@ Local settings override global settings. If a setting is omitted in local config
 
 ### [agents.\<name\>]
 
-AI agent tool configurations. **Global-only** (per DR-004).
+AI agent tool configurations. Can be defined in both global and local configs.
 
 Each agent section defines how to invoke an AI tool. Agent names should match the actual tool binary name (e.g., `claude`, `gemini`, `aichat`).
 
@@ -304,11 +304,16 @@ default_model = "sonnet"
   - **[agents.\<name\>.models]** section MUST exist with ≥1 model → **Error** if missing
 - If **default_model** defined but not in models table → **Warning**, fall back to first model (TOML order)
 - Unknown placeholders in command → **Warning**: `"Unknown placeholder {mdoel} (did you mean {model}?)"`
-- Agents defined in local config → **Warning**: `"Agents in local config ignored (global-only)"`
+- Same agent name in global and local → **Info**: Local overrides global
 
 **Scope:**
 
-Agents are **global-only** (per DR-004). Local configs cannot define agents.
+Agents can be defined in both **global and local** configs (per DR-004 update):
+
+- **Global agents:** `~/.config/start/config.toml` - Personal configurations
+- **Local agents:** `./.start/config.toml` - Team/project configurations (can be committed)
+- **Merge behavior:** Local overrides global for same agent name
+- **Use case:** Teams can commit `.start/` with standard configs; individuals maintain personal preferences
 
 **Example agent (full):**
 
@@ -584,14 +589,14 @@ When both global and local configs exist, contexts are combined in order:
 
 ### [tasks.\<name\>]
 
-Predefined workflow tasks. **Global-only** (embedded in binary, not user-configurable yet).
+Predefined workflow tasks. Can be defined in both global and local configs.
 
-Tasks define reusable workflows with specific prompts, roles, and optional dynamic content.
+Tasks define reusable workflows with specific system prompts, prompt templates, and optional dynamic content. Tasks use the **[Unified Template Design (UTD)](./unified-template-design.md)** pattern for both system prompts and task prompts.
 
-**Fields:**
+**Metadata Fields:**
 
 **alias** (string, optional)
-: Short name for quick access. Must be unique across all tasks.
+: Short name for quick access. Must be unique across all tasks (global + local merged).
 
 ```toml
 [tasks.git-diff-review]
@@ -603,64 +608,103 @@ alias = "gdr"
 
 ```toml
 [tasks.git-diff-review]
-description = "Review git diff changes"
+description = "Review staged git changes"
 ```
 
-**role** (string, required)
-: System prompt for this task. Can be:
-- File path: `"./roles/code-reviewer.md"`
-- Inline text: `"You are an expert code reviewer..."`
+**System Prompt Override (UTD Pattern):**
+
+Tasks can override the global/local system prompt using UTD fields. All fields are optional - if omitted, uses global/local `[system_prompt]`.
+
+**system_prompt_file** (string, optional)
+: Path to role definition file.
+
+**system_prompt_command** (string, optional)
+: Shell command to generate dynamic role content.
+
+**system_prompt** (string, optional)
+: Template text with `{file}` and `{command}` placeholders.
+
+```toml
+[tasks.code-review]
+system_prompt_file = "~/.config/start/roles/code-reviewer.md"
+system_prompt = """
+{file}
+
+CRITICAL: Focus on security vulnerabilities.
+"""
+```
+
+See [UTD documentation](./unified-template-design.md#validation-rules) for field combination behavior.
+
+**Task Prompt (UTD Pattern):**
+
+At least one of `file`, `command`, or `prompt` must be present.
+
+**file** (string, optional)
+: Path to prompt template file.
+
+**command** (string, optional)
+: Shell command to generate dynamic content (e.g., `git diff --staged`). Output available via `{command}` placeholder.
+
+**prompt** (string, optional)
+: Template text with `{file}`, `{command}`, and `{instructions}` placeholders.
 
 ```toml
 [tasks.git-diff-review]
-role = "./roles/code-reviewer.md"
+command = "git diff --staged"
+prompt = """
+Review the following changes:
+
+## Instructions
+{instructions}
+
+## Staged Changes
+```diff
+{command}
+```
+"""
 ```
 
-**documents** (array of strings, optional)
-: Names of context documents to include. References document names from `[context.<name>]` sections.
+**Additional Fields:**
 
-```toml
-[tasks.git-diff-review]
-documents = ["environment", "agents"]
-```
+**shell** (string, optional)
+: Override global shell for command execution. See [UTD shell configuration](./unified-template-design.md#shell-configuration).
 
-**content_command** (string, optional)
-: Shell command to execute. Output becomes `{content}` placeholder in prompt template.
+**command_timeout** (integer, optional)
+: Override global timeout (in seconds) for command execution.
 
-```toml
-[tasks.git-diff-review]
-content_command = "git diff --staged"
-```
+**Context Inclusion:**
 
-**prompt** (string, required)
-: Prompt template for this task. Can be:
-- File path: `"./prompts/review.md"`
-- Inline text (multi-line): See example below
-
-Supports placeholders:
-- Task-specific: `{instructions}`, `{content}`
-- Global: `{model}`, `{system_prompt}`, `{prompt}`, `{date}`
+Tasks automatically include **all contexts where `required = true`**. There is no `documents` array. This ensures critical context (like AGENTS.md) is always present.
 
 **Example task (full):**
 
 ````toml
 [tasks.git-diff-review]
 alias = "gdr"
-description = "Review git diff changes"
-role = "./roles/code-reviewer.md"
-documents = ["environment", "agents"]
-content_command = "git diff --staged"
+description = "Review staged git changes"
+
+# System prompt override (UTD)
+system_prompt_file = "~/.config/start/roles/code-reviewer.md"
+system_prompt = """
+{file}
+
+Additional context: Focus on security and performance.
+"""
+
+# Task prompt (UTD)
+command = "git diff --staged"
+shell = "bash"
+command_timeout = 10
 prompt = """
-Analyze the following git diff and act as a code reviewer.
+Review the following changes:
 
-## Special Instructions
-
+## Instructions
 {instructions}
 
-## Git Diff
-
+## Staged Changes
 ```diff
-{content}
+{command}
 ```
 """
 ````
@@ -669,15 +713,25 @@ Analyze the following git diff and act as a code reviewer.
 
 ```toml
 [tasks.simple]
-role = "You are a helpful assistant."
+alias = "s"
+description = "Simple help task"
 prompt = "Help me with: {instructions}"
+# No system_prompt_* fields = uses global/local [system_prompt]
+# Auto-includes all contexts with required = true
 ```
 
 **Placeholder behavior:**
 
-- `{instructions}` - Command-line args after task name, or `"None"` if not provided
-- `{content}` - Output from `content_command`, or empty string if no command
-- Standard placeholders also available
+In system_prompt templates:
+- `{file}` - Content from `system_prompt_file`
+- `{command}` - Output from `system_prompt_command`
+- `{model}`, `{date}` - Global placeholders
+
+In task prompt templates:
+- `{file}` - Content from task `file`
+- `{command}` - Output from task `command`
+- `{instructions}` - Command-line args (or `"None"`)
+- `{model}`, `{date}` - Global placeholders
 
 **Usage:**
 
@@ -768,10 +822,12 @@ Available in task prompt templates:
 
 Example: `start task gdr "focus on security"` → `{instructions}` = `"focus on security"`
 
-**{content}**
-: Output from task's `content_command`. Empty string if no command defined.
+**{command}**
+: Output from task's `command`. Empty string if no command defined.
 
-Example: `content_command = "git diff --staged"` → `{content}` = output of git diff
+Example: `command = "git diff --staged"` → `{command}` = output of git diff
+
+Note: In task prompts, use `{command}` not `{content}`. The `{content}` placeholder was from an earlier design.
 
 ---
 
@@ -800,9 +856,9 @@ Relative paths resolve based on context:
 
 ```toml
 file = "./AGENTS.md"           # Relative (same as "AGENTS.md")
-path = "AGENTS.md"             # Relative
-path = "/absolute/path.md"     # Absolute
-path = "~/reference/file.md"   # Home-relative (tilde expansion)
+file = "AGENTS.md"             # Relative
+file = "/absolute/path.md"     # Absolute
+file = "~/reference/file.md"   # Home-relative (tilde expansion)
 ```
 
 ---
@@ -816,12 +872,12 @@ path = "~/reference/file.md"   # Home-relative (tilde expansion)
 - `command` must contain `{prompt}` placeholder
 
 **[context.\<name\>]:**
-- `path` must be present
-- `prompt` must be present
+- At least one of `file`, `command`, or `prompt` must be present (UTD pattern)
+- UTD validation rules apply (see [Unified Template Design](./unified-template-design.md#validation-rules))
 
 **[tasks.\<name\>]:**
-- `role` must be present
-- `prompt` must be present
+- At least one of `file`, `command`, or `prompt` must be present (task prompt)
+- UTD validation rules apply (see [Unified Template Design](./unified-template-design.md#validation-rules))
 
 ### Field Constraints
 
@@ -849,14 +905,14 @@ path = "~/reference/file.md"   # Home-relative (tilde expansion)
 ### Scope Constraints
 
 **Global-only sections:**
-- `[agents]` - Cannot appear in local config (DR-004)
 - `[roles]` - Cannot appear in local config
-- `[tasks]` - Cannot appear in local config (embedded assets)
 
 **Allowed in both global and local:**
 - `[settings]` - Local overrides global
 - `[system_prompt]` - Local overrides global
-- `[context.documents]` - Combined (global + local)
+- `[agents]` - Combined (global + local), local overrides global for same name
+- `[context]` - Combined (global + local)
+- `[tasks]` - Combined (global + local), local overrides global for same name
 
 ---
 
@@ -975,7 +1031,7 @@ When both configs exist, the effective configuration is:
 - `verbosity = "verbose"` (from local, overrides global)
 
 **Agents:**
-- claude, gemini, aichat (from global only)
+- claude, gemini, aichat (from global; local can override or add agents)
 
 **System prompt:**
 - `./ROLE.md` (from local, overrides global)
