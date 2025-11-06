@@ -8,7 +8,7 @@
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (17 DRs) | [Tasks](./docs/tasks.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (18 DRs) | [Tasks](./docs/tasks.md)
 
 ## Command Status
 
@@ -40,7 +40,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ## Architecture Decisions
 
-### Completed (17 Design Records)
+### Completed (19 Design Records)
 
 **Core Configuration (DR-001 to DR-008):**
 - DR-001: TOML for configuration format
@@ -59,11 +59,13 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-012: Context document required field and order
 - DR-013: Agent configuration distribution via GitHub
 
-**Asset Management & CLI (DR-014 to DR-017):**
+**Asset Management & CLI (DR-014 to DR-019):**
 - DR-014: GitHub Tree API with SHA-based caching for incremental updates
 - DR-015: Atomic update mechanism with rollback capability
 - DR-016: Asset discovery - each feature checks its own directory
 - DR-017: CLI reorganization - `start config` for all configuration management
+- DR-018: Init and update command integration - shared implementation, no conditional logic
+- DR-019: Task loading and merging - global + local only, assets as templates, local precedence
 
 **Implementation:**
 - Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
@@ -124,6 +126,75 @@ CLI design is complete when:
 - [docs/archive/](./docs/archive/) - Design discussion history
 
 ## Recent Progress
+
+### Task Loading Algorithm Design - DR-019 (2025-01-06)
+
+**Task 16a-c Completed:**
+- ✅ Designed complete task loading and merging algorithm
+- ✅ Created DR-019: Task loading and merging
+- ✅ Clarified asset tasks as templates (not runtime loaded)
+
+**Key Decisions:**
+- Runtime tasks load from global + local configs only (assets NOT auto-loaded)
+- Asset tasks serve as templates for `start config task add` workflow
+- Local completely replaces global for same task name (no field merging)
+- Resolution priority: local name → local alias → global name → global alias
+- Source metadata tracked for transparency/security
+- `start config task list` shows all three: global, local, and available assets
+
+**Task Adding Workflow:**
+- Interactive: "Start from template or create new?"
+- If template: prompts show asset values as defaults (easy to accept)
+- Conflict warnings for name/alias shadowing
+
+**Alias Handling:**
+- Local alias wins over global alias (silent override with warning)
+- Conflict warning during add: "Your task will shadow the global alias"
+- Runtime warning: "Global alias 'cr' shadowed by local task"
+
+**Benefits:**
+- Clear mental model: assets are templates, not active tasks
+- Predictable: local always wins
+- Secure: source shown at runtime (detect malicious local configs)
+- Discoverable: asset templates visible in list
+
+**Implementation Ready:**
+- `internal/config/TaskRegistry` with Load/Resolve/CheckConflicts
+- Clear algorithm for name/alias resolution
+- Metadata tracking structure defined
+
+### Init/Update Integration Design - DR-018 (2025-01-06)
+
+**Task 15a Completed:**
+- ✅ Defined relationship between `start init` and `start update` commands
+- ✅ Created DR-018: Init and update command integration
+- ✅ Simplified approach: No conditional logic, no special flags
+
+**Key Decisions:**
+- `start init` **always** invokes asset update logic (no staleness checks)
+- Both commands share identical SHA-based update implementation from DR-014
+- No flags: `--skip-assets`, `--force`, etc. (KISS principle)
+- Network failure during init: warns but succeeds (can update later)
+- Network failure during update: fails (its explicit purpose)
+
+**Implementation Strategy:**
+```go
+// Package: internal/assets
+func UpdateAssets() error {
+    // Single source of truth for both init and update
+    // Uses SHA comparison to download only changed files
+}
+```
+
+**Benefits:**
+- Self-optimizing: SHA comparison prevents redundant downloads
+- Predictable: init always tries to update, update requires network
+- Offline-friendly: init can proceed without assets
+- Simple: removed all conditional logic and staleness checks
+
+**Next Steps:**
+- Task 15b: Design offline fallback strategy
+- Task 15c: Define behavior when network unavailable
 
 ### Documentation Updates - config.md (2025-01-06)
 
@@ -277,14 +348,14 @@ CLI design is complete when:
 - [ ] **Task 14c:** Design automatic check frequency and caching strategy
 
 *Integration & Offline Support:*
-- [ ] **Task 15a:** Define start init + start update relationship (does init call update?)
+- [x] **Task 15a:** Define start init + start update relationship → DR-018: Shared implementation, no conditional logic
 - [ ] **Task 15b:** Design offline fallback strategy (manual asset installation)
 - [ ] **Task 15c:** Define behavior when network unavailable
 
 *Task Merging Implementation:*
-- [ ] **Task 16a:** Design task loading and merging algorithm (assets + user config)
-- [ ] **Task 16b:** Define source metadata tracking ([default] vs [user] labels)
-- [ ] **Task 16c:** Specify precedence rules implementation details
+- [x] **Task 16a:** Design task loading and merging algorithm (assets + user config) → DR-019: Global + local only, assets as templates
+- [x] **Task 16b:** Define source metadata tracking ([default] vs [user] labels) → DR-019: Source and SourcePath metadata
+- [x] **Task 16c:** Specify precedence rules implementation details → DR-019: Local > global, name/alias resolution priority
 
 *Security & Trust:*
 - [ ] **Task 17a:** Define trust model for downloaded assets
