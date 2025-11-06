@@ -10,7 +10,7 @@
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (21 DRs) | [Tasks](./docs/tasks.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (25 DRs) | [Tasks](./docs/tasks.md)
 
 ## Command Status
 
@@ -42,7 +42,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ## Architecture Decisions
 
-### Completed (21 Design Records)
+### Completed (25 Design Records)
 
 **Core Configuration (DR-001 to DR-008):**
 - DR-001: TOML for configuration format
@@ -61,7 +61,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-012: Context document required field and order
 - DR-013: Agent configuration distribution via GitHub
 
-**Asset Management & CLI (DR-014 to DR-021):**
+**Asset Management & CLI (DR-014 to DR-025):**
 - DR-014: GitHub Tree API with SHA-based caching for incremental updates
 - DR-015: Atomic update mechanism with rollback capability
 - DR-016: Asset discovery - each feature checks its own directory
@@ -70,6 +70,10 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-019: Task loading and merging - global + local only, assets as templates, local precedence
 - DR-020: Binary version injection - ldflags at build time with git-based versioning
 - DR-021: GitHub version checking - Releases API with no caching, integrated into doctor and update commands
+- DR-022: Asset branch strategy - pull from main branch (not releases) for rapid iteration
+- DR-023: Asset staleness checking - GitHub commit comparison with no caching
+- DR-024: Doctor exit code system - simple binary exit codes (0 = healthy, 1 = issues)
+- DR-025: No automatic checks or caching - all health checks are user-initiated only
 
 **Implementation:**
 - Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
@@ -344,12 +348,12 @@ func UpdateAssets() error {
 *Version Tracking & Checking:*
 - [x] **Task 13a:** Define binary version source (build-time injection strategy) → DR-020: ldflags with git tags
 - [x] **Task 13b:** Design GitHub version checking (API endpoint, rate limiting, caching) → DR-021: Releases API, no caching
-- [ ] **Task 13c:** Define commit SHA retrieval strategy (releases vs commits)
+- [x] **Task 13c:** Define commit SHA retrieval strategy (releases vs commits) → DR-022: Main branch for assets
 
 *Doctor Implementation:*
-- [ ] **Task 14a:** Design asset staleness checking (local-only vs GitHub comparison)
-- [ ] **Task 14b:** Define exit code priority system (multiple simultaneous issues)
-- [ ] **Task 14c:** Design automatic check frequency and caching strategy
+- [x] **Task 14a:** Design asset staleness checking (local-only vs GitHub comparison) → DR-023: GitHub commit comparison
+- [x] **Task 14b:** Define exit code priority system (multiple simultaneous issues) → DR-024: Simple binary exit codes
+- [x] **Task 14c:** Design automatic check frequency and caching strategy → DR-025: No automatic checks or caching
 
 *Integration & Offline Support:*
 - [x] **Task 15a:** Define start init + start update relationship → DR-018: Shared implementation, no conditional logic

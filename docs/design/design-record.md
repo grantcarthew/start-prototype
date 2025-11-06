@@ -29,6 +29,10 @@ See [vision.md](../vision.md) for the product vision and goals.
 | [DR-019](./decisions/dr-019-task-loading.md) | Task Loading & Merging Algorithm | Tasks | 2025-01-06 |
 | [DR-020](./decisions/dr-020-version-injection.md) | Binary Version Injection Strategy | Build & Distribution | 2025-01-06 |
 | [DR-021](./decisions/dr-021-github-version-check.md) | GitHub Version Checking | Version Management | 2025-01-06 |
+| [DR-022](./decisions/dr-022-asset-branch-strategy.md) | Asset Branch Strategy | Asset Management | 2025-01-06 |
+| [DR-023](./decisions/dr-023-asset-staleness-check.md) | Asset Staleness Checking | Asset Management | 2025-01-06 |
+| [DR-024](./decisions/dr-024-doctor-exit-codes.md) | Doctor Exit Code System | CLI Design | 2025-01-06 |
+| [DR-025](./decisions/dr-025-no-automatic-checks.md) | No Automatic Checks or Caching | CLI Design | 2025-01-06 |
 
 ## By Category
 
@@ -45,12 +49,14 @@ Core configuration structure and file handling:
 - **[DR-008](./decisions/dr-008-file-handling.md)** - Relative paths and missing file handling
 - **[DR-012](./decisions/dr-012-context-required.md)** - Required field and document order
 
-### CLI Design (DR-006, DR-017)
+### CLI Design (DR-006, DR-017, DR-024, DR-025)
 
 Command-line interface structure:
 
 - **[DR-006](./decisions/dr-006-cobra-cli.md)** - Cobra framework with subcommands and global flags
 - **[DR-017](./decisions/dr-017-cli-reorganization.md)** - Configuration under `start config`, execution at top level
+- **[DR-024](./decisions/dr-024-doctor-exit-codes.md)** - Simple binary exit codes (0 = healthy, 1 = issues)
+- **[DR-025](./decisions/dr-025-no-automatic-checks.md)** - No automatic checks or result caching
 
 ### Tasks (DR-009, DR-010, DR-019)
 
@@ -60,7 +66,7 @@ Task configuration and loading:
 - **[DR-010](./decisions/dr-010-default-tasks.md)** - Four interactive review tasks as defaults
 - **[DR-019](./decisions/dr-019-task-loading.md)** - Global + local loading, assets as templates
 
-### Asset Management (DR-011, DR-013 to DR-016, DR-018)
+### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023)
 
 Asset distribution and updates:
 
@@ -70,6 +76,8 @@ Asset distribution and updates:
 - **[DR-015](./decisions/dr-015-atomic-updates.md)** - Atomic install with rollback capability
 - **[DR-016](./decisions/dr-016-asset-discovery.md)** - Each feature checks its own directory
 - **[DR-018](./decisions/dr-018-init-update-integration.md)** - Init and update share implementation
+- **[DR-022](./decisions/dr-022-asset-branch-strategy.md)** - Assets from main branch (not releases)
+- **[DR-023](./decisions/dr-023-asset-staleness-check.md)** - GitHub commit comparison with no caching
 
 ### Build & Distribution (DR-011, DR-013, DR-020)
 
