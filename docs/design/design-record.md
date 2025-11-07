@@ -33,6 +33,9 @@ See [vision.md](../vision.md) for the product vision and goals.
 | [DR-023](./decisions/dr-023-asset-staleness-check.md) | Asset Staleness Checking | Asset Management | 2025-01-06 |
 | [DR-024](./decisions/dr-024-doctor-exit-codes.md) | Doctor Exit Code System | CLI Design | 2025-01-06 |
 | [DR-025](./decisions/dr-025-no-automatic-checks.md) | No Automatic Checks or Caching | CLI Design | 2025-01-06 |
+| [DR-026](./decisions/dr-026-offline-behavior.md) | Offline Fallback & Network Unavailable | Asset Management | 2025-01-07 |
+| [DR-027](./decisions/dr-027-security-trust-model.md) | Security & Trust Model for Assets | Asset Management | 2025-01-07 |
+| [DR-028](./decisions/dr-028-shell-completion.md) | Shell Completion Support | CLI Design | 2025-01-07 |
 
 ## By Category
 
@@ -49,7 +52,7 @@ Core configuration structure and file handling:
 - **[DR-008](./decisions/dr-008-file-handling.md)** - Relative paths and missing file handling
 - **[DR-012](./decisions/dr-012-context-required.md)** - Required field and document order
 
-### CLI Design (DR-006, DR-017, DR-024, DR-025)
+### CLI Design (DR-006, DR-017, DR-024, DR-025, DR-028)
 
 Command-line interface structure:
 
@@ -57,6 +60,7 @@ Command-line interface structure:
 - **[DR-017](./decisions/dr-017-cli-reorganization.md)** - Configuration under `start config`, execution at top level
 - **[DR-024](./decisions/dr-024-doctor-exit-codes.md)** - Simple binary exit codes (0 = healthy, 1 = issues)
 - **[DR-025](./decisions/dr-025-no-automatic-checks.md)** - No automatic checks or result caching
+- **[DR-028](./decisions/dr-028-shell-completion.md)** - Shell completion for bash/zsh/fish
 
 ### Tasks (DR-009, DR-010, DR-019)
 
@@ -66,7 +70,7 @@ Task configuration and loading:
 - **[DR-010](./decisions/dr-010-default-tasks.md)** - Four interactive review tasks as defaults
 - **[DR-019](./decisions/dr-019-task-loading.md)** - Global + local loading, assets as templates
 
-### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023)
+### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023, DR-026, DR-027)
 
 Asset distribution and updates:
 
@@ -78,6 +82,8 @@ Asset distribution and updates:
 - **[DR-018](./decisions/dr-018-init-update-integration.md)** - Init and update share implementation
 - **[DR-022](./decisions/dr-022-asset-branch-strategy.md)** - Assets from main branch (not releases)
 - **[DR-023](./decisions/dr-023-asset-staleness-check.md)** - GitHub commit comparison with no caching
+- **[DR-026](./decisions/dr-026-offline-behavior.md)** - Network-only, no manual installation, graceful degradation
+- **[DR-027](./decisions/dr-027-security-trust-model.md)** - Trust GitHub HTTPS, no signatures, no pinning
 
 ### Build & Distribution (DR-011, DR-013, DR-020)
 

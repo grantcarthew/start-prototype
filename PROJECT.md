@@ -10,7 +10,7 @@
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (25 DRs) | [Tasks](./docs/tasks.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (28 DRs) | [Tasks](./docs/tasks.md)
 
 ## Command Status
 
@@ -42,7 +42,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ## Architecture Decisions
 
-### Completed (25 Design Records)
+### Completed (28 Design Records)
 
 **Core Configuration (DR-001 to DR-008):**
 - DR-001: TOML for configuration format
@@ -61,7 +61,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-012: Context document required field and order
 - DR-013: Agent configuration distribution via GitHub
 
-**Asset Management & CLI (DR-014 to DR-025):**
+**Asset Management & CLI (DR-014 to DR-028):**
 - DR-014: GitHub Tree API with SHA-based caching for incremental updates
 - DR-015: Atomic update mechanism with rollback capability
 - DR-016: Asset discovery - each feature checks its own directory
@@ -74,6 +74,9 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-023: Asset staleness checking - GitHub commit comparison with no caching
 - DR-024: Doctor exit code system - simple binary exit codes (0 = healthy, 1 = issues)
 - DR-025: No automatic checks or caching - all health checks are user-initiated only
+- DR-026: Offline fallback and network unavailable behavior - network-only, no manual installation, graceful degradation
+- DR-027: Security and trust model for assets - trust GitHub HTTPS, no signatures, no commit pinning
+- DR-028: Shell completion support - bash/zsh/fish, manual + auto-install, dynamic completions
 
 **Implementation:**
 - Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
@@ -100,14 +103,17 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 5. ✅ **Task structure:** Full UTD for system_prompt and task prompt
 6. ✅ **Context management:** `start config context` (DR-017)
 7. ✅ **Role management:** `start config role` (DR-017)
+8. ✅ **Shell completion:** Generate for bash/zsh/fish (DR-028)
+9. ✅ **Version tracking:** Build-time injection strategy (DR-020)
+10. ✅ **Asset staleness:** Local-only check vs GitHub comparison (DR-023)
+11. ✅ **Security:** Trust model for downloaded assets (DR-027)
 
 ### Remaining
 
-8. **Shell completion:** Generate for bash/zsh/fish?
-9. **Non-interactive mode:** What flags needed for CI/automation?
-10. **Version tracking:** Build-time injection strategy
-11. **Asset staleness:** Local-only check vs GitHub comparison
-12. **Security:** Trust model for downloaded assets
+12. **Default assets:** What roles, tasks, metaprompts should ship with start?
+13. **Partial subcommand matching:** Support `start con ag` for `start config agent`?
+14. **Universal --help:** Do all subcommands support --help flag?
+15. **Task agent selection:** Should tasks specify which agent to use?
 
 ## Success Criteria
 
@@ -357,8 +363,8 @@ func UpdateAssets() error {
 
 *Integration & Offline Support:*
 - [x] **Task 15a:** Define start init + start update relationship → DR-018: Shared implementation, no conditional logic
-- [ ] **Task 15b:** Design offline fallback strategy (manual asset installation)
-- [ ] **Task 15c:** Define behavior when network unavailable
+- [x] **Task 15b:** Design offline fallback strategy (manual asset installation) → DR-026: Network-only, no manual installation
+- [x] **Task 15c:** Define behavior when network unavailable → DR-026: Graceful degradation, clear error messages
 
 *Task Merging Implementation:*
 - [x] **Task 16a:** Design task loading and merging algorithm (assets + user config) → DR-019: Global + local only, assets as templates
@@ -366,12 +372,16 @@ func UpdateAssets() error {
 - [x] **Task 16c:** Specify precedence rules implementation details → DR-019: Local > global, name/alias resolution priority
 
 *Security & Trust:*
-- [ ] **Task 17a:** Define trust model for downloaded assets
-- [ ] **Task 17b:** Decide on signature verification (if any)
-- [ ] **Task 17c:** Design commit/tag pinning strategy
+- [x] **Task 17a:** Define trust model for downloaded assets → DR-027: Trust GitHub HTTPS + hardcoded repo
+- [x] **Task 17b:** Decide on signature verification (if any) → DR-027: No signatures, HTTPS sufficient
+- [x] **Task 17c:** Design commit/tag pinning strategy → DR-027: No pinning, always latest from main
 
 *Remaining High-Level Design:*
 - [x] **Task 18:** Evaluate `start context` command necessity → Resolved: `start config context` created (Task 12f)
 - [x] **Task 19:** Evaluate `start role` command necessity → Resolved: `start config role` created (Task 12h)
-- [ ] **Task 20:** Determine shell completion requirements (bash/zsh/fish)
-- [ ] **Task 21:** Define non-interactive mode flags for CI/automation
+- [x] **Task 20:** Determine shell completion requirements (bash/zsh/fish) → DR-028: bash/zsh/fish support, Tier 1+2 completions
+- [x] **Task 21:** Define non-interactive mode flags for CI/automation → Resolved: Delegate to agent configuration (no special flags)
+- [ ] **Task 22:** Define out-of-box assets (roles, tasks, metaprompts, templates)
+- [ ] **Task 23:** Decide on partial subcommand matching support
+- [ ] **Task 24:** Verify --help flag support across all commands
+- [ ] **Task 25:** Add agent field to task configuration - tasks should specify which agent to use
