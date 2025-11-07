@@ -53,8 +53,9 @@ Runs all diagnostic checks in order and reports results. Non-blocking - shows al
 2. Asset library check
 3. Configuration validation
 4. Agent diagnostics
-5. Context verification
-6. Environment check
+5. Task validation (including agent references)
+6. Context verification
+7. Environment check
 
 **Exit codes:**
 
@@ -111,6 +112,20 @@ Agents (3 configured)
     Install: brew install aichat
     Or remove: start agent remove aichat
 
+Tasks (4 configured)
+  ✓ code-review (cr)
+    Agent: claude (default)
+
+  ✓ git-diff-review (gdr)
+    Agent: claude (default)
+
+  ✗ go-review (gor)
+    Agent: go-expert (NOT FOUND)
+    Fix: start config agent add go-expert
+
+  ✓ security-audit (sec)
+    Agent: claude (from task config)
+
 Contexts (2 required, 1 optional)
   Required:
     ✓ environment - ~/reference/ENVIRONMENT.md
@@ -126,17 +141,19 @@ Environment
 
 Summary
 ───────────────────────────────────────────────────────────
-  1 error, 2 warnings found
+  2 errors, 2 warnings found
 
 Issues:
   ✗ Agent 'aichat' binary not found
+  ✗ Task 'go-review' references undefined agent 'go-expert'
   ⚠ Assets outdated (45 days old)
   ⚠ Optional context 'project' missing
 
 Recommendations:
   1. Install aichat: brew install aichat
-  2. Update assets: start update
-  3. Optional: Create PROJECT.md in current directory
+  2. Add go-expert agent: start config agent add go-expert
+  3. Update assets: start update
+  4. Optional: Create PROJECT.md in current directory
 ```
 
 ### Verbose Mode

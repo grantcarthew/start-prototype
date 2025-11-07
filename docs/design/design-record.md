@@ -36,6 +36,7 @@ See [vision.md](../vision.md) for the product vision and goals.
 | [DR-026](./decisions/dr-026-offline-behavior.md) | Offline Fallback & Network Unavailable | Asset Management | 2025-01-07 |
 | [DR-027](./decisions/dr-027-security-trust-model.md) | Security & Trust Model for Assets | Asset Management | 2025-01-07 |
 | [DR-028](./decisions/dr-028-shell-completion.md) | Shell Completion Support | CLI Design | 2025-01-07 |
+| [DR-029](./decisions/dr-029-task-agent-field.md) | Task Agent Field | Tasks | 2025-01-07 |
 
 ## By Category
 
@@ -62,13 +63,14 @@ Command-line interface structure:
 - **[DR-025](./decisions/dr-025-no-automatic-checks.md)** - No automatic checks or result caching
 - **[DR-028](./decisions/dr-028-shell-completion.md)** - Shell completion for bash/zsh/fish
 
-### Tasks (DR-009, DR-010, DR-019)
+### Tasks (DR-009, DR-010, DR-019, DR-029)
 
 Task configuration and loading:
 
 - **[DR-009](./decisions/dr-009-task-structure.md)** - Task structure with {instructions} and {content} placeholders
 - **[DR-010](./decisions/dr-010-default-tasks.md)** - Four interactive review tasks as defaults
 - **[DR-019](./decisions/dr-019-task-loading.md)** - Global + local loading, assets as templates
+- **[DR-029](./decisions/dr-029-task-agent-field.md)** - Optional agent field for task-specific agent preference
 
 ### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023, DR-026, DR-027)
 

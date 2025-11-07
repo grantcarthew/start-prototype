@@ -611,6 +611,17 @@ alias = "gdr"
 description = "Review staged git changes"
 ```
 
+**agent** (string, optional)
+: Preferred agent for this task. Must reference an agent defined in `[agents.<name>]` configuration. Agent selection precedence: CLI `--agent` flag > task `agent` field > `default_agent` setting.
+
+```toml
+[tasks.go-review]
+agent = "go-expert"
+description = "Review Go code with specialized agent"
+```
+
+Validated at task execution time and by `start doctor` / `start config validate`.
+
 **System Prompt Override (UTD Pattern):**
 
 Tasks can override the global/local system prompt using UTD fields. All fields are optional - if omitted, uses global/local `[system_prompt]`.
@@ -878,6 +889,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 **[tasks.\<name\>]:**
 - At least one of `file`, `command`, or `prompt` must be present (task prompt)
 - UTD validation rules apply (see [Unified Template Design](./unified-template-design.md#validation-rules))
+- `agent` field (if present) must reference an existing `[agents.<name>]` section
 
 ### Field Constraints
 

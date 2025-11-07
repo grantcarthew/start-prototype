@@ -30,6 +30,7 @@ Tasks use the section name `[tasks.<name>]` where `<name>` is a unique identifie
 [tasks.<name>]
 alias = "..."                           # Optional: Short name
 description = "..."                     # Optional: Help text
+agent = "..."                           # Optional: Preferred agent
 
 # System prompt override (UTD pattern - optional)
 system_prompt_file = "..."              # Optional: Path to role file
@@ -65,6 +66,28 @@ alias = "gdr"
 [tasks.git-diff-review]
 description = "Review staged git changes"
 ```
+
+**agent** (string, optional)
+: Preferred agent for this task. Must reference an agent defined in `[agents.<name>]` configuration. Agent selection precedence: CLI `--agent` flag > task `agent` field > `default_agent` setting.
+
+```toml
+[tasks.go-review]
+agent = "go-expert"
+description = "Review Go code with specialized agent"
+```
+
+If omitted, uses the `default_agent` from settings (or can be overridden with `--agent` flag at runtime).
+
+**Use cases:**
+- Specialized agents for specific languages or domains
+- Different model perspectives for alternative reviews
+- Performance optimization (fast agents for quick checks)
+- Tool-specific features (vision, artifacts, etc.)
+
+**Validation:**
+- Agent name must match an existing `[agents.<name>]` section
+- Validated at task execution time
+- Also checked by `start doctor` and `start config validate`
 
 ### System Prompt Override
 
@@ -384,6 +407,7 @@ Recommendations: {instructions}
 # ./.start/config.toml
 [tasks.validate-go]
 alias = "vgo"
+agent = "go-expert"
 description = "Project-specific Go validation"
 
 system_prompt_file = "./ROLE.md"
@@ -400,6 +424,40 @@ Go validation results:
 
 Address: {instructions}
 """
+```
+
+### Task with Specialized Agent
+
+```toml
+[tasks.security-audit]
+alias = "sec"
+agent = "security-specialist"
+description = "Security-focused code audit"
+
+system_prompt_file = "~/.config/start/roles/security-auditor.md"
+
+command = "git diff --staged"
+prompt = """
+Perform a security audit on these changes:
+
+{command}
+
+Focus areas: {instructions}
+"""
+```
+
+### Task with Performance-Optimized Agent
+
+```toml
+[tasks.quick-lint]
+alias = "ql"
+agent = "haiku-agent"
+description = "Fast linting with lightweight agent"
+
+system_prompt = "You are a code linter. Focus on obvious issues only."
+
+command = "git diff --staged"
+prompt = "Quick lint: {command}"
 ```
 
 ### Override Global Task (Local Config)

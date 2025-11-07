@@ -113,21 +113,25 @@ start task <name> [instructions]
 
 1. Load and merge configuration (global + local)
 2. Find task by name or alias
-3. Determine agent (task override, `--agent` flag, or default)
-4. Load system prompt using UTD pattern:
+3. Determine agent using precedence rules:
+   - CLI `--agent` flag (highest priority)
+   - Task `agent` field (if configured)
+   - `default_agent` setting (fallback)
+4. Validate agent exists in configuration
+5. Load system prompt using UTD pattern:
    - If task has `system_prompt_*` fields → Use task's system prompt (UTD)
    - Otherwise → Use global/local `[system_prompt]` (if configured)
    - UTD supports: file, command, prompt with placeholders
-5. Load required contexts:
+6. Load required contexts:
    - Auto-includes all contexts where `required = true`
    - No `documents` array needed
    - Skips missing files (same as `start` command behavior)
    - Order: Config definition order
-6. Run task `command` if configured (UTD):
+7. Run task `command` if configured (UTD):
    - Execute in working directory
    - Capture stdout and stderr
    - Error and exit if command fails (non-zero exit code)
-7. Build prompt from task's prompt template using UTD:
+8. Build prompt from task's prompt template using UTD:
    - Load from `file` if specified
    - Execute `command` if specified
    - Process `prompt` template with placeholders
@@ -135,8 +139,8 @@ start task <name> [instructions]
    - Replace `{command}` with command output (or empty string)
    - Replace global placeholders ({model}, {date})
    - Insert required context document prompts first
-8. Display task summary (unless verbose/debug)
-9. Execute agent command
+9. Display task summary (unless verbose/debug)
+10. Execute agent command
 
 ### Task-Specific Help
 
@@ -153,6 +157,7 @@ Tasks are defined in `config.toml` using the **Unified Template Design (UTD)** p
 ````toml
 [tasks.git-diff-review]
 alias = "gdr"
+agent = "claude"                        # Optional: Preferred agent
 description = "Review git diff changes"
 
 # System prompt override (optional, UTD)
@@ -183,6 +188,11 @@ shell = "bash"
 command_timeout = 30
 
 ````
+
+**Agent Selection:**
+- Tasks can specify preferred agent with `agent` field
+- Precedence: `--agent` flag > task `agent` field > `default_agent` setting
+- Agent must exist in `[agents.<name>]` configuration
 
 **Note:** Tasks automatically include all contexts where `required = true`. No `documents` array needed.
 
@@ -522,6 +532,21 @@ Update configuration: start config edit
 ```
 
 Exit code: 1
+
+### Agent Not Found
+
+```
+Error: Agent 'go-expert' not found (required by task 'go-review').
+
+Configured agents:
+  claude
+  opencode
+
+Add agent: start config agent add go-expert
+Or override: start task go-review --agent claude
+```
+
+Exit code: 2
 
 ## Notes
 

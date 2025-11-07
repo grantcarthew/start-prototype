@@ -42,7 +42,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ## Architecture Decisions
 
-### Completed (28 Design Records)
+### Completed (29 Design Records)
 
 **Core Configuration (DR-001 to DR-008):**
 - DR-001: TOML for configuration format
@@ -77,6 +77,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-026: Offline fallback and network unavailable behavior - network-only, no manual installation, graceful degradation
 - DR-027: Security and trust model for assets - trust GitHub HTTPS, no signatures, no commit pinning
 - DR-028: Shell completion support - bash/zsh/fish, manual + auto-install, dynamic completions
+- DR-029: Task agent field - optional agent preference with precedence rules
 
 **Implementation:**
 - Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
@@ -140,6 +141,34 @@ CLI design is complete when:
 - [docs/archive/](./docs/archive/) - Design discussion history
 
 ## Recent Progress
+
+### Task Agent Field - DR-029 (2025-01-07)
+
+**Task 25 Completed:**
+- ✅ Designed task agent field configuration
+- ✅ Created DR-029: Task agent field
+- ✅ Updated all documentation
+
+**Key Decisions:**
+- Optional `agent` field in task configuration
+- Agent selection precedence: CLI flag > task agent > default_agent
+- Validation at execution time (not load time)
+- Also validated by `start doctor` and `start config validate`
+- Simple string field referencing agent name
+
+**Use Cases:**
+- Specialized agents for specific languages/domains
+- Different model perspectives for alternative reviews
+- Performance optimization (fast agents for quick checks)
+- Tool-specific features (vision, artifacts, etc.)
+
+**Documentation Updated:**
+- `docs/design/decisions/dr-029-task-agent-field.md` - Complete design record
+- `docs/design/design-record.md` - Added DR-029 to index
+- `docs/tasks.md` - Added agent field documentation and examples
+- `docs/cli/start-task.md` - Documented agent selection precedence
+- `docs/cli/start-doctor.md` - Added task agent validation check
+- `docs/config.md` - Added agent field to tasks section
 
 ### Task Loading Algorithm Design - DR-019 (2025-01-06)
 
@@ -384,4 +413,4 @@ func UpdateAssets() error {
 - [ ] **Task 22:** Define out-of-box assets (roles, tasks, metaprompts, templates)
 - [ ] **Task 23:** Decide on partial subcommand matching support
 - [ ] **Task 24:** Verify --help flag support across all commands
-- [ ] **Task 25:** Add agent field to task configuration - tasks should specify which agent to use
+- [x] **Task 25:** Add agent field to task configuration → DR-029: Optional agent field with precedence rules
