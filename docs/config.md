@@ -785,45 +785,6 @@ start task simple "explain Go interfaces"
 
 ---
 
-### [roles.\<name\>]
-
-Role template definitions. **Global-only**.
-
-Roles are reusable system prompts stored as named references.
-
-**Fields:**
-
-**path** (string, required)
-: File path to role definition.
-
-```toml
-[roles.coder]
-path = "~/.config/start/roles/coder.md"
-
-[roles.reviewer]
-path = "~/.config/start/roles/reviewer.md"
-```
-
-**Usage:**
-
-Roles are referenced by name in task definitions:
-
-```toml
-[tasks.code-review]
-role = "reviewer"  # References [roles.reviewer]
-prompt = "Review this code..."
-```
-
-Or used directly:
-
-```toml
-[tasks.custom]
-role = "./CUSTOM-ROLE.md"  # Direct file path
-prompt = "..."
-```
-
----
-
 ## Placeholders
 
 Placeholders are variables expanded during command execution.
@@ -1078,8 +1039,10 @@ When both configs exist, the effective configuration is:
 **Agents:**
 - claude, gemini, aichat (from global; local can override or add agents)
 
-**System prompt:**
-- `./ROLE.md` (from local, overrides global)
+**Roles:**
+- code-reviewer: `./ROLE.md` (from local, overrides global)
+- coder: `~/.config/start/roles/coder.md` (from global)
+- reviewer: `~/.config/start/roles/reviewer.md` (from global)
 
 **Context documents (in order):**
 1. environment (global, required)

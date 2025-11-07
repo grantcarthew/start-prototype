@@ -72,13 +72,11 @@ command_timeout = 10
 **description** (optional)
 : Help text displayed in task list and help output.
 
-**System Prompt Override (UTD):**
+**Role Selection:**
 
-All fields optional. If omitted, uses global/local `[system_prompt]`.
+Optional field. If omitted, uses `default_role` setting or first role in config.
 
-- `system_prompt_file` - Path to role definition file
-- `system_prompt_command` - Shell command for dynamic role content
-- `system_prompt` - Template with `{file}` and `{command}` placeholders
+- `role` - Name of role defined in `[roles.<name>]` section
 
 **Task Prompt (UTD):**
 
@@ -257,9 +255,9 @@ Prompts for task details and adds to the selected config file:
    - Human-readable description
    - Press enter to skip
 
-5. **System prompt override?** (yes/no, default: no)
-   - If yes: Configure UTD fields (file, command, prompt)
-   - If no: Uses global/local `[system_prompt]`
+5. **Role selection** (optional)
+   - Select role from available `[roles.<name>]` sections
+   - Or skip to use `default_role` setting
 
 6. **Task prompt** (required)
    - Configure UTD fields (file, command, prompt)

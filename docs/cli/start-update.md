@@ -510,11 +510,14 @@ Located in `~/.config/start/assets/roles/`:
 **Referenced in config:**
 
 ```toml
-[system_prompt]
+[roles.code-reviewer]
 file = "~/.config/start/assets/roles/code-reviewer.md"
 
 [tasks.review]
-system_prompt_file = "~/.config/start/assets/roles/security-reviewer.md"
+role = "security-reviewer"
+
+[roles.security-reviewer]
+file = "~/.config/start/assets/roles/security-reviewer.md"
 ```
 
 **Auto-update behavior:**

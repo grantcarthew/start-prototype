@@ -12,7 +12,7 @@ See [vision.md](../vision.md) for the product vision and goals.
 | [DR-002](./decisions/dr-002-config-merge.md) | Global + Local Config Merge | Configuration | 2025-01-03 |
 | [DR-003](./decisions/dr-003-named-documents.md) | Named Documents for Context | Configuration | 2025-01-03 |
 | [DR-004](./decisions/dr-004-agent-scope.md) | Agent Configuration Scope | Configuration | 2025-01-03 |
-| [DR-005](./decisions/dr-005-system-prompt.md) | System Prompt Handling | Configuration | 2025-01-03 |
+| [DR-005](./decisions/dr-005-role-configuration.md) | Role Configuration & Selection | Configuration | 2025-01-03 |
 | [DR-006](./decisions/dr-006-cobra-cli.md) | CLI Command Structure (Cobra) | CLI Design | 2025-01-03 |
 | [DR-007](./decisions/dr-007-placeholders.md) | Command Interpolation & Placeholders | Configuration | 2025-01-03 |
 | [DR-008](./decisions/dr-008-file-handling.md) | Context File Detection & Handling | Runtime Behavior | 2025-01-03 |
@@ -48,7 +48,7 @@ Core configuration structure and file handling:
 - **[DR-002](./decisions/dr-002-config-merge.md)** - Global + local config merge strategy
 - **[DR-003](./decisions/dr-003-named-documents.md)** - Named document sections instead of arrays
 - **[DR-004](./decisions/dr-004-agent-scope.md)** - Agents in both global and local configs
-- **[DR-005](./decisions/dr-005-system-prompt.md)** - System prompt separate and optional
+- **[DR-005](./decisions/dr-005-role-configuration.md)** - Role configuration with UTD pattern and selection precedence
 - **[DR-007](./decisions/dr-007-placeholders.md)** - Single-brace placeholder system
 - **[DR-008](./decisions/dr-008-file-handling.md)** - Relative paths and missing file handling
 - **[DR-012](./decisions/dr-012-context-required.md)** - Required field and document order
@@ -114,7 +114,7 @@ Version tracking and update checking:
 
 The `file`, `command`, `prompt` pattern is used consistently across:
 - Context documents
-- System prompts
+- Roles
 - Task configurations
 
 See individual DRs for details.
@@ -122,15 +122,15 @@ See individual DRs for details.
 ### Replacement vs Merge
 
 - **Merge:** Contexts (DR-003), Agents (DR-004)
-- **Replace:** System prompts (DR-005), Tasks (DR-019)
+- **Replace:** Roles (DR-005), Tasks (DR-019)
 
 ### Local Precedence
 
 When both global and local configs define the same item, local wins:
 - Contexts: Combined (global + local), local overrides by name
 - Agents: Combined (global + local), local overrides by name
-- System prompt: Local completely replaces global
-- Tasks: Local completely replaces global
+- Roles: Local completely replaces global (for same role name)
+- Tasks: Local completely replaces global (for same task name)
 
 ## References
 

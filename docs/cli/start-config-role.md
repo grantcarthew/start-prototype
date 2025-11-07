@@ -2,7 +2,7 @@
 
 ## Name
 
-start config role - Manage system prompt configuration
+start config role - Manage role configuration
 
 ## Synopsis
 
@@ -15,7 +15,7 @@ start config role test
 
 ## Description
 
-Manages role (system prompt) configuration in config files. Roles define the AI agent's persona and behavior. Roles are passed to agents via the `{role}` and `{role_file}` placeholders in agent commands.
+Manages role configuration in config files. Roles define the AI agent's persona and behavior (system prompts). Roles are passed to agents via the `{role}` and `{role_file}` placeholders in agent commands.
 
 **Role management operations:**
 
@@ -63,7 +63,7 @@ Focus on security and performance.
 
 **Merge behavior:**
 
-Local `[system_prompt]` section **completely replaces** global section. If local section is missing, uses global section.
+Global and local `[roles.<name>]` sections are **combined**. If a role with the same name exists in both configs, local overrides global for that role name.
 
 ## Subcommands
 
@@ -409,14 +409,14 @@ Saving system prompt to ./.start/config.toml...
 **Resulting config (simple file):**
 
 ```toml
-[system_prompt]
+[roles.code-reviewer]
 file = "~/.config/start/roles/code-reviewer.md"
 ```
 
 **Resulting config (file with template):**
 
 ```toml
-[system_prompt]
+[roles.project-default]
 file = "./ROLE.md"
 prompt = """
 {file}
@@ -428,7 +428,7 @@ Additional context: Focus on code quality.
 **Resulting config (inline prompt):**
 
 ```toml
-[system_prompt]
+[roles.inline-reviewer]
 prompt = """
 You are an expert code reviewer.
 Focus on security and performance.
@@ -438,7 +438,7 @@ Focus on security and performance.
 **Resulting config (combination):**
 
 ```toml
-[system_prompt]
+[roles.git-aware-reviewer]
 file = "./ROLE.md"
 command = "git log -1 --format='%s'"
 prompt = """
@@ -541,7 +541,7 @@ start config role remove local    # Remove from local config
 
 **Behavior:**
 
-Removes `[system_prompt]` section from the selected config file. After removal, agents will run without system prompts (or use global if removing from local).
+Removes a `[roles.<name>]` section from the selected config file. You'll be prompted to select which role to remove.
 
 **Interactive flow:**
 
@@ -570,8 +570,8 @@ Remove system prompt from local config? [y/N]: y
 Backing up config to config.2025-01-06-112012.toml...
 ✓ Backup created
 
-Removing [system_prompt] from ./.start/config.toml...
-✓ System prompt removed successfully
+Removing [roles.project-default] from ./.start/config.toml...
+✓ Role removed successfully
 
 Global system prompt will now be used (if configured).
 
@@ -595,8 +595,8 @@ Remove system prompt from global config? [y/N]: y
 Backing up config to config.2025-01-06-112045.toml...
 ✓ Backup created
 
-Removing [system_prompt] from ~/.config/start/config.toml...
-✓ System prompt removed successfully
+Removing [roles.code-reviewer] from ~/.config/start/config.toml...
+✓ Role removed successfully
 ⚠ No system prompt configured
 
 Agents will run without system prompts.
@@ -623,8 +623,8 @@ Remove system prompt from local config? [y/N]: y
 Backing up config to config.2025-01-06-112123.toml...
 ✓ Backup created
 
-Removing [system_prompt] from ./.start/config.toml...
-✓ System prompt removed successfully
+Removing [roles.project-default] from ./.start/config.toml...
+✓ Role removed successfully
 ✓ Now using global system prompt
 
 Global configuration:
@@ -892,9 +892,9 @@ Loading configuration...
   Local config: ./.start/config.toml
 
 Configuration merge:
-  Global [system_prompt]: configured
-  Local [system_prompt]: configured (overrides global)
-  Effective: local
+  Global [roles]: 3 roles configured
+  Local [roles]: 1 role configured
+  Combined: 4 total roles (1 override)
 
 Local configuration details:
   File field: ./ROLE.md
@@ -1032,12 +1032,12 @@ Prompts for scope selection.
 ## Files
 
 **~/.config/start/config.toml**
-: Global configuration file containing `[system_prompt]` section.
+: Global configuration file containing `[roles.<name>]` sections.
 
 **./.start/config.toml**
-: Local project configuration file containing project-specific `[system_prompt]` section.
+: Local project configuration file containing project-specific `[roles.<name>]` sections.
 
-The local section completely replaces the global section (not merged). If local section is missing, uses global section.
+Global and local roles are combined. If a role with the same name exists in both configs, local overrides global for that role name.
 
 ## Error Handling
 
@@ -1066,25 +1066,26 @@ Exit code: 1
 
 ## Notes
 
-### System Prompt Merge Behavior
+### Role Merge Behavior
 
-Per DR-002 and DR-005, the `[system_prompt]` section has special merge behavior:
+Per DR-002 and DR-005, `[roles.<name>]` sections have combine-and-override merge behavior:
 
-**Global system prompt:** `~/.config/start/config.toml`
-- Personal default role definition
-- Used across all projects (unless overridden)
+**Global roles:** `~/.config/start/config.toml`
+- Personal default role definitions
+- Used across all projects
 
-**Local system prompt:** `./.start/config.toml`
-- Project-specific role definition
-- **Completely replaces** global section (not merged)
+**Local roles:** `./.start/config.toml`
+- Project-specific role definitions
+- Added to global roles
 
 **Merge behavior:**
-- If local `[system_prompt]` exists: use local only (ignore global)
-- If local `[system_prompt]` missing: use global
-- This is different from contexts (which are combined)
+- Global and local roles are **combined**
+- If a role with the same name exists in both: local overrides global for that role
+- All other roles from both configs remain available
+- This allows projects to override specific roles while keeping others
 
 **Rationale:**
-System prompts define the complete role. Merging doesn't make sense - you want either the global role OR the project-specific role, not a combination.
+Projects often need custom roles for specific workflows while still having access to global roles. The combine-and-override approach provides maximum flexibility.
 
 ### Optional System Prompt
 
@@ -1101,20 +1102,20 @@ System prompts use UTD pattern for flexible content sourcing:
 
 **File-based:**
 ```toml
-[system_prompt]
+[roles.code-reviewer]
 file = "~/.config/start/roles/code-reviewer.md"
 ```
 
 **Command-based:**
 ```toml
-[system_prompt]
+[roles.dynamic-reviewer]
 command = "git log -1 --format='%s'"
 prompt = "You are a code reviewer. Current commit: {command}"
 ```
 
 **Inline prompt:**
 ```toml
-[system_prompt]
+[roles.security-reviewer]
 prompt = """
 You are an expert code reviewer.
 Focus on security and performance.
@@ -1123,7 +1124,7 @@ Focus on security and performance.
 
 **File with template framing:**
 ```toml
-[system_prompt]
+[roles.project-role]
 file = "./ROLE.md"
 prompt = """
 Role Definition:
@@ -1135,7 +1136,7 @@ Follow these instructions carefully.
 
 **Combination (file + command):**
 ```toml
-[system_prompt]
+[roles.time-aware-role]
 file = "./ROLE.md"
 command = "date"
 prompt = """
@@ -1156,7 +1157,7 @@ System prompt templates support these placeholders:
 
 **Example:**
 ```toml
-[system_prompt]
+[roles.branch-aware-reviewer]
 file = "~/.config/start/roles/reviewer.md"
 command = "git branch --show-current"
 prompt = """
@@ -1171,7 +1172,7 @@ Current branch: {command}
 System prompts can override the global shell setting:
 
 ```toml
-[system_prompt]
+[roles.git-reviewer]
 command = "git log -1 --format='%s'"
 prompt = "Current commit: {command}"
 shell = "bash"
@@ -1203,7 +1204,7 @@ Not all AI agents support system prompts:
 
 - Check agent documentation for system prompt support
 - Some agents use different terminology (role, instruction, etc.)
-- Agent command templates use `{system_prompt}` placeholder
+- Agent command templates use `{role}` and `{role_file}` placeholders
 - If agent doesn't support it, placeholder is ignored
 
 ## See Also
@@ -1216,5 +1217,5 @@ Not all AI agents support system prompts:
 - start-config-task(1) - Manage task configurations
 - start-update(1) - Update asset library
 - DR-002 - Configuration file structure and merge behavior
-- DR-005 - System prompt handling
+- DR-005 - Role configuration & selection
 - DR-017 - CLI command reorganization

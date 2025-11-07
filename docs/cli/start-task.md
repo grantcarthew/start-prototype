@@ -576,7 +576,7 @@ Exit code: 2
 
 **`start` (root):**
 
-- Uses `[system_prompt]` from config (if configured)
+- Uses configured roles from config (via `default_role` or `--role` flag)
 - Includes ALL context documents (required + optional)
 - No dynamic command execution
 - Simple context document prompt concatenation
@@ -639,25 +639,14 @@ Example task configuration with system prompt override:
 
 ```toml
 [tasks.code-review]
-# File only
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
+# Use specific role by name
+role = "code-reviewer"
 
-# File with template framing
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt = """
-{file}
+# Or use a different role for this task
+role = "security-auditor"
 
-Additional context: Focus on security.
-"""
-
-# Inline only
-system_prompt = """
-You are a code reviewer.
-Focus on critical issues only.
-"""
-
-# No override - uses global/local [system_prompt]
-# (omit all system_prompt_* fields)
+# No role specified - uses default_role setting or first role in config
+# (omit role field)
 ```
 
 ### Task Command Execution

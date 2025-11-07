@@ -502,9 +502,9 @@ Context documents: (none configured)
 
 The agent launches with no context document instructions - only system prompt (if configured).
 
-**No system prompt:**
+**No role configured:**
 
-If `[system_prompt]` is not configured or the file doesn't exist:
+If no roles are configured or the role file doesn't exist:
 
 ```
 System prompt: (none)
