@@ -16,7 +16,7 @@ See [vision.md](../vision.md) for the product vision and goals.
 | [DR-006](./decisions/dr-006-cobra-cli.md) | CLI Command Structure (Cobra) | CLI Design | 2025-01-03 |
 | [DR-007](./decisions/dr-007-placeholders.md) | Command Interpolation & Placeholders | Configuration | 2025-01-03 |
 | [DR-008](./decisions/dr-008-file-handling.md) | Context File Detection & Handling | Runtime Behavior | 2025-01-03 |
-| [DR-009](./decisions/dr-009-task-structure.md) | Task Structure & Placeholders | Tasks | 2025-01-03 |
+| [DR-009](./decisions/dr-009-task-structure.md) | Task Structure, Agent Field & Placeholders | Tasks | 2025-01-03 |
 | [DR-010](./decisions/dr-010-default-tasks.md) | Default Task Definitions | Tasks | 2025-01-03 |
 | [DR-011](./decisions/dr-011-asset-distribution.md) | Asset Distribution & Update System | Distribution | 2025-01-03 |
 | [DR-012](./decisions/dr-012-context-required.md) | Context Document Required Field | Configuration | 2025-01-04 |
@@ -67,7 +67,7 @@ Command-line interface structure:
 
 Task configuration and loading:
 
-- **[DR-009](./decisions/dr-009-task-structure.md)** - Task structure with {instructions} and {content} placeholders
+- **[DR-009](./decisions/dr-009-task-structure.md)** - Task structure with role/agent fields and {instructions}/{command} placeholders
 - **[DR-010](./decisions/dr-010-default-tasks.md)** - Four interactive review tasks as defaults
 - **[DR-019](./decisions/dr-019-task-loading.md)** - Global + local loading, assets as templates
 - **[DR-029](./decisions/dr-029-task-agent-field.md)** - Optional agent field for task-specific agent preference

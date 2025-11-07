@@ -1191,7 +1191,7 @@ log_level = "verbose"  # This project needs detailed output
 
 ## See Also
 
-- [Design Record](./design-record.md) - Design decisions (DR-001 through DR-013)
+- [Design Record](./design/design-record.md) - Design decisions (DR-001 through DR-029)
 - [CLI Reference](./cli/) - Command-line usage documentation
 - [Vision](./vision.md) - Product vision and goals
-- [Task Configuration](./task.md) - Task-specific documentation
+- [Task Configuration](./tasks.md) - Task-specific documentation

@@ -69,20 +69,20 @@ Global and local `[roles.<name>]` sections are **combined**. If a role with the 
 
 ### start config role show
 
-Display current system prompt configuration.
+Display current role configuration.
 
 **Synopsis:**
 
 ```bash
 start config role show          # Select scope interactively
-start config role show global   # Show global system prompt only
-start config role show local    # Show local system prompt only
-start config role show merged   # Show effective system prompt (with override info)
+start config role show global   # Show global role only
+start config role show local    # Show local role only
+start config role show merged   # Show effective role (with override info)
 ```
 
 **Behavior:**
 
-Displays system prompt configuration from the selected scope(s) with:
+Displays role configuration from the selected scope(s) with:
 
 - Scope (global, local, or merged)
 - Source type (file, command, inline, or combination)
@@ -94,7 +94,7 @@ Displays system prompt configuration from the selected scope(s) with:
 **Output (merged view):**
 
 ```
-System prompt configuration (merged):
+Role configuration (merged):
 ═══════════════════════════════════════════════════════════
 
 Effective configuration:
@@ -124,7 +124,7 @@ start config role show global
 ```
 
 ```
-System prompt configuration (global):
+Role configuration (global):
 ═══════════════════════════════════════════════════════════
 
 File:
@@ -142,7 +142,7 @@ start config role show local
 ```
 
 ```
-System prompt configuration (local):
+Role configuration (local):
 ═══════════════════════════════════════════════════════════
 
 File:
@@ -159,7 +159,7 @@ Prompt template:
 **Output (inline prompt):**
 
 ```
-System prompt configuration (global):
+Role configuration (global):
 ═══════════════════════════════════════════════════════════
 
 Type: Inline prompt
@@ -172,7 +172,7 @@ Prompt:
 **Output (command-based):**
 
 ```
-System prompt configuration (local):
+Role configuration (local):
 ═══════════════════════════════════════════════════════════
 
 Type: Command-based
@@ -187,42 +187,42 @@ Prompt template:
   Current commit: {command}
 ```
 
-**No system prompt configured:**
+**No role configured:**
 
 ```
-No system prompt configured in global config.
+No role configured in global config.
 
 Configure: start config role edit global
 ```
 
 **Exit codes:**
 
-- 0 - Success (system prompt shown)
-- 1 - No system prompt configured
+- 0 - Success (role shown)
+- 1 - No role configured
 - 2 - Invalid scope argument
 
 ### start config role edit
 
-Edit or create system prompt configuration interactively.
+Edit or create role configuration interactively.
 
 **Synopsis:**
 
 ```bash
 start config role edit          # Select scope interactively
-start config role edit global   # Edit global system prompt
-start config role edit local    # Edit local system prompt
+start config role edit global   # Edit global role
+start config role edit local    # Edit local role
 ```
 
 **Behavior:**
 
-Prompts for system prompt configuration and updates the selected config file:
+Prompts for role configuration and updates the selected config file:
 
 1. **Select scope** (if not provided)
    - global - Edit `~/.config/start/config.toml`
    - local - Edit `./.start/config.toml`
 
 2. **Content source** (choose one or more)
-   - File path (static system prompt document)
+   - File path (static role document)
    - Command (dynamic content)
    - Inline prompt text
    - At least one is required
@@ -237,13 +237,13 @@ Prompts for system prompt configuration and updates the selected config file:
 
 5. **Backup and save**
    - Backs up existing config to `config.YYYY-MM-DD-HHMMSS.toml`
-   - Writes system prompt to config
+   - Writes role to config
    - Shows success message
 
 **Interactive flow (create from file):**
 
 ```
-Edit system prompt
+Edit role
 ─────────────────────────────────────────────────
 
 Select scope:
@@ -273,8 +273,8 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-111234.toml...
 ✓ Backup created
 
-Saving system prompt to ~/.config/start/config.toml...
-✓ System prompt configured successfully
+Saving role to ~/.config/start/config.toml...
+✓ Role configured successfully
 
 Use 'start config role show global' to verify.
 Use 'start config role test' to validate.
@@ -283,7 +283,7 @@ Use 'start config role test' to validate.
 **Interactive flow (file with template):**
 
 ```
-Edit system prompt
+Edit role
 ─────────────────────────────────────────────────
 
 Select scope:
@@ -316,8 +316,8 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-111345.toml...
 ✓ Backup created
 
-Saving system prompt to ./.start/config.toml...
-✓ System prompt updated successfully
+Saving role to ./.start/config.toml...
+✓ Role updated successfully
 
 Use 'start config role show local' to verify.
 ```
@@ -325,7 +325,7 @@ Use 'start config role show local' to verify.
 **Interactive flow (inline prompt):**
 
 ```
-Edit system prompt
+Edit role
 ─────────────────────────────────────────────────
 
 Select scope:
@@ -357,14 +357,14 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-111456.toml...
 ✓ Backup created
 
-Saving system prompt to ~/.config/start/config.toml...
-✓ System prompt configured successfully
+Saving role to ~/.config/start/config.toml...
+✓ Role configured successfully
 ```
 
 **Interactive flow (combination - file + command):**
 
 ```
-Edit system prompt
+Edit role
 ─────────────────────────────────────────────────
 
 Select scope:
@@ -402,8 +402,8 @@ Command timeout in seconds (or enter for default): 5
 Backing up config to config.2025-01-06-111567.toml...
 ✓ Backup created
 
-Saving system prompt to ./.start/config.toml...
-✓ System prompt configured successfully
+Saving role to ./.start/config.toml...
+✓ Role configured successfully
 ```
 
 **Resulting config (simple file):**
@@ -452,7 +452,7 @@ command_timeout = 5
 
 **Exit codes:**
 
-- 0 - Success (system prompt configured)
+- 0 - Success (role configured)
 - 1 - Validation error (invalid configuration)
 - 2 - Scope error (invalid scope, local config directory doesn't exist)
 - 3 - File system error (cannot write config, backup failed)
@@ -480,7 +480,7 @@ File path:
 ```
 File path: ./MISSING.md
 ⚠ Warning: File does not exist: ./MISSING.md
-  System prompt will fail at runtime if file is not found.
+  Role will fail at runtime if file is not found.
 
 Continue anyway? [y/N]: y
 ```
@@ -522,14 +522,14 @@ Backing up config to config.2025-01-06-111234.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/config.toml
-System prompt not configured.
+Role not configured.
 ```
 
 Exit code: 3
 
 ### start config role remove
 
-Remove system prompt configuration.
+Remove role configuration.
 
 **Synopsis:**
 
@@ -552,7 +552,7 @@ start config role remove
 Output:
 
 ```
-Remove system prompt
+Remove role
 ─────────────────────────────────────────────────
 
 Select scope:
@@ -565,7 +565,7 @@ Current configuration (local):
   File: ./ROLE.md
   Prompt template: {file}\n\nFocus on code quality.
 
-Remove system prompt from local config? [y/N]: y
+Remove role from local config? [y/N]: y
 
 Backing up config to config.2025-01-06-112012.toml...
 ✓ Backup created
@@ -573,7 +573,7 @@ Backing up config to config.2025-01-06-112012.toml...
 Removing [roles.project-default] from ./.start/config.toml...
 ✓ Role removed successfully
 
-Global system prompt will now be used (if configured).
+Global role will now be used (if configured).
 
 Use 'start config role show merged' to see effective configuration.
 ```
@@ -590,16 +590,16 @@ Output:
 Current configuration (global):
   File: ~/.config/start/roles/default.md
 
-Remove system prompt from global config? [y/N]: y
+Remove role from global config? [y/N]: y
 
 Backing up config to config.2025-01-06-112045.toml...
 ✓ Backup created
 
 Removing [roles.code-reviewer] from ~/.config/start/config.toml...
 ✓ Role removed successfully
-⚠ No system prompt configured
+⚠ No role configured
 
-Agents will run without system prompts.
+Agents will run without roles.
 
 Configure: start config role edit global
 ```
@@ -616,16 +616,16 @@ Output:
 Current configuration (local):
   File: ./ROLE.md
 
-⚠ Note: Removing local system prompt will revert to global configuration.
+⚠ Note: Removing local role will revert to global configuration.
 
-Remove system prompt from local config? [y/N]: y
+Remove role from local config? [y/N]: y
 
 Backing up config to config.2025-01-06-112123.toml...
 ✓ Backup created
 
 Removing [roles.project-default] from ./.start/config.toml...
 ✓ Role removed successfully
-✓ Now using global system prompt
+✓ Now using global role
 
 Global configuration:
   File: ~/.config/start/roles/default.md
@@ -636,26 +636,26 @@ Use 'start config role show merged' to verify.
 **Declining confirmation:**
 
 ```
-Remove system prompt from global config? [y/N]: n
+Remove role from global config? [y/N]: n
 
-System prompt not removed.
+Role not removed.
 ```
 
 Exit code: 0
 
 **Exit codes:**
 
-- 0 - Success (system prompt removed, or user declined)
-- 1 - No system prompt configured
+- 0 - Success (role removed, or user declined)
+- 1 - No role configured
 - 2 - Invalid scope
 - 3 - File system error (cannot write config, backup failed)
 
 **Error handling:**
 
-**No system prompt configured:**
+**No role configured:**
 
 ```
-Error: No system prompt configured in global config.
+Error: No role configured in global config.
 
 Configure: start config role edit global
 ```
@@ -665,20 +665,20 @@ Exit code: 1
 **Backup failed:**
 
 ```
-Remove system prompt from global config? [y/N]: y
+Remove role from global config? [y/N]: y
 
 Backing up config to config.2025-01-06-112156.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/config.toml
-System prompt not removed.
+Role not removed.
 ```
 
 Exit code: 3
 
 ### start config role test
 
-Test system prompt configuration and file availability.
+Test role configuration and file availability.
 
 **Synopsis:**
 
@@ -688,7 +688,7 @@ start config role test
 
 **Behavior:**
 
-Validates effective system prompt configuration (merged global + local). Performs checks:
+Validates effective role configuration (merged global + local). Performs checks:
 
 1. **File availability** (if `file` field present)
    - Checks if file exists at specified path
@@ -706,12 +706,12 @@ Validates effective system prompt configuration (merged global + local). Perform
    - Unknown placeholders detected (likely typos)
    - Shell and timeout settings valid
 
-**Does NOT pass system prompt to any agent** - only validates configuration.
+**Does NOT pass role to any agent** - only validates configuration.
 
 **Output (file-based, success):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -726,13 +726,13 @@ File:
 
 Prompt: (file content only, no template)
 
-✓ System prompt is configured correctly
+✓ Role is configured correctly
 ```
 
 **Output (file with template, success):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -752,13 +752,13 @@ Prompt template:
   ✓ Valid template
   ✓ Uses {file} placeholder
 
-✓ System prompt is configured correctly
+✓ Role is configured correctly
 ```
 
 **Output (command-based, success):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -777,13 +777,13 @@ Prompt template:
   ✓ Valid template
   ✓ Uses {command} placeholder
 
-✓ System prompt is configured correctly
+✓ Role is configured correctly
 ```
 
 **Output (inline prompt, success):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -795,13 +795,13 @@ Prompt:
   Focus on security and performance.
   ✓ Valid inline prompt (87 characters)
 
-✓ System prompt is configured correctly
+✓ Role is configured correctly
 ```
 
 **Output (file not found):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -815,7 +815,7 @@ File:
 
 Prompt: (file content only)
 
-✗ System prompt has errors
+✗ Role has errors
   File not found - will fail at runtime
   Fix: Create file or update configuration
 ```
@@ -823,7 +823,7 @@ Prompt: (file content only)
 **Output (command failed):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -841,19 +841,19 @@ Prompt template:
   Output: {command}
   ✓ Valid template
 
-✗ System prompt has errors
+✗ Role has errors
   Command execution will fail at runtime
 ```
 
-**Output (no system prompt configured):**
+**Output (no role configured):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
-No system prompt configured (global or local).
+No role configured (global or local).
 
-Agents will run without system prompts.
+Agents will run without roles.
 
 Configure: start config role edit global
 ```
@@ -863,7 +863,7 @@ Exit code: 1
 **Output (configuration error):**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -873,7 +873,7 @@ Effective configuration:
 ✗ No content source defined
   At least one field required: file, command, or prompt
 
-✗ System prompt has configuration errors
+✗ Role has configuration errors
   Fix configuration: start config role edit global
 ```
 
@@ -884,7 +884,7 @@ start config role test --verbose
 ```
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Loading configuration...
@@ -914,13 +914,13 @@ Local configuration details:
   ✓ Valid placeholder usage
   ✓ {file} placeholder matches UTD file field
 
-✓ System prompt is configured correctly
+✓ Role is configured correctly
 ```
 
 **Exit codes:**
 
-- 0 - Success (system prompt valid, file exists, command succeeds)
-- 1 - No system prompt configured
+- 0 - Success (role valid, file exists, command succeeds)
+- 1 - No role configured
 - 2 - Configuration error (invalid configuration)
 - 3 - File not found (config valid but file missing)
 - 4 - Command failed (config valid but command execution failed)
@@ -930,7 +930,7 @@ Local configuration details:
 **Multiple errors:**
 
 ```
-Testing system prompt configuration...
+Testing role configuration...
 ─────────────────────────────────────────────────
 
 Effective configuration:
@@ -946,7 +946,7 @@ Command:
 Prompt template:
   ⚠ Unknown placeholder {unknown}
 
-✗ System prompt has multiple errors:
+✗ Role has multiple errors:
   - File not found
   - Command execution failed
   - Invalid placeholder usage
@@ -969,53 +969,53 @@ These flags work on all `start config role` subcommands where applicable.
 
 ## Examples
 
-### Show System Prompt (Merged View)
+### Show Role (Merged View)
 
 ```bash
 start config role show merged
 ```
 
-Show effective system prompt with override information.
+Show effective role with override information.
 
-### Show Global System Prompt Only
+### Show Global Role Only
 
 ```bash
 start config role show global
 ```
 
-### Show Local System Prompt Only
+### Show Local Role Only
 
 ```bash
 start config role show local
 ```
 
-### Edit Global System Prompt
+### Edit Global Role
 
 ```bash
 start config role edit global
 ```
 
-### Edit Local System Prompt
+### Edit Local Role
 
 ```bash
 start config role edit local
 ```
 
-### Test System Prompt
+### Test Role
 
 ```bash
 start config role test
 ```
 
-Verify system prompt configuration, file availability, and command execution.
+Verify role configuration, file availability, and command execution.
 
-### Remove Local System Prompt (Revert to Global)
+### Remove Local Role (Revert to Global)
 
 ```bash
 start config role remove local
 ```
 
-### Remove Global System Prompt
+### Remove Global Role
 
 ```bash
 start config role remove global
@@ -1087,18 +1087,18 @@ Per DR-002 and DR-005, `[roles.<name>]` sections have combine-and-override merge
 **Rationale:**
 Projects often need custom roles for specific workflows while still having access to global roles. The combine-and-override approach provides maximum flexibility.
 
-### Optional System Prompt
+### Optional Roles
 
-System prompts are completely optional:
+Roles are completely optional:
 
 - Section can be omitted entirely (no warning)
-- Not all AI agents support system prompts
+- Not all AI agents support roles (system prompts)
 - If omitted, agents run without role definition
 - Some agents have built-in default roles
 
 ### Unified Template Design (UTD)
 
-System prompts use UTD pattern for flexible content sourcing:
+Roles use UTD pattern for flexible content sourcing:
 
 **File-based:**
 ```toml
@@ -1150,7 +1150,7 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 
 ### Placeholders
 
-System prompt templates support these placeholders:
+Role templates support these placeholders:
 
 - `{file}` - Content from `file` field (empty if not specified)
 - `{command}` - Output from `command` field (empty if not specified)
@@ -1169,7 +1169,7 @@ Current branch: {command}
 
 ### Shell Configuration
 
-System prompts can override the global shell setting:
+Roles can override the global shell setting:
 
 ```toml
 [roles.git-reviewer]
@@ -1200,9 +1200,9 @@ By convention, role definition files are stored in:
 
 ### Agent Support
 
-Not all AI agents support system prompts:
+Not all AI agents support roles (system prompts):
 
-- Check agent documentation for system prompt support
+- Check agent documentation for role/system prompt support
 - Some agents use different terminology (role, instruction, etc.)
 - Agent command templates use `{role}` and `{role_file}` placeholders
 - If agent doesn't support it, placeholder is ignored
