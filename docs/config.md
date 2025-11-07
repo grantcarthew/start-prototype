@@ -810,12 +810,27 @@ Example: `claude-3-7-sonnet-20250219`
 
 Example: `2025-01-04T14:30:00+10:00`
 
-### Context-Specific Placeholders
+### UTD Pattern Placeholders
 
-**{file}** (context documents only)
-: File path of the document. Used in `prompt` field of `[context.<name>]`.
+**{file}** (in UTD templates)
+: Content from the `file` field. Used in `prompt` field of `[context.<name>]`, `[roles.<name>]`, and `[tasks.<name>]`. The file is read and its contents replace the `{file}` placeholder.
 
-Example: `"Read {file} for context"` → `"Read ~/reference/ENVIRONMENT.md for context"`
+Example in context:
+```toml
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
+prompt = """
+Environment Context:
+{file}
+"""
+```
+
+For instructing the AI to read a file using its tools, use a plain file path reference:
+```toml
+[context.environment]
+file = "~/reference/ENVIRONMENT.md"
+prompt = "Read ~/reference/ENVIRONMENT.md for environment context."
+```
 
 ### Task-Specific Placeholders
 
@@ -1185,6 +1200,60 @@ log_level = "verbose"  # This project needs detailed output
 # 3. Project contexts
 [context.agents]
 # ...
+```
+
+---
+
+## Selection Precedence
+
+### Agent Selection
+
+Agent selection follows this priority order:
+
+1. `--agent` CLI flag (highest priority)
+2. Task `agent` field (if executing a task)
+3. `default_agent` setting
+4. First agent in config (TOML order)
+
+**Example:**
+
+```bash
+start --agent gemini              # Uses gemini (CLI flag)
+start task code-review            # Uses task's agent or default_agent
+start                             # Uses default_agent or first agent
+```
+
+### Role Selection
+
+Role selection follows this priority order:
+
+1. `--role` CLI flag (highest priority)
+2. Task `role` field (if executing a task)
+3. `default_role` setting
+4. First role in config (TOML order)
+
+**Example:**
+
+```bash
+start --role security-auditor     # Uses security-auditor (CLI flag)
+start task code-review            # Uses task's role or default_role
+start                             # Uses default_role or first role
+```
+
+### Model Selection
+
+Model selection follows this priority order:
+
+1. `--model` CLI flag (highest priority)
+2. Agent's `default_model` field
+3. First model in agent's models table (TOML order)
+
+**Example:**
+
+```bash
+start --model opus                # Uses opus (CLI flag)
+start --agent claude              # Uses claude's default_model
+start                             # Uses default agent's default_model
 ```
 
 ---

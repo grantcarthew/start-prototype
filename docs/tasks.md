@@ -64,7 +64,7 @@ description = "Review staged git changes"
 ```
 
 **agent** (string, optional)
-: Preferred agent for this task. Must reference an agent defined in `[agents.<name>]` configuration. Agent selection precedence: CLI `--agent` flag > task `agent` field > `default_agent` setting.
+: Preferred agent for this task. Must reference an agent defined in `[agents.<name>]` configuration. Agent selection precedence: CLI `--agent` flag > task `agent` field > `default_agent` setting > first agent in config.
 
 ```toml
 [tasks.go-review]
@@ -72,7 +72,7 @@ agent = "go-expert"
 description = "Review Go code with specialized agent"
 ```
 
-If omitted, uses the `default_agent` from settings (or can be overridden with `--agent` flag at runtime).
+If omitted, uses the `default_agent` from settings, or the first agent defined in config (TOML order) if no default is set.
 
 **Use cases:**
 - Specialized agents for specific languages or domains

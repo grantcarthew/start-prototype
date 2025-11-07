@@ -34,7 +34,7 @@ start --agent gemini
 ```
 
 **--role** _name_
-: Which role (system prompt) to use. Overrides default role from config. Must reference a role defined in `[roles.<name>]` configuration.
+: Which role to use for the system prompt. Overrides default role from config. Must reference a role defined in `[roles.<name>]` configuration.
 
 ```bash
 start --role security-auditor
@@ -170,7 +170,7 @@ Context documents:
   ✓ agents          ./AGENTS.md
   ✗ project         ./PROJECT.md (not found)
 
-System prompt: ./ROLE.md
+Role: code-reviewer (from ~/.config/start/roles/code-reviewer.md)
 
 Executing command...
 ❯ claude --model claude-3-7-sonnet-20250219 --append-system-prompt '...' '2025-11-03...'
@@ -194,8 +194,9 @@ Detecting context documents (working directory: /Users/gcarthew/Projects/my-app)
   agents: ./AGENTS.md → /Users/gcarthew/Projects/my-app/AGENTS.md (exists)
   project: ./PROJECT.md → /Users/gcarthew/Projects/my-app/PROJECT.md (not found, skipped)
 
-Loading system prompt:
-  Path: ./ROLE.md → /Users/gcarthew/Projects/my-app/ROLE.md
+Loading role:
+  Role: code-reviewer
+  Source: ~/.config/start/roles/code-reviewer.md → /Users/gcarthew/.config/start/roles/code-reviewer.md
   Size: 1.2 KB
 
 Building prompt:
@@ -213,7 +214,7 @@ Context documents:
   ✓ agents          ./AGENTS.md
   ✗ project         ./PROJECT.md (not found)
 
-System prompt: ./ROLE.md
+Role: code-reviewer (from ~/.config/start/roles/code-reviewer.md)
 
 Executing command...
 ❯ claude --model claude-3-7-sonnet-20250219 --append-system-prompt '...' '2025-11-03...'
@@ -247,7 +248,7 @@ Executing command...
 
 [DEBUG] Placeholder resolution:
 [DEBUG]   {model} → "claude-3-7-sonnet-20250219"
-[DEBUG]   {system_prompt} → "[1247 chars from ./ROLE.md]"
+[DEBUG]   {role} → "[1247 chars from code-reviewer.md]"
 [DEBUG]   {prompt} → "[448 chars]"
 [DEBUG]   {date} → "2025-11-03T16:30:45+10:00"
 
@@ -261,7 +262,7 @@ Context documents:
   ✓ agents          ./AGENTS.md
   ✗ project         ./PROJECT.md (not found)
 
-System prompt: ./ROLE.md
+Role: code-reviewer (from ~/.config/start/roles/code-reviewer.md)
 
 Executing command...
 ❯ claude --model claude-3-7-sonnet-20250219 --append-system-prompt '...' '2025-11-03...'
@@ -507,7 +508,7 @@ The agent launches with no context document instructions - only system prompt (i
 If no roles are configured or the role file doesn't exist:
 
 ```
-System prompt: (none)
+Role: (none)
 ```
 
 The agent launches without a system prompt. This is valid - not all agents require system prompts.
@@ -620,7 +621,7 @@ Paths with `~` are expanded to user's home directory. This happens for:
 
 - Config paths
 - Context document paths
-- System prompt path
+- Role file paths
 - Working directory
 
 ### Relative Path Resolution

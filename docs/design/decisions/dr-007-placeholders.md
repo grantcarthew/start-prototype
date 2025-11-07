@@ -86,9 +86,11 @@ Temp files:
 Available in UTD template contexts (roles, contexts, tasks):
 
 **{file}** - Content from UTD `file` field
+- The file is read and its contents replace the `{file}` placeholder
 - Example in role: `{file}` replaced with role file contents
 - Example in context: `{file}` replaced with context file contents
 - Example in task: `{file}` replaced with task file contents
+- Note: This injects file content into the prompt. To instruct the AI to read a file using its tools, reference the file path directly in the prompt text instead of using `{file}`
 
 **{command}** - Output from UTD `command` field
 - Stdout and stderr captured

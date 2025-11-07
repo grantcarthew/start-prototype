@@ -28,6 +28,7 @@ When executing a task, agent selection follows this priority order:
 1. **CLI flag** - `--agent` flag (highest priority, explicit user override)
 2. **Task agent** - `agent` field in task configuration
 3. **Default agent** - `default_agent` from `[settings]` section
+4. **First agent** - First agent in config (TOML order)
 
 **Example:**
 
@@ -48,8 +49,12 @@ start task go-review
 # Uses gemini (CLI flag overrides task)
 start task go-review --agent gemini
 
-# Uses claude (task has no agent field, falls to default)
+# Uses claude (task has no agent field, falls to default_agent)
 start task code-review
+
+# Uses first agent in config (no CLI flag, no task agent, no default_agent)
+# (First agent defined in config TOML order)
+start task simple-task
 ```
 
 ## Field Specification

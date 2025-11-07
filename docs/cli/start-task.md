@@ -123,7 +123,8 @@ start task <name> [instructions]
 3. Determine agent using precedence rules:
    - CLI `--agent` flag (highest priority)
    - Task `agent` field (if configured)
-   - `default_agent` setting (fallback)
+   - `default_agent` setting
+   - First agent in config (TOML order)
 4. Determine role using precedence rules:
    - CLI `--role` flag (highest priority)
    - Task `role` field (if configured)
@@ -193,7 +194,7 @@ command_timeout = 30
 
 **Agent Selection:**
 - Tasks can specify preferred agent with `agent` field
-- Precedence: `--agent` flag > task `agent` field > `default_agent` setting
+- Precedence: `--agent` flag > task `agent` field > `default_agent` setting > first agent in config
 - Agent must exist in `[agents.<name>]` configuration
 
 **Role Selection:**
