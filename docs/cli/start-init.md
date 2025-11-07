@@ -167,9 +167,9 @@ Both create backups automatically if replacing existing config.
 4. Prompt for additional agents (from fetched configs)
 5. Prompt for default agent selection
 6. Create config file structure:
-   - `[settings]` section with default_agent
+   - `[settings]` section with default_agent and default_role
    - `[agents.*]` sections for each selected agent
-   - `[system_prompt]` section
+   - `[roles.*]` sections (default roles)
    - `[context.*]` sections (4 default documents)
 7. Write config to `~/.config/start/config.toml`
 8. Display success message
@@ -182,8 +182,8 @@ These documents are always added to the config:
 3. `./AGENTS.md`
 4. `./PROJECT.md`
 
-**Default system prompt:**
-`./ROLE.md` is always added to config.
+**Default role:**
+A `code-reviewer` role referencing `./ROLE.md` is always added to config.
 
 Files don't need to exist - runtime gracefully handles missing files (see DR-008).
 
@@ -588,9 +588,10 @@ Example generated config:
 ```toml
 [settings]
 default_agent = "claude"
+default_role = "code-reviewer"
 
 [agents.claude]
-command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
 
   [agents.claude.models]
@@ -599,14 +600,15 @@ default_model = "sonnet"
   opus = "claude-opus-4-20250514"
 
 [agents.gemini]
-command = "gemini --model {model} '{prompt}'"
+command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
 default_model = "flash"
 
   [agents.gemini.models]
   flash = "gemini-2.0-flash-exp"
   pro-exp = "gemini-2.0-pro-exp"
 
-[system_prompt]
+[roles.code-reviewer]
+description = "Expert code reviewer"
 file = "./ROLE.md"
 
 [context.environment]

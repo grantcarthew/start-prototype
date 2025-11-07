@@ -33,6 +33,14 @@ These flags work on all `start` commands.
 start --agent gemini
 ```
 
+**--role** _name_
+: Which role (system prompt) to use. Overrides default role from config. Must reference a role defined in `[roles.<name>]` configuration.
+
+```bash
+start --role security-auditor
+start --role go-expert
+```
+
 **--model** _alias|name_
 : Model to use. Accepts either:
 

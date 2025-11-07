@@ -63,6 +63,13 @@ All global flags from `start` command are supported except `--quiet`.
 start task code-review --agent gemini
 ```
 
+**--role** _name_
+: Override role for this task. Overrides task's role setting and default role.
+
+```bash
+start task code-review --role security-auditor
+```
+
 **--model** _alias|name_
 : Model to use. Accepts either model alias or full model name.
 
@@ -117,10 +124,12 @@ start task <name> [instructions]
    - CLI `--agent` flag (highest priority)
    - Task `agent` field (if configured)
    - `default_agent` setting (fallback)
-4. Validate agent exists in configuration
-5. Load system prompt using UTD pattern:
-   - If task has `system_prompt_*` fields → Use task's system prompt (UTD)
-   - Otherwise → Use global/local `[system_prompt]` (if configured)
+4. Determine role using precedence rules:
+   - CLI `--role` flag (highest priority)
+   - Task `role` field (if configured)
+   - `default_role` setting
+   - First role in config (TOML order)
+5. Validate agent and role exist in configuration
    - UTD supports: file, command, prompt with placeholders
 6. Load required contexts:
    - Auto-includes all contexts where `required = true`
@@ -193,6 +202,11 @@ command_timeout = 30
 - Tasks can specify preferred agent with `agent` field
 - Precedence: `--agent` flag > task `agent` field > `default_agent` setting
 - Agent must exist in `[agents.<name>]` configuration
+
+**Role Selection:**
+- Tasks can specify preferred role with `role` field
+- Precedence: `--role` flag > task `role` field > `default_role` setting > first role in config
+- Role must exist in `[roles.<name>]` configuration
 
 **Note:** Tasks automatically include all contexts where `required = true`. No `documents` array needed.
 

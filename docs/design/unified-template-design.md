@@ -6,9 +6,9 @@ A consistent pattern for defining content across `start` configuration sections.
 
 The Unified Template Design (UTD) provides a flexible way to combine static files, dynamic command output, and template text. It's used throughout the configuration for:
 
-- `[system_prompt]` - System prompts for AI agents
+- `[roles.<name>]` - Role (system prompt) definitions
 - `[context.<name>]` - Context documents for sessions
-- `[tasks.<name>]` - Task role and prompt fields
+- `[tasks.<name>]` - Task prompt fields
 
 ## Core Concept
 
@@ -177,7 +177,7 @@ UTD validates field combinations and placeholder usage. At least one of `file`, 
 ### 1. Only `file`
 
 ```toml
-[system_prompt]
+[roles.code-reviewer]
 file = "./ROLE.md"
 ```
 
@@ -309,7 +309,7 @@ Current Status:
 ### Simple File
 
 ```toml
-[system_prompt]
+[roles.code-reviewer]
 file = "./ROLE.md"
 ```
 
@@ -455,10 +455,10 @@ prompt = "Deno runtime: {command}"
 
 ## Where UTD is Used
 
-### [system_prompt]
+### [roles.code-reviewer]
 
 ```toml
-[system_prompt]
+[roles.code-reviewer]
 file = "./ROLE.md"
 command = "git log -1 --format='%s'"
 prompt = """
@@ -485,17 +485,18 @@ prompt = "Repository state:\n{command}"
 
 ```toml
 [tasks.code-review]
-system_prompt_file = "./roles/reviewer.md"
-system_prompt_command = "echo 'Focus on security'"
-system_prompt = """
-{file}
+role = "code-reviewer"  # References [roles.code-reviewer]
+command = "git diff --staged"
+prompt = """
+Review these changes:
 
-Special instructions: {command}
+{command}
+
+Instructions: {instructions}
 """
-# ... other task fields
 ```
 
-Note: Tasks use prefixed field names (`system_prompt_file`, `system_prompt_command`, `system_prompt`) to distinguish system prompt UTD from task prompt UTD.
+Note: Tasks reference roles by name using the `role` field. The role itself can use UTD for dynamic content.
 
 ### [tasks.\<name\>] - Task Prompt
 

@@ -15,23 +15,25 @@ start config role test
 
 ## Description
 
-Manages system prompt configuration in config files. The system prompt defines the AI agent's role and behavior. System prompts are passed to agents via the `{system_prompt}` placeholder in agent commands.
+Manages role (system prompt) configuration in config files. Roles define the AI agent's persona and behavior. Roles are passed to agents via the `{role}` and `{role_file}` placeholders in agent commands.
 
-**System prompt management operations:**
+**Role management operations:**
 
-- **show** - Display current system prompt configuration
-- **edit** - Modify system prompt (create if doesn't exist)
-- **remove** - Clear system prompt configuration
-- **test** - Verify system prompt configuration and file availability
+- **show** - Display current role configurations
+- **edit** - Modify a role (create if doesn't exist)
+- **remove** - Remove a role configuration
+- **test** - Verify role configuration and file availability
+- **list** - List all configured roles
 
-**Note:** System prompts use the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern. The `[system_prompt]` section can be defined in both global and local configs. Local completely replaces global (not merged).
+**Note:** Roles use the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern. Roles are defined as `[roles.<name>]` sections in both global and local configs. Global + local roles are combined; local overrides global for same role name.
 
-## System Prompt Configuration Structure
+## Role Configuration Structure
 
-System prompts are defined using the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern:
+Roles are defined using the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern:
 
 ```toml
-[system_prompt]
+[roles.code-reviewer]
+description = "Expert code reviewer"
 file = "~/.config/start/roles/code-reviewer.md"
 prompt = """
 {file}

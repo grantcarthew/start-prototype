@@ -62,7 +62,7 @@ prompt = "Review for style"
 # alias and command are now undefined (not inherited)
 ```
 
-This matches system_prompt replacement behavior (DR-005).
+This matches role replacement behavior (DR-005).
 
 ## Task Resolution Algorithm
 
@@ -111,6 +111,8 @@ type Task struct {
     Name        string
     Alias       string
     Description string
+    Role        string  // Optional role preference
+    Agent       string  // Optional agent preference
     // ... UTD fields ...
 
     // Metadata (not in config file)
@@ -128,7 +130,7 @@ Starting task: code-review
 ─────────────────────────────────────────────────
 Task source: local (./.start/config.toml)
 Agent: claude (model: sonnet)
-System prompt: custom override
+Role: code-reviewer
 
 Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
@@ -202,7 +204,7 @@ Available templates:
 - **Predictability:** Local always wins (name or alias)
 - **Transparency:** Source shown at runtime for security
 - **Flexibility:** Asset templates make common tasks easy to adopt
-- **Consistency:** Replacement behavior matches system_prompt (DR-005)
+- **Consistency:** Replacement behavior matches role replacement (DR-005)
 - **Discoverability:** Asset tasks visible in list command
 - **Safety:** Conflict warnings prevent accidental shadowing
 
@@ -233,7 +235,8 @@ func (r *TaskRegistry) CheckConflicts(scope, name, alias string) []Conflict {
 
 ## Related Decisions
 
-- [DR-005](./dr-005-system-prompt.md) - Same replacement behavior
-- [DR-009](./dr-009-task-structure.md) - Task structure
+- [DR-005](./dr-005-role-configuration.md) - Role configuration (same replacement behavior)
+- [DR-009](./dr-009-task-structure.md) - Task structure (includes role field)
 - [DR-011](./dr-011-asset-distribution.md) - Asset templates
 - [DR-016](./dr-016-asset-discovery.md) - Task directory structure
+- [DR-029](./dr-029-task-agent-field.md) - Task agent field (parallel to role field)

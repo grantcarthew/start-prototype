@@ -13,10 +13,10 @@ Tasks can specify a preferred agent using an optional `agent` field.
 ```toml
 [tasks.go-review]
 agent = "go-expert"              # Optional: Preferred agent for this task
+role = "go-reviewer"             # Optional: Preferred role for this task
 alias = "gor"
 description = "Review Go code with specialized agent"
 
-system_prompt_file = "~/.config/start/roles/go-reviewer.md"
 command = "git diff --staged"
 prompt = "Review this Go code: {command}\n\n{instructions}"
 ```
@@ -207,13 +207,14 @@ Result: Local task completely replaces global (agent is "go-expert")
 - Agent name reference is sufficient
 - All agent configuration lives in `[agents.<name>]` section
 - Keeps task config simple and focused
-- Similar to how `system_prompt_file` references external files
+- Similar to how `role` field references role names (DR-005)
 
-**Why override system prompt but not contexts?**
-- Tasks can override system prompt (per DR-009, task-specific roles)
+**Why agent and role fields parallel?**
+- Tasks can specify both agent and role preferences
+- Both follow same pattern: string reference to named entity
+- Agent controls execution tool, role controls AI persona
+- Both can be overridden via CLI flags (--agent, --role)
 - Contexts remain global (required contexts auto-included per DR-012)
-- Agent is similar to system prompt: task-specific execution preference
-- Contexts are about information, agent is about execution
 
 ## Alternatives Considered
 
@@ -236,7 +237,8 @@ Result: Local task completely replaces global (agent is "go-expert")
 
 ## Related Decisions
 
-- [DR-009](./dr-009-task-structure.md) - Task structure and placeholders
+- [DR-005](./dr-005-role-configuration.md) - Role configuration (parallel to agent field)
+- [DR-009](./dr-009-task-structure.md) - Task structure and placeholders (includes role field)
 - [DR-004](./dr-004-agent-scope.md) - Agent configuration scope
 - [DR-019](./dr-019-task-loading.md) - Task loading and merging
 

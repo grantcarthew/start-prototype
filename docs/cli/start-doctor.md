@@ -53,9 +53,10 @@ Runs all diagnostic checks in order and reports results. Non-blocking - shows al
 2. Asset library check
 3. Configuration validation
 4. Agent diagnostics
-5. Task validation (including agent references)
-6. Context verification
-7. Environment check
+5. Role validation
+6. Task validation (including agent and role references)
+7. Context verification
+8. Environment check
 
 **Exit codes:**
 

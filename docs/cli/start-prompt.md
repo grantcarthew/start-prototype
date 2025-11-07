@@ -46,6 +46,9 @@ All global flags from `start` command are supported:
 **--agent** _name_
 : Which agent to use
 
+**--role** _name_
+: Which role (system prompt) to use
+
 **--model** _alias|name_
 : Model to use (alias or full model name)
 

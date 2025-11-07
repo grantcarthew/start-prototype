@@ -13,7 +13,7 @@ Complete reference for `start` configuration files.
 - Settings: Local values override global values
 - Agents: Combined (global + local), local overrides global for same name
 - Contexts: Combined (global + local, names must be unique)
-- Roles: Global only
+- Roles: Combined (global + local), local overrides global for same name
 - Tasks: Combined (global + local), local overrides global for same name
 
 ## Complete Example
@@ -33,7 +33,7 @@ command_timeout = 30
 description = "Anthropic's Claude AI assistant via Claude Code CLI"
 url = "https://docs.claude.com/claude-code"
 models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
-command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
 
   [agents.claude.models]
@@ -45,15 +45,12 @@ default_model = "sonnet"
 description = "Google's Gemini AI via CLI"
 url = "https://github.com/example/gemini-cli"
 models_url = "https://ai.google.dev/models/gemini"
-command = "gemini --model {model} '{prompt}'"
+command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
 default_model = "flash"
 
   [agents.gemini.models]
   flash = "gemini-2.0-flash-exp"
   pro-exp = "gemini-2.0-pro-exp"
-
-  [agents.gemini.env]
-  GEMINI_SYSTEM_MD = "{system_prompt}"
 
 [agents.aichat]
 description = "All-in-one multi-provider AI chat tool"
@@ -66,9 +63,13 @@ default_model = "gpt4-mini"
   gpt4 = "gpt-4o"
   claude = "claude-3-5-sonnet-20241022"
 
-# System prompt
-[system_prompt]
-file = "~/.config/start/roles/default.md"
+# Roles (system prompts)
+[settings]
+default_role = "code-reviewer"
+
+[roles.code-reviewer]
+description = "Expert code reviewer"
+file = "~/.config/start/roles/code-reviewer.md"
 
 # Global context documents
 [context.environment]
@@ -101,9 +102,10 @@ file = "~/.config/start/roles/reviewer.md"
 [settings]
 log_level = "debug"
 
-# Override system prompt for this project
-[system_prompt]
+# Project-specific role (overrides global code-reviewer)
+[roles.code-reviewer]
 file = "./ROLE.md"
+description = "Project-specific code reviewer"
 
 # Project-specific context documents (combined with global)
 [context.agents]
@@ -133,8 +135,9 @@ When both configs exist, the effective configuration combines them:
 **Agents:**
 - claude, gemini, aichat (from global; local can override or add agents)
 
-**System prompt:**
-- `./ROLE.md` (from local, overrides global `~/.config/start/roles/default.md`)
+**Roles:**
+- code-reviewer: `./ROLE.md` (from local, overrides global)
+- go-expert: `~/.config/start/roles/go-base.md` (from global)
 
 **Context documents (in definition order):**
 1. environment - `~/reference/ENVIRONMENT.md` (global, required)
@@ -143,9 +146,6 @@ When both configs exist, the effective configuration combines them:
 4. agents - `./AGENTS.md` (local, required)
 5. project - `./PROJECT.md` (local, optional)
 6. design - `./docs/design-record.md` (local, optional)
-
-**Roles:**
-- coder, reviewer (from global only - local cannot define roles)
 
 ## File Locations
 
@@ -258,11 +258,11 @@ Each agent section defines how to invoke an AI tool. Agent names should match th
 **Fields:**
 
 **command** (string, required)
-: Command template to execute the agent. Must contain `{prompt}` placeholder. Supports additional placeholders: `{model}`, `{system_prompt}`, `{date}`.
+: Command template to execute the agent. Must contain `{prompt}` placeholder. Supports additional placeholders: `{model}`, `{role}`, `{role_file}`, `{date}`.
 
 ```toml
 [agents.claude]
-command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 ```
 
 **description** (string, optional)
@@ -322,7 +322,7 @@ Agents can be defined in both **global and local** configs (per DR-004 update):
 description = "Anthropic's Claude AI assistant via Claude Code CLI"
 url = "https://docs.claude.com/claude-code"
 models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
-command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
 
   [agents.claude.models]
@@ -373,100 +373,153 @@ gpt4 = "gpt-4o"
 claude = "claude-3-5-sonnet-20241022"
 ```
 
-#### [agents.\<name\>.env]
+**Environment Variables:**
 
-Environment variables to set when executing the agent command. Optional section.
-
-**Structure:**
+Use standard shell syntax to set environment variables in the `command` field:
 
 ```toml
-[agents.<name>.env]
-<KEY> = "<value>"
-```
-
-**Placeholder support:**
-- Values can contain placeholders: `{model}`, `{system_prompt}`, `{prompt}`, `{date}`
-- Expanded before setting environment variable
-
-**Example:**
-
-```toml
+# Single variable
 [agents.gemini]
-command = "gemini --model {model} '{prompt}'"
+command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
 
-  [agents.gemini.env]
-  GEMINI_SYSTEM_MD = "{system_prompt}"
-  GEMINI_API_KEY = "your-api-key-here"
+# Multiple variables
+[agents.custom]
+command = "VAR1='{role}' VAR2='{date}' custom-ai --model {model} '{prompt}'"
 ```
+
+**Benefits:**
+- Standard and familiar syntax
+- No separate env section needed
+- Supports multiple variables easily
+- Works with any shell command syntax
+
+See [DR-005](./design/decisions/dr-005-role-configuration.md) for details on `{role}` and `{role_file}` placeholders.
 
 ---
 
-### [system_prompt]
+### [roles.\<name\>]
 
-System prompt configuration. Optional section. Local overrides global.
+Named role (system prompt) configurations. Global and local configs are combined; local overrides global for same role name.
 
 Uses **[Unified Template Design (UTD)](./unified-template-design.md)** pattern.
 
 **UTD Fields:**
 
-- `file` (string, optional) - Path to system prompt file
+- `file` (string, optional) - Path to role content file
 - `command` (string, optional) - Shell command for dynamic content
 - `prompt` (string, optional) - Template text with `{file}` and `{command}` placeholders
 
-At least one field must be present. See [UTD documentation](./unified-template-design.md) for complete validation rules and examples.
+At least one UTD field must be present. See [UTD documentation](./unified-template-design.md) for complete validation rules.
+
+**Role-Specific Fields:**
+
+**description** (string, optional)
+: Human-readable description of this role. Displayed in `start config role list`.
+
+```toml
+[roles.code-reviewer]
+description = "Expert code reviewer focusing on security"
+```
 
 **Additional Fields:**
 
 - `shell` (string, optional) - Override global shell for command execution
 - `command_timeout` (integer, optional) - Override global timeout for command execution
 
-**Behavior:**
+**Role Selection:**
 
-- System prompt passed to agent via `{system_prompt}` placeholder in agent command
-- Not all agents support system prompts
-- Section can be omitted entirely (no warning)
+Roles are selected using precedence rules:
+1. CLI `--role` flag (highest priority)
+2. Task `role` field (if executing a task)
+3. `default_role` setting
+4. First role in config (TOML order)
+
+**Default Role:**
+
+```toml
+[settings]
+default_role = "code-reviewer"
+```
+
+**Placeholders:**
+
+Roles are passed to agents via two placeholders:
+- `{role}` - Inline content (fully resolved, for Claude, aichat)
+- `{role_file}` - File path (for Gemini and file-based agents)
+
+See [DR-005](./design/decisions/dr-005-role-configuration.md) and [DR-007](./design/decisions/dr-007-placeholders.md) for details.
 
 **Merge behavior:**
 
-Local section completely replaces global section. If local section missing, use global.
+- Global + local roles are combined
+- Local role completely replaces global role with same name (no field merging)
+- All roles available for selection
+
+**Validation:**
+
+- Role name must match: `/^[a-z0-9]+(-[a-z0-9]+)*$/`
+- At least one UTD field required (`file`, `command`, or `prompt`)
+- `default_role` must reference existing role (if specified)
 
 **Examples:**
 
 ```toml
-# Simple file
-[system_prompt]
-file = "./ROLE.md"
+# Simple role (file only)
+[roles.general-assistant]
+description = "General purpose AI assistant"
+file = "~/.config/start/roles/general.md"
 ```
 
 ```toml
-# Inline text
-[system_prompt]
+# Role with template framing
+[roles.code-reviewer]
+description = "Code reviewer with context"
+file = "~/.config/start/roles/reviewer.md"
 prompt = """
-You are an expert code reviewer.
-Focus on security and performance.
-"""
-```
-
-```toml
-# File with framing
-[system_prompt]
-file = "./ROLE.md"
-prompt = """
-Role Definition:
 {file}
 
-Follow these instructions carefully.
+Additional Instructions:
+- Focus on security and performance
+- Check edge cases
+- Verify error handling
 """
 ```
 
 ```toml
-# Dynamic content from command
-[system_prompt]
-command = "git log -1 --format='%s'"
+# Role with dynamic content
+[roles.go-expert]
+description = "Go language expert"
+file = "~/.config/start/roles/go-base.md"
+command = "go version 2>/dev/null || echo 'Go not installed'"
 prompt = """
-You are a code reviewer.
-Current commit: {command}
+{file}
+
+Environment: {command}
+
+Apply Go-specific best practices.
 """
+```
+
+```toml
+# Inline role (no file)
+[roles.documentation-writer]
+description = "Technical documentation specialist"
+prompt = """
+You are a technical documentation specialist.
+
+Guidelines:
+- Clear, concise language
+- Include code examples
+- Focus on user needs
+- Use active voice
+"""
+```
+
+```toml
+# Project-specific role (local config)
+[roles.project-reviewer]
+description = "Project-specific reviewer"
+file = "./ROLE.md"
 ```
 
 See [UTD Examples](./unified-template-design.md#examples) for more patterns.
@@ -622,30 +675,17 @@ description = "Review Go code with specialized agent"
 
 Validated at task execution time and by `start doctor` / `start config validate`.
 
-**System Prompt Override (UTD Pattern):**
-
-Tasks can override the global/local system prompt using UTD fields. All fields are optional - if omitted, uses global/local `[system_prompt]`.
-
-**system_prompt_file** (string, optional)
-: Path to role definition file.
-
-**system_prompt_command** (string, optional)
-: Shell command to generate dynamic role content.
-
-**system_prompt** (string, optional)
-: Template text with `{file}` and `{command}` placeholders.
+**role** (string, optional)
+: Preferred role for this task. Must reference a role defined in `[roles.<name>]` configuration. Role selection precedence: CLI `--role` flag > task `role` field > `default_role` setting > first role in config.
 
 ```toml
-[tasks.code-review]
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt = """
-{file}
-
-CRITICAL: Focus on security vulnerabilities.
-"""
+[tasks.security-audit]
+role = "security-auditor"
+agent = "claude"
+description = "Security-focused code audit"
 ```
 
-See [UTD documentation](./unified-template-design.md#validation-rules) for field combination behavior.
+Validated at task execution time and by `start doctor` / `start config validate`. See [DR-005](./design/decisions/dr-005-role-configuration.md) for role configuration details.
 
 **Task Prompt (UTD Pattern):**
 
@@ -694,14 +734,8 @@ Tasks automatically include **all contexts where `required = true`**. There is n
 [tasks.git-diff-review]
 alias = "gdr"
 description = "Review staged git changes"
-
-# System prompt override (UTD)
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt = """
-{file}
-
-Additional context: Focus on security and performance.
-"""
+role = "code-reviewer"
+agent = "claude"
 
 # Task prompt (UTD)
 command = "git diff --staged"
@@ -727,22 +761,19 @@ Review the following changes:
 alias = "s"
 description = "Simple help task"
 prompt = "Help me with: {instructions}"
-# No system_prompt_* fields = uses global/local [system_prompt]
+# No role field = uses default_role or first role in config
 # Auto-includes all contexts with required = true
 ```
 
 **Placeholder behavior:**
-
-In system_prompt templates:
-- `{file}` - Content from `system_prompt_file`
-- `{command}` - Output from `system_prompt_command`
-- `{model}`, `{date}` - Global placeholders
 
 In task prompt templates:
 - `{file}` - Content from task `file`
 - `{command}` - Output from task `command`
 - `{instructions}` - Command-line args (or `"None"`)
 - `{model}`, `{date}` - Global placeholders
+
+See [DR-007](./design/decisions/dr-007-placeholders.md) for complete placeholder documentation.
 
 **Usage:**
 
@@ -806,8 +837,11 @@ Available in agent command templates, prompts, and environment variables:
 
 Example: `claude-3-7-sonnet-20250219`
 
-**{system_prompt}**
-: Contents of system prompt file. Empty string if not configured or file doesn't exist.
+**{role}**
+: Fully resolved role content (inline text). Use for agents that accept system prompts inline (Claude, aichat).
+
+**{role_file}**
+: File path to role content. Use for agents that require file-based system prompts (Gemini). Points to original file for simple roles, or temp file for UTD roles.
 
 **{prompt}**
 : Assembled prompt text from context documents and custom prompts.
@@ -916,15 +950,12 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 
 ### Scope Constraints
 
-**Global-only sections:**
-- `[roles]` - Cannot appear in local config
-
 **Allowed in both global and local:**
 - `[settings]` - Local overrides global
-- `[system_prompt]` - Local overrides global
-- `[agents]` - Combined (global + local), local overrides global for same name
-- `[context]` - Combined (global + local)
-- `[tasks]` - Combined (global + local), local overrides global for same name
+- `[roles.<name>]` - Combined (global + local), local overrides global for same name
+- `[agents.<name>]` - Combined (global + local), local overrides global for same name
+- `[context.<name>]` - Combined (global + local)
+- `[tasks.<name>]` - Combined (global + local), local overrides global for same name
 
 ---
 
@@ -945,7 +976,7 @@ command_timeout = 30
 description = "Anthropic's Claude AI assistant via Claude Code CLI"
 url = "https://docs.claude.com/claude-code"
 models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
-command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
 
   [agents.claude.models]
@@ -957,15 +988,12 @@ default_model = "sonnet"
 description = "Google's Gemini AI via CLI"
 url = "https://github.com/example/gemini-cli"
 models_url = "https://ai.google.dev/models/gemini"
-command = "gemini --model {model} '{prompt}'"
+command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
 default_model = "flash"
 
   [agents.gemini.models]
   flash = "gemini-2.0-flash-exp"
   pro-exp = "gemini-2.0-pro-exp"
-
-  [agents.gemini.env]
-  GEMINI_SYSTEM_MD = "{system_prompt}"
 
 [agents.aichat]
 description = "All-in-one multi-provider AI chat tool"
@@ -978,9 +1006,13 @@ default_model = "gpt4-mini"
   gpt4 = "gpt-4o"
   claude = "claude-3-5-sonnet-20241022"
 
-# System prompt
-[system_prompt]
-file = "~/.config/start/roles/default.md"
+# Roles (system prompts)
+[settings]
+default_role = "code-reviewer"
+
+[roles.code-reviewer]
+description = "Expert code reviewer"
+file = "~/.config/start/roles/code-reviewer.md"
 
 # Global context documents
 [context.environment]
@@ -1013,9 +1045,10 @@ file = "~/.config/start/roles/reviewer.md"
 [settings]
 log_level = "verbose"
 
-# Override system prompt for this project
-[system_prompt]
+# Project-specific role (overrides global)
+[roles.code-reviewer]
 file = "./ROLE.md"
+description = "Project-specific code reviewer"
 
 # Project-specific context documents
 [context.agents]
@@ -1170,16 +1203,12 @@ log_level = "verbose"  # This project needs detailed output
 [agents.claude]
 # ...
 
-# 3. System prompt
-[system_prompt]
+# 3. Roles (system prompts)
+[roles.code-reviewer]
 # ...
 
 # 4. Shared contexts
 [context.environment]
-# ...
-
-# 5. Roles
-[roles.coder]
 # ...
 ```
 
@@ -1190,8 +1219,8 @@ log_level = "verbose"  # This project needs detailed output
 [settings]
 # ...
 
-# 2. System prompt override
-[system_prompt]
+# 2. Project-specific roles (override global)
+[roles.code-reviewer]
 # ...
 
 # 3. Project contexts

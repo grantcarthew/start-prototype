@@ -31,11 +31,7 @@ Tasks use the section name `[tasks.<name>]` where `<name>` is a unique identifie
 alias = "..."                           # Optional: Short name
 description = "..."                     # Optional: Help text
 agent = "..."                           # Optional: Preferred agent
-
-# System prompt override (UTD pattern - optional)
-system_prompt_file = "..."              # Optional: Path to role file
-system_prompt_command = "..."           # Optional: Dynamic role content
-system_prompt = "..."                   # Optional: Template with {file}/{command}
+role = "..."                            # Optional: Preferred role
 
 # Task prompt (UTD pattern - at least one required)
 file = "..."                            # Optional: Path to prompt file
@@ -89,25 +85,35 @@ If omitted, uses the `default_agent` from settings (or can be overridden with `-
 - Validated at task execution time
 - Also checked by `start doctor` and `start config validate`
 
-### System Prompt Override
+### Role Field
 
-Tasks use the **[Unified Template Design (UTD)](./design/unified-template-design.md)** pattern for system prompts.
+**role** (string, optional)
+: Preferred role for this task. Must reference a role defined in `[roles.<name>]` configuration.
 
-**system_prompt_file** (string, optional)
-: Path to a role definition file. Supports tilde (`~`) expansion and relative paths.
+**Role Selection Precedence:**
+1. CLI `--role` flag (highest priority)
+2. Task `role` field
+3. `default_role` setting
+4. First role in config (TOML order)
 
-**system_prompt_command** (string, optional)
-: Shell command to generate dynamic role content. Output available via `{command}` placeholder.
+```toml
+[tasks.security-audit]
+role = "security-auditor"
+agent = "claude"
+description = "Security-focused code audit"
+```
 
-**system_prompt** (string, optional)
-: Template text that can use `{file}` and `{command}` placeholders. Can be inline text or template.
+**Validation:**
+- Role name must match an existing `[roles.<name>]` section
+- Validated at task execution time
+- Also checked by `start doctor` and `start config validate`
 
-**Behavior:**
-- If **no system_prompt_\* fields** → Uses local `[system_prompt]` if configured, else global `[system_prompt]`
-- If **any system_prompt_\* field set** → Overrides global/local system prompt for this task
-- At least one field should be present to override, or omit all to use global/local
+**Use cases:**
+- Task-specific AI personas (security auditor, code reviewer, documentation writer)
+- Different perspectives for same codebase
+- Specialized domain knowledge (Go expert, API validator, etc.)
 
-See [UTD validation rules](./design/unified-template-design.md#validation-rules) for field combination behavior.
+See [DR-005](./design/decisions/dr-005-role-configuration.md) for role configuration details.
 
 ### Task Prompt
 
@@ -138,19 +144,7 @@ See [UTD shell configuration](./design/unified-template-design.md#shell-configur
 
 ## Placeholders
 
-### In system_prompt Templates
-
-Available in `system_prompt_file` content and `system_prompt` templates:
-
-- `{file}` - Content from `system_prompt_file`
-- `{command}` - Output from `system_prompt_command`
-- `{model}` - Model name (global)
-- `{date}` - Current timestamp (global)
-
-**NOT available:**
-- `{instructions}` - Only available in task prompts, not system prompts
-
-### In prompt Templates
+### In Task Prompt Templates
 
 Available in `file` content and `prompt` templates:
 
@@ -233,9 +227,9 @@ At least one of `file`, `command`, or `prompt` must be present for the task prom
 
 ### Warnings
 
-- **System prompt file missing:** `"File not found: {path}"` - System prompt not set (empty)
+- **Role not found:** `"Role 'security-auditor' not found in configuration"` - Error at execution time
 - **Alias conflict:** `"Alias 'cr' used by multiple tasks, using first: code-review"`
-- **Field defined but not used:** `"system_prompt_file defined but not used in system_prompt template"`
+- **Field defined but not used:** `"file defined but not used in prompt template"`
 
 See [UTD validation rules](./design/unified-template-design.md#validation-rules) for complete field validation behavior.
 
@@ -247,25 +241,20 @@ See [UTD validation rules](./design/unified-template-design.md#validation-rules)
 [tasks.code-review]
 alias = "cr"
 description = "General code quality review"
-
-system_prompt = """
-You are an expert code reviewer.
-Focus on security, performance, and best practices.
-"""
+role = "code-reviewer"
 
 prompt = "Review the code in this project. {instructions}"
 ```
 
 Usage: `start task cr "check error handling"`
 
-### File-Based System Prompt
+### Task with Role Reference
 
 ```toml
 [tasks.git-diff-review]
 alias = "gdr"
 description = "Review staged git changes"
-
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
+role = "code-reviewer"
 
 command = "git diff --staged"
 prompt = """
@@ -289,61 +278,20 @@ Usage: `start task gdr "focus on security"`
 [tasks.security-review]
 alias = "sec"
 description = "Security-focused code review"
-
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt = """
-{file}
-
-CRITICAL: This is a security-focused review.
-Prioritize vulnerability detection above all else.
-"""
+role = "security-auditor"
 
 command = "git diff --staged"
 prompt = "Security review:\n{command}\n\n{instructions}"
 ```
 
-### Dynamic System Prompt
-
-```toml
-[tasks.context-aware-review]
-alias = "car"
-description = "Review with current branch context"
-
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt_command = "git log -1 --format='Current work: %s'"
-system_prompt = """
-{file}
-
-Branch context: {command}
-
-Adjust your review focus based on the current work.
-"""
-
-command = "git diff --staged"
-prompt = "Review these changes:\n{command}"
-```
-
-### Command-Only System Prompt
-
-```toml
-[tasks.dynamic-role]
-alias = "dyn"
-description = "Use current focus file as role"
-
-system_prompt_command = "cat ./CURRENT_FOCUS.txt"
-# Uses command output directly as system prompt
-
-prompt = "Review with current focus. {instructions}"
-```
-
-### No System Prompt Override
+### Task Without Specific Role
 
 ```toml
 [tasks.quick-check]
 alias = "qc"
 description = "Quick review with default role"
 
-# No system_prompt_* fields = uses local [system_prompt] if set, else global
+# No role field = uses default_role or first role in config
 
 prompt = "Quick code check: {instructions}"
 ```
@@ -354,8 +302,7 @@ prompt = "Quick code check: {instructions}"
 [tasks.api-check]
 alias = "api"
 description = "Validate API endpoints"
-
-system_prompt = "You are an API validator."
+role = "api-validator"
 
 shell = "bash"
 command = """
@@ -380,8 +327,7 @@ Focus: {instructions}
 [tasks.package-info]
 alias = "pkg"
 description = "Analyze package.json"
-
-system_prompt = "You are a Node.js dependency expert."
+role = "nodejs-expert"
 
 shell = "node"
 command_timeout = 10
@@ -410,7 +356,7 @@ alias = "vgo"
 agent = "go-expert"
 description = "Project-specific Go validation"
 
-system_prompt_file = "./ROLE.md"
+role = "project-reviewer"
 
 command = """
 go vet ./... 2>&1
@@ -434,7 +380,7 @@ alias = "sec"
 agent = "security-specialist"
 description = "Security-focused code audit"
 
-system_prompt_file = "~/.config/start/roles/security-auditor.md"
+role = "security-auditor"
 
 command = "git diff --staged"
 prompt = """
@@ -452,9 +398,8 @@ Focus areas: {instructions}
 [tasks.quick-lint]
 alias = "ql"
 agent = "haiku-agent"
+role = "code-linter"
 description = "Fast linting with lightweight agent"
-
-system_prompt = "You are a code linter. Focus on obvious issues only."
 
 command = "git diff --staged"
 prompt = "Quick lint: {command}"
@@ -466,13 +411,13 @@ prompt = "Quick lint: {command}"
 # Global: ~/.config/start/config.toml
 [tasks.code-review]
 alias = "cr"
-system_prompt_file = "~/.config/start/roles/reviewer.md"
+role = "reviewer"
 prompt = "Review code: {instructions}"
 
 # Local: ./.start/config.toml (overrides global)
 [tasks.code-review]
 alias = "cr"
-system_prompt = "You are a Go expert reviewing this specific project."
+role = "go-expert"
 command = "git diff --staged"
 prompt = "Review Go code changes:\n{command}\n\n{instructions}"
 ```
