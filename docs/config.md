@@ -24,6 +24,7 @@ Complete reference for `start` configuration files.
 # Global settings
 [settings]
 default_agent = "claude"
+default_role = "code-reviewer"
 log_level = "normal"
 shell = "bash"
 command_timeout = 30
@@ -64,9 +65,6 @@ default_model = "gpt4-mini"
   claude = "claude-3-5-sonnet-20241022"
 
 # Roles (system prompts)
-[settings]
-default_role = "code-reviewer"
-
 [roles.code-reviewer]
 description = "Expert code reviewer"
 file = "~/.config/start/roles/code-reviewer.md"
@@ -928,6 +926,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 # Global settings
 [settings]
 default_agent = "claude"
+default_role = "code-reviewer"
 log_level = "normal"
 shell = "bash"
 command_timeout = 30
@@ -968,9 +967,6 @@ default_model = "gpt4-mini"
   claude = "claude-3-5-sonnet-20241022"
 
 # Roles (system prompts)
-[settings]
-default_role = "code-reviewer"
-
 [roles.code-reviewer]
 description = "Expert code reviewer"
 file = "~/.config/start/roles/code-reviewer.md"

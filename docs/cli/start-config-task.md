@@ -16,7 +16,7 @@ start config task remove [name] [scope]
 
 ## Description
 
-Manages predefined workflow task configurations in config files. Tasks define reusable AI-assisted workflows with optional system prompt overrides, automatic required context inclusion, and dynamic content from shell commands.
+Manages predefined workflow task configurations in config files. Tasks define reusable AI-assisted workflows with optional role selection, automatic required context inclusion, and dynamic content from shell commands.
 
 **Task management operations:**
 
@@ -37,13 +37,8 @@ Tasks use the **[Unified Template Design (UTD)](../design/unified-template-desig
 alias = "gdr"
 description = "Review staged git changes"
 
-# System prompt override (UTD - all optional)
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt = """
-{file}
-
-Focus on security and performance.
-"""
+# Role selection (optional)
+role = "code-reviewer"
 
 # Task prompt (UTD - at least one required)
 command = "git diff --staged"
@@ -117,7 +112,7 @@ Lists all tasks defined in the selected scope(s) with:
 - Task name
 - Alias
 - Description
-- System prompt override (yes/no)
+- Role selection (yes/no)
 - Task prompt type (file, command, inline, or combination)
 - Source scope (asset, global, local, or override)
 
@@ -147,21 +142,21 @@ Asset tasks (4):
 Global tasks (1):
   security-review (sr)
     Security-focused code review
-    System prompt: custom (code-reviewer.md + template)
+    Role: custom (code-reviewer.md + template)
     Task: command-based (git diff --staged)
     Source: ~/.config/start/config.toml
 
 Local tasks (1):
   quick-help (qh)
     Quick help with instructions
-    System prompt: default
+    Role: default
     Task: inline prompt
     Source: ./.start/config.toml
 
 Overridden tasks (1):
   code-review (cr) [local overrides asset]
     Project-specific code review
-    System prompt: custom (project-reviewer.md)
+    Role: custom (project-reviewer.md)
     Task: combination (file + command)
     Source: ./.start/config.toml (overrides asset)
 ```
@@ -178,7 +173,7 @@ Configured tasks (global):
 
 security-review (sr)
   Security-focused code review
-  System prompt: custom (code-reviewer.md + template)
+  Role: custom (code-reviewer.md + template)
   Task: command-based (git diff --staged)
   Shell: bash
   Timeout: 10 seconds
@@ -196,12 +191,12 @@ Configured tasks (local):
 
 code-review (cr)
   Project-specific code review (overrides asset task)
-  System prompt: custom (project-reviewer.md)
+  Role: custom (project-reviewer.md)
   Task: combination (file + command)
 
 quick-help (qh)
   Quick help with instructions
-  System prompt: default
+  Role: default
   Task: inline prompt
 ```
 
@@ -288,8 +283,8 @@ Task name: quick-help
 Alias (optional): qh
 Description (optional): Quick help with instructions
 
-Override system prompt? [y/N]: n
-✓ Will use default system prompt
+Select role? [y/N]: n
+✓ Will use default role
 
 Task prompt:
 
@@ -316,7 +311,7 @@ Use 'start config task list global' to see all tasks.
 Use 'start task quick-help "your question"' to run.
 ```
 
-**Interactive flow (complex task with system prompt override and command):**
+**Interactive flow (complex task with role selection and command):**
 
 ```
 Add new task
@@ -332,9 +327,9 @@ Task name: git-diff-review
 Alias (optional): gdr
 Description (optional): Review staged git changes
 
-Override system prompt? [y/N]: y
+Select role? [y/N]: y
 
-System prompt configuration:
+Role configuration:
 
 Content source:
   1) File path
@@ -344,10 +339,10 @@ Content source:
 
 Select [1-4]: 4
 
-System prompt file: ~/.config/start/roles/code-reviewer.md
+Role file: ~/.config/start/roles/code-reviewer.md
 ✓ File exists
 
-System prompt template: {file}\n\nFocus on security and performance.
+Role template: {file}\n\nFocus on security and performance.
 ✓ Valid template (uses {file} placeholder)
 
 Task prompt:
@@ -397,12 +392,7 @@ prompt = "Help me with: {instructions}"
 alias = "gdr"
 description = "Review staged git changes"
 
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt = """
-{file}
-
-Focus on security and performance.
-"""
+role = "code-reviewer"
 
 command = "git diff --staged"
 prompt = """
@@ -518,10 +508,10 @@ start config task test <name>
 
 Validates task configuration without executing the task. Performs checks:
 
-1. **System prompt validation** (if override configured)
-   - File exists (if `system_prompt_file` present)
-   - Command executes (if `system_prompt_command` present)
-   - Template uses valid placeholders
+1. **Role validation** (if role field specified)
+   - Role exists in configuration
+   - Role file exists (if role uses file)
+   - Role command executes (if role uses command)
 
 2. **Task prompt validation**
    - File exists (if `file` present)
@@ -545,7 +535,7 @@ Configuration:
   Scope: global
   Alias: qh
   Description: Quick help with instructions
-  System prompt: default (uses global/local)
+  Role: default (uses global/local)
 
 Task prompt:
   Type: Inline prompt
@@ -566,9 +556,9 @@ Configuration:
   Scope: global
   Alias: gdr
   Description: Review staged git changes
-  System prompt: custom override
+  Role: custom override
 
-System prompt override:
+Role override:
   File: ~/.config/start/roles/code-reviewer.md
   Resolved: /Users/grant/.config/start/roles/code-reviewer.md
   ✓ File exists (847 bytes)
@@ -613,9 +603,9 @@ Configuration:
   Scope: local
   Alias: bt
   Description: Broken task example
-  System prompt: custom override
+  Role: custom override
 
-System prompt override:
+Role override:
   File: ./roles/missing.md
   Resolved: /Users/grant/Projects/myapp/roles/missing.md
   ✗ File not found
@@ -642,7 +632,7 @@ Configuration:
   Scope: global
   Alias: bc
   Description: Task with broken command
-  System prompt: default
+  Role: default
 
 Task prompt:
   Type: Command-based
@@ -669,7 +659,7 @@ Testing task: invalid
 Configuration:
   Scope: global
   Description: Invalid task
-  System prompt: default
+  Role: default
 
 Task prompt:
   ✗ No UTD fields present (no file, command, or prompt)
@@ -868,7 +858,7 @@ Interactive prompts to edit specific task. Shows current values as defaults - pr
 
 1. **Alias** - Current value shown in brackets
 2. **Description** - Current value shown in brackets
-3. **System prompt override changes** - Modify or remove
+3. **Role selection changes** - Modify or remove
 4. **Task prompt changes** - Modify file, command, or prompt
 5. **Advanced options** - Shell, timeout
 6. **Backup and save** - Backs up to `config.YYYY-MM-DD-HHMMSS.toml`
@@ -882,7 +872,7 @@ Edit task: quick-help (global)
 Current configuration:
   Alias: qh
   Description: Quick help with instructions
-  System prompt: default
+  Role: default
   Task prompt: inline (Help me with: {instructions})
 
 Press enter to keep current value, or type new value:
@@ -890,7 +880,7 @@ Press enter to keep current value, or type new value:
 Alias [qh]:
 Description [Quick help with instructions]: Quick help for any question
 
-System prompt override? [y/N]: n
+Select role? [y/N]: n
 
 Task prompt template [Help me with: {instructions}]:
 
@@ -910,7 +900,7 @@ Edit task: git-diff-review (global)
 Current configuration:
   Alias: gdr
   Description: Review staged git changes
-  System prompt: custom (code-reviewer.md + template)
+  Role: custom (code-reviewer.md + template)
   Task prompt: command-based (git diff --staged)
   Shell: bash
   Timeout: 10 seconds
@@ -920,9 +910,9 @@ Press enter to keep current value, or type new value:
 Alias [gdr]:
 Description [Review staged git changes]:
 
-Keep system prompt override? [Y/n]: y
-System prompt file [~/.config/start/roles/code-reviewer.md]:
-System prompt template [{file}\n\nFocus on security and performance.]:
+Keep role override? [Y/n]: y
+Role file [~/.config/start/roles/code-reviewer.md]:
+Role template [{file}\n\nFocus on security and performance.]:
 
 Keep command for task prompt? [Y/n]: y
 Task command [git diff --staged]:
@@ -1310,18 +1300,13 @@ In task lists, tasks are labeled by source:
 
 ### Unified Template Design (UTD)
 
-Tasks use UTD pattern for both system prompts and task prompts:
+Tasks use UTD pattern for task prompts and reference roles by name:
 
-**System prompt override (all optional):**
+**Role selection (optional):**
 ```toml
 [tasks.code-review]
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt_command = "date"
-system_prompt = """
-{file}
-
-Current time: {command}
-"""
+role = "code-reviewer"  # References [roles.code-reviewer] section
+agent = "claude"         # Optional: preferred agent
 ```
 
 **Task prompt (at least one required):**
@@ -1343,11 +1328,6 @@ prompt = """
 See [UTD documentation](../design/unified-template-design.md) for complete details.
 
 ### Placeholders
-
-**System prompt templates:**
-- `{file}` - Content from `system_prompt_file`
-- `{command}` - Output from `system_prompt_command`
-- `{model}`, `{date}` - Global placeholders
 
 **Task prompt templates:**
 - `{file}` - Content from task `file`

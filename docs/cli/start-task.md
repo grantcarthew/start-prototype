@@ -18,7 +18,7 @@ Executes predefined AI workflow tasks configured in `config.toml`. Tasks are reu
 
 **Task components:**
 
-- **System prompt override** - Optional UTD fields to override global/local system prompt (`system_prompt_file`, `system_prompt_command`, `system_prompt`)
+- **Role selection** - Optional `role` field to specify which role (system prompt) to use
 - **Required contexts** - Automatically includes all contexts where `required = true`
 - **Task prompt** - UTD fields for prompt template (`file`, `command`, `prompt`)
 - **Alias** - Optional short name for quick access
@@ -167,15 +167,8 @@ Tasks are defined in `config.toml` using the **Unified Template Design (UTD)** p
 [tasks.git-diff-review]
 alias = "gdr"
 agent = "claude"                        # Optional: Preferred agent
+role = "code-reviewer"                  # Optional: Preferred role
 description = "Review git diff changes"
-
-# System prompt override (optional, UTD)
-system_prompt_file = "~/.config/start/roles/code-reviewer.md"
-system_prompt = """
-{file}
-
-Focus on security and maintainability.
-"""
 
 # Task prompt (UTD - at least one required)
 command = "git diff --staged"
@@ -250,7 +243,7 @@ Required contexts:
   ✓ environment     ~/reference/ENVIRONMENT.md
   ✓ index           ~/reference/INDEX.csv
 
-System prompt: (from task - code-reviewer.md)
+Role: (from task - code-reviewer.md)
 Command output: (none)
 Instructions: None
 
@@ -292,7 +285,7 @@ Required contexts:
   ✓ environment     ~/reference/ENVIRONMENT.md
   ✓ index           ~/reference/INDEX.csv
 
-System prompt: (from task - code-reviewer.md)
+Role: (from task - code-reviewer.md)
 Command output: git diff --staged (127 lines)
 Instructions: None
 
@@ -337,7 +330,7 @@ Description:
   Review code for quality and best practices
 
 Configuration:
-  System prompt: (from task configuration)
+  Role: (from task configuration)
   Required contexts: Auto-included (environment, index, etc.)
   Command: (none)
 
@@ -364,11 +357,11 @@ Loading configuration...
 
 Resolving task: git-diff-review (alias: gdr)
   Description: Review git diff changes
-  System prompt override: code-reviewer.md with template
+  Role override: code-reviewer.md with template
   Task command: git diff --staged
   Auto-includes required contexts
 
-Loading system prompt (UTD)...
+Loading role (UTD)...
   File: ~/.config/start/roles/code-reviewer.md → /Users/gcarthew/.config/start/roles/code-reviewer.md
   Size: 847 bytes
   Template: Applied with framing text
@@ -397,7 +390,7 @@ Required contexts:
   ✓ environment     ~/reference/ENVIRONMENT.md
   ✓ index           ~/reference/INDEX.csv
 
-System prompt: (from task - code-reviewer.md)
+Role: (from task - code-reviewer.md)
 Command output: git diff --staged (127 lines)
 Instructions: None
 
@@ -431,7 +424,7 @@ Required contexts:
   ✓ <name>     <path>
   ✗ <name>     <path> (not found)
 
-System prompt: <source>
+Role: <source>
 Command output: <command> (<lines> lines) | (none)
 Instructions: <text> | None
 
@@ -468,7 +461,7 @@ See: https://github.com/grantcarthew/start#tasks
 
 **3** - File error
 
-- System prompt file not found (if using `system_prompt_file`)
+- Role file not found (if role references missing file)
 - Working directory doesn't exist
 - Config file permissions error
 
@@ -524,13 +517,13 @@ Exit code: 4
 
 Task execution stops. Agent is not launched.
 
-### System Prompt File Not Found
+### Role File Not Found
 
 ```
-Error: System prompt file not found: ./tasks/code-reviewer.md
+Error: Role file not found: ~/.config/start/roles/code-reviewer.md
 
-Task 'code-review' references missing file in system_prompt_file.
-Update task configuration or create the file.
+Task 'code-review' uses role 'code-reviewer' which references missing file.
+Update role configuration or create the file.
 ```
 
 Exit code: 3
@@ -568,7 +561,7 @@ Exit code: 2
 
 **`start task <name>`:**
 
-- Can override system prompt with task-specific `system_prompt_*` fields (UTD)
+- Can override role with task-specific `role` field
 - Auto-includes ONLY contexts where `required = true`
 - Can run task `command` for dynamic content (UTD)
 - Task prompt from UTD fields (`file`, `command`, `prompt`)
@@ -596,12 +589,6 @@ Task prompt templates support these placeholders:
 - `{model}` - Model name
 - `{date}` - Current timestamp (ISO 8601)
 - `{file}` - File contents (in UTD file fields)
-
-**System prompt placeholders:**
-
-In task `system_prompt_*` templates:
-- `{file}` - Content from `system_prompt_file`
-- `{command}` - Output from `system_prompt_command`
 
 **Task prompt placeholders:**
 

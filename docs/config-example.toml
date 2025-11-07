@@ -280,10 +280,10 @@ Include examples if helpful.
 
 [tasks.code-review]
 alias = "cr"
+agent = "claude"
 role = "code-reviewer"
 description = "General code quality review"
-# No agent specified → uses default_agent
-# No command → static prompt only
+# Uses specified agent, no command → static prompt only
 prompt = """
 Please review the code in this project.
 
@@ -297,6 +297,7 @@ Provide specific, actionable feedback on:
 
 [tasks.security-audit]
 alias = "sec"
+agent = "claude"
 role = "security-auditor"
 description = "Security-focused code audit"
 command = "git diff --staged"
@@ -312,6 +313,7 @@ Additional focus areas: {instructions}
 
 [tasks.doc-review]
 alias = "dr"
+agent = "claude"
 role = "documentation-writer"
 description = "Review and improve documentation"
 file = "./README.md"

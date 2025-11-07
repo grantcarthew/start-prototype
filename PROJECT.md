@@ -249,11 +249,12 @@ func UpdateAssets() error {
 
 **Task Section Updates:**
 - Completely rewrote to use Unified Template Design (UTD) pattern
-- Documented system prompt override: `system_prompt_file`, `system_prompt_command`, `system_prompt`
+- Added `role` field to reference named roles (replaced `system_prompt_*` fields)
+- Added `agent` field for task-specific agent preference
 - Updated task prompt fields: `file`, `command`, `prompt` (UTD)
 - Added shell configuration: `shell`, `command_timeout`
 - Documented auto-inclusion of `required = true` contexts (no `documents` array)
-- Removed old field references: `role`, `documents`, `content_command`
+- Removed old field references: `documents`, `content_command`, `system_prompt_*` fields
 
 **Consistency Fixes:**
 - Fixed placeholder documentation (`{command}` not `{content}` for tasks)
@@ -270,11 +271,11 @@ func UpdateAssets() error {
 - Command timeout: Global `command_timeout`, per-section override
 
 **Config Sections Completed:**
-- ✅ `[settings]` - default_agent, log_level, shell, command_timeout
+- ✅ `[settings]` - default_agent, default_role, log_level, shell, command_timeout
 - ✅ `[agents.<name>]` - Full design with models, env, validation (global + local)
-- ✅ `[system_prompt]` - Uses UTD pattern (file, command, prompt)
+- ✅ `[roles.<name>]` - Named roles using UTD pattern (file, command, prompt)
 - ✅ `[context.<name>]` - Uses UTD pattern with required/description fields
-- ✅ `[tasks.<name>]` - Full UTD for system_prompt_* and task prompt, auto-includes required contexts
+- ✅ `[tasks.<name>]` - Role and agent fields, UTD for task prompt, auto-includes required contexts
 
 **Config Section Naming:**
 - Changed `[context.documents.<name>]` → `[context.<name>]`
