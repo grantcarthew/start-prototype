@@ -534,7 +534,7 @@ Run 'start init' to create global configuration, or ensure
 agents are defined in local config.
 ```
 
-Note: Agents must be defined in global config (per DR-004). Local config alone is insufficient unless it includes agent definitions (not recommended).
+Note: Per DR-004, agents can be defined in both global and local configs. If using only local config, at least one agent must be defined. For shared team configurations, defining agents in local `./.start/config.toml` allows the config to be committed to version control.
 
 **All context documents missing:**
 

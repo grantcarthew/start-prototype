@@ -12,7 +12,7 @@ Complete reference for `start` configuration files.
 **Merge behavior:**
 - Settings: Local values override global values
 - Agents: Combined (global + local), local overrides global for same name
-- Contexts: Combined (global + local, names must be unique)
+- Contexts: Combined (global + local), local overrides global for same name
 - Roles: Combined (global + local), local overrides global for same name
 - Tasks: Combined (global + local), local overrides global for same name
 
@@ -553,12 +553,20 @@ description = "User environment and tool configuration"
 **required** (boolean, optional, default: false)
 : Whether this document is required context.
 
-- `true` - Included by both `start` and `start prompt`
-- `false` - Included by `start`, excluded by `start prompt`
+**Behavior by command:**
+- `required = true`: Included in `start`, `start prompt`, and `start task`
+- `required = false`: Included in `start` only, excluded from `start prompt` and `start task`
+
+**Use cases:**
+- `required = true`: Critical context needed for all interactions (ENVIRONMENT.md, AGENTS.md, INDEX.csv)
+- `required = false`: Optional context for full sessions only (PROJECT.md, README.md)
 
 ```toml
 [context.environment]
-required = true
+required = true  # Always included
+
+[context.project]
+required = false  # Only in 'start' command
 ```
 
 **shell** (string, optional)
@@ -724,7 +732,9 @@ Review the following changes:
 
 **Context Inclusion:**
 
-Tasks automatically include **all contexts where `required = true`**. There is no `documents` array. This ensures critical context (like AGENTS.md) is always present.
+Tasks automatically include **all contexts where `required = true`**. There is no `documents` array.
+
+This ensures critical context (like AGENTS.md, ENVIRONMENT.md) is always present while excluding optional contexts. See the `required` field documentation in the **[context.\<name\>]** section above for complete behavior across all commands.
 
 **Example task (full):**
 
