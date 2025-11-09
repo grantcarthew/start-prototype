@@ -29,7 +29,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - ✅ `start config validate` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Validate config
 
 **Configuration Sections:**
-- ✅ `start config agent` - [docs/cli/start-agent.md](./docs/cli/start-agent.md) - Manage agents (MOVED from `start agent`)
+- ✅ `start config agent` - [docs/cli/start-config-agent.md](./docs/cli/start-config-agent.md) - Manage agents (MOVED from `start agent`)
 - ✅ `start config context` - [docs/cli/start-config-context.md](./docs/cli/start-config-context.md) - Manage contexts
 - ✅ `start config task` - [docs/cli/start-config-task.md](./docs/cli/start-config-task.md) - Manage tasks
 - ✅ `start config role` - [docs/cli/start-config-role.md](./docs/cli/start-config-role.md) - Manage system prompts
@@ -376,7 +376,7 @@ func UpdateAssets() error {
 
 *Command Reorganization:*
 - [x] **Task 12d:** CLI command reorganization → DR-017: `start config` for all configuration management
-- [x] **Task 12e:** Update `start-agent.md` to reflect `start config agent` (path change only)
+- [x] **Task 12e:** Update `start-config-agent.md` to reflect `start config agent` (path change only)
 - [x] **Task 12f:** Create `start-config-context.md` spec (NEW command)
 - [x] **Task 12g:** Create `start-config-task.md` spec (NEW command)
 - [x] **Task 12h:** Create `start-config-role.md` spec (NEW command)
