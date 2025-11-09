@@ -48,6 +48,34 @@ Work on all commands:
 --directory <path>    # Working directory (default: pwd)
 ```
 
+## Automatic Help Support
+
+Cobra automatically adds help support to all commands with zero configuration required:
+
+**Help flags (automatic):**
+```bash
+-h, --help            # Show help for any command
+```
+
+**Help command (automatic):**
+```bash
+start help                    # Show root command help
+start help config             # Show help for config subcommand
+start help config agent       # Show help for nested subcommand
+```
+
+**Works at all levels:**
+```bash
+start --help
+start config --help
+start config agent --help
+start config agent list --help
+start task --help
+start task code-review --help
+```
+
+Every command in the `start` CLI has help support built-in. No custom code required.
+
 ## Rationale
 
 - Cobra provides robust subcommand support

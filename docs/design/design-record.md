@@ -37,6 +37,7 @@ See [vision.md](../vision.md) for the product vision and goals.
 | [DR-027](./decisions/dr-027-security-trust-model.md) | Security & Trust Model for Assets | Asset Management | 2025-01-07 |
 | [DR-028](./decisions/dr-028-shell-completion.md) | Shell Completion Support | CLI Design | 2025-01-07 |
 | [DR-029](./decisions/dr-029-task-agent-field.md) | Task Agent Field | Tasks | 2025-01-07 |
+| [DR-030](./decisions/dr-030-prefix-matching.md) | Prefix Matching for Commands | CLI Design | 2025-01-10 |
 
 ## By Category
 
@@ -53,7 +54,7 @@ Core configuration structure and file handling:
 - **[DR-008](./decisions/dr-008-file-handling.md)** - Relative paths and missing file handling
 - **[DR-012](./decisions/dr-012-context-required.md)** - Required field and document order
 
-### CLI Design (DR-006, DR-017, DR-024, DR-025, DR-028)
+### CLI Design (DR-006, DR-017, DR-024, DR-025, DR-028, DR-030)
 
 Command-line interface structure:
 
@@ -62,6 +63,7 @@ Command-line interface structure:
 - **[DR-024](./decisions/dr-024-doctor-exit-codes.md)** - Simple binary exit codes (0 = healthy, 1 = issues)
 - **[DR-025](./decisions/dr-025-no-automatic-checks.md)** - No automatic checks or result caching
 - **[DR-028](./decisions/dr-028-shell-completion.md)** - Shell completion for bash/zsh/fish
+- **[DR-030](./decisions/dr-030-prefix-matching.md)** - Enable prefix matching for all commands
 
 ### Tasks (DR-009, DR-010, DR-019, DR-029)
 

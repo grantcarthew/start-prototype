@@ -10,7 +10,7 @@
 
 Context-aware AI agent launcher that detects project context, builds intelligent prompts, and launches AI development tools with proper configuration.
 
-**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (29 DRs) | [Tasks](./docs/tasks.md)
+**Links:** [Vision](./docs/vision.md) | [Config Reference](./docs/config.md) | [UTD](./docs/design/unified-template-design.md) | [Design Decisions](./docs/design/design-record.md) (30 DRs) | [Tasks](./docs/tasks.md)
 
 ## Command Status
 
@@ -42,7 +42,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ## Architecture Decisions
 
-### Completed (29 Design Records)
+### Completed (30 Design Records)
 
 **Core Configuration (DR-001 to DR-008):**
 - DR-001: TOML for configuration format
@@ -78,6 +78,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-027: Security and trust model for assets - trust GitHub HTTPS, no signatures, no commit pinning
 - DR-028: Shell completion support - bash/zsh/fish, manual + auto-install, dynamic completions
 - DR-029: Task agent field - optional agent preference with precedence rules
+- DR-030: Prefix matching for commands - enable Cobra's prefix matching globally
 
 **Implementation:**
 - Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
@@ -108,13 +109,13 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 9. ✅ **Version tracking:** Build-time injection strategy (DR-020)
 10. ✅ **Asset staleness:** Local-only check vs GitHub comparison (DR-023)
 11. ✅ **Security:** Trust model for downloaded assets (DR-027)
+12. ✅ **Partial subcommand matching:** Enable everywhere via Cobra (DR-030)
+13. ✅ **Task agent selection:** Optional agent field in tasks (DR-029)
+14. ✅ **Universal --help:** Automatic via Cobra framework (DR-006)
 
 ### Remaining
 
-12. **Default assets:** What roles, tasks, metaprompts should ship with start?
-13. **Partial subcommand matching:** Support `start con ag` for `start config agent`?
-14. **Universal --help:** Do all subcommands support --help flag?
-15. **Task agent selection:** Should tasks specify which agent to use?
+15. **Default assets:** What roles, tasks, metaprompts should ship with start?
 
 ## Success Criteria
 
@@ -141,6 +142,60 @@ CLI design is complete when:
 - [docs/archive/](./docs/archive/) - Design discussion history
 
 ## Recent Progress
+
+### Universal --help Support - Task 24 (2025-01-10)
+
+**Task 24 Completed:**
+- ✅ Verified Cobra's automatic help support in source code
+- ✅ Updated DR-006 with help documentation
+- ✅ Confirmed zero implementation required
+
+**Key Findings:**
+- Cobra automatically adds `-h, --help` flag to every command
+- Also provides `help` subcommand automatically (`start help config agent`)
+- No `DisableHelpFlag` option exists - it's always enabled
+- `InitDefaultHelpFlag()` called automatically on all commands
+- Works at all nesting levels
+
+**Implementation Required:**
+- Zero lines of code
+- Built-in Cobra behavior
+
+**Documentation Updated:**
+- `docs/design/decisions/dr-006-cobra-cli.md` - Added automatic help support section
+- `PROJECT.md` - Marked question 14 and Task 24 as resolved
+
+### Prefix Matching for Commands - DR-030 (2025-01-10)
+
+**Task 23 Completed:**
+- ✅ Explored Cobra source code to understand prefix matching support
+- ✅ Created DR-030: Prefix matching for commands
+- ✅ Updated all documentation
+
+**Key Decisions:**
+- Enable Cobra's built-in prefix matching via `cobra.EnablePrefixMatching = true`
+- Works at all command levels automatically
+- One line of code implementation
+- Unambiguous prefixes only (exact one match required)
+- Accept trade-offs: ambiguity risk, script fragility, reduced explicitness
+
+**Benefits:**
+- Faster typing for power users (`start con ag l` vs `start config agent list`)
+- Muscle memory development for common workflows
+- Forgiving of typos and partial memory
+- Works seamlessly with shell completion (DR-028)
+- Zero implementation cost (built into Cobra)
+
+**Guidelines:**
+- Interactive use: shortcuts encouraged
+- Scripts/CI: always use full commands
+- Documentation: show full commands, mention shortcuts optionally
+- Command naming: avoid similar prefixes
+
+**Documentation Updated:**
+- `docs/design/decisions/dr-030-prefix-matching.md` - Complete design record
+- `docs/design/design-record.md` - Added DR-030 to index
+- `PROJECT.md` - Updated task list, design record count, resolved questions
 
 ### Task Agent Field - DR-029 (2025-01-07)
 
@@ -412,6 +467,6 @@ func UpdateAssets() error {
 - [x] **Task 20:** Determine shell completion requirements (bash/zsh/fish) → DR-028: bash/zsh/fish support, Tier 1+2 completions
 - [x] **Task 21:** Define non-interactive mode flags for CI/automation → Resolved: Delegate to agent configuration (no special flags)
 - [ ] **Task 22:** Define out-of-box assets (roles, tasks, metaprompts, templates)
-- [ ] **Task 23:** Decide on partial subcommand matching support
-- [ ] **Task 24:** Verify --help flag support across all commands
+- [x] **Task 23:** Decide on partial subcommand matching support → DR-030: Enable Cobra prefix matching globally
+- [x] **Task 24:** Verify --help flag support across all commands → Resolved: Automatic in Cobra (DR-006)
 - [x] **Task 25:** Add agent field to task configuration → DR-029: Optional agent field with precedence rules
