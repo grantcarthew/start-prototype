@@ -60,7 +60,7 @@ $ start update
 | Cache management | Invisible, no commands, manual delete only | ✅ Decided | DR-036 |
 | Config integration | Inline assets completely, global by default | ✅ Decided | DR-033 |
 | Asset download | `asset_download = true` setting + flag | ✅ Decided | DR-033 |
-| Minimal viable set | 28 assets (8 roles, 12 tasks, 6 agents, 2 templates) | ✅ Decided | DR-031 |
+| Minimal viable set | 30 assets (8 roles, 12 tasks, 6 agents, 2 templates, 2 contexts) | ✅ Decided | DR-031 |
 
 ## High-Priority Questions - RESOLVED ✅
 
@@ -235,14 +235,6 @@ start update --auto     # Automatic mode
 start update --check    # Check only, don't update
 ```
 
-**`start cache`** - New command for cache management (optional)
-```bash
-start cache list        # Show cached assets
-start cache clean       # Remove all cached assets
-start cache clean --old # Remove assets older than 30 days
-start cache info        # Show cache size, location
-```
-
 ### Command Specs to Update
 
 - [x] `start-config-agent.md` - Add interactive browsing flow
@@ -250,7 +242,6 @@ start cache info        # Show cache size, location
 - [ ] `start-config-role.md` - Add interactive browsing flow (NEW)
 - [ ] `start-task.md` - Add lazy loading behavior
 - [ ] `start-update.md` - Update to per-asset model
-- [ ] `start-cache.md` - New cache management command (optional)
 
 ## Configuration Updates
 
@@ -267,7 +258,7 @@ command_timeout = 30
 # Asset management (NEW)
 asset_path = "~/.config/start/assets"           # Cache location
 github_token_env = "GITHUB_TOKEN"               # Env var for API token
-asset_repo = "start-project/start-assets"       # GitHub repository
+asset_repo = "grantcarthew/start"       # GitHub repository
 ```
 
 ### Asset Cache Structure
@@ -285,6 +276,10 @@ asset_repo = "start-project/start-assets"       # GitHub repository
 │   └── git-workflow/
 │       ├── pre-commit-review.toml
 │       └── pre-commit-review.meta.toml
+├── contexts/
+│   └── dev/
+│       ├── go.toml
+│       └── go.meta.toml
 └── agents/
     └── claude/
         ├── sonnet.toml
@@ -312,7 +307,10 @@ asset_repo = "start-project/start-assets"       # GitHub repository
 ### Templates (2)
 - **projects/** (2): solo-developer, team-project
 
-**Total: 28 assets** - Enough to impress, not overwhelming
+### Contexts (2)
+- **dev/** (2): go, python
+
+**Total: 30 assets** - Enough to impress, not overwhelming
 
 See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete asset ideas and future possibilities.
 
@@ -379,6 +377,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 - [ ] Write 12 task definitions (toml)
 - [ ] Write 6 agent configs (toml)
 - [ ] Write 2 project templates (toml)
+- [ ] Write 2 context definitions (toml)
 - [ ] Create all metadata files
 - [ ] Validate all assets
 - [ ] Test each asset end-to-end
@@ -389,7 +388,6 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 
 **Goal:** Production-ready catalog system
 
-- [ ] Cache cleanup commands
 - [ ] Search/filter functionality
 - [ ] Asset validation and security
 - [ ] Error recovery and retry logic
@@ -412,7 +410,7 @@ Catalog design is complete when:
 - [x] Asset metadata schema finalized - **DONE (DR-032)**
 - [x] Resolution algorithm specified - **DONE (DR-033)**
 - [x] GitHub API strategy documented - **DONE (DR-034)**
-- [x] Minimal viable asset set defined (28 assets) - **DONE**
+- [x] Minimal viable asset set defined (30 assets) - **DONE**
 
 Implementation is complete when:
 
@@ -464,7 +462,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 - Working on Task 22 (out-of-box assets) from CLI design phase
 - Realized bulk download model was wrong
 - Brainstormed catalog-driven architecture
-- Defined minimal viable asset set (28 assets)
+- Defined minimal viable asset set (30 assets)
 - Made initial architectural decisions
 
 **Session 2: Design Resolution and Documentation**

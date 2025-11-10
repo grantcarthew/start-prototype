@@ -125,11 +125,12 @@ Flags:
 
 | Setting | Flag | Not in Config/Cache | Action |
 |---------|------|---------------------|--------|
-| `true` | (none) | Found in GitHub | Download, cache, add to global |
-| `false` | (none) | Found in GitHub | Error (download disabled) |
-| (any) | `--asset-download` | Found in GitHub | Download, cache, add to global |
-| (any) | `--asset-download=false` | Found in GitHub | Error (download disabled) |
-| (any) | `--asset-download --local` | Found in GitHub | Download, cache, add to local |
+| `true`  | (none)                   | Found in GitHub     | Download, cache, add to global |
+| `false` | (none)                   | Found in GitHub     | Error (download disabled)      |
+| (any)   | `--asset-download`       | Found in GitHub     | Download, cache, add to global |
+| (any)   | `--asset-download=true`  | Found in GitHub     | Download, cache, add to global |
+| (any)   | `--asset-download=false` | Found in GitHub     | Error (download disabled)      |
+| (any)   | `--asset-download --local` | Found in GitHub     | Download, cache, add to local  |
 
 ## Examples
 
