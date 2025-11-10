@@ -14,7 +14,17 @@ start task <name> [instructions] [flags]
 
 ## Description
 
-Executes predefined AI workflow tasks configured in `config.toml`. Tasks are reusable workflows with optional system prompt overrides, automatic required context inclusion, and dynamic content from shell commands.
+Executes predefined AI workflow tasks configured in `tasks.toml`. Tasks are reusable workflows with optional system prompt overrides, automatic required context inclusion, and dynamic content from shell commands.
+
+**Task resolution** (per DR-033):
+
+1. Local config (`./.start/tasks.toml`)
+2. Global config (`~/.config/start/tasks.toml`)
+3. Asset cache (`~/.config/start/assets/tasks/`)
+4. GitHub catalog (lazy download if `asset_download = true`)
+5. Error if not found
+
+Tasks can be downloaded from the GitHub catalog on first use, cached locally for offline use, and added to your configuration automatically.
 
 **Task components:**
 
@@ -32,7 +42,7 @@ Executes predefined AI workflow tasks configured in `config.toml`. Tasks are reu
 - Comment cleanup
 - Any repeatable AI-assisted workflow
 
-Tasks are defined in `config.toml` and can be customized per user or per project. See [task.md](../task.md) for configuration details.
+Tasks are defined in `tasks.toml` and can be customized per user or per project. See [DR-031](../design/decisions/dr-031-catalog-based-assets.md) for catalog architecture and [DR-033](../design/decisions/dr-033-asset-resolution-algorithm.md) for resolution details.
 
 ## Arguments
 
@@ -100,7 +110,71 @@ start task gdr --directory ~/my-project
 **--quiet**, **-q**
 : Silently ignored for tasks (no effect).
 
+**--local**
+: Add downloaded catalog task to local config instead of global (default: global).
+
+```bash
+start task pre-commit-review --local  # Add to ./.start/tasks.toml
+```
+
+**--asset-download[=bool]**
+: Enable/disable downloading from GitHub catalog if task not found (default: from settings).
+
+```bash
+start task pre-commit-review --asset-download     # Force download
+start task pre-commit-review --asset-download=false  # Fail if not found
+```
+
 ## Behavior
+
+### Task Resolution and Lazy Loading
+
+When you run `start task <name>`, the CLI follows this resolution order:
+
+**1. Local config** (`./.start/tasks.toml`)
+- Project-specific tasks
+- Highest priority
+
+**2. Global config** (`~/.config/start/tasks.toml`)
+- Your personal tasks
+- Available across all projects
+
+**3. Asset cache** (`~/.config/start/assets/tasks/`)
+- Previously downloaded catalog tasks
+- Used immediately without prompting
+
+**4. GitHub catalog** (if `asset_download = true`)
+- Query GitHub for task
+- Prompt to download (or auto-download if configured)
+- Cache locally and add to config
+- Global by default, local with `--local` flag
+
+**5. Error if not found**
+
+**Example - Lazy loading:**
+
+```bash
+$ start task pre-commit-review
+
+Task 'pre-commit-review' not found locally.
+Found in GitHub catalog: tasks/git-workflow/pre-commit-review
+Downloading...
+
+✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+✓ Added to global config as 'pre-commit-review'
+
+Running task 'pre-commit-review'...
+[task executes]
+```
+
+**Next time:**
+
+```bash
+$ start task pre-commit-review
+
+Running task 'pre-commit-review'...
+[task executes immediately from config]
+```
 
 ### No Arguments - List Tasks
 
@@ -118,8 +192,9 @@ start task <name> [instructions]
 
 **Execution flow:**
 
-1. Load and merge configuration (global + local)
-2. Find task by name or alias
+1. Resolve task using resolution algorithm (see above)
+2. Load and merge configuration (global + local)
+3. Find task by name or alias
 3. Determine agent using precedence rules:
    - CLI `--agent` flag (highest priority)
    - Task `agent` field (if configured)
@@ -162,7 +237,7 @@ Displays task configuration including system prompt override, required contexts,
 
 ## Task Configuration
 
-Tasks are defined in `config.toml` using the **Unified Template Design (UTD)** pattern:
+Tasks are defined in `tasks.toml` using the **Unified Template Design (UTD)** pattern:
 
 ````toml
 [tasks.git-diff-review]

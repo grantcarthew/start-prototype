@@ -20,15 +20,20 @@ Manages `start` configuration files (global and local). Provides tools for viewi
 **Configuration management operations:**
 
 - **show** - Display merged configuration with sources
-- **edit** - Open config file in editor
-- **path** - Show config file paths
-- **validate** - Check configuration syntax and semantics
+- **edit** - Open config.toml (settings) file in editor
+- **path** - Show config directory paths and files
+- **validate** - Check configuration syntax and semantics across all config files
 
-**Configuration hierarchy:**
+**Configuration hierarchy** (per DR-031):
 
-- **Global:** `~/.config/start/config.toml` - User-wide settings, agents, global context
-- **Local:** `./.start/config.toml` - Project-specific settings, local context
-- **Merge behavior:** Local overrides global for settings, contexts are combined
+- **Global:** `~/.config/start/` - User-wide configuration files
+  - `config.toml` - Settings
+  - `agents.toml` - Agent configurations
+  - `roles.toml` - Role definitions
+  - `contexts.toml` - Context document references
+  - `tasks.toml` - Task definitions
+- **Local:** `./.start/` - Project-specific configuration files (same structure)
+- **Merge behavior:** Local overrides global for matching items, collections are combined
 
 ## Subcommands
 
@@ -44,10 +49,10 @@ start config show
 
 **Behavior:**
 
-Shows the effective configuration after merging global and local configs. Displays:
+Shows the effective configuration after merging global and local configs from all configuration files (config.toml, agents.toml, roles.toml, contexts.toml, tasks.toml). Displays:
 
 - Which values come from global vs local config
-- All sections: settings, agents, contexts, roles
+- All sections: settings, agents, contexts, roles, tasks
 - Missing optional files are noted but not shown as errors
 
 **Output (both global and local exist):**
@@ -56,8 +61,8 @@ Shows the effective configuration after merging global and local configs. Displa
 Configuration
 ─────────────────────────────────────────────────
 
-Global: ~/.config/start/config.toml
-Local:  ./.start/config.toml
+Global: ~/.config/start/
+Local:  ./.start/
 
 Settings
 ────────
@@ -124,7 +129,7 @@ Roles (2)
 Configuration
 ─────────────────────────────────────────────────
 
-Global: ~/.config/start/config.toml
+Global: ~/.config/start/
 Local:  (none)
 
 Settings
@@ -152,7 +157,7 @@ Configuration
 ─────────────────────────────────────────────────
 
 Global: (none)
-Local:  ./.start/config.toml
+Local:  ./.start/
 
 Settings
 ────────
@@ -197,11 +202,11 @@ Adds:
 **No config files:**
 
 ```
-Error: No configuration files found.
+Error: No configuration found.
 
 Checked locations:
-  Global: ~/.config/start/config.toml (not found)
-  Local:  ./.start/config.toml (not found)
+  Global: ~/.config/start/ (not found)
+  Local:  ./.start/ (not found)
 
 Run 'start init' to create initial configuration.
 ```
@@ -224,7 +229,7 @@ Exit code: 1
 
 ### start config edit
 
-Open configuration file in editor.
+Open settings configuration file (config.toml) in editor. For editing other config files, use specialized commands: `start config task edit`, `start config agent edit`, `start config role edit`, `start config context edit`.
 
 **Synopsis:**
 
@@ -235,10 +240,10 @@ start config edit [scope]
 **Arguments:**
 
 **[scope]** (optional)
-: Which config to edit. If omitted, edit will detect and ask.
+: Which config.toml to edit. If omitted, edit will detect and ask.
 
-- `global` - Edit `~/.config/start/config.toml`
-- `local` - Edit `./.start/config.toml`
+- `global` - Edit `~/.config/start/config.toml` (settings)
+- `local` - Edit `./.start/config.toml` (settings)
 
 **Behavior:**
 
@@ -425,7 +430,7 @@ Exit code: 3
 
 ### start config path
 
-Show paths to configuration files.
+Show paths to configuration directories and files.
 
 **Synopsis:**
 
@@ -435,39 +440,56 @@ start config path
 
 **Behavior:**
 
-Displays the paths to global and local config files, indicating whether each exists.
+Displays the paths to global and local config directories, listing all configuration files and indicating whether each exists.
 
 **Output (both exist):**
 
 ```
-Configuration file locations:
+Configuration locations:
 
-Global: ~/.config/start/config.toml ✓
-Local:  ./.start/config.toml ✓
+Global: ~/.config/start/ ✓
+  config.toml ✓
+  agents.toml ✓
+  roles.toml ✓
+  contexts.toml ✓
+  tasks.toml ✓
 
-Use 'start config edit global' to edit global config.
-Use 'start config edit local' to edit local config.
+Local:  ./.start/ ✓
+  config.toml ✓
+  agents.toml ✓
+  roles.toml ✓
+  contexts.toml ✓
+  tasks.toml ✓
+
+Use 'start config edit [scope]' to edit settings.
+Use specialized commands for other files (e.g., 'start config task edit').
 ```
 
 **Output (only global exists):**
 
 ```
-Configuration file locations:
+Configuration locations:
 
-Global: ~/.config/start/config.toml ✓
-Local:  ./.start/config.toml (not found)
+Global: ~/.config/start/ ✓
+  config.toml ✓
+  agents.toml ✓
+  roles.toml ✓
+  contexts.toml ✓
+  tasks.toml ✓
 
-Use 'start config edit global' to edit global config.
-Use 'start config edit local' to create local config.
+Local:  ./.start/ (not found)
+
+Use 'start config edit global' to edit global settings.
+Use 'start init local' to create local config.
 ```
 
 **Output (neither exists):**
 
 ```
-Configuration file locations:
+Configuration locations:
 
-Global: ~/.config/start/config.toml (not found)
-Local:  ./.start/config.toml (not found)
+Global: ~/.config/start/ (not found)
+Local:  ./.start/ (not found)
 
 Run 'start init' to create initial configuration.
 ```
@@ -481,23 +503,23 @@ start config path --verbose
 Output:
 
 ```
-Configuration file locations:
+Configuration locations:
 
-Global config:
-  Path: /Users/grant/.config/start/config.toml
-  Status: exists
-  Size: 2.3 KB
-  Modified: 2025-01-04 14:30:15
+Global directory: /Users/grant/.config/start/
+  config.toml: 1.2 KB (2025-01-04 14:30:15)
+  agents.toml: 3.1 KB (2025-01-04 14:30:15)
+  roles.toml: 847 bytes (2025-01-04 14:30:15)
+  contexts.toml: 456 bytes (2025-01-04 14:30:15)
+  tasks.toml: 2.8 KB (2025-01-04 14:30:15)
+  Backups: 12 files
 
-Local config:
-  Path: /Users/grant/Projects/myproject/.start/config.toml
-  Status: exists
-  Size: 456 bytes
-  Modified: 2025-01-04 15:12:42
-
-Backup directory:
-  Global: /Users/grant/.config/start/ (3 backups)
-  Local:  /Users/grant/Projects/myproject/.start/ (1 backup)
+Local directory: /Users/grant/Projects/myproject/.start/
+  config.toml: 234 bytes (2025-01-04 15:12:42)
+  agents.toml: (not found)
+  roles.toml: (not found)
+  contexts.toml: 198 bytes (2025-01-04 15:12:42)
+  tasks.toml: (not found)
+  Backups: 2 files
 ```
 
 **Exit codes:**
@@ -506,7 +528,7 @@ Backup directory:
 
 ### start config validate
 
-Validate configuration syntax and semantics without launching agent.
+Validate configuration syntax and semantics across all config files without launching agent.
 
 **Synopsis:**
 
@@ -516,11 +538,11 @@ start config validate
 
 **Behavior:**
 
-Performs comprehensive validation of both global and local configs:
+Performs comprehensive validation of all configuration files (config.toml, agents.toml, roles.toml, contexts.toml, tasks.toml) in both global and local locations:
 
 1. **TOML syntax validation**
 
-   - Valid TOML structure
+   - Valid TOML structure in all files
    - Proper section headers
    - Correct data types
 
@@ -532,11 +554,12 @@ Performs comprehensive validation of both global and local configs:
    - Unknown placeholders detected
    - Context file paths exist
    - Role file paths exist
+   - Task definitions valid
 
 3. **Merge validation**
-   - Local config doesn't define agents (DR-004)
-   - No conflicting settings
+   - No conflicting settings between global and local
    - Combined context names unique
+   - Local overrides properly structured
 
 **Output (all valid):**
 
@@ -544,26 +567,29 @@ Performs comprehensive validation of both global and local configs:
 Validating configuration...
 ─────────────────────────────────────────────────
 
-Global: ~/.config/start/config.toml
-  ✓ TOML syntax valid
-  ✓ Settings section valid
-  ✓ Agents section valid (3 agents)
+Global: ~/.config/start/
+  ✓ config.toml - Settings valid
+  ✓ agents.toml - 3 agents configured
     ✓ claude
     ✓ gemini
     ✓ aichat
-  ✓ Contexts section valid (3 contexts)
-  ✓ Roles section valid (2 roles)
+  ✓ roles.toml - 2 roles configured
+  ✓ contexts.toml - 3 contexts configured
+  ✓ tasks.toml - 4 tasks configured
 
-Local: ./.start/config.toml
-  ✓ TOML syntax valid
-  ✓ Settings section valid
-  ✓ Contexts section valid (2 contexts)
-  ✓ No agents defined (correct - agents are global-only)
+Local: ./.start/
+  ✓ config.toml - Settings valid
+  ✓ agents.toml - (not present)
+  ✓ roles.toml - (not present)
+  ✓ contexts.toml - 2 contexts configured
+  ✓ tasks.toml - (not present)
 
 Merged configuration:
   ✓ No conflicts
   ✓ 5 total contexts (3 global + 2 local)
   ✓ 3 agents available
+  ✓ 2 roles available
+  ✓ 4 tasks available
   ✓ Default agent set: claude
 
 ✓ Configuration is valid
@@ -686,11 +712,11 @@ Adds detailed checks:
 **No config files:**
 
 ```
-Error: No configuration files found.
+Error: No configuration found.
 
 Checked locations:
-  Global: ~/.config/start/config.toml (not found)
-  Local:  ./.start/config.toml (not found)
+  Global: ~/.config/start/ (not found)
+  Local:  ./.start/ (not found)
 
 Run 'start init' to create initial configuration.
 ```
@@ -783,14 +809,24 @@ Show detailed validation results including all checks performed.
 
 ## Files
 
-**~/.config/start/config.toml**
-: Global configuration file. Contains agents, global contexts, global settings, and roles.
+**~/.config/start/**
+: Global configuration directory containing:
+  - `config.toml` - Settings only
+  - `agents.toml` - Agent configurations
+  - `roles.toml` - Role definitions
+  - `contexts.toml` - Context document references
+  - `tasks.toml` - Task definitions
 
-**./.start/config.toml**
-: Local project configuration file. Contains project-specific contexts and settings. Cannot define agents (DR-004).
+**./.start/**
+: Local project configuration directory (same file structure as global)
+  - Local values override global for matching items
+  - Collections are combined (e.g., contexts from both are merged)
 
-**~/.config/start/config.\*.toml**
-: Backup files created before modifications. Format: `config.YYYY-MM-DD-HHMMSS.toml`
+**~/.config/start/\*.YYYY-MM-DD-HHMMSS.toml**
+: Backup files created before modifications. Examples:
+  - `config.2025-01-04-103045.toml`
+  - `agents.2025-01-04-103045.toml`
+  - `roles.2025-01-04-103045.toml`
 
 ## Editor Configuration
 
@@ -899,18 +935,25 @@ Per DR-004 (updated 2025-01-05), agents can be defined in **both global and loca
 
 ### Backup Files
 
-Commands that modify configs create timestamped backups:
+Commands that modify configs create timestamped backups for each file:
 
-- Format: `config.YYYY-MM-DD-HHMMSS.toml`
-- Location: Same directory as original config
+- Format: `<filename>.YYYY-MM-DD-HHMMSS.toml`
+- Location: Same directory as original config files
 - Created before any modification
 - Not automatically cleaned up (manual deletion safe)
+- Examples:
+  - `config.2025-01-04-103045.toml`
+  - `agents.2025-01-04-103045.toml`
+  - `tasks.2025-01-04-103045.toml`
 
 **Backup creation triggers:**
 
 - `start config edit` (after validation warnings)
-- `start agent add|edit|remove|default` (before write)
-- `start init` (when modifying existing config)
+- `start config task add|edit|remove` (before write to tasks.toml)
+- `start config agent add|edit|remove` (before write to agents.toml)
+- `start config role edit|remove` (before write to roles.toml)
+- `start config context add|edit|remove` (before write to contexts.toml)
+- `start init` (when modifying existing config files)
 
 ### Context File Validation
 

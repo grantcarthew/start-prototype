@@ -47,73 +47,83 @@ $ start update
 
 | Decision | Choice | Status | DR |
 |----------|--------|--------|----|
-| Metadata format | Sidecar `.meta.toml` files | ✅ Decided | TBD |
-| Installation model | Lazy loading - download on first use | ✅ Decided | TBD |
-| State management | Filesystem = state, no tracking file | ✅ Decided | TBD |
-| Browse/search | Go TUI libraries (bubbletea/promptui) | ✅ Decided | TBD |
-| Update strategy | Interactive (default) or `--auto` flag | ✅ Decided | TBD |
-| Versioning | SHA-based (git blob or content hash) | ✅ Decided | TBD |
+| Metadata format | Sidecar `.meta.toml` files (6 required fields) | ✅ Decided | DR-032 |
+| Config structure | Multi-file (config, tasks, agents, contexts) | ✅ Decided | DR-031 |
+| Installation model | Lazy loading - download on first use | ✅ Decided | DR-031 |
+| State management | Filesystem = state, no tracking file | ✅ Decided | DR-031 |
+| Browse/search | Numbered selection (v1), TUI future | ✅ Decided | DR-035 |
+| Update strategy | Manual only, SHA-based detection | ✅ Decided | DR-037 |
+| Versioning | SHA-based (git blob SHA) | ✅ Decided | DR-032 |
 | Offline behavior | Manual config only, no GitHub access | ✅ Decided | DR-026 |
-| Resolution order | local → global → cache → GitHub → error | ✅ Decided | TBD |
-| GitHub token | Recommend `GITHUB_TOKEN` env var | ✅ Decided | TBD |
-| Asset types (v1) | roles, tasks, agents, templates | ✅ Decided | TBD |
-| Minimal viable set | 28 assets (8 roles, 12 tasks, 6 agents, 2 templates) | ✅ Decided | TBD |
+| Resolution order | local → global → cache → GitHub → error | ✅ Decided | DR-033 |
+| GitHub API | Tree API + raw.githubusercontent.com | ✅ Decided | DR-034 |
+| Cache management | Invisible, no commands, manual delete only | ✅ Decided | DR-036 |
+| Config integration | Inline assets completely, global by default | ✅ Decided | DR-033 |
+| Asset download | `asset_download = true` setting + flag | ✅ Decided | DR-033 |
+| Minimal viable set | 28 assets (8 roles, 12 tasks, 6 agents, 2 templates) | ✅ Decided | DR-031 |
+
+## High-Priority Questions - RESOLVED ✅
+
+1. **Sidecar metadata schema** - ✅ RESOLVED (DR-032)
+   - 6 required fields: name, description, tags, sha, created, updated
+   - No optional fields (KISS)
+   - Category derived from filesystem (no drift)
+   - SHA is 40-char git blob hex
+
+2. **GitHub API strategy** - ✅ RESOLVED (DR-034)
+   - Tree API for catalog browsing (in-memory cache)
+   - raw.githubusercontent.com for downloads (no rate limit!)
+   - Contents API as fallback
+   - Recommend GITHUB_TOKEN env var (5000/hr vs 60/hr)
+
+3. **Asset resolution algorithm** - ✅ RESOLVED (DR-033)
+   - Priority: local → global → cache → GitHub
+   - `asset_download = true` setting (default)
+   - `--asset-download[=bool]` and `--local` flags
+   - Auto-add to global unless `--local`
+
+4. **Cache management** - ✅ RESOLVED (DR-036)
+   - No `start cache` command - cache is invisible
+   - Manual deletion only: `rm -rf ~/.config/start/assets`
+   - Files are tiny (< 1MB for hundreds of assets)
+   - No cleanup needed
+
+5. **Config integration** - ✅ RESOLVED (DR-031, DR-033)
+   - Multi-file config: config.toml, tasks.toml, agents.toml, contexts.toml
+   - Downloaded assets inlined completely (no source tracking)
+   - Cache updated via `start update`, user config never auto-updated
+   - Global by default, `--local` to override
 
 ## Open Questions
 
-### High Priority (Blockers)
+### Medium Priority (Resolved for v1, Future Enhancement)
 
-1. **Sidecar metadata schema** - Exact fields in `.meta.toml`?
-   - Required: name, category, description, sha, tags
-   - Optional: version, author, created, updated, dependencies
-   - Schema validation?
+6. **TUI library choice** - ✅ RESOLVED (DR-035)
+   - v1: Numbered selection (no dependencies)
+   - Future: TUI library if users request it
+   - Works everywhere (SSH, containers, CI)
 
-2. **GitHub API strategy** - Which endpoints, rate limiting, caching?
-   - Tree API for browsing vs Contents API for downloading
-   - How to handle rate limits gracefully
-   - Cache catalog index locally?
+7. **Asset validation** - ✅ RESOLVED (DR-032)
+   - TOML parsing validates structure
+   - Required field checks in Go code
+   - SHA format validation (40-char hex)
+   - No schema file (keep simple)
 
-3. **Asset resolution algorithm** - Exact priority order and fallback behavior?
-   - local config → global config → cache → GitHub
-   - When to prompt user vs auto-download
-   - Error messages for each failure case
+8. **Update notification** - ✅ RESOLVED (DR-037)
+   - Manual `start update` only (DR-025 compliant)
+   - No automatic checks
+   - No background processes
+   - User explicitly opts in
 
-4. **Cache management** - When to clean up, size limits, manual control?
-   - `start cache clean` command?
-   - Age-based cleanup?
-   - Size-based cleanup?
+9. **Error recovery** - ✅ RESOLVED (DR-037)
+   - Partial failures reported clearly
+   - User can retry `start update`
+   - Cache is disposable (can delete and re-download)
 
-5. **Config integration** - How do cached assets get added to config?
-   - Automatic on first use?
-   - Manual add command?
-   - Prompt user each time?
-
-### Medium Priority (Important)
-
-6. **TUI library choice** - bubbletea vs promptui vs basic numbered selection?
-   - Feature comparison
-   - Dependency size
-   - Fallback strategy
-
-7. **Asset validation** - How to validate downloaded assets?
-   - TOML validation
-   - Schema checking
-   - Security considerations
-
-8. **Update notification** - When to check for updates?
-   - On `start update` only?
-   - Weekly background check?
-   - Never automatic (DR-025 compliance)
-
-9. **Error recovery** - What if download fails mid-way?
-   - Retry logic
-   - Partial file cleanup
-   - User notification
-
-10. **Asset dependencies** - Can tasks require specific roles/agents?
-    - Dependency declaration in metadata
-    - Automatic installation of dependencies
-    - Version compatibility
+10. **Asset dependencies** - DEFERRED (not in v1)
+    - Add if users request it
+    - Would use `dependencies` field in metadata
+    - Auto-install would require dependency resolution
 
 ### Low Priority (Nice to Have)
 
@@ -142,60 +152,59 @@ $ start update
     - Install from list/file
     - Workspace templates
 
-## Design Records Needed
+## Design Records - COMPLETED ✅
 
-### New DRs
+### New DRs (All Written)
 
-1. **DR-031: Catalog-Based Asset Architecture** (High Priority)
-   - Overall system design
-   - Lazy loading model
-   - GitHub as database
-   - State management via filesystem
-   - Supersedes aspects of DR-014, DR-015, DR-016, DR-019, DR-023
+1. ✅ **DR-031: Catalog-Based Asset Architecture**
+   - Overall system design and core principles
+   - Multi-file configuration structure
+   - Lazy loading model and GitHub as database
+   - Supersedes DR-014, DR-015, DR-016; Updates DR-019, DR-023
 
-2. **DR-032: Asset Metadata Schema** (High Priority)
-   - Sidecar `.meta.toml` format
-   - Required vs optional fields
-   - Versioning with SHA
-   - Schema validation
+2. ✅ **DR-032: Asset Metadata Schema**
+   - Sidecar `.meta.toml` format with 6 required fields
+   - Category derived from filesystem (no drift)
+   - SHA-based versioning, no semver needed
+   - Validation rules and Go struct
 
-3. **DR-033: Asset Resolution Algorithm** (High Priority)
+3. ✅ **DR-033: Asset Resolution Algorithm**
    - Priority order: local → global → cache → GitHub
-   - Lazy loading behavior
-   - User prompts vs auto-download
-   - Error handling and messages
+   - `asset_download` setting and `--asset-download` flag
+   - `--local` flag for local config (global by default)
+   - Error handling for each failure case
 
-4. **DR-034: GitHub Catalog API Strategy** (High Priority)
-   - API endpoints used
-   - Rate limiting handling
-   - Authentication with GITHUB_TOKEN
-   - Caching strategy
+4. ✅ **DR-034: GitHub Catalog API Strategy**
+   - Tree API for browsing (in-memory cache)
+   - raw.githubusercontent.com for downloads (no rate limit)
+   - Contents API as fallback
+   - Rate limiting and authentication strategy
 
-5. **DR-035: Interactive Asset Browsing** (Medium Priority)
-   - TUI library choice
-   - Category navigation
-   - Search/filter functionality
-   - Fallback for non-interactive environments
+5. ✅ **DR-035: Interactive Asset Browsing**
+   - Numbered selection for v1 (no dependencies)
+   - Category navigation workflow
+   - Future TUI library consideration
+   - Non-interactive mode for scripts
 
-6. **DR-036: Cache Management** (Medium Priority)
-   - Cache structure and location
-   - Cleanup policies
-   - Manual cache commands
-   - Size management
+6. ✅ **DR-036: Cache Management**
+   - Cache is invisible (no user commands)
+   - Manual deletion only: `rm -rf ~/.config/start/assets`
+   - No size limits or cleanup policies
+   - Cache structure and operations
 
-7. **DR-037: Asset Update Mechanism** (Medium Priority)
-   - SHA-based update detection
-   - Interactive vs automatic updates
-   - Update notifications (compliant with DR-025)
-   - Rollback on failure
+7. ✅ **DR-037: Asset Update Mechanism**
+   - SHA-based update detection via Tree API
+   - Manual `start update` only (DR-025 compliant)
+   - Updates cache only, never user config
+   - Per-asset updates with clear reporting
 
-### Updates to Existing DRs
+### Updates to Existing DRs (All Completed)
 
-8. **DR-014: GitHub Tree API** → Add note: "See DR-031 for catalog model"
-9. **DR-015: Atomic Updates** → Add note: "See DR-031 for per-asset updates"
-10. **DR-016: Asset Discovery** → Add note: "See DR-031 for interactive browsing"
-11. **DR-019: Task Loading** → Update with cache in resolution order
-12. **DR-023: Staleness Checking** → Update with per-asset SHA comparison
+8. ✅ **DR-014: GitHub Tree API** → Status: Superseded by DR-031
+9. ✅ **DR-015: Atomic Updates** → Status: Superseded by DR-031
+10. ✅ **DR-016: Asset Discovery** → Status: Superseded by DR-031
+11. ✅ **DR-019: Task Loading** → Status: Updated by DR-031
+12. ✅ **DR-023: Staleness Checking** → Status: Superseded by DR-031
 
 ## Command Updates Required
 
@@ -394,16 +403,16 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 
 Catalog design is complete when:
 
-- [ ] All high-priority questions resolved (5 questions)
-- [ ] All new DRs written (DR-031 through DR-037)
-- [ ] Existing DRs updated with notes
+- [x] All high-priority questions resolved (5 questions) - **DONE 2025-01-10**
+- [x] All new DRs written (DR-031 through DR-037) - **DONE 2025-01-10**
+- [x] Existing DRs updated with notes - **DONE 2025-01-10**
 - [ ] Command specs updated for new behavior
-- [ ] Configuration schema updated
-- [ ] Cache structure defined
-- [ ] Asset metadata schema finalized
-- [ ] Resolution algorithm specified
-- [ ] GitHub API strategy documented
-- [ ] Minimal viable asset set defined (28 assets)
+- [x] Configuration schema updated - **DONE (multi-file config)**
+- [x] Cache structure defined - **DONE (DR-036)**
+- [x] Asset metadata schema finalized - **DONE (DR-032)**
+- [x] Resolution algorithm specified - **DONE (DR-033)**
+- [x] GitHub API strategy documented - **DONE (DR-034)**
+- [x] Minimal viable asset set defined (28 assets) - **DONE**
 
 Implementation is complete when:
 
@@ -449,42 +458,48 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 
 ## Recent Progress
 
-### Catalog Architecture Brainstorming (2025-01-10)
+### Catalog Design Phase Complete (2025-01-10)
 
-**Session Context:**
+**Session 1: Catalog Architecture Brainstorming**
 - Working on Task 22 (out-of-box assets) from CLI design phase
 - Realized bulk download model was wrong
 - Brainstormed catalog-driven architecture
 - Defined minimal viable asset set (28 assets)
-- Made key architectural decisions
+- Made initial architectural decisions
 
-**Key Insights:**
-- GitHub as database, not just distribution
-- Lazy loading > bulk download
-- Filesystem = state (no tracking files)
-- Sidecar metadata keeps content clean
-- On-demand installation is better UX
+**Session 2: Design Resolution and Documentation**
+- ✅ Resolved all 5 high-priority questions interactively
+- ✅ Wrote 7 new Design Records (DR-031 through DR-037)
+- ✅ Updated 5 existing DRs with catalog notes
+- ✅ Tested GitHub API strategy (confirmed working)
+- ✅ Documented all decisions in detail
 
-**Decisions Made:**
-1. ✅ Metadata format: Sidecar `.meta.toml`
-2. ✅ Installation model: Lazy loading
-3. ✅ State management: Filesystem only
-4. ✅ Browsing: Go TUI libraries
-5. ✅ Updates: Interactive or `--auto`
-6. ✅ Versioning: SHA-based
-7. ✅ Offline: Manual config only
-8. ✅ Minimal set: 28 assets
+**Key Final Decisions:**
+1. ✅ Metadata: 6 required fields, category from filesystem
+2. ✅ Config: Multi-file (config, tasks, agents, contexts)
+3. ✅ API: Tree API + raw.githubusercontent.com (no rate limit)
+4. ✅ Cache: Invisible, no commands, manual delete only
+5. ✅ Resolution: local → global → cache → GitHub
+6. ✅ Download: `asset_download = true` + `--asset-download` flag
+7. ✅ Integration: Inline assets, global by default, `--local` to override
+8. ✅ Updates: Manual only, SHA-based, cache-only (never touch config)
+9. ✅ Browsing: Numbered selection (v1), TUI future
 
 **Documents Created:**
-- `docs/ideas/catalog-based-assets.md` - Complete vision and ideas
-- `PROJECT-catalog-redesign.md` - This file, tracks new design phase
+- `docs/ideas/catalog-based-assets.md` - Complete vision
+- `docs/design/decisions/dr-031-catalog-based-assets.md` - Overall architecture
+- `docs/design/decisions/dr-032-asset-metadata-schema.md` - Metadata format
+- `docs/design/decisions/dr-033-asset-resolution-algorithm.md` - Resolution logic
+- `docs/design/decisions/dr-034-github-catalog-api.md` - GitHub API strategy
+- `docs/design/decisions/dr-035-interactive-browsing.md` - Catalog browsing UX
+- `docs/design/decisions/dr-036-cache-management.md` - Cache behavior
+- `docs/design/decisions/dr-037-asset-updates.md` - Update mechanism
 
 **Next Steps:**
-1. Resolve high-priority open questions
-2. Write DR-031 through DR-037
-3. Update impacted DRs with notes
-4. Update command specs
-5. Begin implementation
+1. Update command specs for new behavior
+2. Begin Phase 1 implementation (Core Catalog Infrastructure)
+3. Create minimal viable asset set (28 assets)
+4. Test end-to-end workflows
 
 ## Notes
 

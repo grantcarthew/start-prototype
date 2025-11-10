@@ -1,8 +1,10 @@
 # DR-019: Task Loading and Merging Algorithm
 
 **Date:** 2025-01-06
-**Status:** Accepted
+**Status:** Updated by DR-031
 **Category:** Tasks
+
+> **Note:** This DR remains valid but has been extended. See [DR-031](./dr-031-catalog-based-assets.md) for the catalog architecture and [DR-033](./dr-033-asset-resolution-algorithm.md) for the updated resolution algorithm that includes cache and GitHub catalog.
 
 ## Decision
 

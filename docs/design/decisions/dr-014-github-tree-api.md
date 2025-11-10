@@ -1,8 +1,10 @@
 # DR-014: GitHub Asset Download Strategy
 
 **Date:** 2025-01-06
-**Status:** Accepted
+**Status:** Superseded by DR-031
 **Category:** Asset Management
+
+> **Note:** This DR described the original bulk download model. See [DR-031](./dr-031-catalog-based-assets.md) for the current catalog-based architecture and [DR-034](./dr-034-github-catalog-api.md) for the updated GitHub API strategy.
 
 ## Decision
 

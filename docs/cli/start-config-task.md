@@ -232,8 +232,8 @@ start config task add local    # Add to local config
 Prompts for task details and adds to the selected config file:
 
 1. **Select scope** (if not provided)
-   - global - Add to `~/.config/start/config.toml`
-   - local - Add to `./.start/config.toml`
+   - global - Add to `~/.config/start/tasks.toml`
+   - local - Add to `./.start/tasks.toml`
 
 2. **Task name** (required)
    - Validation: lowercase alphanumeric with hyphens
@@ -304,7 +304,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-101234.toml...
 ✓ Backup created
 
-Saving task 'quick-help' to ~/.config/start/config.toml...
+Saving task 'quick-help' to ~/.config/start/tasks.toml...
 ✓ Task added successfully
 
 Use 'start config task list global' to see all tasks.
@@ -369,7 +369,7 @@ Command timeout in seconds (or enter for default): 10
 Backing up config to config.2025-01-06-101345.toml...
 ✓ Backup created
 
-Saving task 'git-diff-review' to ~/.config/start/config.toml...
+Saving task 'git-diff-review' to ~/.config/start/tasks.toml...
 ✓ Task added successfully
 
 Use 'start config task list global' to see all tasks.
@@ -925,7 +925,7 @@ Timeout in seconds [10]: 15
 Backing up config to config.2025-01-06-102345.toml...
 ✓ Backup created
 
-Saving changes to ~/.config/start/config.toml...
+Saving changes to ~/.config/start/tasks.toml...
 ✓ Task 'git-diff-review' updated successfully
 
 Use 'start config task list global' to see changes.
@@ -1028,7 +1028,7 @@ Remove task 'quick-help' from global config? [y/N]: y
 Backing up config to config.2025-01-06-103012.toml...
 ✓ Backup created
 
-Removing task 'quick-help' from ~/.config/start/config.toml...
+Removing task 'quick-help' from ~/.config/start/tasks.toml...
 ✓ Task 'quick-help' removed successfully
 
 Use 'start config task list global' to see remaining tasks.
@@ -1049,7 +1049,7 @@ Remove task 'quick-help' from global config? [y/N]: y
 Backing up config to config.2025-01-06-103045.toml...
 ✓ Backup created
 
-Removing task 'quick-help' from ~/.config/start/config.toml...
+Removing task 'quick-help' from ~/.config/start/tasks.toml...
 ✓ Task 'quick-help' removed successfully
 
 Use 'start config task list global' to see remaining tasks.
@@ -1088,7 +1088,7 @@ Remove task 'code-review' from local config? [y/N]: y
 Backing up config to config.2025-01-06-103123.toml...
 ✓ Backup created
 
-Removing task 'code-review' from ./.start/config.toml...
+Removing task 'code-review' from ./.start/tasks.toml...
 ✓ Task 'code-review' removed successfully
 ✓ Asset task 'code-review' is now active
 
@@ -1158,7 +1158,7 @@ Remove task 'quick-help' from global config? [y/N]: y
 Backing up config to config.2025-01-06-103156.toml...
 ✗ Failed to backup config: permission denied
 
-Existing config preserved at: ~/.config/start/config.toml
+Existing config preserved at: ~/.config/start/tasks.toml
 Task not removed.
 ```
 
@@ -1236,11 +1236,11 @@ Shows list of all tasks to choose from.
 
 ## Files
 
-**~/.config/start/config.toml**
-: Global configuration file containing user-defined task definitions.
+**~/.config/start/tasks.toml**
+: Global task definitions file containing user-defined tasks.
 
-**./.start/config.toml**
-: Local project configuration file containing project-specific tasks.
+**./.start/tasks.toml**
+: Local project task definitions file containing project-specific tasks.
 
 **~/.config/start/assets/tasks/*.toml**
 : Asset library tasks (updated via `start update`). Cannot be edited directly via `start config task` commands.
@@ -1252,7 +1252,7 @@ Tasks are merged from all three sources: assets + global + local. User tasks (gl
 ### No Configuration File
 
 ```
-Error: No configuration found at ~/.config/start/config.toml
+Error: No task configuration found at ~/.config/start/tasks.toml
 
 Run 'start init' to create initial configuration.
 ```
@@ -1279,8 +1279,8 @@ Exit code: 1
 Tasks are discovered from three sources:
 
 1. **Asset library:** `~/.config/start/assets/tasks/*.toml` (managed by `start update`)
-2. **Global config:** `~/.config/start/config.toml` (managed by `start config task`)
-3. **Local config:** `./.start/config.toml` (managed by `start config task`)
+2. **Global config:** `~/.config/start/tasks.toml` (managed by `start config task`)
+3. **Local config:** `./.start/tasks.toml` (managed by `start config task`)
 
 **Precedence:**
 1. Local tasks override global tasks (same name)

@@ -7,6 +7,8 @@ start config role - Manage role configuration
 ## Synopsis
 
 ```bash
+start config role list
+start config role add [path]
 start config role show [scope]
 start config role edit [scope]
 start config role remove [scope]
@@ -19,11 +21,12 @@ Manages role configuration in config files. Roles define the AI agent's persona 
 
 **Role management operations:**
 
+- **list** - Display all configured roles
+- **add** - Add role from catalog (interactive) or by path
 - **show** - Display current role configurations
 - **edit** - Modify a role (create if doesn't exist)
 - **remove** - Remove a role configuration
 - **test** - Verify role configuration and file availability
-- **list** - List all configured roles
 
 **Note:** Roles use the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern. Roles are defined as `[roles.<name>]` sections in both global and local configs. Global + local roles are combined; local overrides global for same role name.
 
@@ -66,6 +69,211 @@ Focus on security and performance.
 Global and local `[roles.<name>]` sections are **combined**. If a role with the same name exists in both configs, local overrides global for that role name.
 
 ## Subcommands
+
+### start config role list
+
+Display all roles (configured and catalog).
+
+**Synopsis:**
+
+```bash
+start config role list
+```
+
+**Behavior:**
+
+Lists roles from three sources:
+
+1. **Global config** (`~/.config/start/config.toml`) - Personal roles
+2. **Local config** (`./.start/config.toml`) - Project-specific roles
+3. **Asset catalog** (`~/.config/start/assets/roles/`) - Available catalog roles
+
+**Output:**
+
+```
+Configured roles:
+═══════════════════════════════════════════════════════════
+
+Global (2):
+  code-reviewer
+    Expert code reviewer focused on security
+    File: ~/.config/start/assets/roles/general/code-reviewer.md
+
+  default
+    Balanced helpful assistant
+    File: ~/.config/start/assets/roles/general/default.md
+
+Local (1):
+  project-specific
+    Project-specific role definition
+    File: ./ROLE.md
+
+Available catalog roles (4):
+  general/code-reviewer
+    Expert code reviewer focused on security
+
+  general/default
+    Balanced helpful assistant
+
+  languages/go-expert
+    Go programming language expert
+
+  specialized/rubber-duck
+    Socratic method questioning assistant
+```
+
+**Exit codes:**
+
+- 0 - Success (roles listed)
+- 1 - No config file exists
+
+### start config role add
+
+Add role from GitHub catalog or by direct path.
+
+**Synopsis:**
+
+```bash
+start config role add                   # Interactive catalog browser
+start config role add general/code-reviewer  # Direct install from catalog
+start config role add --local           # Add to local config
+```
+
+**Arguments:**
+
+**[path]** (optional)
+: Catalog path to install directly (e.g., `general/code-reviewer`). If omitted, shows interactive browser.
+
+**Flags:**
+
+**--local**
+: Add to local config (`./.start/config.toml`) instead of global.
+
+**--asset-download[=bool]**
+: Enable/disable downloading from GitHub (default: from settings).
+
+**Behavior:**
+
+**Interactive mode** (no path specified):
+
+1. Fetch catalog from GitHub
+2. Show categories and roles
+3. User selects role
+4. Download and cache role file
+5. Add role configuration to config file
+
+**Direct mode** (path specified):
+
+1. Check if role exists in catalog
+2. Download and cache role file
+3. Add role configuration to config file
+
+**Interactive flow:**
+
+```
+Fetching catalog from GitHub...
+✓ Found 8 roles across 3 categories
+
+Select category:
+  1. general (4 roles)
+  2. languages (2 roles)
+  3. specialized (2 roles)
+
+Choice [1-3]: 1
+
+general roles:
+  1. code-reviewer - Expert code reviewer focused on security
+  2. default - Balanced helpful assistant
+  3. pair-programmer - Collaborative programming assistant
+  4. explainer - Teaching mode that simplifies concepts
+
+Choice [1-4]: 1
+
+Selected: code-reviewer
+Description: Expert code reviewer focused on security
+Tags: review, quality, security, strict
+
+Download and add to config? [Y/n] y
+
+Downloading...
+✓ Cached to ~/.config/start/assets/roles/general/
+✓ Added to global config as 'code-reviewer'
+
+Try it: start --role code-reviewer
+    or: start task <taskname>  # Task-specific role overrides work too
+```
+
+**Direct install:**
+
+```bash
+start config role add general/code-reviewer
+```
+
+Output:
+
+```
+Downloading general/code-reviewer...
+✓ Cached to ~/.config/start/assets/roles/general/
+✓ Added to global config as 'code-reviewer'
+```
+
+**Add to local config:**
+
+```bash
+start config role add general/code-reviewer --local
+```
+
+Output:
+
+```
+Downloading general/code-reviewer...
+✓ Cached to ~/.config/start/assets/roles/general/
+✓ Added to local config as 'code-reviewer'
+```
+
+**Resulting configuration:**
+
+```toml
+# In config.toml (or tasks.toml, agents.toml, contexts.toml as appropriate)
+[roles.code-reviewer]
+description = "Expert code reviewer focused on security"
+file = "~/.config/start/assets/roles/general/code-reviewer.md"
+```
+
+**Error handling:**
+
+**Network unavailable:**
+
+```
+Error: Cannot fetch catalog from GitHub
+
+  Network error: dial tcp: no route to host
+
+To resolve:
+- Check internet connection
+- Add custom role: start config role edit
+```
+
+**Role not found in catalog:**
+
+```
+Error: Role 'nonexistent/role' not found in catalog
+
+Available roles:
+  - general/code-reviewer
+  - general/default
+  - languages/go-expert
+  - specialized/rubber-duck
+
+Try: start config role add  # Browse interactively
+```
+
+**Exit codes:**
+
+- 0 - Success (role added)
+- 1 - Network error (catalog unavailable)
+- 2 - Role not found
+- 3 - User cancelled
 
 ### start config role show
 

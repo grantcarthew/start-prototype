@@ -2,7 +2,7 @@
 
 ## Name
 
-start update - Update asset library from GitHub
+start update - Update cached assets from GitHub
 
 ## Synopsis
 
@@ -13,46 +13,48 @@ start update [flags]
 
 ## Description
 
-Downloads the latest asset library from GitHub repository, replacing the local asset directory (`~/.config/start/assets/`). Does not modify user configuration files - only updates the shared asset library.
+Checks cached assets for updates and downloads newer versions from GitHub. Updates only the asset cache (`~/.config/start/assets/`), never modifies user configuration files.
+
+**Update behavior** (per DR-037):
+
+- Fetches GitHub catalog tree (SHA for every asset)
+- Compares cached asset SHAs with GitHub SHAs
+- Downloads assets with different SHAs
+- Updates cached files and metadata
+- **Never touches user config** (tasks.toml, agents.toml, etc.)
 
 **What gets updated:**
 
-- **Agents** - Agent configuration templates
-- **Roles** - System prompt markdown files
-- **Tasks** - Default task configurations
-- **Examples** - Configuration examples
+- **Cached roles** - System prompt markdown files
+- **Cached tasks** - Task definition files
+- **Cached agents** - Agent configuration templates
+- **Asset metadata** - `.meta.toml` sidecar files
 
 **What doesn't change:**
 
-- User's `config.toml` (global or local)
-- Custom files outside asset directory
+- User's config files (config.toml, tasks.toml, agents.toml, contexts.toml)
+- Custom files outside asset cache
 - Installed agent binaries
-
-**Update behavior:**
-
-- Fetches from GitHub repository default branch
-- Overwrites existing asset directory completely
-- Updates `asset-version.toml` file with timestamp and commit SHA
-- Reports what changed (new, updated, removed files)
+- User customizations
 
 **Use cases:**
 
-- Get latest agent configurations
-- Update role templates with improvements
-- Get new default tasks
-- Refresh after repository updates
+- Get latest improvements to catalog assets
+- Update role prompts with better content
+- Get bug fixes in task definitions
+- Refresh cache after repository updates
 
 **Safety:**
 
-- Non-destructive: Only updates asset library
-- User config untouched
+- Non-destructive: Only updates asset cache
+- User config files untouched
+- User modifications preserved
 - Can re-run safely anytime
-- No backup needed (assets are from repo)
 
 ## Flags
 
 **--verbose**, **-v**
-: Show detailed download progress and file-by-file changes.
+: Show detailed SHA comparison and download progress.
 
 **--quiet**, **-q**
 : Suppress progress output, show only summary and errors.
@@ -71,47 +73,67 @@ start update
 **Process:**
 
 1. Check network connectivity
-2. Fetch asset manifest from GitHub
-3. Download all asset files
-4. Overwrite `~/.config/start/assets/`
-5. Update `asset-version.toml` file
-6. Report changes
+2. Fetch GitHub catalog tree (all files and SHAs)
+3. Find all cached `.meta.toml` files
+4. Compare local SHA with remote SHA for each asset
+5. Download assets where SHA differs
+6. Update cache files and metadata
+7. Report changes
 
 **Output:**
 
 ```
-Updating asset library...
-═══════════════════════════════════════════════════════════
+Checking for asset updates...
 
-Fetching from GitHub:
-  Repository: github.com/grantcarthew/start
-  Branch: main
-  Path: /assets
-
-Downloading assets:
-  agents/     [████████████████████████████████] 8 files
-  roles/      [████████████████████████████████] 12 files
-  tasks/      [████████████████████████████████] 6 files
-  examples/   [████████████████████████████████] 2 files
-
-Installed to: ~/.config/start/assets/
-
-What's new:
-  + 2 new agents: openai, deepseek
-  ~ 3 updated roles: code-reviewer, security-reviewer, doc-reviewer
-  + 1 new task: security-review
-  - 1 removed: legacy-task
-
-Asset version: abc123def456 (2025-01-06T10:30:00Z)
+  ⬇ Updating tasks/pre-commit-review...
+  ⬇ Updating roles/code-reviewer...
 
 ✓ Update complete
+  Updated: 2 assets
+  Unchanged: 10 assets
 
-To use updated assets:
-  - New agents: start agent add
-  - Updated roles: Already in use if referenced
-  - New tasks: Available in 'start task' list
+Note: Your configuration files are unchanged.
+Review updated assets and manually update config if desired.
+```
 
-Run 'start doctor' to verify.
+### No Updates Available
+
+```bash
+start update
+```
+
+When all cached assets are up to date:
+
+```
+Checking for asset updates...
+
+✓ Update complete
+  Updated: 0 assets
+  Unchanged: 12 assets
+
+All cached assets are up to date.
+```
+
+### First Run (No Cache)
+
+```bash
+start update
+```
+
+When `~/.config/start/assets/` is empty:
+
+```
+Checking for asset updates...
+
+✓ Update complete
+  Updated: 0 assets
+  Unchanged: 0 assets
+
+No cached assets found.
+
+To download assets:
+  - Browse catalog: start config task add
+  - Use a task: start task <name>
 ```
 
 ### Verbose Mode
@@ -120,70 +142,47 @@ Run 'start doctor' to verify.
 start update --verbose
 ```
 
-Shows file-by-file progress:
+Shows detailed SHA comparison:
 
 ```
-Updating asset library...
-═══════════════════════════════════════════════════════════
+Checking for asset updates...
 
-Connecting to GitHub...
-  API endpoint: https://api.github.com/repos/grantcarthew/start
-  Checking repository: github.com/grantcarthew/start
-  ✓ Repository accessible
-  Latest commit: abc123def456
+Fetching catalog from GitHub...
+  Repository: grantcarthew/start
+  Branch: main
+  ✓ Fetched tree (156 files)
 
-Fetching asset manifest...
-  ✓ Found 28 files to download
+Scanning cached assets...
+  Found 12 cached assets
 
-Downloading agents/ (8 files):
-  ✓ claude.toml (2.3 KB)
-  ✓ gemini.toml (1.8 KB)
-  ✓ aichat.toml (2.1 KB)
-  + openai.toml (2.5 KB) - NEW
-  + deepseek.toml (1.9 KB) - NEW
-  ✓ anthropic.toml (2.2 KB)
-  ✓ google.toml (1.7 KB)
-  ✓ local.toml (1.2 KB)
+Comparing SHAs:
+  tasks/git-workflow/pre-commit-review
+    Local:  a1b2c3d4...
+    Remote: b2c3d4e5...
+    → UPDATE NEEDED
 
-Downloading roles/ (12 files):
-  ~ code-reviewer.md (4.2 KB) - UPDATED
-  ✓ doc-reviewer.md (3.1 KB)
-  ~ security-reviewer.md (5.8 KB) - UPDATED
-  ✓ architect.md (3.7 KB)
-  ~ bug-fixer.md (2.9 KB) - UPDATED
-  [... 7 more files ...]
+  tasks/git-workflow/pr-ready
+    Local:  e5f6g7h8...
+    Remote: e5f6g7h8...
+    → UP TO DATE
 
-Downloading tasks/ (6 files):
-  ✓ code-review.toml (892 bytes)
-  ✓ git-diff-review.toml (1.1 KB)
-  ✓ comment-tidy.toml (745 bytes)
-  ✓ doc-review.toml (823 bytes)
-  + security-review.toml (1.3 KB) - NEW
-  ✓ refactor-review.toml (967 bytes)
+  roles/general/code-reviewer
+    Local:  i9j0k1l2...
+    Remote: j0k1l2m3...
+    → UPDATE NEEDED
 
-Downloading examples/ (2 files):
-  ✓ global-config.toml (2.8 KB)
-  ✓ local-config.toml (1.2 KB)
+  [... 9 more assets ...]
 
-Installing assets:
-  Target: /Users/grant/.config/start/assets/
-  ✓ Removed old assets
-  ✓ Created directory structure
-  ✓ Installed 28 files (45.2 KB total)
-
-Updating version file:
-  ✓ Written: /Users/grant/.config/start/asset-version.toml
-  Commit: abc123def456
-  Timestamp: 2025-01-06T10:30:00Z
-
-Summary:
-  Total files: 28
-  New: 3 files
-  Updated: 5 files
-  Unchanged: 19 files
-  Removed: 1 file
+Downloading updates:
+  ⬇ tasks/git-workflow/pre-commit-review.toml (1.2 KB)
+  ⬇ tasks/git-workflow/pre-commit-review.md (3.4 KB)
+  ⬇ tasks/git-workflow/pre-commit-review.meta.toml (245 bytes)
+  ⬇ roles/general/code-reviewer.md (4.8 KB)
+  ⬇ roles/general/code-reviewer.meta.toml (198 bytes)
 
 ✓ Update complete
+  Updated: 2 assets
+  Unchanged: 10 assets
 ```
 
 ### Quiet Mode
@@ -195,104 +194,41 @@ start update --quiet
 Minimal output:
 
 ```
-Updating assets from github.com/grantcarthew/start...
-✓ Update complete (28 files, 3 new, 5 updated)
+✓ Updated 2 assets, 10 unchanged
 ```
 
-### First Time (No Existing Assets)
+## SHA-Based Versioning
 
-```bash
-start update
+Assets use Git blob SHA for versioning (per DR-032):
+
+**Metadata file example:**
+
+```toml
+# pre-commit-review.meta.toml
+name = "pre-commit-review"
+description = "Review staged changes before committing"
+tags = ["git", "review", "quality"]
+sha = "a1b2c3d4e5f6789012345678901234567890abcd"
+created = "2025-01-10T00:00:00Z"
+updated = "2025-01-10T12:30:00Z"
 ```
 
-When `~/.config/start/assets/` doesn't exist:
+**Update detection:**
 
-```
-Updating asset library...
-═══════════════════════════════════════════════════════════
+1. Read local SHA from cached `.meta.toml`
+2. Get remote SHA from GitHub Tree API
+3. If SHAs differ → download new version
+4. Update cached files with new content and SHA
 
-No asset library found. This will download initial assets.
+**Benefits:**
 
-Fetching from GitHub:
-  Repository: github.com/grantcarthew/start
-  Branch: main
-
-Downloading assets:
-  agents/     [████████████████████████████████] 8 files
-  roles/      [████████████████████████████████] 12 files
-  tasks/      [████████████████████████████████] 6 files
-  examples/   [████████████████████████████████] 2 files
-
-Installed to: ~/.config/start/assets/
-
-Initial assets installed:
-  + 8 agents
-  + 12 roles
-  + 6 tasks
-  + 2 examples
-
-✓ Update complete
-
-Next steps:
-  - Add agents: start agent add
-  - View tasks: start task
-  - Run diagnostics: start doctor
-```
-
-## Output Details
-
-### Change Detection
-
-**New files (+):**
-```
-+ openai.toml - NEW
-```
-
-File didn't exist in local assets, downloaded from repo.
-
-**Updated files (~):**
-```
-~ code-reviewer.md - UPDATED
-```
-
-File existed locally, content changed in repo.
-
-**Unchanged files (✓):**
-```
-✓ gemini.toml
-```
-
-File exists locally and in repo, content identical (no download).
-
-**Removed files (-):**
-```
-- legacy-task.toml - REMOVED
-```
-
-File existed locally but not in repo, deleted from local assets.
-
-### Progress Indicators
-
-**Download progress:**
-```
-agents/ [████████████████████████████████] 8/8 files
-```
-
-Shows progress bar and file count.
-
-**Verbose progress:**
-```
-Downloading agents/ (8 files):
-  ✓ claude.toml (2.3 KB)
-  ✓ gemini.toml (1.8 KB)
-  ...
-```
-
-Shows each file name and size as downloaded.
+- Reliable: Content hash guarantees integrity
+- Simple: No version number conflicts
+- Efficient: Single API call for all SHAs
 
 ## Exit Codes
 
-**0** - Success (assets updated)
+**0** - Success (assets checked, updates applied if available)
 
 **1** - Network error
 - Cannot reach GitHub
@@ -300,19 +236,13 @@ Shows each file name and size as downloaded.
 - API rate limit exceeded
 
 **2** - File system error
-- Cannot create asset directory
-- Permission denied writing files
+- Cannot write to asset cache
+- Permission denied
 - Disk full
 
-**3** - Invalid repository
-- Asset structure incorrect
-- Manifest parsing failed
-- Missing required directories
-
-**4** - Partial failure
-- Some files downloaded, some failed
-- Asset directory in inconsistent state
-- Version file not updated
+**3** - Partial failure
+- Some assets updated, some failed
+- Cache may be incomplete
 
 ## Error Handling
 
@@ -330,29 +260,21 @@ Check your internet connection and try again.
 
 Exit code: 1
 
-**Repository not found:**
-
-```
-Error: Repository not found
-
-  URL: github.com/grantcarthew/start
-  HTTP 404: Not Found
-
-Check repository configuration.
-```
-
-Exit code: 1
-
 **Rate limit exceeded:**
 
 ```
 Error: GitHub API rate limit exceeded
 
   Limit: 60 requests/hour (anonymous)
-  Reset: 2025-01-06 11:30:00 (in 45 minutes)
+  Reset: 2025-01-10 12:00:00 (in 45 minutes)
 
-Try again after rate limit resets.
-Or authenticate with GH_TOKEN for higher limits.
+Solutions:
+1. Set GITHUB_TOKEN for 5,000 requests/hour:
+   export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+
+2. Wait until rate limit resets
+
+3. Use cached assets (if available)
 ```
 
 Exit code: 1
@@ -362,13 +284,13 @@ Exit code: 1
 **Permission denied:**
 
 ```
-Error: Cannot write to asset directory
+Error: Cannot write to asset cache
 
   Path: ~/.config/start/assets/
   Error: permission denied
 
 Check directory permissions:
-  chmod 755 ~/.config/start
+  chmod 755 ~/.config/start/assets
 ```
 
 Exit code: 2
@@ -378,217 +300,89 @@ Exit code: 2
 ```
 Error: Insufficient disk space
 
-  Required: ~500 KB
-  Available: 124 KB
+  Required: ~50 KB
+  Available: 12 KB
 
 Free up disk space and try again.
 ```
 
 Exit code: 2
 
-### Repository Structure Errors
-
-**Invalid asset structure:**
-
-```
-Error: Invalid repository structure
-
-  Missing required directories:
-    - /assets/agents/
-    - /assets/roles/
-
-Repository may be incompatible with this version.
-```
-
-Exit code: 3
-
-**Manifest parsing failed:**
-
-```
-Error: Cannot parse asset manifest
-
-  File: /assets/manifest.json
-  Error: invalid JSON at line 5
-
-Repository content may be corrupted.
-```
-
-Exit code: 3
-
 ### Partial Failures
 
-**Some files failed:**
+**Some assets failed:**
 
 ```
 Warning: Update partially failed
 
-Downloaded: 25/28 files
-Failed:
-  - agents/openai.toml (network timeout)
-  - roles/new-role.md (404 not found)
-  - tasks/beta-task.toml (network timeout)
+  ✓ Updated: tasks/pre-commit-review
+  ✗ Failed: roles/code-reviewer (network timeout)
 
-Asset directory may be incomplete.
-Re-run 'start update' to retry.
+Some assets updated successfully.
+Re-run 'start update' to retry failed downloads.
 ```
 
-Exit code: 4
+Exit code: 3
 
-Asset version file NOT updated (prevents false "up to date").
+Cache is partially updated. Successful downloads are kept.
 
-## Asset Version File
+### Asset Removed from Catalog
 
-### Format
+**Asset exists in cache but not in GitHub:**
 
-`asset-version.toml` tracks downloaded assets:
+```
+Warning: Asset not found in catalog
 
-```toml
-# Asset version tracking - managed by 'start update'
-# Last updated: 2025-01-06T10:30:00Z
+  Asset: tasks/deprecated-task
+  (exists in cache but removed from GitHub)
 
-commit = "abc123def456"
-timestamp = "2025-01-06T10:30:00Z"
-repository = "github.com/grantcarthew/start"
-branch = "main"
-
-[files]
-"agents/claude.toml" = "a1b2c3d4e5f6..."
-"agents/gemini.toml" = "e5f6g7h8i9j0..."
-"roles/code-reviewer.md" = "i9j0k1l2m3n4..."
+Keep cached version? (no action taken)
 ```
 
-### Purpose
+Exit code: 0 (warning only, not an error)
 
-- Track when assets were last updated
-- Display in `start doctor`
-- Determine if assets are stale (> 30 days)
-- Debugging and support
+## Manual Config Updates
 
-### Location
+After updating cache, review changes and manually update config if desired:
 
-`~/.config/start/asset-version.toml`
-
-Same directory as `config.toml`, not inside `assets/`.
-
-## How Assets Are Used
-
-### Agent Templates
-
-Located in `~/.config/start/assets/agents/`:
-
-**During `start agent add`:**
+**View updated asset:**
 
 ```bash
-start agent add
-
-Add new agent
-─────────────────────────────────────────────────
-
-Use a template? [Y/n]: y
-
-Available templates:
-  1) claude - Anthropic's Claude AI
-  2) gemini - Google's Gemini AI
-  3) openai - OpenAI GPT models (NEW)
-  4) deepseek - DeepSeek coding models (NEW)
-  5) Custom (manual entry)
-
-Select [1-5]: 3
-
-Loading template: openai.toml...
-Agent name [openai]:
-Description: OpenAI GPT models
-[... continues with template values ...]
+cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.toml
+cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
 ```
 
-Templates pre-fill agent configuration.
-
-### Role Files
-
-Located in `~/.config/start/assets/roles/`:
-
-**Referenced in config:**
-
-```toml
-[roles.code-reviewer]
-file = "~/.config/start/assets/roles/code-reviewer.md"
-
-[tasks.review]
-role = "security-reviewer"
-
-[roles.security-reviewer]
-file = "~/.config/start/assets/roles/security-reviewer.md"
-```
-
-**Auto-update behavior:**
-
-When you run `start update`:
-1. `code-reviewer.md` is updated in assets directory
-2. Next `start` invocation reads updated file
-3. **No config change needed** - reference is to file path
-
-### Task Definitions
-
-Located in `~/.config/start/assets/tasks/`:
-
-**Merged into task list:**
+**Compare with your config:**
 
 ```bash
-start task
+# View your current task config
+cat ~/.config/start/tasks.toml | grep -A 10 "\[tasks.pre-commit-review\]"
 
-Available tasks:
-  code-review (cr)        - Review code quality [default]
-  git-diff-review (gdr)   - Review git diff [default]
-  comment-tidy (ct)       - Tidy code comments [default]
-  doc-review (dr)         - Review documentation [default]
-  security-review (sr)    - Security-focused review [default, NEW]
-  my-custom-task          - Custom task [user]
+# View updated cached version
+cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.toml
 ```
 
-Tasks from assets marked `[default]`, user tasks marked `[user]`.
+**Update your config if desired:**
 
-**Override behavior:**
-
-If user defines task with same name in their config:
-
-```toml
-[tasks.code-review]  # User's version
-# Overrides default code-review from assets
-```
-
-User's version takes precedence.
-
-### Example Configs
-
-Located in `~/.config/start/assets/examples/`:
-
-**Used as reference:**
-
-Users can view examples:
 ```bash
-cat ~/.config/start/assets/examples/global-config.toml
-cat ~/.config/start/assets/examples/local-config.toml
+start config task edit  # Manually update with new content
 ```
-
-Copy sections into their own config.
-
-Not automatically loaded - reference only.
 
 ## Network Requirements
-
-### GitHub Access
 
 **Required:**
 - HTTPS access to `github.com`
 - HTTPS access to `api.github.com`
-- Outbound TCP 443
+- HTTPS access to `raw.githubusercontent.com`
 
 **Optional:**
-- `GH_TOKEN` environment variable (for higher rate limits)
+- `GITHUB_TOKEN` environment variable (for higher rate limits)
+  - Anonymous: 60 requests/hour
+  - Authenticated: 5,000 requests/hour
 
-### Offline Behavior
+**Offline behavior:**
 
-If network unavailable:
+Per DR-026, update requires network access:
 
 ```
 Error: Cannot connect to GitHub
@@ -596,78 +390,97 @@ Error: Cannot connect to GitHub
   Network error: no internet connection
 
 Update requires network access.
-Asset library not modified.
-```
-
-**Workaround:**
-
-Assets are in GitHub repository - can manually clone:
-
-```bash
-git clone https://github.com/grantcarthew/start /tmp/start-repo
-cp -r /tmp/start-repo/assets ~/.config/start/assets/
+Asset cache not modified.
 ```
 
 ## Performance
 
 **Typical update:**
-- Initial download: 2-5 seconds (28 files, ~50 KB)
-- Incremental update: 1-2 seconds (3-5 changed files)
+- Check 12 cached assets: < 1 second (1 API call)
+- Download 2 updated assets: 1-2 seconds
 - Network speed dependent
 
 **Bandwidth:**
-- Full download: ~50-100 KB
-- Incremental: ~5-20 KB
+- Tree API call: ~5-10 KB
+- Asset downloads: 2-5 KB per asset (via raw.githubusercontent.com)
+- Total: ~10-30 KB for typical update
 
 **Disk space:**
-- Asset directory: ~500 KB
-- Per update (no cleanup needed)
+- Per asset: 2-5 KB (toml + md + meta)
+- Cache growth: Minimal (old versions overwritten)
 
 ## Notes
 
 ### Update Frequency
 
+**Manual only** (per DR-025):
+- No automatic background checks
+- No version checking on CLI startup
+- User explicitly runs `start update`
+
 **Recommended:**
-- Update every 30 days for new features
-- Update when `start doctor` warns
-- Update after repository announcements
+- Update monthly for improvements
+- Update when you need new features
+- Update is optional, not required
 
-**Not required:**
-- Assets don't expire
-- Old assets continue working
-- Update is optional, not mandatory
+### User Config Never Auto-Updated
 
-### Breaking Changes
+**Cache updates are separate from config:**
 
-Asset updates are backward compatible:
+When you run `start update`:
+1. Cache gets new versions
+2. Your config files remain unchanged
+3. If task references cache file path, it uses new version automatically
+4. If task has inlined content, you must manually update
 
-- New fields added (optional)
-- Old fields preserved (deprecated gradually)
-- Major changes announced in release notes
+**Example - Automatic update (file reference):**
 
-If breaking change needed:
-- Announced 90 days in advance
-- Migration guide provided
-- `start doctor` will warn
+```toml
+# In your tasks.toml
+[tasks.pre-commit-review]
+prompt_file = "~/.config/start/assets/tasks/git-workflow/pre-commit-review.md"
 
-### Repository Configuration
-
-Default repository: `github.com/grantcarthew/start`
-
-Future: Support custom repositories:
-```bash
-start update --repo github.com/myorg/start-assets
+# After 'start update':
+# - Cache file updated with new content
+# - Your config unchanged
+# - Next task run uses new cached file
+# ✓ Automatic
 ```
 
-Not implemented yet.
+**Example - Manual update needed (inlined):**
+
+```toml
+# In your tasks.toml
+[tasks.pre-commit-review]
+prompt = """
+Review the following changes...
+(old inlined content)
+"""
+
+# After 'start update':
+# - Cache file updated with new content
+# - Your config unchanged
+# - Still uses old inlined content
+# ✗ Manual update needed
+```
+
+### Rollback
+
+**No built-in rollback in v1:**
+
+If you want previous version:
+1. Delete cache: `rm -rf ~/.config/start/assets`
+2. Re-download specific version (future feature)
+
+Cache is disposable - can always re-download.
 
 ### Privacy
 
 `start update` makes these network requests:
-- GitHub API: Repository metadata
-- GitHub raw content: Asset files
+- GitHub Tree API: Repository tree with SHAs
+- raw.githubusercontent.com: Asset file content
 
-No telemetry, no tracking, no data sent.
+No telemetry, no tracking, no data sent to external services.
 
 ## Examples
 
@@ -677,7 +490,7 @@ No telemetry, no tracking, no data sent.
 start update
 ```
 
-Download latest assets from GitHub.
+Check for and apply asset updates.
 
 ### Quiet Update (CI/CD)
 
@@ -697,21 +510,35 @@ Minimal output, check exit code.
 start update --verbose
 ```
 
-See exactly what's being downloaded and why.
+See SHA comparison and download details.
 
-### Check Then Update
+### Check Before Updating
 
 ```bash
+# Use doctor to check asset status (future feature)
 start doctor
-# See warning about outdated assets
+
+# Update assets
 start update
-start doctor
-# Verify update successful
+```
+
+## Configuration
+
+**Settings in config.toml:**
+
+```toml
+[settings]
+github_token_env = "GITHUB_TOKEN"   # Environment variable name
+asset_repo = "grantcarthew/start"   # GitHub repository
+asset_download = true               # Download if not found (doesn't affect update)
 ```
 
 ## See Also
 
-- start-doctor(1) - Diagnose installation
+- [DR-031](../design/decisions/dr-031-catalog-based-assets.md) - Catalog architecture
+- [DR-037](../design/decisions/dr-037-asset-updates.md) - Update mechanism
+- [DR-032](../design/decisions/dr-032-asset-metadata-schema.md) - Metadata schema
+- start-config-task(1) - Add tasks from catalog
+- start-config-role(1) - Add roles from catalog
 - start-init(1) - Initialize configuration
-- start-agent(1) - Manage agents
-- start-task(1) - Run tasks
+- start-doctor(1) - Diagnose installation

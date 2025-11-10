@@ -12,11 +12,17 @@ start init [scope]
 
 ## Description
 
-Interactive wizard to create `start` configuration. Detects installed AI agents, fetches current agent configurations from GitHub, and creates a working config file.
+Interactive wizard to create `start` configuration files. Detects installed AI agents, fetches current agent configurations from GitHub, and creates a working multi-file configuration.
 
 **Scopes:**
-- **global** - Personal config at `~/.config/start/config.toml` (default, recommended)
-- **local** - Project config at `./.start/config.toml` (for team use)
+- **global** - Personal config at `~/.config/start/` (default, recommended)
+- **local** - Project config at `./.start/` (for team use)
+
+**Configuration files created** (per DR-031):
+- `config.toml` - Settings only
+- `tasks.toml` - Task definitions
+- `agents.toml` - Agent configurations
+- `contexts.toml` - Context document references
 
 **What init does:**
 
@@ -33,18 +39,18 @@ Interactive wizard to create `start` configuration. Detects installed AI agents,
 
 - First time setup
 - Reset configuration to defaults
-- Add newly installed agents
+- Create local project configuration
 
 **Network requirement:**
-Init requires network access to fetch agent configurations from GitHub. If offline, see manual configuration documentation.
+Init attempts to download asset catalog from GitHub. If offline, creates config files without downloading assets (per DR-026).
 
 ## Arguments
 
 **[scope]** (optional)
 : Where to create the configuration. If omitted, init will ask interactively.
 
-- `global` - Create `~/.config/start/config.toml` (personal, default)
-- `local` - Create `./.start/config.toml` (project, can be committed)
+- `global` - Create config files in `~/.config/start/` (personal, default)
+- `local` - Create config files in `./.start/` (project, can be committed)
 
 ```bash
 start init          # Interactive: asks where to create
@@ -84,9 +90,9 @@ Initialize start configuration
 No existing configuration found.
 
 Where should this configuration be created?
-  1) Global (~/.config/start/config.toml) [RECOMMENDED]
+  1) Global (~/.config/start/) [RECOMMENDED]
      Personal config across all projects
-  2) Local (./.start/config.toml)
+  2) Local (./.start/)
      Project config (for team use)
 
 Select [1-2] (default: 1):
@@ -99,7 +105,7 @@ Press Enter → Creates global (default)
 ```
 Initialize start configuration
 
-Existing global config found: ~/.config/start/config.toml
+Existing global config found: ~/.config/start/
 
 What would you like to do?
   1) Replace global config [BACKUP WILL BE CREATED]
@@ -109,7 +115,7 @@ What would you like to do?
 Select [1-3] (default: 1):
 ```
 
-Option 1 → Backup to `config.YYYY-MM-DD-HHMMSS.toml`, create new global
+Option 1 → Backup config files to `*.YYYY-MM-DD-HHMMSS.toml`, create new global
 Option 2 → Create local, keep global untouched
 Option 3 → Exit
 
@@ -119,8 +125,8 @@ Option 3 → Exit
 Initialize start configuration
 
 Existing configs found:
-  Global: ~/.config/start/config.toml
-  Local:  ./.start/config.toml
+  Global: ~/.config/start/
+  Local:  ./.start/
 
 Which would you like to replace? [BACKUP WILL BE CREATED]
   1) Replace global config
@@ -135,7 +141,7 @@ Select [1-3] (default: 1):
 ```
 Initialize start configuration
 
-Existing local config found: ./.start/config.toml
+Existing local config found: ./.start/
 
 What would you like to do?
   1) Create global config [RECOMMENDED]
@@ -166,12 +172,12 @@ Both create backups automatically if replacing existing config.
 3. Auto-configure all detected agents
 4. Prompt for additional agents (from fetched configs)
 5. Prompt for default agent selection
-6. Create config file structure:
-   - `[settings]` section with default_agent and default_role
-   - `[agents.*]` sections for each selected agent
-   - `[roles.*]` sections (default roles)
-   - `[context.*]` sections (4 default documents)
-7. Write config to `~/.config/start/config.toml`
+6. Create multi-file configuration:
+   - `config.toml` - Settings (default_agent, default_role, etc.)
+   - `agents.toml` - Agent configurations for each selected agent
+   - `roles.toml` - Default role definitions
+   - `contexts.toml` - Context document references (4 default documents)
+7. Write all config files to chosen directory
 8. Display success message
 
 **Default context documents:**
@@ -249,9 +255,9 @@ Initialize start configuration
 No existing configuration found.
 
 Where should this configuration be created?
-  1) Global (~/.config/start/config.toml) [RECOMMENDED]
+  1) Global (~/.config/start/) [RECOMMENDED]
      Personal config across all projects
-  2) Local (./.start/config.toml)
+  2) Local (./.start/)
      Project config (for team use)
 
 Select [1-2] (default: 1): 1
@@ -283,8 +289,11 @@ Select default agent:
   2) gemini
 Default [1]: 1
 
-Creating configuration at ~/.config/start/config.toml...
-✓ Configuration created
+Creating configuration at ~/.config/start/...
+✓ config.toml created
+✓ agents.toml created
+✓ roles.toml created
+✓ contexts.toml created
 
 Default context documents configured:
   ~/reference/ENVIRONMENT.md (required)
@@ -320,8 +329,11 @@ Fetching latest agent configurations from GitHub...
 
 [...agent detection and wizard...]
 
-Creating configuration at ./.start/config.toml...
-✓ Configuration created
+Creating configuration at ./.start/...
+✓ config.toml created
+✓ agents.toml created
+✓ roles.toml created
+✓ contexts.toml created
 
 Default context documents configured:
   ~/reference/ENVIRONMENT.md (required)
@@ -343,12 +355,15 @@ start init
 Output:
 
 ```
-Configuration already exists at ~/.config/start/config.toml
+Configuration already exists at ~/.config/start/
 
 Backup and reinitialize? [y/N]: y
 
-Backing up to config.2025-01-04-103045.toml...
-✓ Backup created
+Backing up config files...
+✓ config.2025-01-04-103045.toml
+✓ agents.2025-01-04-103045.toml
+✓ roles.2025-01-04-103045.toml
+✓ contexts.2025-01-04-103045.toml
 
 Welcome to start!
 [...continues with wizard...]
@@ -372,14 +387,17 @@ Output:
 
 ```
 Checking for existing configuration...
-  Path: ~/.config/start/config.toml
+  Path: ~/.config/start/
   Exists: true
+  Files: config.toml, agents.toml, roles.toml, contexts.toml
 
 Prompting for backup confirmation...
 
-Backing up existing config...
-  From: ~/.config/start/config.toml
-  To: ~/.config/start/config.2025-01-04-103045.toml
+Backing up existing config files...
+  config.toml → config.2025-01-04-103045.toml
+  agents.toml → agents.2025-01-04-103045.toml
+  roles.toml → roles.2025-01-04-103045.toml
+  contexts.toml → contexts.2025-01-04-103045.toml
   ✓ Backup successful
 
 Fetching agent configurations from GitHub...
@@ -522,10 +540,10 @@ Permission denied. Check directory permissions.
 
 Exit code: 3
 
-**Cannot write config file:**
+**Cannot write config files:**
 
 ```
-Error: Failed to write config file: ~/.config/start/config.toml
+Error: Failed to write config files: ~/.config/start/
 
 Permission denied. Check file permissions.
 ```
@@ -535,15 +553,15 @@ Exit code: 3
 **Backup fails:**
 
 ```
-Error: Failed to backup existing config.
+Error: Failed to backup existing config files.
 
 Check permissions: ~/.config/start/
-Existing config preserved at: ~/.config/start/config.toml
+Existing config files preserved.
 ```
 
 Exit code: 3
 
-Does not proceed with initialization. Existing config remains untouched.
+Does not proceed with initialization. Existing config files remain untouched.
 
 ### Invalid Agent Config from GitHub
 
@@ -564,14 +582,18 @@ Init continues with other agents. Does not exit.
 
 **Backup prompt behavior:**
 
-- Shown only if `~/.config/start/config.toml` exists
+- Shown only if `~/.config/start/` directory contains config files
 - Skipped with `--force` flag
 - Answer 'N' exits gracefully (exit code 0)
 
 **Backup naming:**
-Format: `config.YYYY-MM-DD-HHMMSS.toml`
+Format: `<filename>.YYYY-MM-DD-HHMMSS.toml`
 
-Example: `config.2025-01-04-103045.toml`
+Examples:
+- `config.2025-01-04-103045.toml`
+- `agents.2025-01-04-103045.toml`
+- `roles.2025-01-04-103045.toml`
+- `contexts.2025-01-04-103045.toml`
 
 Multiple backups accumulate (not overwritten).
 
@@ -583,13 +605,20 @@ Standard permissions: `0755` (drwxr-xr-x)
 
 ### Generated Config Structure
 
-Example generated config:
+Init creates 4 configuration files. Example content shown below:
 
+**config.toml** (settings):
 ```toml
 [settings]
 default_agent = "claude"
 default_role = "code-reviewer"
+log_level = "normal"
+shell = "bash"
+command_timeout = 30
+```
 
+**agents.toml** (agent configurations):
+```toml
 [agents.claude]
 command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
@@ -606,11 +635,17 @@ default_model = "flash"
   [agents.gemini.models]
   flash = "gemini-2.0-flash-exp"
   pro-exp = "gemini-2.0-pro-exp"
+```
 
+**roles.toml** (role definitions):
+```toml
 [roles.code-reviewer]
 description = "Expert code reviewer"
 file = "./ROLE.md"
+```
 
+**contexts.toml** (context documents):
+```toml
 [context.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
@@ -658,11 +693,14 @@ After running init:
 
 ### Manual Configuration Alternative
 
-If init doesn't meet your needs (offline, custom setup, etc.), create config manually:
+If init doesn't meet your needs (offline, custom setup, etc.), create config files manually:
 
 ```bash
 mkdir -p ~/.config/start
 $EDITOR ~/.config/start/config.toml
+$EDITOR ~/.config/start/agents.toml
+$EDITOR ~/.config/start/roles.toml
+$EDITOR ~/.config/start/contexts.toml
 ```
 
 See: https://github.com/grantcarthew/start#configuration

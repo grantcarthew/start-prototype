@@ -1,8 +1,10 @@
 # DR-015: Atomic Update Mechanism
 
 **Date:** 2025-01-06
-**Status:** Accepted
+**Status:** Superseded by DR-031
 **Category:** Asset Management
+
+> **Note:** This DR described atomic bulk updates. See [DR-031](./dr-031-catalog-based-assets.md) for the current catalog model and [DR-037](./dr-037-asset-updates.md) for per-asset updates.
 
 ## Decision
 

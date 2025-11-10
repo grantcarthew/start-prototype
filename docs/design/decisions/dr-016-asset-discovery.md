@@ -1,8 +1,10 @@
 # DR-016: Asset Discovery and Directory Structure
 
 **Date:** 2025-01-06
-**Status:** Accepted
+**Status:** Superseded by DR-031
 **Category:** Asset Management
+
+> **Note:** This DR described the original local asset structure. See [DR-031](./dr-031-catalog-based-assets.md) for the current catalog architecture and [DR-035](./dr-035-interactive-browsing.md) for interactive catalog browsing.
 
 ## Decision
 

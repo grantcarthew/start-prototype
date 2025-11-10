@@ -17,7 +17,7 @@ start config agent default [name]
 
 ## Description
 
-Manages AI agent configurations in the global config file (`~/.config/start/config.toml`). Agents define how `start` delegates to different AI tools (claude, gemini, aichat, etc.).
+Manages AI agent configurations in the global agents file (`~/.config/start/agents.toml`). Agents define how `start` delegates to different AI tools (claude, gemini, aichat, etc.).
 
 **Agent management operations:**
 
@@ -28,7 +28,7 @@ Manages AI agent configurations in the global config file (`~/.config/start/conf
 - **remove** - Delete agent from configuration
 - **default** - Set or show default agent
 
-**Note:** These commands only modify `~/.config/start/config.toml` (global configuration). Per DR-004, agents can also be defined in local configs (`./.start/config.toml`), but those must be edited manually.
+**Note:** These commands only modify `~/.config/start/agents.toml` (global configuration). Per DR-004, agents can also be defined in local configs (`./.start/agents.toml`), but those must be edited manually.
 
 ## Agent Configuration Structure
 
@@ -82,7 +82,7 @@ start config agent list
 
 **Behavior:**
 
-Lists all agents defined in `~/.config/start/config.toml` with:
+Lists all agents defined in `~/.config/start/agents.toml` with:
 
 - Agent name
 - Description
@@ -161,7 +161,7 @@ start config agent add
 
 **Behavior:**
 
-Prompts for agent details and adds to `~/.config/start/config.toml`:
+Prompts for agent details and adds to `~/.config/start/agents.toml`:
 
 1. **Agent name** (required)
 
@@ -243,7 +243,7 @@ Default: 1
 Backing up config to config.2025-01-04-143022.toml...
 ✓ Backup created
 
-Saving agent 'my-agent' to ~/.config/start/config.toml...
+Saving agent 'my-agent' to ~/.config/start/agents.toml...
 ✓ Agent added successfully
 
 Use 'start config agent list' to see all agents.
@@ -269,7 +269,7 @@ Add models? [y/N]: n
 Backing up config to config.2025-01-04-143105.toml...
 ✓ Backup created
 
-Saving agent 'simple-agent' to ~/.config/start/config.toml...
+Saving agent 'simple-agent' to ~/.config/start/agents.toml...
 ✓ Agent added successfully
 
 Use 'start config agent list' to see all agents.
@@ -358,7 +358,7 @@ Command template: my-agent --model {model} '{prompt}'
 Backing up config to config.2025-01-04-143022.toml...
 ✗ Failed to backup config: permission denied
 
-Existing config preserved at: ~/.config/start/config.toml
+Existing config preserved at: ~/.config/start/agents.toml
 Agent not added.
 ```
 
@@ -670,7 +670,7 @@ Default [2]: 4
 Backing up config to config.2025-01-04-144512.toml...
 ✓ Backup created
 
-Saving changes to ~/.config/start/config.toml...
+Saving changes to ~/.config/start/agents.toml...
 ✓ Agent 'claude' updated successfully
 
 Use 'start config agent list' to see changes.
@@ -705,7 +705,7 @@ Add models? [y/N]: n
 Backing up config to config.2025-01-04-144623.toml...
 ✓ Backup created
 
-Saving changes to ~/.config/start/config.toml...
+Saving changes to ~/.config/start/agents.toml...
 ✓ Agent 'simple-agent' updated successfully
 ```
 
@@ -819,7 +819,7 @@ Remove agent 'gemini'? [y/N]: y
 Backing up config to config.2025-01-04-150212.toml...
 ✓ Backup created
 
-Removing agent 'gemini' from ~/.config/start/config.toml...
+Removing agent 'gemini' from ~/.config/start/agents.toml...
 ✓ Agent 'gemini' removed successfully
 
 Use 'start config agent list' to see remaining agents.
@@ -840,7 +840,7 @@ Remove agent 'gemini'? [y/N]: y
 Backing up config to config.2025-01-04-150245.toml...
 ✓ Backup created
 
-Removing agent 'gemini' from ~/.config/start/config.toml...
+Removing agent 'gemini' from ~/.config/start/agents.toml...
 ✓ Agent 'gemini' removed successfully
 
 Use 'start config agent list' to see remaining agents.
@@ -864,7 +864,7 @@ Remove agent 'claude'? [y/N]: y
 Backing up config to config.2025-01-04-150312.toml...
 ✓ Backup created
 
-Removing agent 'claude' from ~/.config/start/config.toml...
+Removing agent 'claude' from ~/.config/start/agents.toml...
 ✓ Agent 'claude' removed successfully
 ✓ Default agent setting cleared
 
@@ -930,7 +930,7 @@ Remove agent 'claude'? [y/N]: y
 Backing up config to config.2025-01-04-150412.toml...
 ✓ Backup created
 
-Removing agent 'claude' from ~/.config/start/config.toml...
+Removing agent 'claude' from ~/.config/start/agents.toml...
 ✓ Agent 'claude' removed successfully
 ⚠ No agents remaining in configuration
 
@@ -946,7 +946,7 @@ Remove agent 'gemini'? [y/N]: y
 Backing up config to config.2025-01-04-150445.toml...
 ✗ Failed to backup config: permission denied
 
-Existing config preserved at: ~/.config/start/config.toml
+Existing config preserved at: ~/.config/start/agents.toml
 Agent not removed.
 ```
 
@@ -1161,15 +1161,15 @@ claude
 
 ## Files
 
-**~/.config/start/config.toml**
-: Global configuration file containing agent definitions. This is the only file modified by `start config agent` commands.
+**~/.config/start/agents.toml**
+: Global agent configurations file containing agent definitions. This is the only file modified by `start config agent` commands.
 
 ## Error Handling
 
 ### No Configuration File
 
 ```
-Error: No configuration found at ~/.config/start/config.toml
+Error: No agent configuration found at ~/.config/start/agents.toml
 
 Run 'start init' to create initial configuration.
 ```
@@ -1195,7 +1195,7 @@ Exit code: 1
 
 Per DR-004, agents can be defined in both global and local configs with merge behavior:
 
-**Global agents:** `~/.config/start/config.toml`
+**Global agents:** `~/.config/start/agents.toml`
 - Personal agent configurations
 - Managed by `start config agent` commands
 - Individual preferences (model aliases, default models)
