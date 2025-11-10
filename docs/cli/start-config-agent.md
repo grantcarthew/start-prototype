@@ -7,18 +7,18 @@ start config agent - Manage AI agent configurations
 ## Synopsis
 
 ```bash
-start config agent list
-start config agent add [name]
-start config agent new
+start config agent list [scope]
+start config agent add [name] [scope]
+start config agent new [scope]
 start config agent test <name>
-start config agent edit [name]
-start config agent remove [name]
+start config agent edit [name] [scope]
+start config agent remove [name] [scope]
 start config agent default [name]
 ```
 
 ## Description
 
-Manages AI agent configurations in the global agents file (`~/.config/start/agents.toml`). Agents define how `start` delegates to different AI tools (claude, gemini, aichat, etc.).
+Manages AI agent configurations in both global (`~/.config/start/agents.toml`) and local (`./.start/agents.toml`) files. Agents define how `start` delegates to different AI tools (claude, gemini, aichat, etc.).
 
 **Agent management operations:**
 
@@ -29,7 +29,7 @@ Manages AI agent configurations in the global agents file (`~/.config/start/agen
 - **remove** - Delete agent from configuration
 - **default** - Set or show default agent
 
-**Note:** These commands only modify `~/.config/start/agents.toml` (global configuration). Per DR-004, agents can also be defined in local configs (`./.start/agents.toml`), but those must be edited manually.
+**Note:** Per DR-004, agents can be defined in both global and local configs. These commands can manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
 
 ## Agent Configuration Structure
 
@@ -78,7 +78,10 @@ Display all configured agents with their details.
 **Synopsis:**
 
 ```bash
-start config agent list
+start config agent list          # Select scope interactively
+start config agent list global   # List global agents only
+start config agent list local    # List local agents only
+start config agent list merged   # Show merged view (global + local)
 ```
 
 **Behavior:**
@@ -157,8 +160,10 @@ Add agent from the official asset catalog. This command allows you to browse and
 **Synopsis:**
 
 ```bash
-start config agent add              # Interactive catalog browser
-start config agent add <name>       # Direct install from catalog
+start config agent add              # Interactive, prompts for scope
+start config agent add <name>       # Prompts for scope
+start config agent add <name> global  # Add to global config
+start config agent add <name> local   # Add to local config
 ```
 
 **Behavior:**
@@ -170,12 +175,14 @@ This command downloads the agent configuration from the asset catalog, adds it t
 
 ### start config agent new
 
-Interactively add a new agent to the global configuration.
+Interactively add a new agent to the configuration.
 
 **Synopsis:**
 
 ```bash
-start config agent add
+start config agent new          # Select scope interactively
+start config agent new global   # Add to global config
+start config agent new local    # Add to local config
 ```
 
 **Behavior:**
@@ -593,8 +600,10 @@ Edit agent configuration interactively.
 **Synopsis:**
 
 ```bash
-start config agent edit              # Select from list
-start config agent edit <name>       # Edit specific agent
+start config agent edit                  # Select agent and scope
+start config agent edit <name>           # Select scope for named agent
+start config agent edit <name> global    # Edit in global config
+start config agent edit <name> local     # Edit in local config
 ```
 
 **Behavior:**
@@ -807,13 +816,15 @@ Exit code: 0 (no backup created, no write)
 
 ### start config agent remove
 
-Remove agent from global configuration.
+Remove agent from configuration.
 
 **Synopsis:**
 
 ```bash
-start config agent remove           # Select from list
-start config agent remove <name>    # Remove specific agent
+start config agent remove                  # Select agent and scope
+start config agent remove <name>           # Select scope for named agent
+start config agent remove <name> global    # Remove from global config
+start config agent remove <name> local     # Remove from local config
 ```
 
 **Behavior:**
@@ -1181,7 +1192,10 @@ claude
 ## Files
 
 **~/.config/start/agents.toml**
-: Global agent configurations file containing agent definitions. This is the only file modified by `start config agent` commands.
+: Global agent configurations file.
+
+**./.start/agents.toml**
+: Local project agent configurations file.
 
 ## Error Handling
 
