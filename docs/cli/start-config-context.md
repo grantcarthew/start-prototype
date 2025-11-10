@@ -205,9 +205,14 @@ Add a context from the official asset catalog. This command allows you to browse
 
 ```bash
 start config context add              # Interactive catalog browser
-start config context add <name>       # Direct install (prompts for scope)
-start config context add <name> --local # Install to local config
+start config context add [path]       # Direct install from catalog
+start config context add [path] --local # Install to local config
 ```
+
+**Arguments:**
+
+**[path]** (optional)
+: The full catalog path of the context to install. If omitted, an interactive browser is shown.
 
 **Flags:**
 

@@ -224,9 +224,14 @@ Add a task from the official asset catalog. This command allows you to browse an
 
 ```bash
 start config task add              # Interactive catalog browser
-start config task add <name>       # Direct install (prompts for scope)
-start config task add <name> --local # Install to local config
+start config task add [path]       # Direct install from catalog
+start config task add [path] --local # Install to local config
 ```
+
+**Arguments:**
+
+**[path]** (optional)
+: The full catalog path of the task to install (e.g., `git-workflow/pre-commit-review`). If omitted, an interactive browser is shown.
 
 **Flags:**
 

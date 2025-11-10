@@ -130,7 +130,7 @@ Available catalog roles (4):
 
 ### start config role add
 
-Add role from GitHub catalog or by direct path.
+Add a role from the official GitHub asset catalog.
 
 **Synopsis:**
 
@@ -143,7 +143,7 @@ start config role add --local           # Add to local config
 **Arguments:**
 
 **[path]** (optional)
-: Catalog path to install directly (e.g., `general/code-reviewer`). If omitted, shows interactive browser.
+: The full catalog path of the role to install directly (e.g., `general/code-reviewer`). If omitted, an interactive browser is shown.
 
 **Flags:**
 

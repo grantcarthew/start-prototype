@@ -161,9 +161,14 @@ Add agent from the official asset catalog. This command allows you to browse and
 
 ```bash
 start config agent add              # Interactive catalog browser
-start config agent add <name>       # Direct install (prompts for scope)
-start config agent add <name> --local # Install to local config
+start config agent add [path]       # Direct install from catalog
+start config agent add [path] --local # Install to local config
 ```
+
+**Arguments:**
+
+**[path]** (optional)
+: The full catalog path of the agent to install (e.g., `anthropic/claude`). If omitted, an interactive browser is shown.
 
 **Flags:**
 
