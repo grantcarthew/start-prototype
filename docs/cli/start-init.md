@@ -20,9 +20,10 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 
 **Configuration files created** (per DR-031):
 - `config.toml` - Settings only
-- `tasks.toml` - Task definitions
 - `agents.toml` - Agent configurations
+- `roles.toml` - Role definitions
 - `contexts.toml` - Context document references
+- `tasks.toml` - Task definitions
 
 **What init does:**
 
@@ -177,6 +178,7 @@ Both create backups automatically if replacing existing config.
    - `agents.toml` - Agent configurations for each selected agent
    - `roles.toml` - Default role definitions
    - `contexts.toml` - Context document references (4 default documents)
+   - `tasks.toml` - Default task definitions
 7. Write all config files to chosen directory
 8. Display success message
 
@@ -605,36 +607,21 @@ Standard permissions: `0755` (drwxr-xr-x)
 
 ### Generated Config Structure
 
-Init creates 4 configuration files. Example content shown below:
+Init creates 5 configuration files. Example content shown below:
 
 **config.toml** (settings):
 ```toml
 [settings]
 default_agent = "claude"
 default_role = "code-reviewer"
-log_level = "normal"
-shell = "bash"
-command_timeout = 30
+# ...
 ```
 
 **agents.toml** (agent configurations):
 ```toml
 [agents.claude]
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
-default_model = "sonnet"
-
-  [agents.claude.models]
-  haiku = "claude-3-5-haiku-20241022"
-  sonnet = "claude-3-7-sonnet-20250219"
-  opus = "claude-opus-4-20250514"
-
-[agents.gemini]
-command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
-default_model = "flash"
-
-  [agents.gemini.models]
-  flash = "gemini-2.0-flash-exp"
-  pro-exp = "gemini-2.0-pro-exp"
+command = "claude --model {model} ..."
+# ...
 ```
 
 **roles.toml** (role definitions):
@@ -648,20 +635,15 @@ file = "./ROLE.md"
 ```toml
 [context.environment]
 file = "~/reference/ENVIRONMENT.md"
-prompt = "Read {file} for environment context."
 required = true
+# ...
+```
 
-[context.index]
-file = "~/reference/INDEX.csv"
-prompt = "Read {file} for documentation index."
-
-[context.agents]
-file = "./AGENTS.md"
-prompt = "Read {file} for repository context."
-
-[context.project]
-file = "./PROJECT.md"
-prompt = "Read {file} for current project status."
+**tasks.toml** (task definitions):
+```toml
+# This file is created by 'start init'.
+# Add custom tasks here or install them from the
+# asset catalog using 'start config task add'.
 ```
 
 **Note:** Agent model aliases and command templates come from GitHub. Above is illustrative only.
