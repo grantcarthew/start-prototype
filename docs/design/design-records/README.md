@@ -21,16 +21,16 @@ See [vision.md](../../vision.md) for the product vision and goals.
 | [DR-011](./dr-011-asset-distribution.md) | Asset Distribution & Update System | Distribution | 2025-01-03 |
 | [DR-012](./dr-012-context-required.md) | Context Document Required Field | Configuration | 2025-01-04 |
 | [DR-013](./dr-013-agent-templates.md) | Agent Templates from GitHub | Distribution | 2025-01-04 |
-| [DR-014](./dr-014-github-tree-api.md) | GitHub Tree API for Assets | Asset Management | 2025-01-06 |
-| [DR-015](./dr-015-atomic-updates.md) | Atomic Update Mechanism | Asset Management | 2025-01-06 |
-| [DR-016](./dr-016-asset-discovery.md) | Asset Discovery Strategy | Asset Management | 2025-01-06 |
+| [DR-014](./archive/dr-014-github-tree-api.md) | GitHub Tree API for Assets | Asset Management | 2025-01-06 |
+| [DR-015](./archive/dr-015-atomic-updates.md) | Atomic Update Mechanism | Asset Management | 2025-01-06 |
+| [DR-016](./archive/dr-016-asset-discovery.md) | Asset Discovery Strategy | Asset Management | 2025-01-06 |
 | [DR-017](./dr-017-cli-reorganization.md) | CLI Command Reorganization | CLI Design | 2025-01-06 |
 | [DR-018](./dr-018-init-update-integration.md) | Init/Update Command Integration | Asset Management | 2025-01-06 |
 | [DR-019](./dr-019-task-loading.md) | Task Loading & Merging Algorithm | Tasks | 2025-01-06 |
 | [DR-020](./dr-020-version-injection.md) | Binary Version Injection Strategy | Build & Distribution | 2025-01-06 |
 | [DR-021](./dr-021-github-version-check.md) | GitHub Version Checking | Version Management | 2025-01-06 |
 | [DR-022](./dr-022-asset-branch-strategy.md) | Asset Branch Strategy | Asset Management | 2025-01-06 |
-| [DR-023](./dr-023-asset-staleness-check.md) | Asset Staleness Checking | Asset Management | 2025-01-06 |
+| [DR-023](./archive/dr-023-asset-staleness-check.md) | Asset Staleness Checking | Asset Management | 2025-01-06 |
 | [DR-024](./dr-024-doctor-exit-codes.md) | Doctor Exit Code System | CLI Design | 2025-01-06 |
 | [DR-025](./dr-025-no-automatic-checks.md) | No Automatic Checks or Caching | CLI Design | 2025-01-06 |
 | [DR-026](./dr-026-offline-behavior.md) | Offline Fallback & Network Unavailable | Asset Management | 2025-01-07 |
@@ -87,12 +87,12 @@ Asset distribution and updates:
 
 - **[DR-011](./dr-011-asset-distribution.md)** - GitHub-fetched assets with update system
 - **[DR-013](./dr-013-agent-templates.md)** - Fetch agent configs from GitHub
-- **[DR-014](./dr-014-github-tree-api.md)** - SHA-based caching for incremental updates (Superseded by DR-031)
-- **[DR-015](./dr-015-atomic-updates.md)** - Atomic install with rollback capability (Superseded by DR-031)
-- **[DR-016](./dr-016-asset-discovery.md)** - Each feature checks its own directory (Superseded by DR-031)
+- **[DR-014](./archive/dr-014-github-tree-api.md)** - SHA-based caching for incremental updates (Superseded by DR-031)
+- **[DR-015](./archive/dr-015-atomic-updates.md)** - Atomic install with rollback capability (Superseded by DR-031)
+- **[DR-016](./archive/dr-016-asset-discovery.md)** - Each feature checks its own directory (Superseded by DR-031)
 - **[DR-018](./dr-018-init-update-integration.md)** - Init and update share implementation
 - **[DR-022](./dr-022-asset-branch-strategy.md)** - Assets from main branch (not releases)
-- **[DR-023](./dr-023-asset-staleness-check.md)** - GitHub commit comparison with no caching (Superseded by DR-031)
+- **[DR-023](./archive/dr-023-asset-staleness-check.md)** - GitHub commit comparison with no caching (Superseded by DR-031)
 - **[DR-026](./dr-026-offline-behavior.md)** - Network-only, no manual installation, graceful degradation
 - **[DR-027](./dr-027-security-trust-model.md)** - Trust GitHub HTTPS, no signatures, no pinning
 - **[DR-031](./dr-031-catalog-based-assets.md)** - Catalog-Based Asset Architecture
