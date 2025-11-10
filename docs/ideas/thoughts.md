@@ -1,8 +1,12 @@
 # Design Thoughts
 
+This document is just my thoughts dumped for reference. Do not use this document as a concrete reference. It is most likely wrong.
+
+## General Ideas
+
 - I want it to be able to use a prompt writer prompt to create role documents on the fly
-- Do we support partial subcommand names eg: `start con ag` for start config agent?
-- Do all the subcommands support --help?
+- Need an easy way to switch defaults
+- Need a config delete option if it does not exist (or remove), something like `start config agent rm xyz`
 
 ## Roles
 
