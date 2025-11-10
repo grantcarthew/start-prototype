@@ -8,7 +8,8 @@ start config context - Manage context document configurations
 
 ```bash
 start config context list [scope]
-start config context add [scope]
+start config context add [name] [scope]
+start config context new [scope]
 start config context test <name>
 start config context edit [name] [scope]
 start config context remove [name] [scope]
@@ -197,6 +198,24 @@ Add contexts: start config context add global
 - 2 - Invalid scope argument
 
 ### start config context add
+
+Add a context from the official asset catalog. This command allows you to browse and install pre-made context configurations.
+
+**Synopsis:**
+
+```bash
+start config context add              # Interactive catalog browser
+start config context add <name>       # Direct install from catalog
+```
+
+**Behavior:**
+
+This command downloads the context configuration from the asset catalog, adds it to your `contexts.toml` file (global or local), and caches it locally.
+
+(See `start config role add` for a detailed example of the interactive catalog browsing flow).
+
+
+### start config context new
 
 Interactively add a new context to the configuration.
 

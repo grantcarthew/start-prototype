@@ -9,6 +9,7 @@ start config role - Manage role configuration
 ```bash
 start config role list
 start config role add [path]
+start config role new [scope]
 start config role show [scope]
 start config role edit [scope]
 start config role remove [scope]
@@ -274,6 +275,23 @@ Try: start config role add  # Browse interactively
 - 1 - Network error (catalog unavailable)
 - 2 - Role not found
 - 3 - User cancelled
+
+### start config role new
+
+Interactively create a new custom role configuration.
+
+**Synopsis:**
+
+```bash
+start config role new [scope]
+```
+
+**Behavior:**
+
+This command launches an interactive wizard to help you create a new role from scratch. It will prompt you for the content source (file, command, or inline prompt) and other configuration details. This is for creating your own custom roles, as opposed to adding existing ones from the asset catalog.
+
+(See `start config agent new` for a detailed example of the interactive wizard flow).
+
 
 ### start config role show
 

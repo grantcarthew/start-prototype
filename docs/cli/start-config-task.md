@@ -8,7 +8,8 @@ start config task - Manage task configurations
 
 ```bash
 start config task list [scope]
-start config task add [scope]
+start config task add [name] [scope]
+start config task new [scope]
 start config task test <name>
 start config task edit [name] [scope]
 start config task remove [name] [scope]
@@ -216,6 +217,24 @@ View asset tasks: start config task list merged
 - 2 - Invalid scope argument
 
 ### start config task add
+
+Add a task from the official asset catalog. This command allows you to browse and install pre-made task configurations.
+
+**Synopsis:**
+
+```bash
+start config task add              # Interactive catalog browser
+start config task add <name>       # Direct install from catalog
+```
+
+**Behavior:**
+
+This command downloads the task configuration from the asset catalog, adds it to your `tasks.toml` file (global or local), and caches it locally.
+
+(See `start config role add` for a detailed example of the interactive catalog browsing flow).
+
+
+### start config task new
 
 Interactively add a new task to the configuration.
 

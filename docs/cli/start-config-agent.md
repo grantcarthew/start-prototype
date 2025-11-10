@@ -8,7 +8,8 @@ start config agent - Manage AI agent configurations
 
 ```bash
 start config agent list
-start config agent add
+start config agent add [name]
+start config agent new
 start config agent test <name>
 start config agent edit [name]
 start config agent remove [name]
@@ -150,6 +151,24 @@ use 'start config agent add' to add an agent manually.
 - 1 - No config file exists
 
 ### start config agent add
+
+Add agent from the official asset catalog. This command allows you to browse and install pre-made agent configurations.
+
+**Synopsis:**
+
+```bash
+start config agent add              # Interactive catalog browser
+start config agent add <name>       # Direct install from catalog
+```
+
+**Behavior:**
+
+This command downloads the agent configuration from the asset catalog, adds it to your global `agents.toml` file, and caches it locally. It is the standard way to get pre-configured agents.
+
+(See `start config role add` for a detailed example of the interactive catalog browsing flow).
+
+
+### start config agent new
 
 Interactively add a new agent to the global configuration.
 
