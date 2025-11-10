@@ -52,7 +52,7 @@ default_model = "sonnet"
 **Fields:**
 
 **command** (required)
-: Command template to execute the agent. Supports placeholders: `{model}`, `{system_prompt}`, `{prompt}`, `{date}`.
+: Command template to execute the agent. Supports placeholders: `{model}`, `{role}`, `{role_file}`, `{prompt}`, `{date}`.
 
 **description** (optional)
 : Human-readable description of the agent. Displayed in `start agent list` and help output.
@@ -215,7 +215,7 @@ Prompts for agent details and adds to `~/.config/start/agents.toml`:
 
    - Must contain `{prompt}` placeholder
    - Warns on unknown placeholders (typos)
-   - Valid placeholders: `{model}`, `{system_prompt}`, `{prompt}`, `{date}`
+   - Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
 
 6. **Add models?** (yes/no)
 
@@ -370,7 +370,7 @@ Command template: my-agent --model {model} '{prompt}'
 ```
 Command template: my-agent --model {mdoel} '{prompt}'
 ⚠ Warning: Unknown placeholder {mdoel} (did you mean {model}?)
-  Valid placeholders: {model}, {system_prompt}, {prompt}, {date}
+  Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
 
 Continue anyway? [y/N]: n
 
@@ -525,11 +525,11 @@ Validating configuration...
   Agent section: [agents.claude]
 
   Command template:
-    claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'
+    claude --model {model} --append-system-prompt '{role}' '{prompt}'
 
   Placeholder analysis:
     ✓ {model} - valid
-    ✓ {system_prompt} - valid
+    ✓ {role} / {role_file} - valid
     ✓ {prompt} - valid (required)
 
   Model configuration:
@@ -660,7 +660,7 @@ Current configuration:
   Description: Anthropic's Claude AI assistant via Claude Code CLI
   URL: https://docs.claude.com/claude-code
   Models URL: https://docs.anthropic.com/en/docs/about-claude/models
-  Command: claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'
+  Command: claude --model {model} --append-system-prompt '{role}' '{prompt}'
   Default model: sonnet
   Models: 3 (haiku, sonnet, opus)
 
@@ -669,7 +669,7 @@ Press enter to keep current value, or type new value:
 Description [Anthropic's Claude AI assistant via Claude Code CLI]:
 URL [https://docs.claude.com/claude-code]:
 Models URL [https://docs.anthropic.com/en/docs/about-claude/models]:
-Command template [claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}']:
+Command template [claude --model {model} --append-system-prompt '{role}' '{prompt}']:
 
 Current models:
   haiku = claude-3-5-haiku-20241022
@@ -773,7 +773,7 @@ Command template [claude --model {model}]: claude --model {model} '{prompt}'
 ```
 Command template [claude '{prompt}']: claude --model {mdoel} '{prompt}'
 ⚠ Warning: Unknown placeholder {mdoel} (did you mean {model}?)
-  Valid placeholders: {model}, {system_prompt}, {prompt}, {date}
+  Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
 
 Continue anyway? [y/N]: n
 
@@ -1281,7 +1281,8 @@ See DR-004 for full rationale.
 Agent commands support these placeholders:
 
 - `{model}` - Resolved model name
-- `{system_prompt}` - System prompt file contents
+- `{role}` - The fully resolved role/system prompt content (inline).
+- `{role_file}` - A file path to the resolved role/system prompt content.
 - `{prompt}` - Built prompt from context documents
 - `{date}` - Current timestamp (ISO 8601)
 
@@ -1292,7 +1293,7 @@ Agent commands support these placeholders:
 command = "claude --model {model} '{prompt}'"
 
 # Multiple placeholders
-command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 
 # Environment variable (via env section, not shown here)
 command = "gemini --model {model} '{prompt}'"

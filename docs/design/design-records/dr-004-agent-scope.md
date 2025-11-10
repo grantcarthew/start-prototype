@@ -15,7 +15,7 @@ Agents can be defined in both global and local configs with merge behavior
 default_agent = "claude"
 
 [agents.claude]
-command = "claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'"
+command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"  # Default alias to use
 
   [agents.claude.models]

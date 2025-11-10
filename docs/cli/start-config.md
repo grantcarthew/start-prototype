@@ -73,7 +73,7 @@ Settings
 Agents (3)
 ──────────
   claude                                (global)
-    Command: claude --model {model} --append-system-prompt '{system_prompt}' '{prompt}'
+    Command: claude --model {model} --append-system-prompt '{role}' '{prompt}'
     Default model: sonnet
     Models: haiku, sonnet, opus
 
@@ -644,7 +644,7 @@ Global: ~/.config/start/config.toml
       Command: broken-agent --model {model}
     ⚠ test-agent
       Unknown placeholder {mdoel} in command template
-      Valid placeholders: {model}, {system_prompt}, {prompt}, {date}
+      Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
   ✓ Contexts section valid (2 contexts)
 
 Local: ./.start/config.toml
