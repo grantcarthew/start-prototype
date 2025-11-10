@@ -141,7 +141,7 @@ Note: Your task configurations are unchanged.
 Review changes and manually update tasks.toml if desired.
 ```
 
-User config is **never auto-updated**. Updates only affect the cache.
+Your existing task configurations are **never automatically overwritten**. Updates only affect the cache.
 
 ## Benefits
 
@@ -173,9 +173,9 @@ User config is **never auto-updated**. Updates only affect the cache.
 - ❌ Same asset content in cache and config
 - **Mitigation:** Files are tiny text files, acceptable trade-off for simplicity
 
-**No automatic config updates:**
-- ❌ User must manually update config after `start update`
-- **Mitigation:** Preserves user customizations, prevents breaking changes
+**No automatic overwrites of user config:**
+- ❌ `start update` does not change your configured tasks. You must manually apply asset updates to your `tasks.toml` if desired.
+- **Mitigation:** Preserves user customizations, prevents breaking changes.
 
 **GitHub dependency:**
 - ❌ Relies on GitHub API availability

@@ -58,25 +58,16 @@ updated = "2025-01-10T12:00:00Z"
 
 **SHA mismatch = update available**
 
-### User Config Never Auto-Updated
+## User Config Never Automatically Overwritten
 
 **Cache updates are separate from config:**
 
-```
-Cache:                          User Config:
-~/.config/start/assets/         ~/.config/start/tasks.toml
-├── tasks/git-workflow/
-│   ├── pre-commit-review.toml  [tasks.pre-commit-review]
-│   ├── pre-commit-review.md    alias = "pcr"
-│   └── pre-commit-review.meta  prompt_file = "...pre-commit-review.md"
-│       sha = b2c3d4...          # User's version remains unchanged
-```
+When you run `start update`:
+1. The asset cache gets new versions.
+2. Your configuration files (`tasks.toml`, etc.) remain unchanged.
+3. If a task in your config references a cached file (e.g., via `prompt_file`), it will automatically use the new content on the next run.
+4. If a task in your config has inlined content copied from an asset, you must manually update it to reflect the changes.
 
-**After `start update`:**
-- Cache has new version (SHA b2c3d4...)
-- User config still references cache
-- If user edited config → edits preserved
-- If user wants new version → manually update config
 
 ## Implementation
 
