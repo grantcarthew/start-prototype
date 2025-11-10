@@ -27,14 +27,14 @@ This is the primary command for launching an AI session with full context. For c
 These flags work on all `start` commands.
 
 **--agent** _name_
-: Which agent to use. Overrides default agent from config.
+: Which agent to use. Overrides default agent from config. If the agent is not found in the local or global configuration, it will be searched for in the GitHub asset catalog and can be lazy-loaded on first use.
 
 ```bash
 start --agent gemini
 ```
 
 **--role** _name_
-: Which role to use for the system prompt. Overrides default role from config. Must reference a role defined in `[roles.<name>]` configuration.
+: Which role to use for the system prompt. Overrides default role from config. If the role is not found in the local or global configuration, it will be searched for in the GitHub asset catalog and can be lazy-loaded on first use.
 
 ```bash
 start --role security-auditor
@@ -272,6 +272,12 @@ Executing command...
 ```
 
 **Note:** Debug output shows detailed information for each step including config merging, path resolution, and placeholder substitution. Useful for troubleshooting configuration issues. Documents appear in config definition order.
+
+### Lazy-Loading of Assets
+
+If an asset (like an agent, role, or task) is requested but not found in the local or global configuration, the CLI will attempt to find it in the GitHub asset catalog. If found, it will be downloaded, cached, and added to your global configuration for future use. This allows for seamless, on-demand use of the entire asset library.
+
+This behavior can be controlled with the `--asset-download` flag.
 
 ## Examples
 

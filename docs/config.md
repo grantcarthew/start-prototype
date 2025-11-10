@@ -14,7 +14,16 @@ Complete reference for `start` configuration files.
 - Agents: Combined (global + local), local overrides global for same name
 - Contexts: Combined (global + local), local overrides global for same name
 - Roles: Combined (global + local), local overrides global for same name
-- Tasks: Combined (global + local), local overrides global for same name
+## Asset Resolution & Lazy-Loading
+
+`start` treats configurations for agents, roles, and tasks as "assets". When you ask for an asset (e.g., by running `start task <name>` or `start --role <name>`), the CLI resolves it using the following order of precedence:
+
+1.  **Local Config:** (`./.start/`) - Highest priority. Allows project-specific overrides.
+2.  **Global Config:** (`~/.config/start/`) - Your personal, user-wide configurations.
+3.  **Asset Cache:** (`~/.config/start/assets/`) - Assets you have previously downloaded.
+4.  **GitHub Catalog:** If an asset is not found in any of the above locations, the CLI will search the official GitHub asset catalog.
+
+If the asset is found in the GitHub catalog, it will be "lazy-loaded": downloaded, saved to the asset cache, and added to your global configuration for immediate and future offline use. This makes the entire library of official assets available on-demand without requiring you to install them all upfront.
 
 ## Complete Example
 

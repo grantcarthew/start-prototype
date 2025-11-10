@@ -16,6 +16,8 @@ start task <name> [instructions] [flags]
 
 Executes predefined AI workflow tasks configured in `tasks.toml`. Tasks are reusable workflows with optional system prompt overrides, automatic required context inclusion, and dynamic content from shell commands.
 
+Like all assets (including roles and agents), tasks can be lazy-loaded from the GitHub catalog on first use.
+
 **Task resolution** (per DR-033):
 
 1. Local config (`./.start/tasks.toml`)
