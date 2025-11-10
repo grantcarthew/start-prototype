@@ -15,13 +15,11 @@ start update [flags]
 
 Checks cached assets for updates and downloads newer versions from GitHub. Updates only the asset cache (`~/.config/start/assets/`), never modifies user configuration files.
 
-**Update behavior** (per DR-037):
+**Behavior:**
 
-- Fetches GitHub catalog tree (SHA for every asset)
-- Compares cached asset SHAs with GitHub SHAs
-- Downloads assets with different SHAs
-- Updates cached files and metadata
-- **Never touches user config** (tasks.toml, agents.toml, etc.)
+- **This command only checks for updates to assets already present in your local cache. It does not discover or download new assets from the catalog.**
+- Compares local asset SHAs with remote SHAs from GitHub catalog
+- Downloads new versions of assets if SHAs differ
 
 **What gets updated:**
 

@@ -58,6 +58,10 @@ updated = "2025-01-10T12:00:00Z"
 
 **SHA mismatch = update available**
 
+This DR defines how `start update` works.
+
+The scope of this command is limited to refreshing assets that the user has already acquired (i.e., are present in the local cache). It does not discover or add new assets from the catalog.
+
 ## User Config Never Automatically Overwritten
 
 **Cache updates are separate from config:**
