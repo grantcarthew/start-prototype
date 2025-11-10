@@ -66,54 +66,16 @@ start task code-review "check error handling"
 
 ## Flags
 
-All global flags from `start` command are supported except `--quiet`.
-
-**--agent** _name_
-: Override agent for this task. Overrides task's agent setting and default agent.
-
-```bash
-start task code-review --agent gemini
-```
-
-**--role** _name_
-: Override role for this task. Overrides task's role setting and default role.
-
-```bash
-start task code-review --role security-auditor
-```
-
-**--model** _alias|name_
-: Model to use. Accepts either model alias or full model name.
-
-```bash
-start task gdr --model opus
-start task gdr --model claude-opus-4-20250514
-```
-
-**--directory** _path_, **-d** _path_
-: Working directory for context detection and command execution.
-
-```bash
-start task gdr --directory ~/my-project
-```
-
-**--verbose**, **-v**
-: Show detailed output including config resolution, context detection, and command execution.
-
-**--debug**
-: Debug mode. Shows all internal operations, placeholder resolution, and command construction.
-
-**--help**, **-h**
-: Show help. Behavior depends on usage:
-
-- `start task --help` - Show general task command help
-- `start task <name> --help` - Show specific task configuration and usage
+All global flags from `start` command are supported. See `start --help` for a full list of global flags like `--agent`, `--role`, `--model`, `--directory`, `--verbose`, and `--debug`.
 
 **--quiet**, **-q**
-: Silently ignored for tasks (no effect).
+: Silently ignored for tasks. Unlike other commands, `start task` always shows a summary before execution to ensure the user sees what context is being used.
 
 **--local**
-: Add downloaded catalog task to local config instead of global (default: global).
+: When lazy-loading a new task from the catalog, this flag adds the task to the local config (`./.start/tasks.toml`) instead of the global config.
+
+**--help**, **-h**
+: Shows help for the `task` command. Use `start task <name> --help` to see details for a specific task.
 
 ```bash
 start task pre-commit-review --asset-download     # Force download

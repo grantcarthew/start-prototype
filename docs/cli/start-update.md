@@ -51,14 +51,7 @@ Checks cached assets for updates and downloads newer versions from GitHub. Updat
 
 ## Flags
 
-**--verbose**, **-v**
-: Show detailed SHA comparison and download progress.
-
-**--quiet**, **-q**
-: Suppress progress output, show only summary and errors.
-
-**--help**, **-h**
-: Show help for this command.
+This command supports the standard global flags for controlling output verbosity and showing help: `--verbose`, `--quiet`, and `--help`. See `start --help` for more details.
 
 ## Behavior
 

@@ -68,14 +68,7 @@ start init local    # Create local config
 start init --force
 ```
 
-**--verbose**, **-v**
-: Show detailed output including GitHub API calls and file operations.
-
-**--debug**
-: Debug mode. Shows all internal operations, API responses, and config generation.
-
-**--help**, **-h**
-: Show help text.
+This command also supports the standard global flags for verbosity and help: `--verbose`, `--debug`, and `--help`.
 
 ## Behavior
 

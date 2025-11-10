@@ -34,14 +34,7 @@ Performs comprehensive health check of `start` installation, configuration, and 
 
 ## Flags
 
-**--verbose**, **-v**
-: Show detailed diagnostic information for each check.
-
-**--quiet**, **-q**
-: Suppress all output except errors. Exit code indicates health (0 = healthy, non-zero = issues).
-
-**--help**, **-h**
-: Show help for this command.
+This command supports the standard global flags for controlling output verbosity and showing help: `--verbose`, `--quiet`, and `--help`. See `start --help` for more details.
 
 ## Behavior
 
