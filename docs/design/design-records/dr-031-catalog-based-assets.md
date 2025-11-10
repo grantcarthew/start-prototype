@@ -57,6 +57,7 @@ start update                  # Check cached assets for updates via SHA comparis
 ```
 ~/.config/start/
 ├── config.toml      # Settings only
+├── roles.toml       # All role definitions
 ├── tasks.toml       # All task definitions
 ├── agents.toml      # All agent configurations
 ├── contexts.toml    # All context configurations

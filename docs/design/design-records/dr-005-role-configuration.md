@@ -155,8 +155,8 @@ prompt = "{file}\n\nDate: {command}"
 ## Scope and Merge Behavior
 
 **Allowed scopes:**
-- Global: `~/.config/start/config.toml`
-- Local: `./.start/config.toml`
+- Global: `~/.config/start/roles.toml`
+- Local: `./.start/roles.toml`
 
 **Merge behavior:**
 - Global + local roles are **combined**
@@ -166,11 +166,11 @@ prompt = "{file}\n\nDate: {command}"
 **Example:**
 
 ```toml
-# Global: ~/.config/start/config.toml
+# Global: ~/.config/start/roles.toml
 [roles.code-reviewer]
 file = "~/.config/start/roles/general-reviewer.md"
 
-# Local: ./.start/config.toml
+# Local: ./.start/roles.toml
 [roles.code-reviewer]
 file = "./PROJECT_REVIEWER.md"
 ```

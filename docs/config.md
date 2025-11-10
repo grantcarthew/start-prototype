@@ -6,8 +6,18 @@ Complete reference for `start` configuration files.
 
 `start` uses TOML configuration files with a two-tier hierarchy:
 
-- **Global:** `~/.config/start/config.toml` - User-wide settings, agents, shared context
-- **Local:** `./.start/config.toml` - Project-specific settings and context
+- **Global:** `~/.config/start/` - User-wide configurations (multi-file)
+  - `config.toml` - Settings only
+  - `roles.toml` - Role definitions
+  - `tasks.toml` - Task definitions
+  - `agents.toml` - Agent configurations
+  - `contexts.toml` - Context configurations
+- **Local:** `./.start/` - Project-specific configurations (multi-file)
+  - `config.toml` - Settings overrides
+  - `roles.toml` - Project roles
+  - `tasks.toml` - Project tasks
+  - `agents.toml` - Project agents
+  - `contexts.toml` - Project contexts
 
 **Merge behavior:**
 - Settings: Local values override global values
@@ -27,7 +37,9 @@ If the asset is found in the GitHub catalog, it will be "lazy-loaded": downloade
 
 ## Complete Example
 
-### Global Config (~/.config/start/config.toml)
+### Global Config
+
+**config.toml** (`~/.config/start/config.toml`)
 
 ```toml
 # Global settings
@@ -37,8 +49,25 @@ default_role = "code-reviewer"
 log_level = "normal"
 shell = "bash"
 command_timeout = 30
+```
 
-# Agent configurations
+**roles.toml** (`~/.config/start/roles.toml`)
+
+```toml
+[roles.code-reviewer]
+description = "Expert code reviewer"
+file = "~/.config/start/assets/roles/general/code-reviewer.md"
+
+[roles.coder]
+file = "~/.config/start/roles/coder.md"
+
+[roles.reviewer]
+file = "~/.config/start/roles/reviewer.md"
+```
+
+**agents.toml** (`~/.config/start/agents.toml`)
+
+```toml
 [agents.claude]
 description = "Anthropic's Claude AI assistant via Claude Code CLI"
 url = "https://docs.claude.com/claude-code"
@@ -72,13 +101,11 @@ default_model = "gpt4-mini"
   gpt4-mini = "gpt-4o-mini"
   gpt4 = "gpt-4o"
   claude = "claude-3-5-sonnet-20241022"
+```
 
-# Roles (system prompts)
-[roles.code-reviewer]
-description = "Expert code reviewer"
-file = "~/.config/start/roles/code-reviewer.md"
+**contexts.toml** (`~/.config/start/contexts.toml`)
 
-# Global context documents
+```toml
 [context.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
@@ -93,28 +120,30 @@ required = true
 file = "README.md"
 prompt = "Project overview from {file}"
 required = false
-
-# Roles
-[roles.coder]
-file = "~/.config/start/roles/coder.md"
-
-[roles.reviewer]
-file = "~/.config/start/roles/reviewer.md"
 ```
 
-### Local Config (./.start/config.toml)
+### Local Config
+
+**config.toml** (`./.start/config.toml`)
 
 ```toml
 # Project-specific settings (overrides global)
 [settings]
 log_level = "debug"
+```
 
+**roles.toml** (`./.start/roles.toml`)
+
+```toml
 # Project-specific role (overrides global code-reviewer)
 [roles.code-reviewer]
 file = "./ROLE.md"
 description = "Project-specific code reviewer"
+```
 
-# Project-specific context documents (combined with global)
+**contexts.toml** (`./.start/contexts.toml`)
+
+```toml
 [context.agents]
 file = "./AGENTS.md"
 prompt = "Read {file} for repository instructions and agent guidance."
@@ -159,28 +188,37 @@ When both configs exist, the effective configuration combines them:
 ### Global Config
 
 ```
-~/.config/start/config.toml
+~/.config/start/
+├── config.toml      # Settings only
+├── roles.toml       # Role definitions
+├── tasks.toml       # Task definitions
+├── agents.toml      # Agent configurations
+├── contexts.toml    # Context configurations
+└── assets/          # Cached catalog assets
 ```
 
 **Purpose:**
-- Agent configurations (command templates, models)
-- Global settings (default agent, log_level)
-- Shared context documents (ENVIRONMENT.md, INDEX.csv, etc.)
-- Role templates
-- User-wide defaults
+- User-wide defaults and configurations
+- Shared across all projects
+- Personal preferences and common workflows
 
 **Created by:** `start init`
 
 ### Local Config
 
 ```
-./.start/config.toml
+./.start/
+├── config.toml      # Settings overrides
+├── roles.toml       # Project-specific roles
+├── tasks.toml       # Project-specific tasks
+├── agents.toml      # Project-specific agents (optional)
+└── contexts.toml    # Project-specific contexts
 ```
 
 **Purpose:**
-- Project-specific context documents (PROJECT.md, AGENTS.md, etc.)
-- Project-specific settings overrides
-- Local customizations
+- Project-specific overrides and customizations
+- Team-shareable configurations (can be committed)
+- Project-specific workflows
 
 **Created by:** Manual creation or `start init` in project directory
 
@@ -954,109 +992,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 
 ## Complete Example
 
-### Global Config (~/.config/start/config.toml)
-
-```toml
-# Global settings
-[settings]
-default_agent = "claude"
-default_role = "code-reviewer"
-log_level = "normal"
-shell = "bash"
-command_timeout = 30
-
-# Agent configurations
-[agents.claude]
-description = "Anthropic's Claude AI assistant via Claude Code CLI"
-url = "https://docs.claude.com/claude-code"
-models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
-default_model = "sonnet"
-
-  [agents.claude.models]
-  haiku = "claude-3-5-haiku-20241022"
-  sonnet = "claude-3-7-sonnet-20250219"
-  opus = "claude-opus-4-20250514"
-
-[agents.gemini]
-description = "Google's Gemini AI via CLI"
-url = "https://github.com/example/gemini-cli"
-models_url = "https://ai.google.dev/models/gemini"
-command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
-default_model = "flash"
-
-  [agents.gemini.models]
-  flash = "gemini-2.0-flash-exp"
-  pro-exp = "gemini-2.0-pro-exp"
-
-[agents.aichat]
-description = "All-in-one multi-provider AI chat tool"
-url = "https://github.com/sigoden/aichat"
-command = "aichat --model {model} '{prompt}'"
-default_model = "gpt4-mini"
-
-  [agents.aichat.models]
-  gpt4-mini = "gpt-4o-mini"
-  gpt4 = "gpt-4o"
-  claude = "claude-3-5-sonnet-20241022"
-
-# Roles (system prompts)
-[roles.code-reviewer]
-description = "Expert code reviewer"
-file = "~/.config/start/roles/code-reviewer.md"
-
-# Global context documents
-[context.environment]
-file = "~/reference/ENVIRONMENT.md"
-prompt = "Read {file} for environment context."
-required = true
-
-[context.index]
-file = "~/reference/INDEX.csv"
-prompt = "Read {file} for documentation index."
-required = true
-
-[context.readme]
-file = "README.md"
-prompt = "Project overview from {file}"
-required = false
-
-# Roles
-[roles.coder]
-file = "~/.config/start/roles/coder.md"
-
-[roles.reviewer]
-file = "~/.config/start/roles/reviewer.md"
-```
-
-### Local Config (./.start/config.toml)
-
-```toml
-# Project-specific settings
-[settings]
-log_level = "verbose"
-
-# Project-specific role (overrides global)
-[roles.code-reviewer]
-file = "./ROLE.md"
-description = "Project-specific code reviewer"
-
-# Project-specific context documents
-[context.agents]
-file = "./AGENTS.md"
-prompt = "Read {file} for repository instructions and agent guidance."
-required = true
-
-[context.project]
-file = "./PROJECT.md"
-prompt = "Read {file}. Respond with the project title and shortest possible summary of work required."
-required = false
-
-[context.design]
-file = "./docs/design-record.md"
-prompt = "Read {file} for design decisions."
-required = false
-```
+(See earlier example at top of document - same structure applies here)
 
 ### Merged Result
 

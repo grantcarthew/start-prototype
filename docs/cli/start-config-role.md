@@ -85,8 +85,8 @@ start config role list
 
 Lists roles from three sources:
 
-1. **Global config** (`~/.config/start/config.toml`) - Personal roles
-2. **Local config** (`./.start/config.toml`) - Project-specific roles
+1. **Global config** (`~/.config/start/roles.toml`) - Personal roles
+2. **Local config** (`./.start/roles.toml`) - Project-specific roles
 3. **Asset catalog** (`~/.config/start/assets/roles/`) - Available catalog roles
 
 **Output:**
@@ -441,8 +441,8 @@ start config role edit local    # Edit local role
 Prompts for role configuration and updates the selected config file:
 
 1. **Select scope** (if not provided)
-   - global - Edit `~/.config/start/config.toml`
-   - local - Edit `./.start/config.toml`
+   - global - Edit `~/.config/start/roles.toml`
+   - local - Edit `./.start/roles.toml`
 
 2. **Content source** (choose one or more)
    - File path (static role document)
@@ -496,7 +496,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-111234.toml...
 ✓ Backup created
 
-Saving role to ~/.config/start/config.toml...
+Saving role to ~/.config/start/roles.toml...
 ✓ Role configured successfully
 
 Use 'start config role show global' to verify.
@@ -539,7 +539,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-111345.toml...
 ✓ Backup created
 
-Saving role to ./.start/config.toml...
+Saving role to ./.start/roles.toml...
 ✓ Role updated successfully
 
 Use 'start config role show local' to verify.
@@ -580,7 +580,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-111456.toml...
 ✓ Backup created
 
-Saving role to ~/.config/start/config.toml...
+Saving role to ~/.config/start/roles.toml...
 ✓ Role configured successfully
 ```
 
@@ -625,7 +625,7 @@ Command timeout in seconds (or enter for default): 5
 Backing up config to config.2025-01-06-111567.toml...
 ✓ Backup created
 
-Saving role to ./.start/config.toml...
+Saving role to ./.start/roles.toml...
 ✓ Role configured successfully
 ```
 
@@ -744,7 +744,7 @@ Exit code: 2
 Backing up config to config.2025-01-06-111234.toml...
 ✗ Failed to backup config: permission denied
 
-Existing config preserved at: ~/.config/start/config.toml
+Existing config preserved at: ~/.config/start/roles.toml
 Role not configured.
 ```
 
@@ -793,7 +793,7 @@ Remove role from local config? [y/N]: y
 Backing up config to config.2025-01-06-112012.toml...
 ✓ Backup created
 
-Removing [roles.project-default] from ./.start/config.toml...
+Removing [roles.project-default] from ./.start/roles.toml...
 ✓ Role removed successfully
 
 Global role will now be used (if configured).
@@ -818,7 +818,7 @@ Remove role from global config? [y/N]: y
 Backing up config to config.2025-01-06-112045.toml...
 ✓ Backup created
 
-Removing [roles.code-reviewer] from ~/.config/start/config.toml...
+Removing [roles.code-reviewer] from ~/.config/start/roles.toml...
 ✓ Role removed successfully
 ⚠ No role configured
 
@@ -846,7 +846,7 @@ Remove role from local config? [y/N]: y
 Backing up config to config.2025-01-06-112123.toml...
 ✓ Backup created
 
-Removing [roles.project-default] from ./.start/config.toml...
+Removing [roles.project-default] from ./.start/roles.toml...
 ✓ Role removed successfully
 ✓ Now using global role
 
@@ -893,7 +893,7 @@ Remove role from global config? [y/N]: y
 Backing up config to config.2025-01-06-112156.toml...
 ✗ Failed to backup config: permission denied
 
-Existing config preserved at: ~/.config/start/config.toml
+Existing config preserved at: ~/.config/start/roles.toml
 Role not removed.
 ```
 
@@ -1111,8 +1111,8 @@ Testing role configuration...
 ─────────────────────────────────────────────────
 
 Loading configuration...
-  Global config: ~/.config/start/config.toml
-  Local config: ./.start/config.toml
+  Global config: ~/.config/start/roles.toml
+  Local config: ./.start/roles.toml
 
 Configuration merge:
   Global [roles]: 3 roles configured
@@ -1254,11 +1254,11 @@ Prompts for scope selection.
 
 ## Files
 
-**~/.config/start/config.toml**
-: Global configuration file containing `[roles.<name>]` sections.
+**~/.config/start/roles.toml**
+: Global roles configuration file containing `[roles.<name>]` sections.
 
-**./.start/config.toml**
-: Local project configuration file containing project-specific `[roles.<name>]` sections.
+**./.start/roles.toml**
+: Local project roles configuration file containing project-specific `[roles.<name>]` sections.
 
 Global and local roles are combined. If a role with the same name exists in both configs, local overrides global for that role name.
 
@@ -1267,7 +1267,7 @@ Global and local roles are combined. If a role with the same name exists in both
 ### No Configuration File
 
 ```
-Error: No configuration found at ~/.config/start/config.toml
+Error: No roles configuration found at ~/.config/start/roles.toml
 
 Run 'start init' to create initial configuration.
 ```
@@ -1279,7 +1279,7 @@ Exit code: 1
 ```
 Error: Configuration file has invalid syntax.
 
-File: ~/.config/start/config.toml
+File: ~/.config/start/roles.toml
 Line 15: invalid TOML syntax
 
 Fix the configuration file or restore from backup.
@@ -1293,11 +1293,11 @@ Exit code: 1
 
 Per DR-002 and DR-005, `[roles.<name>]` sections have combine-and-override merge behavior:
 
-**Global roles:** `~/.config/start/config.toml`
+**Global roles:** `~/.config/start/roles.toml`
 - Personal default role definitions
 - Used across all projects
 
-**Local roles:** `./.start/config.toml`
+**Local roles:** `./.start/roles.toml`
 - Project-specific role definitions
 - Added to global roles
 

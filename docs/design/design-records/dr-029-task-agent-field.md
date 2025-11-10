@@ -163,12 +163,12 @@ Task agent field follows standard task merge behavior:
 **Example:**
 
 ```toml
-# Global: ~/.config/start/config.toml
+# Global: ~/.config/start/tasks.toml
 [tasks.code-review]
 agent = "claude"
 prompt = "Review code: {instructions}"
 
-# Local: ./.start/config.toml
+# Local: ./.start/tasks.toml
 [tasks.code-review]
 agent = "go-expert"
 prompt = "Review Go code: {instructions}"
