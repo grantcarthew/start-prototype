@@ -239,7 +239,7 @@ start update --check    # Check only, don't update
 
 - [x] `start-config-agent.md` - Add interactive browsing flow
 - [x] `start-config-task.md` - Add interactive browsing flow
-- [ ] `start-config-role.md` - Add interactive browsing flow (NEW)
+- [x] `start-config-role.md` - Add interactive browsing flow (NEW)
 - [ ] `start-task.md` - Add lazy loading behavior
 - [ ] `start-update.md` - Update to per-asset model
 
@@ -371,7 +371,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 
 ### Phase 5: Asset Content (Value)
 
-**Goal:** Ship with 28 high-quality assets
+**Goal:** Ship with 30 high-quality assets
 
 - [ ] Write 8 role prompts (markdown)
 - [ ] Write 12 task definitions (toml)
@@ -382,7 +382,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 - [ ] Validate all assets
 - [ ] Test each asset end-to-end
 
-**Validation:** All 28 assets work perfectly
+**Validation:** All 30 assets work perfectly
 
 ### Phase 6: Polish (Quality)
 
@@ -415,7 +415,7 @@ Catalog design is complete when:
 Implementation is complete when:
 
 - [ ] All 6 implementation phases done
-- [ ] 28 assets created and tested
+- [ ] 30 assets created and tested
 - [ ] GitHub asset repository live
 - [ ] Can browse catalog interactively
 - [ ] Lazy loading works
