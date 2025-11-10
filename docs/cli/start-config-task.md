@@ -224,8 +224,14 @@ Add a task from the official asset catalog. This command allows you to browse an
 
 ```bash
 start config task add              # Interactive catalog browser
-start config task add <name>       # Direct install from catalog
+start config task add <name>       # Direct install (prompts for scope)
+start config task add <name> --local # Install to local config
 ```
+
+**Flags:**
+
+**--local**
+: Add to local config (`./.start/tasks.toml`) instead of global.
 
 **Behavior:**
 

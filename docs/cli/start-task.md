@@ -116,13 +116,6 @@ start task gdr --directory ~/my-project
 : Add downloaded catalog task to local config instead of global (default: global).
 
 ```bash
-start task pre-commit-review --local  # Add to ./.start/tasks.toml
-```
-
-**--asset-download[=bool]**
-: Enable/disable downloading from GitHub catalog if task not found (default: from settings).
-
-```bash
 start task pre-commit-review --asset-download     # Force download
 start task pre-commit-review --asset-download=false  # Fail if not found
 ```

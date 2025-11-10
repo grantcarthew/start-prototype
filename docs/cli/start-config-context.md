@@ -205,8 +205,14 @@ Add a context from the official asset catalog. This command allows you to browse
 
 ```bash
 start config context add              # Interactive catalog browser
-start config context add <name>       # Direct install from catalog
+start config context add <name>       # Direct install (prompts for scope)
+start config context add <name> --local # Install to local config
 ```
+
+**Flags:**
+
+**--local**
+: Add to local config (`./.start/contexts.toml`) instead of global.
 
 **Behavior:**
 

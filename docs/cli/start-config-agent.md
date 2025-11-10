@@ -160,11 +160,15 @@ Add agent from the official asset catalog. This command allows you to browse and
 **Synopsis:**
 
 ```bash
-start config agent add              # Interactive, prompts for scope
-start config agent add <name>       # Prompts for scope
-start config agent add <name> global  # Add to global config
-start config agent add <name> local   # Add to local config
+start config agent add              # Interactive catalog browser
+start config agent add <name>       # Direct install (prompts for scope)
+start config agent add <name> --local # Install to local config
 ```
+
+**Flags:**
+
+**--local**
+: Add to local config (`./.start/agents.toml`) instead of global.
 
 **Behavior:**
 

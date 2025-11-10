@@ -69,6 +69,9 @@ start -d ~/my-project
 **--debug**
 : Debug mode. Shows everything: config merging, placeholder resolution, command construction, environment variables.
 
+**--asset-download[=bool]**
+: Enable or disable downloading assets from the GitHub catalog on-demand. Defaults to `true`. Use `--asset-download=false` to prevent network requests for missing assets.
+
 **--help**, **-h**
 : Show help text.
 

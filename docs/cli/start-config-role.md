@@ -150,9 +150,6 @@ start config role add --local           # Add to local config
 **--local**
 : Add to local config (`./.start/config.toml`) instead of global.
 
-**--asset-download[=bool]**
-: Enable/disable downloading from GitHub (default: from settings).
-
 **Behavior:**
 
 **Interactive mode** (no path specified):
