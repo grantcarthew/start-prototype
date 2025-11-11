@@ -403,5 +403,5 @@ start prompt "analyze \$dollar and \"quotes\""
 - start(1) - Launch with context only
 - start-task(1) - Run predefined tasks
 - start-init(1) - Initialize configuration
-- start-agent(1) - Manage agents
+- start-config-agent(1) - Manage agents
 - start-config(1) - Manage configuration

@@ -668,5 +668,5 @@ Absolute paths and `~` paths resolve independently of working directory.
 - start-prompt(1) - Launch with custom prompt
 - start-task(1) - Run predefined tasks
 - start-init(1) - Initialize configuration
-- start-agent(1) - Manage agents
+- start-config-agent(1) - Manage agents
 - start-config(1) - Manage configuration

@@ -731,5 +731,5 @@ New agents added to repository become available immediately (no start release ne
 ## See Also
 
 - start-config(1) - Manage configuration
-- start-agent(1) - Manage agents
+- start-config-agent(1) - Manage agents
 - start(1) - Launch with context

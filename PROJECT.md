@@ -40,7 +40,7 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/cli/start.md`
+Active document: `docs/vision.md`
 
 ### Root Documentation
 
@@ -50,7 +50,7 @@ Active document: `docs/cli/start.md`
 
 ### Main Commands
 
-- [ ] `docs/cli/start.md` - Main entry point, interactive sessions
+- [x] `docs/cli/start.md` - Main entry point, interactive sessions
 - [ ] `docs/cli/start-prompt.md` - Prompt composition and execution
 - [ ] `docs/cli/start-task.md` - Task execution (needs lazy loading updates)
 - [ ] `docs/cli/start-init.md` - Configuration initialization
@@ -154,3 +154,9 @@ Documentation review is complete when:
 - `docs/cli/start-config.md`: Changed "Agents: (none - agents must be defined in global config)" to "Agents: (none configured)" (line 178)
 - `docs/cli/start-config.md`: Fixed Configuration Merge Behavior section - agents, roles, and tasks can all be in both global and local configs with merge behavior (lines 889-893)
 - `docs/cli/start.md`: Fixed "Local config only" section - removed error message, clarified that local-only config is valid (no global config required)
+- **Man page references**: Fixed all `start-agent(1)` references to `start-config-agent(1)` in See Also sections
+- `docs/cli/start-doctor.md`: Changed `start-agent(1)` to `start-config-agent(1)`
+- `docs/cli/start-init.md`: Changed `start-agent(1)` to `start-config-agent(1)`
+- `docs/cli/start-config.md`: Changed `start-agent(1)` to `start-config-agent(1)`
+- `docs/cli/start.md`: Changed `start-agent(1)` to `start-config-agent(1)`
+- `docs/cli/start-prompt.md`: Changed `start-agent(1)` to `start-config-agent(1)`

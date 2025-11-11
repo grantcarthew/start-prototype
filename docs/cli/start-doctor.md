@@ -507,5 +507,5 @@ Total: ~100-800ms for typical installation.
 
 - start-update(1) - Update asset library
 - start-config(1) - Configuration management
-- start-agent(1) - Agent management
+- start-config-agent(1) - Agent management
 - start-init(1) - Initialize configuration
