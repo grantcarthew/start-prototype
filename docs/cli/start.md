@@ -2,7 +2,7 @@
 
 ## Name
 
-start - Launch AI agent with project context
+start - Launch AI agent with important context
 
 ## Synopsis
 
@@ -22,38 +22,60 @@ Launches an AI agent with automatically detected project context. Reads ALL conf
 
 This is the primary command for launching an AI session with full context. For custom prompts with minimal context, use `start prompt` subcommand. For predefined workflows, use `start task` subcommand.
 
+Note: _You can always launch your agent directly for full custom controls if the role and context documents are not needed for one-off use._
+
 ## Global Flags
 
 These flags work on all `start` commands.
 
 **--agent** _name_, **-a** _name_
-: Which agent to use. Overrides default agent from config. If the agent is not found in the local or global configuration, it will be searched for in the GitHub asset catalog and can be lazy-loaded on first use.
+: Which agent to use. Overrides default agent from config. Resolution order:
+
+1. Exact match: local → global → cache → GitHub (lazy fetch)
+2. Prefix match: local → global → cache → GitHub (short-circuit at first source with matches)
+   - Single match → use it
+   - Multiple matches → interactive selection (TTY) or error (non-TTY)
 
 ```bash
-start --agent gemini
-start -a gemini
+start --agent anthropic  # Exact match
+start -a anth            # Prefix match (if unambiguous)
+start --agent a          # Ambiguous: interactive picker or error
 ```
+
+See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
 
 **--role** _name_, **-r** _name_
-: Which role to use for the system prompt. Overrides default role from config. If the role is not found in the local or global configuration, it will be searched for in the GitHub asset catalog and can be lazy-loaded on first use.
+: Which role to use for the system prompt. Overrides default role from config. Resolution order:
+
+1. Exact match: local → global → cache → GitHub (lazy fetch)
+2. Prefix match: local → global → cache → GitHub (short-circuit at first source with matches)
+   - Single match → use it
+   - Multiple matches → interactive selection (TTY) or error (non-TTY)
 
 ```bash
-start --role security-auditor
-start -r go-expert
+start --role go-expert       # Exact match
+start -r go                  # Prefix match (if unambiguous)
+start --role code            # Ambiguous: interactive picker or error
 ```
+
+See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
 
 **--model** _name_, **-m** _name_
-: Model to use. Resolution order:
+: Model to use (from agent configuration). Resolution order:
 
 1. Exact match on any configured model name → use it
-2. Prefix match (first match by config order) → use it
-3. No match → pass string to agent as-is (agent errors if invalid)
+2. Prefix match (short-circuit at first match) → use it
+   - Single match → use it
+   - Multiple matches → interactive selection (TTY) or error (non-TTY)
+3. No match → pass string to agent as-is (passthrough, agent errors if invalid)
 
 ```bash
-start --model sonnet                    # Exact match
-start -m s                              # Prefix match (if unambiguous)
-start --model claude-3-5-haiku-20241022 # No match, passthrough
+start --model claude-sonnet-4           # Exact match
+start -m claude                         # Prefix match (if unambiguous)
+start --model gpt-5-experimental        # No match, passthrough to agent
 ```
+
+See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
 
 **--directory** _path_, **-d** _path_
 : Working directory for context detection. Relative paths in config resolve to this directory. Default: current directory (pwd).

@@ -121,3 +121,9 @@ Documentation review is complete when:
 - `docs/cli/start-task.md`: Updated execution flow for missing file handling
 - **Runtime behavior**: Missing files show `⚠ context-name file-path (not found, skipped)` - warnings, not errors
 - `docs/design/design-records/dr-008-file-handling.md`: Updated to reflect warning behavior instead of "silently skipped"; updated output examples to use ⚠ symbol; added rationale about catching config errors
+- **Flag value prefix matching**: Implemented intelligent prefix matching for --agent, --role, --task, and --model flags with ambiguity detection and TTY-aware interactive selection
+- `docs/design/design-records/dr-038-flag-value-resolution.md`: Created new DR defining two-phase resolution (exact → prefix), short-circuit evaluation, ambiguity handling (interactive/error), and passthrough for --model
+- `docs/cli/start.md`: Updated --agent, --role, and --model flag descriptions with full resolution algorithm and examples
+- `docs/cli/start-prompt.md`: Updated --agent, --role, and --model flag descriptions to reference DR-038
+- `docs/cli/start-task.md`: Updated task resolution section and name argument to describe prefix matching behavior
+- `docs/design/design-records/dr-033-asset-resolution-algorithm.md`: Added DR-038 to related decisions (prefix matching extends exact match)

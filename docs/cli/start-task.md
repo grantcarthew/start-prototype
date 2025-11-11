@@ -18,15 +18,20 @@ Executes predefined AI workflow tasks configured in `tasks.toml`. Tasks are reus
 
 Like all assets (including roles and agents), tasks can be lazy-loaded from the GitHub catalog on first use.
 
-**Task resolution** (per DR-033):
+**Task resolution** (per DR-038):
 
-1. Local config (`./.start/tasks.toml`)
-2. Global config (`~/.config/start/tasks.toml`)
-3. Asset cache (`~/.config/start/assets/tasks/`)
-4. GitHub catalog (lazy download if `asset_download = true`)
-5. Error if not found
+1. Exact match: local → global → cache → GitHub (lazy fetch)
+2. Prefix match: local → global → cache → GitHub (short-circuit at first source with matches)
+   - Single match → use it
+   - Multiple matches → interactive selection (TTY) or error (non-TTY)
 
-Tasks can be downloaded from the GitHub catalog on first use, cached locally for offline use, and added to your configuration automatically.
+```bash
+start task pre-commit-review  # Exact match
+start task pre                # Prefix match (if unambiguous)
+start task code               # Ambiguous: interactive picker or error
+```
+
+Tasks can be downloaded from the GitHub catalog on first use, cached locally for offline use, and added to your configuration automatically. See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
 
 **Task components:**
 
@@ -49,11 +54,12 @@ Tasks are defined in `tasks.toml` and can be customized per user or per project.
 ## Arguments
 
 **name**
-: Task name or alias to execute. Use `start task` to see available tasks.
+: Task name or alias to execute. Supports exact match or prefix matching. Use `start task` to see available tasks.
 
 ```bash
-start task code-review        # By name
-start task cr                 # By alias
+start task code-review        # Exact match
+start task code               # Prefix match (if unambiguous)
+start task c                  # Ambiguous: interactive picker or error
 ```
 
 **instructions** (optional)

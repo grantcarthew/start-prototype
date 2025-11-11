@@ -44,17 +44,13 @@ start prompt  # Launch with required context only, no custom prompt
 All global flags from `start` command are supported:
 
 **--agent** _name_, **-a** _name_
-: Which agent to use
+: Which agent to use. Supports exact match or prefix matching with ambiguity handling. See `start --help` or [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for details.
 
 **--role** _name_, **-r** _name_
-: Which role (system prompt) to use
+: Which role (system prompt) to use. Supports exact match or prefix matching with ambiguity handling. See `start --help` or [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for details.
 
 **--model** _name_, **-m** _name_
-: Model to use. Resolution order:
-
-1. Exact match on any configured model name → use it
-2. Prefix match (first match by config order) → use it
-3. No match → pass string to agent as-is (agent errors if invalid)
+: Model to use (from agent configuration). Supports exact match, prefix matching, and passthrough. See `start --help` or [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for details.
 
 **--directory** _path_, **-d** _path_
 : Working directory for context detection

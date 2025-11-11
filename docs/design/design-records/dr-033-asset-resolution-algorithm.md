@@ -375,3 +375,4 @@ func getCatalog() *GitHubCatalog {
 - [DR-034](./dr-034-github-catalog-api.md) - GitHub API (catalog fetching)
 - [DR-036](./dr-036-cache-management.md) - Cache structure (cache lookup)
 - [DR-026](./dr-026-offline-behavior.md) - Offline fallback (network error handling)
+- [DR-038](./dr-038-flag-value-resolution.md) - Prefix matching for flag values (extends exact match with prefix support)
