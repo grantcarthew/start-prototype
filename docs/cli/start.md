@@ -41,15 +41,17 @@ start --role security-auditor
 start --role go-expert
 ```
 
-**--model** _alias|name_
-: Model to use. Accepts either:
+**--model** _name_
+: Model to use. Resolution order:
 
-- Model alias: User-defined aliases from agent's config (e.g., `sonnet`, `haiku`, `opus`)
-- Full model name: Complete model identifier (e.g., `claude-3-5-haiku-20241022`, `gemini-2.0-flash-exp`)
+1. Exact match on any configured model name → use it
+2. Prefix match (first match by config order) → use it
+3. No match → pass string to agent as-is (agent errors if invalid)
 
 ```bash
-start --model sonnet                    # Use alias from config
-start --model claude-3-5-haiku-20241022 # Use specific model
+start --model sonnet                    # Exact match
+start --model s                         # Prefix match (if unambiguous)
+start --model claude-3-5-haiku-20241022 # No match, passthrough
 ```
 
 **--directory** _path_, **-d** _path_
@@ -135,22 +137,25 @@ Read ./PROJECT.md for current project status.
 
 ### Model Flag Resolution
 
-**When using alias** (`--model sonnet`):
+**When `--model` provided:**
 
-1. Look up agent's `models.sonnet` value from config
-2. Use the resolved model name
-3. Error if alias not defined for agent
+1. Check for exact match in selected agent's models → use it
+2. Check for prefix match in selected agent's models → use first match (by config order)
+3. No match → pass string directly to agent (agent handles validation)
 
-**When using full model name** (`--model claude-3-5-haiku-20241022`):
+**Examples:**
 
-1. Use exact model name provided
-2. Bypass alias resolution
-3. Agent must support this model
+Agent config has models: `sonnet`, `sonnet-new`, `haiku`
 
-**When no `--model` flag**:
+- `--model sonnet` → exact match, uses `sonnet`
+- `--model s` → prefix match, uses `sonnet` (first in config)
+- `--model haiku` → exact match, uses `haiku`
+- `--model xyz-model` → no match, passes "xyz-model" to agent
 
-1. Use agent's `default_model` alias from config
-2. Error if no default_model configured
+**When no `--model` flag:**
+
+1. Use agent's `default_model` from config
+2. If no default_model, use first model in agent's models table (config order)
 
 ### Verbosity Levels
 
@@ -303,7 +308,7 @@ start --agent opencode
 
 ### Model Selection
 
-Use model alias (from config):
+Use configured model names:
 
 ```bash
 start --model haiku
@@ -311,7 +316,14 @@ start --model sonnet
 start --model opus
 ```
 
-Use full model name:
+Use prefix matching:
+
+```bash
+start --model s      # Matches 'sonnet' if unambiguous
+start --model h      # Matches 'haiku' if unambiguous
+```
+
+Use any model string (passthrough):
 
 ```bash
 start --model claude-3-5-haiku-20241022
@@ -456,21 +468,15 @@ Use 'start agent list' to see details.
 
 Exit code: 2
 
-### Invalid Model Alias
+### Invalid Model (from agent)
 
-If alias not configured for agent:
+If model string is invalid (determined by agent, not CLI):
 
 ```
-Error: Model alias 'pro' not configured for agent 'gemini'.
-
-Available aliases for gemini:
-  - flash: gemini-2.0-flash-exp
-  - pro-exp: gemini-2.0-pro-exp
-
-Update config or use full model name with --model.
+(Agent-specific error output)
 ```
 
-Exit code: 2
+Exit code: 4 (agent execution error)
 
 ### Agent Tool Not Found
 
@@ -602,26 +608,26 @@ required = false   # Optional - included by start, excluded by start prompt
 
 ### Model Override Behavior
 
-The `--model` flag overrides the default model but respects the agent. Each agent has its own model aliases defined in config.
+The `--model` flag overrides the default model. Each agent has its own configured models.
 
-**Agent-specific aliases:**
+**Example configured models:**
 
 - Claude: `haiku`, `sonnet`, `opus`
 - Gemini: `flash`, `pro-exp`
 - Other agents: user-defined
 
-When using an alias, it must be defined for the selected agent:
+Model resolution is agent-specific:
 
 ```bash
-start --agent claude --model opus     # ✓ Works if opus defined for claude
-start --agent gemini --model opus     # ✗ Error if opus not defined for gemini
-start --agent gemini --model flash    # ✓ Works if flash defined for gemini
+start --agent claude --model opus     # Matches 'opus' in claude config
+start --agent gemini --model opus     # No match, passes "opus" to gemini (likely errors)
+start --agent gemini --model flash    # Matches 'flash' in gemini config
 ```
 
-When using full model names, the agent must support that model:
+Any unmatched string is passed to the agent:
 
 ```bash
-start --agent claude --model claude-opus-4-20250514  # Agent must support this
+start --agent claude --model claude-opus-4-20250514  # Passthrough to agent
 ```
 
 ### Tilde Expansion

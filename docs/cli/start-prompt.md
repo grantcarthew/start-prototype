@@ -49,8 +49,12 @@ All global flags from `start` command are supported:
 **--role** _name_
 : Which role (system prompt) to use
 
-**--model** _alias|name_
-: Model to use (alias or full model name)
+**--model** _name_
+: Model to use. Resolution order:
+
+1. Exact match on any configured model name → use it
+2. Prefix match (first match by config order) → use it
+3. No match → pass string to agent as-is (agent errors if invalid)
 
 **--directory** _path_, **-d** _path_
 : Working directory for context detection

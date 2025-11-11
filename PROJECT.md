@@ -14,17 +14,39 @@ I am reviewing the documents. Your task is to fix issues defined by me during th
 
 We will be working through this step by step. If you see something that should be addressed, bring it up in the discussion.
 
-As we fix issues, I will be needing you to ensure the docs/design/design-records/* document that relates to the changes is in-sync with our updates.
+As we fix issues, I will be needing you to ensure the docs/design/design-records/\* document that relates to the changes is in-sync with our updates.
+
+This repository is not large yet. Before you do anything, run a `lsd --tree` to get a list of the documents.
 
 ## Objectives
 
-1. Review all 11 CLI command documentation files for accuracy
+1. Review all documentation files (3 root docs + 11 CLI commands) for accuracy
 2. Fix inconsistencies, outdated information, and errors
 3. Ensure alignment with design decisions (DRs)
 4. Verify examples, flags, and usage patterns are correct
 5. Prepare clean, accurate documentation for implementation phase
+6. Design records will be updated as needed based on changes to other documents
 
-## CLI Documents to Review
+## Review Process
+
+1. I will identify and issue
+2. We will discuss it and decide on the fix
+3. You will fix the issue in the document
+4. You will review related documents to make sure there are no inconsistencies
+5. You will update related documents
+6. Add the fix to the bottom of this document in the ## Fixed section
+7. Ask me to commit the changes
+8. Next issue
+
+## Documents to Review
+
+Active document: `docs/cli/start.md`
+
+### Root Documentation
+
+- [ ] `docs/config.md` - Configuration reference
+- [ ] `docs/tasks.md` - Task-specific documentation
+- [ ] `docs/vision.md` - Product vision and goals
 
 ### Main Commands
 
@@ -59,13 +81,14 @@ Ensure all documentation aligns with these key design decisions:
 
 Documentation review is complete when:
 
-- [ ] All 11 CLI documents reviewed and corrected
+- [ ] All 14 documents (3 root + 11 CLI) reviewed and corrected
 - [ ] Examples are accurate and tested conceptually
 - [ ] Flags and options are consistent across commands
 - [ ] Multi-file config structure correctly documented
 - [ ] Catalog behavior (lazy loading, browsing) accurately described
 - [ ] Design decisions referenced where relevant
 - [ ] No contradictions between documents
+- [ ] Design records updated to reflect changes
 - [ ] Ready for implementation phase
 
 ## Notes
@@ -74,3 +97,8 @@ Documentation review is complete when:
 - Some issues may require updates to design documents (docs/design/)
 - Focus on correctness over completeness - better to have accurate docs than comprehensive but wrong docs
 - Track design questions separately for resolution before implementation
+
+## Fixed
+
+- `docs/cli/start.md`: Removed "alias" terminology from --model flag, clarified resolution as exact match → prefix match → passthrough
+- `docs/cli/start-prompt.md`: Updated --model flag to match start.md (removed "alias|name", added resolution order)
