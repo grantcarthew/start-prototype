@@ -25,7 +25,7 @@ assets/tasks/git-workflow/
 - ✅ Metadata separate from what agent sees
 - ✅ Easy to parse independently
 - ✅ No risk of corrupting content when updating metadata
-- ✅ Consistent format across asset types (roles, tasks, agents)
+- ✅ Consistent format across asset types (roles, tasks, agents, contexts)
 - ❌ More files to manage (acceptable trade-off for cleanliness)
 
 ### Metadata Schema

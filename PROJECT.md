@@ -140,3 +140,8 @@ Documentation review is complete when:
 - `docs/cli/start-config-role.md`: Updated field descriptions and placeholder section
 - `docs/cli/start-config-task.md`: Updated field descriptions and placeholder section
 - `docs/design/design-records/dr-009-task-structure.md`: Updated decision summary, field descriptions, placeholder definitions, execution flow, and all examples
+- **Contexts as lazy-loadable assets**: Confirmed contexts can be lazy-loaded from GitHub catalog (config templates, not content)
+- `docs/design/design-records/dr-031-catalog-based-assets.md`: Added `contexts/` to cache structure; removed contexts from Future Considerations
+- `docs/config.md`: Updated Asset Resolution & Lazy-Loading section to include contexts as downloadable asset type
+- `docs/design/design-records/dr-032-asset-metadata-schema.md`: Added contexts to asset types list
+- `docs/design/design-records/dr-022-asset-branch-strategy.md`: Added contexts to asset types in three locations (content list, benefits, rationale)

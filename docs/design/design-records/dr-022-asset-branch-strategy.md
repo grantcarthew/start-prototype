@@ -14,6 +14,7 @@ Asset library updates (`start update` and `start init`) always pull from the **l
 - Roles: Markdown prompt documents
 - Agents: TOML configuration templates
 - Tasks: TOML task definitions
+- Contexts: TOML context configurations
 - Examples: TOML reference configurations
 
 Content updates have lower risk than binary code updates and benefit from rapid iteration.
@@ -30,7 +31,7 @@ Content updates have lower risk than binary code updates and benefit from rapid 
   - Improvements available immediately
 
 **Benefits:**
-- Iterate on tasks/roles/agents without cutting CLI releases
+- Iterate on tasks/roles/agents/contexts without cutting CLI releases
 - Users get content improvements immediately
 - Simple mental model: "Code = releases, Content = main branch"
 - Faster feedback loop for asset improvements
@@ -169,6 +170,7 @@ Assets are content that benefits from rapid iteration. Pulling from main branch 
 - Fixing typos in role prompts without a release
 - Adding new task templates as they're created
 - Updating agent configs for new model versions
+- Adding new context configurations for common patterns
 - Iterating on examples based on user feedback
 
 Users control when they get updates (via `start update`), so they're not forced to take changes immediately. The CLI binary remains tied to stable releases for safety.

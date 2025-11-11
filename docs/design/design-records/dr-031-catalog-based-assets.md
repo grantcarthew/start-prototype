@@ -68,7 +68,8 @@ start update                  # Check cached assets for updates via SHA comparis
     │       ├── pre-commit-review.md
     │       └── pre-commit-review.meta.toml
     ├── roles/
-    └── agents/
+    ├── agents/
+    └── contexts/
 ```
 
 **Settings (config.toml):**
@@ -283,6 +284,6 @@ func LoadConfig(dir string) (*Config, error) {
 - Search/filter functionality across catalog
 - Asset dependencies (tasks requiring specific roles)
 - Workspace templates (preset configurations)
-- Additional asset types (contexts, metaprompts, snippets)
+- Additional asset types (metaprompts, snippets)
 
 **Current stance:** Ship v1 with minimal viable set (28 assets across 4 types), iterate based on user feedback.

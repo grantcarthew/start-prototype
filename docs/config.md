@@ -26,7 +26,7 @@ Complete reference for `start` configuration files.
 - Roles: Combined (global + local), local overrides global for same name
 ## Asset Resolution & Lazy-Loading
 
-`start` treats configurations for agents, roles, and tasks as "assets". When you ask for an asset (e.g., by running `start task <name>` or `start --role <name>`), the CLI resolves it using the following order of precedence:
+`start` treats configurations for agents, roles, tasks, and contexts as "assets". When you ask for an asset (e.g., by running `start task <name>`, `start --role <name>`, or `start config context add <name>`), the CLI resolves it using the following order of precedence:
 
 1.  **Local Config:** (`./.start/`) - Highest priority. Allows project-specific overrides.
 2.  **Global Config:** (`~/.config/start/`) - Your personal, user-wide configurations.
