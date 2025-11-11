@@ -43,13 +43,13 @@ start prompt  # Launch with required context only, no custom prompt
 
 All global flags from `start` command are supported:
 
-**--agent** _name_
+**--agent** _name_, **-a** _name_
 : Which agent to use
 
-**--role** _name_
+**--role** _name_, **-r** _name_
 : Which role (system prompt) to use
 
-**--model** _name_
+**--model** _name_, **-m** _name_
 : Model to use. Resolution order:
 
 1. Exact match on any configured model name → use it
@@ -62,7 +62,7 @@ All global flags from `start` command are supported:
 **--quiet**, **-q**
 : Quiet mode (no output)
 
-**--verbose**, **-v**
+**--verbose**
 : Verbose output
 
 **--debug**
@@ -70,6 +70,9 @@ All global flags from `start` command are supported:
 
 **--help**, **-h**
 : Show help
+
+**--version**, **-v**
+: Show version information
 
 ## Behavior
 

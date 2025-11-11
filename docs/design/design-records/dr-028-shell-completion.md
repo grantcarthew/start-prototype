@@ -78,10 +78,10 @@ start config agent <Tab>
 Flags:
 ```bash
 start --<Tab>
-# Shows: --agent, --model, --verbose, --quiet, --debug, --help, --version
+# Shows: --agent, -a, --role, -r, --model, -m, --directory, -d, --verbose, --quiet, -q, --debug, --help, -h, --version, -v
 
 start task --<Tab>
-# Shows: --verbose, --quiet, --debug, --help
+# Shows: --agent, -a, --role, -r, --model, -m, --directory, -d, --verbose, --quiet, -q, --debug, --help, -h, --version, -v
 ```
 
 **Tier 2: Dynamic completion (high-value, worth implementing)**

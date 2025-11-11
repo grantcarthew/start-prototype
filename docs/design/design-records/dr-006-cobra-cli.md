@@ -43,9 +43,15 @@ start config edit                  # Open config in editor
 Work on all commands:
 
 ```bash
---agent <name>        # Which agent to use (overrides default)
---model <alias>       # Model alias or full model name
---directory <path>    # Working directory (default: pwd)
+--agent <name>, -a <name>       # Which agent to use (overrides default)
+--role <name>, -r <name>        # Which role to use (overrides default)
+--model <name>, -m <name>       # Model alias or full model name
+--directory <path>, -d <path>   # Working directory (default: pwd)
+--quiet, -q                     # Quiet mode (no output)
+--verbose                       # Verbose output (detailed info)
+--debug                         # Debug mode (everything)
+--help, -h                      # Show help (automatic from Cobra)
+--version, -v                   # Show version information
 ```
 
 ## Automatic Help Support

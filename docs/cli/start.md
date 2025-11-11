@@ -26,22 +26,23 @@ This is the primary command for launching an AI session with full context. For c
 
 These flags work on all `start` commands.
 
-**--agent** _name_
+**--agent** _name_, **-a** _name_
 : Which agent to use. Overrides default agent from config. If the agent is not found in the local or global configuration, it will be searched for in the GitHub asset catalog and can be lazy-loaded on first use.
 
 ```bash
 start --agent gemini
+start -a gemini
 ```
 
-**--role** _name_
+**--role** _name_, **-r** _name_
 : Which role to use for the system prompt. Overrides default role from config. If the role is not found in the local or global configuration, it will be searched for in the GitHub asset catalog and can be lazy-loaded on first use.
 
 ```bash
 start --role security-auditor
-start --role go-expert
+start -r go-expert
 ```
 
-**--model** _name_
+**--model** _name_, **-m** _name_
 : Model to use. Resolution order:
 
 1. Exact match on any configured model name → use it
@@ -50,7 +51,7 @@ start --role go-expert
 
 ```bash
 start --model sonnet                    # Exact match
-start --model s                         # Prefix match (if unambiguous)
+start -m s                              # Prefix match (if unambiguous)
 start --model claude-3-5-haiku-20241022 # No match, passthrough
 ```
 
@@ -65,7 +66,7 @@ start -d ~/my-project
 **--quiet**, **-q**
 : Quiet mode. No output, launches agent directly. Use when you don't want to see context summary.
 
-**--verbose**, **-v**
+**--verbose**
 : Verbose output. Shows config resolution, file detection details, full paths, and context being sent.
 
 **--debug**
@@ -77,7 +78,7 @@ start -d ~/my-project
 **--help**, **-h**
 : Show help text.
 
-**--version**
+**--version**, **-v**
 : Show version information.
 
 ## Behavior
@@ -365,7 +366,6 @@ Verbose mode:
 
 ```bash
 start --verbose
-start -v
 ```
 
 Debug mode:

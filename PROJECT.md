@@ -102,3 +102,15 @@ Documentation review is complete when:
 
 - `docs/cli/start.md`: Removed "alias" terminology from --model flag, clarified resolution as exact match → prefix match → passthrough
 - `docs/cli/start-prompt.md`: Updated --model flag to match start.md (removed "alias|name", added resolution order)
+- **Short flags added**: Added `-a` (--agent), `-r` (--role), `-m` (--model) short flags across all CLI docs
+- **Version flag corrected**: Changed `-v` from --verbose to --version across all CLI docs (--verbose has no short form)
+- `docs/cli/start.md`: Added short flags -a, -r, -m; moved -v to --version; removed -v from --verbose
+- `docs/cli/start-prompt.md`: Added short flags -a, -r, -m; added --version with -v
+- `docs/cli/start-config.md`: Moved -v to --version; removed from --verbose
+- `docs/cli/start-config-agent.md`: Moved -v to --version; removed from --verbose
+- `docs/cli/start-config-task.md`: Moved -v to --version; removed from --verbose
+- `docs/cli/start-config-role.md`: Moved -v to --version; removed from --verbose
+- `docs/cli/start-config-context.md`: Moved -v to --version; removed from --verbose
+- `docs/design/design-records/dr-006-cobra-cli.md`: Updated Global Flags section with complete flag list including short forms
+- `docs/design/design-records/dr-028-shell-completion.md`: Updated flag completion examples to include all short flags
+- **--context flag**: Decided not to add --context/-c flag; current config-driven design is sufficient

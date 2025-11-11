@@ -1156,11 +1156,14 @@ These flags work on all `start config agent` subcommands where applicable.
 **--help**, **-h**
 : Show help for the subcommand.
 
-**--verbose**, **-v**
+**--verbose**
 : Verbose output. Shows config file paths and additional details.
 
 **--debug**
 : Debug mode. Shows all internal operations.
+
+**--version**, **-v**
+: Show version information.
 
 ## Examples
 

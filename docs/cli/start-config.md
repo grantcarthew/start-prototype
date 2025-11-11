@@ -751,11 +751,14 @@ These flags work on all `start config` subcommands where applicable.
 **--help**, **-h**
 : Show help for the subcommand.
 
-**--verbose**, **-v**
+**--verbose**
 : Verbose output. Shows additional details and full paths.
 
 **--debug**
 : Debug mode. Shows all internal operations and validation steps.
+
+**--version**, **-v**
+: Show version information.
 
 ## Examples
 
