@@ -650,7 +650,7 @@ Prompt template:
   ✓ Uses {file} placeholder
 
 ⚠ Context 'missing-doc' has warnings
-  File will be skipped at runtime (not an error)
+  File will generate warning and be skipped at runtime
 ```
 
 **Output (command failed):**

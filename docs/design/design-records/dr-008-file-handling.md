@@ -6,7 +6,7 @@
 
 ## Decision
 
-Relative paths resolve to working directory; missing files skipped with status display
+Relative paths resolve to working directory; missing files generate warnings and are skipped
 
 ## Path Resolution
 
@@ -26,8 +26,9 @@ file = "~/reference/file.md"     # Home-relative
 
 ## Missing File Behavior
 
-- Files that don't exist are skipped silently
-- No error, no exit
+- Files that don't exist generate warnings
+- Warnings displayed with ⚠ symbol
+- No error, no exit - execution continues
 - Missing files excluded from prompt
 - Status displayed to user before execution
 
@@ -41,8 +42,8 @@ Agent: claude (model: claude-sonnet-4-5@20250929)
 Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
   ✓ index          ~/reference/INDEX.csv
-  ✗ agents         ./AGENTS.md (not found)
-  ✗ project        ./PROJECT.md (not found)
+  ⚠ agents         ./AGENTS.md (not found, skipped)
+  ⚠ project        ./PROJECT.md (not found, skipped)
 
 System prompt: ./ROLE.md
 
@@ -53,9 +54,11 @@ Executing command...
 ## Rationale
 
 - Users see exactly what context is being used
-- Can diagnose path issues easily
+- Can diagnose path issues easily via warnings
+- Warnings help catch configuration errors (typos, wrong paths)
+- Follows standard CLI conventions (git, npm, make warn about missing configured resources)
 - Optional files work naturally (not all projects have all documents)
-- No false errors for legitimately missing optional files
+- Warnings displayed but don't stop execution
 - Command display truncates system prompt ('...') to avoid noise
 - Full prompt visible in agent chat once started
 

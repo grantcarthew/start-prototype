@@ -167,7 +167,7 @@ start task <name> [instructions]
 6. Load required contexts:
    - Auto-includes all contexts where `required = true`
    - No `documents` array needed
-   - Skips missing files (same as `start` command behavior)
+   - Missing files generate warnings and are skipped (same as `start` command behavior)
    - Order: Config definition order
 7. Run task `command` if configured (UTD):
    - Execute in working directory

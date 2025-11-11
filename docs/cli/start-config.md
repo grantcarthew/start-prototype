@@ -965,7 +965,7 @@ Validation checks if context files exist but:
 - Missing files are **warnings**, not errors
 - Files are checked relative to current directory (for local contexts)
 - Tilde (`~`) expansion is supported
-- Missing optional contexts (`required = false`) are silently skipped at runtime
+- Missing contexts (both required and optional) generate warnings and are skipped at runtime
 
 ## See Also
 

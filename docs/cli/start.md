@@ -17,7 +17,7 @@ Launches an AI agent with automatically detected project context. Reads ALL conf
 **Context document behavior:**
 
 - Includes ALL context documents (required + optional)
-- Missing files are skipped with notification
+- Missing files generate warnings and are skipped
 - Use `start prompt` for required documents only
 
 This is the primary command for launching an AI session with full context. For custom prompts with minimal context, use `start prompt` subcommand. For predefined workflows, use `start task` subcommand.
@@ -90,7 +90,7 @@ start -d ~/my-project
 3. Merge configs (local overrides global)
 4. Detect ALL context documents (check which files exist)
    - Includes both `required = true` and `required = false` documents
-   - Missing files are skipped (not errors)
+   - Missing files generate warnings and are skipped
    - Order determined by config definition order (see below)
 5. Build prompt from document prompts
 6. Resolve placeholders in agent command template
@@ -177,7 +177,7 @@ Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
   ✓ index           ~/reference/INDEX.csv
   ✓ agents          ./AGENTS.md
-  ✗ project         ./PROJECT.md (not found)
+  ⚠ project         ./PROJECT.md (not found, skipped)
 
 Role: code-reviewer (from ~/.config/start/roles/code-reviewer.md)
 
@@ -221,7 +221,7 @@ Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
   ✓ index           ~/reference/INDEX.csv
   ✓ agents          ./AGENTS.md
-  ✗ project         ./PROJECT.md (not found)
+  ⚠ project         ./PROJECT.md (not found, skipped)
 
 Role: code-reviewer (from ~/.config/start/roles/code-reviewer.md)
 
@@ -269,7 +269,7 @@ Context documents:
   ✓ environment     ~/reference/ENVIRONMENT.md
   ✓ index           ~/reference/INDEX.csv
   ✓ agents          ./AGENTS.md
-  ✗ project         ./PROJECT.md (not found)
+  ⚠ project         ./PROJECT.md (not found, skipped)
 
 Role: code-reviewer (from ~/.config/start/roles/code-reviewer.md)
 
@@ -557,10 +557,10 @@ If all configured documents don't exist:
 
 ```
 Context documents:
-  ✗ environment    ~/reference/ENVIRONMENT.md (not found)
-  ✗ index          ~/reference/INDEX.csv (not found)
-  ✗ agents         ./AGENTS.md (not found)
-  ✗ project        ./PROJECT.md (not found)
+  ⚠ environment    ~/reference/ENVIRONMENT.md (not found, skipped)
+  ⚠ index          ~/reference/INDEX.csv (not found, skipped)
+  ⚠ agents         ./AGENTS.md (not found, skipped)
+  ⚠ project        ./PROJECT.md (not found, skipped)
 ```
 
 The agent launches with no context. This is valid - useful for general AI sessions.

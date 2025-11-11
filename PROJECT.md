@@ -32,7 +32,7 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 1. I will identify and issue
 2. We will discuss it and decide on the fix
 3. You will fix the issue in the document
-4. You will review related documents to make sure there are no inconsistencies
+4. You will review related documents in docs/cli/ and docs/design/design-records/ to make sure there are no inconsistencies
 5. You will update related documents
 6. Add the fix to the bottom of this document in the ## Fixed section
 7. Ask me to commit the changes
@@ -114,3 +114,10 @@ Documentation review is complete when:
 - `docs/design/design-records/dr-006-cobra-cli.md`: Updated Global Flags section with complete flag list including short forms
 - `docs/design/design-records/dr-028-shell-completion.md`: Updated flag completion examples to include all short flags
 - **--context flag**: Decided not to add --context/-c flag; current config-driven design is sufficient
+- **Missing file behavior**: Standardized wording across all docs - missing context files always generate warnings and are skipped
+- `docs/cli/start.md`: Updated context behavior description and execution flow; changed output examples from ✗ to ⚠ for missing files
+- `docs/cli/start-config.md`: Changed from "silently skipped" to "generate warnings and are skipped"
+- `docs/cli/start-config-context.md`: Updated test output example for missing files
+- `docs/cli/start-task.md`: Updated execution flow for missing file handling
+- **Runtime behavior**: Missing files show `⚠ context-name file-path (not found, skipped)` - warnings, not errors
+- `docs/design/design-records/dr-008-file-handling.md`: Updated to reflect warning behavior instead of "silently skipped"; updated output examples to use ⚠ symbol; added rationale about catching config errors
