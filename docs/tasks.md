@@ -120,13 +120,13 @@ See [DR-005](./design/decisions/dr-005-role-configuration.md) for role configura
 Tasks use the **[Unified Template Design (UTD)](./design/unified-template-design.md)** pattern for prompts.
 
 **file** (string, optional)
-: Path to a prompt template file. File contents available via `{file}` placeholder.
+: Path to a prompt template file. File path available via `{file}`, contents available via `{file_contents}`.
 
 **command** (string, optional)
-: Shell command to generate dynamic content (e.g., `git diff --staged`). Output available via `{command}` placeholder.
+: Shell command to generate dynamic content (e.g., `git diff --staged`). Command string available via `{command}`, output available via `{command_output}`.
 
 **prompt** (string, optional)
-: Template text that can use `{file}`, `{command}`, and `{instructions}` placeholders.
+: Template text that can use `{file}`, `{file_contents}`, `{command}`, `{command_output}`, and `{instructions}` placeholders.
 
 **Requirement:** At least one of `file`, `command`, or `prompt` must be present.
 
@@ -148,8 +148,10 @@ See [UTD shell configuration](./design/unified-template-design.md#shell-configur
 
 Available in `file` content and `prompt` templates:
 
-- `{file}` - Content from task `file`
-- `{command}` - Output from task `command`
+- `{file}` - File path from task `file`
+- `{file_contents}` - Content from task `file`
+- `{command}` - Command string from task `command`
+- `{command_output}` - Output from task `command`
 - **`{instructions}`** - User's command-line arguments (task-specific)
 - `{model}` - Model name (global)
 - `{date}` - Current timestamp (global)
@@ -265,7 +267,7 @@ Review the following git diff.
 
 ## Staged Changes
 ```diff
-{command}
+{command_output}
 ```
 """
 ```
@@ -281,7 +283,7 @@ description = "Security-focused code review"
 role = "security-auditor"
 
 command = "git diff --staged"
-prompt = "Security review:\n{command}\n\n{instructions}"
+prompt = "Security review:\n{command_output}\n\n{instructions}"
 ```
 
 ### Task Without Specific Role
@@ -315,7 +317,7 @@ git log --oneline --grep="api" -5
 prompt = """
 Validate these API endpoints and recent changes:
 
-{command}
+{command_output}
 
 Focus: {instructions}
 """
@@ -341,7 +343,7 @@ console.log(`DevDependencies: ${Object.keys(pkg.devDependencies || {}).length}`)
 prompt = """
 Analyze this package:
 
-{command}
+{command_output}
 
 Recommendations: {instructions}
 """
@@ -366,7 +368,7 @@ golangci-lint run --fast 2>&1
 prompt = """
 Go validation results:
 
-{command}
+{command_output}
 
 Address: {instructions}
 """
@@ -386,7 +388,7 @@ command = "git diff --staged"
 prompt = """
 Perform a security audit on these changes:
 
-{command}
+{command_output}
 
 Focus areas: {instructions}
 """
@@ -402,7 +404,7 @@ role = "code-linter"
 description = "Fast linting with lightweight agent"
 
 command = "git diff --staged"
-prompt = "Quick lint: {command}"
+prompt = "Quick lint: {command_output}"
 ```
 
 ### Override Global Task (Local Config)
@@ -419,7 +421,7 @@ prompt = "Review code: {instructions}"
 alias = "cr"
 role = "go-expert"
 command = "git diff --staged"
-prompt = "Review Go code changes:\n{command}\n\n{instructions}"
+prompt = "Review Go code changes:\n{command_output}\n\n{instructions}"
 ```
 
 The local task completely replaces the global task with the same name.

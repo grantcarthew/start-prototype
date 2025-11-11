@@ -452,9 +452,9 @@ Uses **[Unified Template Design (UTD)](./unified-template-design.md)** pattern.
 
 - `file` (string, optional) - Path to role content file
 - `command` (string, optional) - Shell command for dynamic content
-- `prompt` (string, optional) - Template text with `{file}` and `{command}` placeholders
+- `prompt` (string, optional) - Template text with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`
 
-At least one UTD field must be present. See [UTD documentation](./unified-template-design.md) for complete validation rules.
+At least one UTD field must be present. See [UTD documentation](./design/unified-template-design.md) for complete validation rules.
 
 **Role-Specific Fields:**
 
@@ -521,7 +521,7 @@ file = "~/.config/start/roles/general.md"
 description = "Code reviewer with context"
 file = "~/.config/start/roles/reviewer.md"
 prompt = """
-{file}
+{file_contents}
 
 Additional Instructions:
 - Focus on security and performance
@@ -537,9 +537,9 @@ description = "Go language expert"
 file = "~/.config/start/roles/go-base.md"
 command = "go version 2>/dev/null || echo 'Go not installed'"
 prompt = """
-{file}
+{file_contents}
 
-Environment: {command}
+Environment: {command_output}
 
 Apply Go-specific best practices.
 """
@@ -583,9 +583,9 @@ Uses **[Unified Template Design (UTD)](./unified-template-design.md)** pattern.
 
 - `file` (string, optional) - Path to context document file
 - `command` (string, optional) - Shell command for dynamic content
-- `prompt` (string, optional) - Template text with `{file}` and `{command}` placeholders
+- `prompt` (string, optional) - Template text with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`
 
-At least one UTD field must be present. See [UTD documentation](./unified-template-design.md) for complete validation rules.
+At least one UTD field must be present. See [UTD documentation](./design/unified-template-design.md) for complete validation rules.
 
 **Context-Specific Fields:**
 
@@ -661,7 +661,7 @@ required = true
 # Dynamic content from command
 [context.git-status]
 command = "git status --short"
-prompt = "Working tree status:\n{command}"
+prompt = "Working tree status:\n{command_output}"
 description = "Current git status"
 required = false
 
@@ -670,10 +670,10 @@ required = false
 file = "./PROJECT.md"
 command = "git log -5 --oneline"
 prompt = """
-{file}
+{file_contents}
 
 Recent commits:
-{command}
+{command_output}
 """
 required = true
 ```
@@ -748,10 +748,10 @@ At least one of `file`, `command`, or `prompt` must be present.
 : Path to prompt template file.
 
 **command** (string, optional)
-: Shell command to generate dynamic content (e.g., `git diff --staged`). Output available via `{command}` placeholder.
+: Shell command to generate dynamic content (e.g., `git diff --staged`). Output available via `{command_output}` placeholder.
 
 **prompt** (string, optional)
-: Template text with `{file}`, `{command}`, and `{instructions}` placeholders.
+: Template text with `{file}`, `{file_contents}`, `{command}`, `{command_output}`, and `{instructions}` placeholders.
 
 ```toml
 [tasks.git-diff-review]
@@ -764,7 +764,7 @@ Review the following changes:
 
 ## Staged Changes
 ```diff
-{command}
+{command_output}
 ```
 """
 ```
@@ -804,7 +804,7 @@ Review the following changes:
 
 ## Staged Changes
 ```diff
-{command}
+{command_output}
 ```
 """
 ````
@@ -823,12 +823,14 @@ prompt = "Help me with: {instructions}"
 **Placeholder behavior:**
 
 In task prompt templates:
-- `{file}` - Content from task `file`
-- `{command}` - Output from task `command`
+- `{file}` - File path from task `file`
+- `{file_contents}` - Content from task `file`
+- `{command}` - Command string from task `command`
+- `{command_output}` - Output from task `command`
 - `{instructions}` - Command-line args (or `"None"`)
 - `{model}`, `{date}` - Global placeholders
 
-See [DR-007](./design/decisions/dr-007-placeholders.md) for complete placeholder documentation.
+See [DR-007](./design/design-records/dr-007-placeholders.md) for complete placeholder documentation.
 
 **Usage:**
 
@@ -869,25 +871,42 @@ Example: `2025-01-04T14:30:00+10:00`
 
 ### UTD Pattern Placeholders
 
-**{file}** (in UTD templates)
-: Content from the `file` field. Used in `prompt` field of `[context.<name>]`, `[roles.<name>]`, and `[tasks.<name>]`. The file is read and its contents replace the `{file}` placeholder.
+Used in `prompt` field of `[context.<name>]`, `[roles.<name>]`, and `[tasks.<name>]`:
 
-Example in context:
+**{file}**
+: File path from the `file` field (absolute, with ~ expanded).
+
+Example: `file = "~/reference/ENVIRONMENT.md"` → `{file}` = `"/Users/username/ref/ENV.md"`
+
+**{file_contents}**
+: Content from the `file` field. The file is read and its contents replace the placeholder.
+
+Example for injecting contents:
 ```toml
 [context.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = """
 Environment Context:
-{file}
+{file_contents}
 """
 ```
 
-For instructing the AI to read a file using its tools, use a plain file path reference:
+Example for instructing AI to read (for agents with file access):
 ```toml
 [context.environment]
 file = "~/reference/ENVIRONMENT.md"
-prompt = "Read ~/reference/ENVIRONMENT.md for environment context."
+prompt = "Read {file} for environment context."
 ```
+
+**{command}**
+: Command string from the `command` field.
+
+Example: `command = "git status"` → `{command}` = `"git status"`
+
+**{command_output}**
+: Output from executing the `command` field (stdout/stderr combined).
+
+Example: `command = "git diff --staged"` → `{command_output}` = output of git diff
 
 ### Task-Specific Placeholders
 
@@ -898,12 +917,7 @@ Available in task prompt templates:
 
 Example: `start task gdr "focus on security"` → `{instructions}` = `"focus on security"`
 
-**{command}**
-: Output from task's `command`. Empty string if no command defined.
-
-Example: `command = "git diff --staged"` → `{command}` = output of git diff
-
-Note: In task prompts, use `{command}` not `{content}`. The `{content}` placeholder was from an earlier design.
+Tasks also have access to all UTD Pattern Placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`.
 
 ---
 

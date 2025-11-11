@@ -85,17 +85,30 @@ Temp files:
 
 Available in UTD template contexts (roles, contexts, tasks):
 
-**{file}** - Content from UTD `file` field
-- The file is read and its contents replace the `{file}` placeholder
-- Example in role: `{file}` replaced with role file contents
-- Example in context: `{file}` replaced with context file contents
-- Example in task: `{file}` replaced with task file contents
-- Note: This injects file content into the prompt. To instruct the AI to read a file using its tools, reference the file path directly in the prompt text instead of using `{file}`
+**{file}** - File path from UTD `file` field
+- Replaced with absolute file path (~ expanded)
+- Example: `file = "~/ref/ENV.md"` → `{file}` = `"/Users/username/ref/ENV.md"`
+- Use case: Instructing AI agents with file access to read files
+- Example: `prompt = "Read {file} for context."`
 
-**{command}** - Output from UTD `command` field
-- Stdout and stderr captured
-- Empty string if no command
-- Example: `command = "date"` → `{command}` = `"2025-01-07 14:30:00"`
+**{file_contents}** - Content from UTD `file` field
+- Replaced with complete file contents
+- Example in role: `{file_contents}` replaced with role file contents
+- Example in context: `{file_contents}` replaced with context file contents
+- Use case: Injecting file content directly into prompts for AI agents without file access
+- Example: `prompt = "Environment info:\n{file_contents}"`
+
+**{command}** - Command string from UTD `command` field
+- Replaced with the command string as written
+- Example: `command = "git status"` → `{command}` = `"git status"`
+- Use case: Documenting what command was run
+- Example: `prompt = "Output of '{command}':\n{command_output}"`
+
+**{command_output}** - Output from UTD `command` field
+- Stdout and stderr captured and combined
+- Empty string if command fails or produces no output
+- Example: `command = "date"` → `{command_output}` = `"2025-01-07 14:30:00"`
+- Use case: Injecting dynamic command results into prompts
 
 ## Task-Specific Placeholders
 
@@ -107,12 +120,7 @@ Available only in task prompt templates (not in roles or contexts):
 - Example: `start task review "focus on security"` → `{instructions}` = `"focus on security"`
 - Example: `start task review` → `{instructions}` = `"None"`
 
-**{command}** - Output from task's command
-- Same as UTD {command} but in task context
-- Example: `command = "git diff --staged"` → `{command}` = git diff output
-
-**{file}** - Content from task's file
-- Same as UTD {file} but in task context
+Tasks also have access to all UTD Pattern Placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`.
 
 See [DR-009](./dr-009-task-structure.md) for task structure details.
 
@@ -180,16 +188,16 @@ default_model = "gpt4-mini"
 file = "~/.config/start/roles/reviewer.md"
 command = "date '+%Y-%m-%d'"
 prompt = """
-{file}
+{file_contents}
 
-Review Date: {command}
+Review Date: {command_output}
 
 Focus on security and performance.
 """
 ```
 
 When this role is used:
-- `{role}` = fully resolved content (file + date + framing)
+- `{role}` = fully resolved content (file contents + date + framing)
 - `{role_file}` = temp file path (because it uses `command`)
 
 ### Context with Placeholders
@@ -209,7 +217,7 @@ command = "git diff --staged"
 prompt = """
 Review these changes:
 
-{command}
+{command_output}
 
 Instructions: {instructions}
 """
@@ -233,8 +241,10 @@ Instructions: {instructions}
 3. **Task resolution** (if executing task):
    - Resolve task UTD (file, command, prompt)
    - Replace `{instructions}` with user args
-   - Replace `{command}` with task command output
-   - Replace `{file}` with task file content
+   - Replace `{file}` with task file path
+   - Replace `{file_contents}` with task file content
+   - Replace `{command}` with task command string
+   - Replace `{command_output}` with task command output
 
 4. **Final assembly:**
    - Assemble `{prompt}` from contexts + task/custom prompt
@@ -248,16 +258,18 @@ Instructions: {instructions}
 
 **Placeholder scope:**
 
-| Placeholder    | Agent Commands | Roles | Contexts | Tasks |
-|----------------|----------------|-------|----------|-------|
-| {model}        | ✓              | ✓     | ✓        | ✓     |
-| {date}         | ✓              | ✓     | ✓        | ✓     |
-| {prompt}       | ✓              | -     | -        | -     |
-| {role}         | ✓              | -     | -        | -     |
-| {role_file}    | ✓              | -     | -        | -     |
-| {file}         | -              | ✓     | ✓        | ✓     |
-| {command}      | -              | ✓     | ✓        | ✓     |
-| {instructions} | -              | -     | -        | ✓     |
+| Placeholder       | Agent Commands | Roles | Contexts | Tasks |
+|-------------------|----------------|-------|----------|-------|
+| {model}           | ✓              | ✓     | ✓        | ✓     |
+| {date}            | ✓              | ✓     | ✓        | ✓     |
+| {prompt}          | ✓              | -     | -        | -     |
+| {role}            | ✓              | -     | -        | -     |
+| {role_file}       | ✓              | -     | -        | -     |
+| {file}            | -              | ✓     | ✓        | ✓     |
+| {file_contents}   | -              | ✓     | ✓        | ✓     |
+| {command}         | -              | ✓     | ✓        | ✓     |
+| {command_output}  | -              | ✓     | ✓        | ✓     |
+| {instructions}    | -              | -     | -        | ✓     |
 
 ## Rationale
 
