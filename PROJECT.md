@@ -40,13 +40,13 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/vision.md`
+Active document: `docs/config.md`
 
 ### Root Documentation
 
 - [ ] `docs/config.md` - Configuration reference
 - [ ] `docs/tasks.md` - Task-specific documentation
-- [ ] `docs/vision.md` - Product vision and goals
+- [x] `docs/vision.md` - Product vision and goals
 
 ### Main Commands
 
@@ -160,3 +160,24 @@ Documentation review is complete when:
 - `docs/cli/start-config.md`: Changed `start-agent(1)` to `start-config-agent(1)`
 - `docs/cli/start.md`: Changed `start-agent(1)` to `start-config-agent(1)`
 - `docs/cli/start-prompt.md`: Changed `start-agent(1)` to `start-config-agent(1)`
+- **TOML link added**: Added link to https://toml.io/ in Overview section of docs/config.md
+- **Settings merge clarification**: Changed "Settings: Local values override global values" to "Settings: Merged per-field, local overrides global for same field" to clarify it's per-field merge, not whole-section replacement
+- `docs/config.md`: Updated Merge behavior section (line 23)
+- `docs/cli/start-config.md`: Updated Configuration Merge Behavior section (line 889)
+- **Path choice rationale**: Added explanation to DR-002 for why `./.start/` is used (not `./.config/start/`)
+- `docs/design/design-records/dr-002-config-merge.md`: Added "Path choices" section to Rationale explaining `./.start/` follows project-level tool convention (like `.vscode/`, `.github/`), while `.config/` is for user-level configs
+- **Missing settings documentation**: Added complete documentation for all 9 settings fields in [settings] section
+- `docs/config.md`: Added field documentation for `default_role` (uses first role if not specified)
+- `docs/config.md`: Added field documentation for `asset_download` (enable/disable auto-download from GitHub, default true)
+- `docs/config.md`: Added field documentation for `asset_repo` (GitHub repository for assets, default "grantcarthew/start")
+- `docs/config.md`: Added field documentation for `github_token_env` (env var for GitHub token, default "GITHUB_TOKEN")
+- `docs/config.md`: Added field documentation for `asset_path` (cache directory, default "~/.config/start/assets")
+- `docs/config.md`: Updated Validation section to include all 9 settings
+- `docs/config.md`: Updated Example section to show all 9 settings
+- `docs/config.md`: Updated Complete Example to show all 9 settings in global config
+- **Settings field name correction**: Fixed incorrect field name "verbosity" to "log_level" in examples
+- `docs/cli/start-config.md`: Changed three instances of `verbosity` to `log_level` (lines 901, 913, 924)
+- **Incomplete settings blocks**: Added missing `asset_download` field to complete settings examples
+- `docs/ideas/catalog-based-assets.md`: Added `asset_download = true` to settings block (line 358)
+- `PROJECT-backlog.md`: Added `asset_download = true` to settings block (line 259)
+- `docs/design/design-records/dr-031-catalog-based-assets.md`: Added missing basic settings (`log_level`, `shell`, `command_timeout`) to complete the example (lines 80-82)

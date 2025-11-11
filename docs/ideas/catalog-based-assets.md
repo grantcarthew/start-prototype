@@ -355,6 +355,7 @@ shell = "bash"
 command_timeout = 30
 
 # Asset management
+asset_download = true                           # Auto-download from GitHub if not found
 asset_path = "~/.config/start/assets"           # Where assets are cached
 github_token_env = "GITHUB_TOKEN"               # Env var for GitHub API
 asset_repo = "start-project/start-assets"       # GitHub repo

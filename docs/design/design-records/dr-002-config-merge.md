@@ -22,9 +22,16 @@ Single configuration file with global + local merge strategy
 
 ## Rationale
 
+**Configuration structure:**
 - Single file simpler than multiple files
 - Merge allows both defaults and project-specific overrides
 - CLI commands will manage config, so complexity is hidden from users
+
+**Path choices:**
+- Global uses `~/.config/start/` following XDG Base Directory specification
+- Local uses `./.start/` following project-level tool convention (`.vscode/`, `.github/`, `.docker/`, `.git/`)
+- Not `./.config/start/` - the `.config/` pattern is for user-level configs, not project-level
+- Follows established pattern where tools use `.<toolname>/` at project root
 
 ## Related Decisions
 

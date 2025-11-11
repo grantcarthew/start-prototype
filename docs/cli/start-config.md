@@ -886,7 +886,7 @@ This is the user's responsibility. `start config edit` will launch the editor as
 
 When both global and local configs exist:
 
-1. **Settings:** Local values override global values
+1. **Settings:** Merged per-field, local overrides global for same field
 2. **Contexts:** Combined (global + local), local overrides global for same name
 3. **Agents:** Combined (global + local), local overrides global for same name
 4. **Roles:** Combined (global + local), local overrides global for same name
@@ -898,7 +898,7 @@ Global config:
 
 ```toml
 [settings]
-verbosity = "normal"
+log_level = "normal"
 default_agent = "claude"
 
 [contexts.environment]
@@ -910,7 +910,7 @@ Local config:
 
 ```toml
 [settings]
-verbosity = "verbose"  # Overrides global
+log_level = "verbose"  # Overrides global
 
 [contexts.project]
 path = "PROJECT.md"
@@ -921,7 +921,7 @@ Merged result:
 
 ```toml
 [settings]
-verbosity = "verbose"      # From local (override)
+log_level = "verbose"      # From local (override)
 default_agent = "claude"   # From global (not overridden)
 
 # Contexts: environment (global) + project (local)

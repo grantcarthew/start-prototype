@@ -77,10 +77,13 @@ start update                  # Check cached assets for updates via SHA comparis
 [settings]
 default_agent = "claude"
 default_role = "default"
+log_level = "normal"
+shell = "bash"
+command_timeout = 30
+asset_download = true  # Download from GitHub if asset not found
 asset_path = "~/.config/start/assets"
 github_token_env = "GITHUB_TOKEN"
 asset_repo = "grantcarthew/start"
-asset_download = true  # Download from GitHub if asset not found
 ```
 
 **Task configuration (tasks.toml):**

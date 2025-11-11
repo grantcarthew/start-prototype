@@ -4,7 +4,7 @@ Complete reference for `start` configuration files.
 
 ## Overview
 
-`start` uses TOML configuration files with a two-tier hierarchy:
+`start` uses [TOML](https://toml.io/) configuration files with a two-tier hierarchy:
 
 - **Global:** `~/.config/start/` - User-wide configurations (multi-file)
   - `config.toml` - Settings only
@@ -20,7 +20,7 @@ Complete reference for `start` configuration files.
   - `contexts.toml` - Project contexts
 
 **Merge behavior:**
-- Settings: Local values override global values
+- Settings: Merged per-field, local overrides global for same field
 - Agents: Combined (global + local), local overrides global for same name
 - Contexts: Combined (global + local), local overrides global for same name
 - Roles: Combined (global + local), local overrides global for same name
@@ -49,6 +49,10 @@ default_role = "code-reviewer"
 log_level = "normal"
 shell = "bash"
 command_timeout = 30
+asset_download = true
+asset_repo = "grantcarthew/start"
+github_token_env = "GITHUB_TOKEN"
+asset_path = "~/.config/start/assets"
 ```
 
 **roles.toml** (`~/.config/start/roles.toml`)
@@ -238,6 +242,14 @@ Global behavior settings. Local overrides global.
 default_agent = "claude"
 ```
 
+**default_role** (string, optional)
+: Which role to use when `--role` flag not provided and task doesn't specify a role. Must match a role name defined in `[roles]` section. If omitted, first role in config (TOML order) is used.
+
+```toml
+[settings]
+default_role = "code-reviewer"
+```
+
 **log_level** (string, optional)
 : Default output level. Overridden by command-line flags (`--quiet`, `--verbose`, `--debug`).
 
@@ -268,14 +280,51 @@ Default: 30 seconds
 command_timeout = 30
 ```
 
+**asset_download** (boolean, optional)
+: Enable automatic download of assets from GitHub catalog when not found locally. Can be overridden by `--asset-download` flag. Default: `true`
+
+```toml
+[settings]
+asset_download = true
+```
+
+**asset_repo** (string, optional)
+: GitHub repository for asset catalog. Default: `"grantcarthew/start"`
+
+```toml
+[settings]
+asset_repo = "grantcarthew/start"
+```
+
+**github_token_env** (string, optional)
+: Environment variable name containing GitHub personal access token for API requests. Recommended to avoid rate limiting. Default: `"GITHUB_TOKEN"`
+
+```toml
+[settings]
+github_token_env = "GITHUB_TOKEN"
+```
+
+**asset_path** (string, optional)
+: Local directory for caching downloaded assets. Default: `"~/.config/start/assets"`
+
+```toml
+[settings]
+asset_path = "~/.config/start/assets"
+```
+
 **Validation:**
 
 All fields use soft validation with fallback defaults:
 
 - **default_agent** misconfigured or agent not found → **Warning**, fall back to first agent in config (TOML order)
+- **default_role** misconfigured or role not found → **Warning**, fall back to first role in config (TOML order)
 - **log_level** invalid value → **Warning**, fall back to `"normal"`
 - **shell** not found in PATH → **Warning**, fall back to auto-detected shell (`bash` or `sh`)
 - **command_timeout** invalid → **Warning**, fall back to 30 seconds
+- **asset_download** invalid → **Warning**, fall back to `true`
+- **asset_repo** invalid format → **Warning**, fall back to `"grantcarthew/start"`
+- **github_token_env** invalid → **Warning**, fall back to `"GITHUB_TOKEN"`
+- **asset_path** invalid or inaccessible → **Warning**, fall back to `"~/.config/start/assets"`
 - Missing fields → Silent, use defaults
 
 **Example:**
@@ -283,9 +332,14 @@ All fields use soft validation with fallback defaults:
 ```toml
 [settings]
 default_agent = "claude"
+default_role = "code-reviewer"
 log_level = "normal"
 shell = "bash"
 command_timeout = 30
+asset_download = true
+asset_repo = "grantcarthew/start"
+github_token_env = "GITHUB_TOKEN"
+asset_path = "~/.config/start/assets"
 ```
 
 **Merge behavior:**
