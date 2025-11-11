@@ -47,10 +47,10 @@ required = true
 : Path to context document file. Supports `~` expansion and relative paths.
 
 **command** (optional)
-: Shell command to execute for dynamic content. Output replaces `{command}` placeholder.
+: Shell command to execute for dynamic content. Command string available via `{command}`, output available via `{command_output}`.
 
 **prompt** (optional)
-: Template text with `{file}` and `{command}` placeholders.
+: Template text with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`.
 
 **Context-Specific Fields:**
 
@@ -1329,8 +1329,10 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 
 Context prompt templates support these placeholders:
 
-- `{file}` - Content from `file` field (empty if not specified)
-- `{command}` - Output from `command` field (empty if not specified)
+- `{file}` - File path from `file` field (absolute, ~ expanded)
+- `{file_contents}` - Content from `file` field (empty if file missing)
+- `{command}` - Command string from `command` field
+- `{command_output}` - Output from `command` execution (empty if command fails)
 
 **Example:**
 ```toml
@@ -1338,9 +1340,9 @@ Context prompt templates support these placeholders:
 file = "~/reference/ENVIRONMENT.md"
 command = "date"
 prompt = """
-{file}
+{file_contents}
 
-Current timestamp: {command}
+Current timestamp: {command_output}
 """
 ```
 
@@ -1351,7 +1353,7 @@ Contexts can override the global shell setting:
 ```toml
 [context.git-status]
 command = "git status --short"
-prompt = "Working tree status:\n{command}"
+prompt = "Working tree status:\n{command_output}"
 shell = "bash"
 command_timeout = 5
 ```

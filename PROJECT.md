@@ -127,3 +127,16 @@ Documentation review is complete when:
 - `docs/cli/start-prompt.md`: Updated --agent, --role, and --model flag descriptions to reference DR-038
 - `docs/cli/start-task.md`: Updated task resolution section and name argument to describe prefix matching behavior
 - `docs/design/design-records/dr-033-asset-resolution-algorithm.md`: Added DR-038 to related decisions (prefix matching extends exact match)
+- **UTD Placeholder Design**: Enhanced placeholder system with four new placeholders for better flexibility
+- New placeholders: `{file}` (path), `{file_contents}` (contents), `{command}` (string), `{command_output}` (output)
+- Pattern: Short form = reference/source, long form = result/contents
+- `docs/design/unified-template-design.md`: Updated all placeholder definitions and examples with new four-placeholder system
+- `docs/design/design-records/dr-007-placeholders.md`: Updated UTD Pattern Placeholders section with detailed descriptions and use cases for all four placeholders
+- `docs/config.md`: Updated all UTD field descriptions and examples throughout roles, contexts, and tasks sections
+- `docs/tasks.md`: Updated task prompt placeholders and all code examples
+- `docs/cli/start-prompt.md`: Examples already correct (using {file} for paths)
+- `docs/cli/start-task.md`: Updated execution flow and placeholder documentation
+- `docs/cli/start-config-context.md`: Updated field descriptions and placeholder section
+- `docs/cli/start-config-role.md`: Updated field descriptions and placeholder section
+- `docs/cli/start-config-task.md`: Updated field descriptions and placeholder section
+- `docs/design/design-records/dr-009-task-structure.md`: Updated decision summary, field descriptions, placeholder definitions, execution flow, and all examples

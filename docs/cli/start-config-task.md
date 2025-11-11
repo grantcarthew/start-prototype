@@ -80,7 +80,7 @@ At least one required:
 
 - `file` - Path to prompt template file
 - `command` - Shell command for dynamic content
-- `prompt` - Template with `{file}`, `{command}`, `{instructions}` placeholders
+- `prompt` - Template with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`, `{instructions}`
 
 **Additional Fields:**
 
@@ -1363,8 +1363,10 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 ### Placeholders
 
 **Task prompt templates:**
-- `{file}` - Content from task `file`
-- `{command}` - Output from task `command`
+- `{file}` - File path from task `file` (absolute, ~ expanded)
+- `{file_contents}` - Content from task `file`
+- `{command}` - Command string from task `command`
+- `{command_output}` - Output from task `command` execution
 - `{instructions}` - User's command-line arguments (or "None")
 - `{model}`, `{date}` - Global placeholders
 

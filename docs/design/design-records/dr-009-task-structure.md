@@ -6,7 +6,7 @@
 
 ## Decision
 
-Tasks are predefined workflows that reference roles by name, use the Unified Template Design (UTD) pattern for prompts, and support task-specific placeholders including `{instructions}` and `{command}`.
+Tasks are predefined workflows that reference roles by name, use the Unified Template Design (UTD) pattern for prompts, and support task-specific placeholders including `{instructions}`, `{file}`, `{file_contents}`, `{command}`, and `{command_output}`.
 
 ## Complete Task Configuration
 
@@ -29,7 +29,7 @@ Analyze the following git diff and act as a code reviewer.
 ## Git Diff
 
 ```diff
-{command}
+{command_output}
 ```
 
 """
@@ -71,17 +71,17 @@ Tasks use the **Unified Template Design (UTD)** pattern for prompt templates.
 
 **file** (string, optional)
 - Path to prompt template file
-- File contents available via `{file}` placeholder
+- File path available via `{file}`, contents available via `{file_contents}`
 
 **command** (string, optional)
 - Shell command to generate dynamic content
 - Example: `"git diff --staged"`
-- Output available via `{command}` placeholder
+- Command string available via `{command}`, output available via `{command_output}`
 - Stderr and stdout both captured
 
 **prompt** (string, optional)
 - Prompt template text
-- Can use `{file}`, `{command}`, and `{instructions}` placeholders
+- Can use `{file}`, `{file_contents}`, `{command}`, `{command_output}`, and `{instructions}` placeholders
 - Can be multi-line string
 
 **UTD Requirement:** At least one of `file`, `command`, or `prompt` must be present.
@@ -141,22 +141,34 @@ Available in task prompt templates only (not in role prompts or context prompts)
 - Example: `start task gdr "focus on security"` → `{instructions}` = `"focus on security"`
 - Example: `start task gdr` → `{instructions}` = `"None"`
 
-**{command}** - Output from task's `command` field
-- Value: Stdout and stderr from command execution
-- Empty case: Empty string if no command defined
-- Example: `command = "git diff --staged"` → `{command}` = git diff output
-
-**{file}** - Content from task's `file` field
-- Value: File contents
+**{file}** - File path from task's `file` field
+- Value: Absolute file path (~ expanded)
 - Empty case: Empty string if no file defined
-- Example: `file = "./template.md"` → `{file}` = template contents
+- Example: `file = "./template.md"` → `{file}` = `"/Users/username/project/template.md"`
+
+**{file_contents}** - Content from task's `file` field
+- Value: File contents
+- Empty case: Empty string if no file defined or file missing
+- Example: `file = "./template.md"` → `{file_contents}` = template contents
+
+**{command}** - Command string from task's `command` field
+- Value: Command string as written
+- Empty case: Empty string if no command defined
+- Example: `command = "git diff --staged"` → `{command}` = `"git diff --staged"`
+
+**{command_output}** - Output from task's `command` execution
+- Value: Stdout and stderr from command execution
+- Empty case: Empty string if no command defined or command fails
+- Example: `command = "git diff --staged"` → `{command_output}` = git diff output
 
 ## All Placeholders Available in Task Prompts
 
 **Task-specific:**
 - `{instructions}` - User's CLI arguments
-- `{command}` - Task command output
-- `{file}` - Task file contents
+- `{file}` - Task file path
+- `{file_contents}` - Task file contents
+- `{command}` - Task command string
+- `{command_output}` - Task command output
 
 **Global (available everywhere):**
 - `{model}` - Current model name
@@ -197,11 +209,11 @@ When `start task <name>` is executed:
 
 5. **Build task prompt:**
    - Load from `file` if specified
-   - Execute `command` if specified (output to `{command}`)
+   - Execute `command` if specified
    - Process `prompt` template
    - Replace `{instructions}` with user args (or "None")
-   - Replace `{command}` with command output (or empty)
-   - Replace `{file}` with file contents (or empty)
+   - Replace `{file}` with file path, `{file_contents}` with file contents
+   - Replace `{command}` with command string, `{command_output}` with command output
    - Replace global placeholders (`{model}`, `{date}`)
 
 6. **Assemble final prompt:**
@@ -264,7 +276,7 @@ command = "git diff --staged -- '*.go'"
 prompt = """
 Review Go code changes:
 
-{command}
+{command_output}
 
 Focus: {instructions}
 """
@@ -292,7 +304,7 @@ Review these changes:
 
 ## Changes
 ```diff
-{command}
+{command_output}
 ```
 """
 ```
@@ -314,7 +326,7 @@ file = "./README.md"
 prompt = """
 Review this documentation:
 
-{file}
+{file_contents}
 
 Improvements needed: {instructions}
 """
@@ -344,7 +356,7 @@ git log --oneline --grep="api" -5
 prompt = """
 Review API endpoints:
 
-{command}
+{command_output}
 
 Focus: {instructions}
 """
@@ -399,7 +411,7 @@ prompt = "Review: {instructions}"
 [tasks.code-review]
 role = "go-expert"
 command = "git diff --staged"
-prompt = "Review Go code: {command}"
+prompt = "Review Go code: {command_output}"
 ```
 
 Result: Local task used, global ignored.

@@ -184,7 +184,8 @@ start task <name> [instructions]
    - Execute `command` if specified
    - Process `prompt` template with placeholders
    - Replace `{instructions}` with user's args (or "None")
-   - Replace `{command}` with command output (or empty string)
+   - Replace `{file}` with file path, `{file_contents}` with file contents
+   - Replace `{command}` with command string, `{command_output}` with command output
    - Replace global placeholders ({model}, {date})
    - Insert required context document prompts first
 9. Display task summary (unless verbose/debug)
@@ -219,7 +220,7 @@ Review the following changes:
 
 ## Changes
 ```diff
-{command}
+{command_output}
 ````
 
 """
@@ -604,7 +605,7 @@ Exit code: 2
 - Auto-includes ONLY contexts where `required = true`
 - Can run task `command` for dynamic content (UTD)
 - Task prompt from UTD fields (`file`, `command`, `prompt`)
-- `{instructions}` and `{command}` placeholders available
+- Task-specific placeholders: `{instructions}`, `{file}`, `{file_contents}`, `{command}`, `{command_output}`
 
 **`start` (root):**
 
@@ -621,20 +622,18 @@ Task prompt templates support these placeholders:
 **Task-specific:**
 
 - `{instructions}` - User's command-line arguments (or "None")
-- `{command}` - Output from task `command` field (or empty string)
+
+**UTD placeholders (from task's UTD fields):**
+
+- `{file}` - File path from task `file` field (absolute, ~ expanded)
+- `{file_contents}` - Content from task `file` field
+- `{command}` - Command string from task `command` field
+- `{command_output}` - Output from task `command` execution (or empty string)
 
 **Global:**
 
 - `{model}` - Model name
 - `{date}` - Current timestamp (ISO 8601)
-- `{file}` - File contents (in UTD file fields)
-
-**Task prompt placeholders:**
-
-In task prompt (`file`, `command`, `prompt`):
-- `{file}` - Content from task `file`
-- `{command}` - Output from task `command`
-- `{instructions}` - User's arguments
 
 ### Required Context Handling
 

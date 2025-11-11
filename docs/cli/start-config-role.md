@@ -52,10 +52,10 @@ Focus on security and performance.
 : Path to system prompt file. Supports `~` expansion and relative paths.
 
 **command** (optional)
-: Shell command to execute for dynamic content. Output replaces `{command}` placeholder.
+: Shell command to execute for dynamic content. Command string available via `{command}`, output available via `{command_output}`.
 
 **prompt** (optional)
-: Template text with `{file}` and `{command}` placeholders.
+: Template text with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`.
 
 **Additional Fields:**
 
@@ -1378,8 +1378,10 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 
 Role templates support these placeholders:
 
-- `{file}` - Content from `file` field (empty if not specified)
-- `{command}` - Output from `command` field (empty if not specified)
+- `{file}` - File path from `file` field (absolute, ~ expanded)
+- `{file_contents}` - Content from `file` field (empty if file missing)
+- `{command}` - Command string from `command` field
+- `{command_output}` - Output from `command` execution (empty if command fails)
 
 **Example:**
 ```toml
@@ -1387,9 +1389,9 @@ Role templates support these placeholders:
 file = "~/.config/start/roles/reviewer.md"
 command = "git branch --show-current"
 prompt = """
-{file}
+{file_contents}
 
-Current branch: {command}
+Current branch: {command_output}
 """
 ```
 
@@ -1400,7 +1402,7 @@ Roles can override the global shell setting:
 ```toml
 [roles.git-reviewer]
 command = "git log -1 --format='%s'"
-prompt = "Current commit: {command}"
+prompt = "Current commit: {command_output}"
 shell = "bash"
 command_timeout = 5
 ```
