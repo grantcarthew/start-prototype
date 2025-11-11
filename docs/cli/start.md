@@ -485,7 +485,7 @@ Available agents:
   - gemini
   - opencode
 
-Use 'start agent list' to see details.
+Use 'start config agent list' to see details.
 ```
 
 Exit code: 2

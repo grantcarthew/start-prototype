@@ -145,3 +145,8 @@ Documentation review is complete when:
 - `docs/config.md`: Updated Asset Resolution & Lazy-Loading section to include contexts as downloadable asset type
 - `docs/design/design-records/dr-032-asset-metadata-schema.md`: Added contexts to asset types list
 - `docs/design/design-records/dr-022-asset-branch-strategy.md`: Added contexts to asset types in three locations (content list, benefits, rationale)
+- **Command name corrections**: Fixed all instances of `start agent` to `start config agent` (there is no `start agent` command)
+- `docs/config.md`: Changed `start agent list` to `start config agent list`
+- `docs/cli/start.md`: Changed `start agent list` to `start config agent list`
+- `docs/cli/start-doctor.md`: Changed `start agent remove` to `start config agent remove` and `start agent test` to `start config agent test`
+- `docs/cli/start-config-agent.md`: Changed `start agent list` to `start config agent list` and two instances of `start agent remove` to `start config agent remove`

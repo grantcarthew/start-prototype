@@ -311,7 +311,7 @@ command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 ```
 
 **description** (string, optional)
-: Human-readable description of the agent. Displayed in `start agent list`.
+: Human-readable description of the agent. Displayed in `start config agent list`.
 
 ```toml
 [agents.claude]

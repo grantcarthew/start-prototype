@@ -104,7 +104,7 @@ Agents (3 configured)
   ✗ aichat
     Binary: NOT FOUND
     Install: brew install aichat
-    Or remove: start agent remove aichat
+    Or remove: start config agent remove aichat
 
 Tasks (4 configured)
   ✓ code-review (cr)
@@ -337,7 +337,7 @@ Tests all configured agents.
 - Model configuration
 - Default model set
 
-Similar to `start agent test` but for all agents.
+Similar to `start config agent test` but for all agents.
 
 **Output example:**
 

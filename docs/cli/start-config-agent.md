@@ -55,7 +55,7 @@ default_model = "sonnet"
 : Command template to execute the agent. Supports placeholders: `{model}`, `{role}`, `{role_file}`, `{prompt}`, `{date}`.
 
 **description** (optional)
-: Human-readable description of the agent. Displayed in `start agent list` and help output.
+: Human-readable description of the agent. Displayed in `start config agent list` and help output.
 
 **url** (optional)
 : Documentation or homepage URL for the agent tool.
@@ -868,7 +868,7 @@ Use 'start config agent list' to see remaining agents.
 Removes specific agent directly (with confirmation):
 
 ```bash
-start agent remove gemini
+start config agent remove gemini
 ```
 
 Output:
@@ -890,7 +890,7 @@ Use 'start config agent list' to see remaining agents.
 If removing the agent that's set as `default_agent`:
 
 ```bash
-start agent remove claude
+start config agent remove claude
 ```
 
 Output:
