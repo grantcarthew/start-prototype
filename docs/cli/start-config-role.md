@@ -13,6 +13,7 @@ start config role new [scope]
 start config role show [scope]
 start config role edit [scope]
 start config role remove [scope]
+start config role default [name]
 start config role test
 ```
 
@@ -27,6 +28,7 @@ Manages role configuration in config files. Roles define the AI agent's persona 
 - **show** - Display current role configurations
 - **edit** - Modify a role (create if doesn't exist)
 - **remove** - Remove a role configuration
+- **default** - Set or show default role
 - **test** - Verify role configuration and file availability
 
 **Note:** Roles use the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern. Roles are defined as `[roles.<name>]` sections in both global and local configs. Global + local roles are combined; local overrides global for same role name.
@@ -898,6 +900,129 @@ Role not removed.
 ```
 
 Exit code: 3
+
+### start config role default
+
+Set or show the default role.
+
+**Synopsis:**
+
+```bash
+start config role default          # Show current default
+start config role default <name>   # Set default role
+```
+
+**Behavior:**
+
+Without a role name, shows the current default role. With a role name, sets it as the default in the `[settings]` section of global config.
+
+**Output (show current default):**
+
+```bash
+start config role default
+```
+
+Output:
+
+```
+Default role: code-reviewer
+  Expert code reviewer focusing on security
+  Source: ~/.config/start/roles.toml
+
+Use 'start config role default <name>' to change.
+```
+
+**No default set:**
+
+If `default_role` is not configured in `[settings]`:
+
+```
+No default role configured.
+
+First role in config will be used: code-reviewer
+
+Use 'start config role default <name>' to set explicitly.
+```
+
+Exit code: 0
+
+**Setting default (no previous default):**
+
+```bash
+start config role default security-auditor
+```
+
+Output:
+
+```
+Backing up config to config.2025-01-06-113045.toml...
+✓ Backup created
+
+Setting default role to 'security-auditor'...
+✓ Default role set to 'security-auditor'
+
+Use 'start' to launch with default role.
+Use 'start config role default' to confirm.
+```
+
+Exit code: 0
+
+**Updating existing default:**
+
+```bash
+start config role default go-expert
+```
+
+Output:
+
+```
+Current default: code-reviewer
+
+Backing up config to config.2025-01-06-113112.toml...
+✓ Backup created
+
+Setting default role to 'go-expert'...
+✓ Default role changed: code-reviewer → go-expert
+
+Use 'start' to launch with new default.
+```
+
+Exit code: 0
+
+**Exit codes:**
+
+- 0 - Success (default shown or set)
+- 1 - No roles configured
+- 2 - Role not found
+- 3 - File system error (cannot write config, backup failed)
+
+**Error handling:**
+
+**Role not found:**
+
+```
+Error: Role 'nonexistent' not found in configuration.
+
+Available roles:
+  - code-reviewer
+  - security-auditor
+  - go-expert
+
+Use 'start config role list' for details.
+```
+
+Exit code: 2
+
+**No roles configured:**
+
+```
+Error: No roles configured.
+
+Use 'start config role add' to add a role.
+Use 'start init' to set up roles automatically.
+```
+
+Exit code: 1
 
 ### start config role test
 

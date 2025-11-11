@@ -181,3 +181,7 @@ Documentation review is complete when:
 - `docs/ideas/catalog-based-assets.md`: Added `asset_download = true` to settings block (line 358)
 - `PROJECT-backlog.md`: Added `asset_download = true` to settings block (line 259)
 - `docs/design/design-records/dr-031-catalog-based-assets.md`: Added missing basic settings (`log_level`, `shell`, `command_timeout`) to complete the example (lines 80-82)
+- **New command: start config role default**: Added documentation for setting/showing default role
+- `docs/cli/start-config-role.md`: Added `start config role default [name]` to Synopsis (line 16)
+- `docs/cli/start-config-role.md`: Added "default" to role management operations list (line 31)
+- `docs/cli/start-config-role.md`: Added complete section documenting the default subcommand with examples (lines 904-1025)
