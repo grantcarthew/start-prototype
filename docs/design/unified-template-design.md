@@ -22,8 +22,10 @@ UTD uses three optional fields that work together via placeholders:
 
 **Placeholders:**
 
-- `{file}` - Replaced with contents from `file` path
-- `{command}` - Replaced with output from `command` execution
+- `{file}` - Replaced with file path (absolute, with ~ expanded)
+- `{file_contents}` - Replaced with file contents
+- `{command}` - Replaced with command string as written
+- `{command_output}` - Replaced with command execution output (stdout/stderr)
 
 **At least one field must be present.**
 
@@ -40,8 +42,8 @@ file = "~/reference/ENVIRONMENT.md"
 
 **Behavior:**
 
-- If file exists → Contents available via `{file}` placeholder
-- If file missing → **Warning**: `"File not found: {path}"`, `{file}` replaced with empty string
+- If file exists → Path available via `{file}`, contents available via `{file_contents}`
+- If file missing and prompt uses `{file}` or `{file_contents}` → **Warning**, skip entire section
 
 ### command (string, optional)
 
@@ -63,12 +65,12 @@ git log -5 --oneline
 
 - Command executed in working directory
 - stdout and stderr both captured
-- Output available via `{command}` placeholder
+- Command string available via `{command}`, output available via `{command_output}`
 - Subject to timeout (see `command_timeout`)
 
 ### prompt (string, optional)
 
-Template text that can contain `{file}` and/or `{command}` placeholders.
+Template text that can contain placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`.
 
 ```toml
 prompt = "Let's process this step by step."
@@ -81,10 +83,10 @@ prompt = "Read {file} for context."
 ```toml
 prompt = """
 Project Status:
-{file}
+{file_contents}
 
 Recent Activity:
-{command}
+{command_output}
 """
 ```
 
@@ -208,8 +210,8 @@ prompt = "Important: This project uses Go 1.21"
 
 **Behavior:**
 
-- Prompt contains `{file}` → **Warning**: `"No file defined but prompt uses {file}"`, ignore section
-- Prompt contains `{command}` → **Warning**: `"No command defined but prompt uses {command}"`, ignore section
+- Prompt contains `{file}` or `{file_contents}` → **Warning**: `"No file defined but prompt uses {file}"`, ignore section
+- Prompt contains `{command}` or `{command_output}` → **Warning**: `"No command defined but prompt uses {command}"`, ignore section
 - Otherwise → **Use prompt as-is** (inline text) ✓
 
 ### 4. `file` + `command` (no `prompt`)
@@ -223,16 +225,16 @@ command = "git log -5 --oneline"
 **Behavior:**
 
 - Read file contents
-- If file contains `{command}` → Execute command, inject into `{command}`, **use result** ✓
-- If file doesn't contain `{command}` → **Warning**: `"Command defined but not used"`, ignore command, use file as-is ✓
+- If file contains `{command}` or `{command_output}` → Execute command, inject into placeholder, **use result** ✓
+- If file doesn't contain `{command}` or `{command_output}` → **Warning**: `"Command defined but not used"`, ignore command, use file as-is ✓
 
-**Example file with `{command}`:**
+**Example file with `{command_output}`:**
 
 ```markdown
 # Project Status
 
 Last 5 commits:
-{command}
+{command_output}
 ```
 
 Result:
@@ -256,21 +258,21 @@ prompt = "Read {file} for environment context."
 
 **Behavior:**
 
-- Prompt contains `{file}` → Read file, inject into `{file}`, **use prompt** ✓
-- Prompt doesn't contain `{file}` → **Warning**: `"File defined but not used"`, ignore file, use prompt as-is
+- Prompt contains `{file}` or `{file_contents}` → Read file, inject into placeholder, **use prompt** ✓
+- Prompt doesn't contain `{file}` or `{file_contents}` → **Warning**: `"File defined but not used"`, ignore file, use prompt as-is
 
 ### 6. `command` + `prompt`
 
 ```toml
 [context.status]
 command = "git status --short"
-prompt = "Current status:\n{command}"
+prompt = "Current status:\n{command_output}"
 ```
 
 **Behavior:**
 
-- Prompt contains `{command}` → Execute command, inject into `{command}`, **use prompt** ✓
-- Prompt doesn't contain `{command}` → **Warning**: `"Command defined but not used"`, ignore command, use prompt as-is
+- Prompt contains `{command}` or `{command_output}` → Execute command, inject into placeholder, **use prompt** ✓
+- Prompt doesn't contain `{command}` or `{command_output}` → **Warning**: `"Command defined but not used"`, ignore command, use prompt as-is
 
 ### 7. All three (`file` + `command` + `prompt`)
 
@@ -280,18 +282,18 @@ file = "./PROJECT.md"
 command = "git status --short"
 prompt = """
 Project Documentation:
-{file}
+{file_contents}
 
 Current Status:
-{command}
+{command_output}
 """
 ```
 
 **Behavior:**
 
-- Both `{file}` and `{command}` used in prompt → **Inject both, use prompt** ✓
-- `{file}` missing from prompt → **Warning**: `"File defined but not used"`, ignore file
-- `{command}` missing from prompt → **Warning**: `"Command defined but not used"`, ignore command
+- Placeholders used in prompt → **Inject values, use prompt** ✓
+- `{file}` or `{file_contents}` missing from prompt → **Warning**: `"File defined but not used"`, ignore file
+- `{command}` or `{command_output}` missing from prompt → **Warning**: `"Command defined but not used"`, ignore command
 
 ### 8. Empty section (no fields)
 
@@ -352,7 +354,7 @@ Injects file contents into prompt template.
 command = "git log -5 --oneline"
 prompt = """
 Recent commits:
-{command}
+{command_output}
 
 Focus on these changes during the session.
 """
@@ -369,7 +371,7 @@ Create a PROJECT.md file:
 
 ## Recent Activity
 
-{command}
+{command_output}
 
 ## Status
 
@@ -384,7 +386,7 @@ file = "./PROJECT.md"
 command = "git log -3 --oneline"
 ```
 
-Result includes git log output where `{command}` appears in the file.
+Result includes git log output where `{command_output}` appears in the file.
 
 ### Combined: File + Command + Prompt
 
@@ -396,10 +398,10 @@ prompt = """
 # Full Project Context
 
 ## Documentation
-{file}
+{file_contents}
 
 ## Working Tree
-{command}
+{command_output}
 
 Use this context to understand current project state.
 """
@@ -417,7 +419,7 @@ const pkg = require('./package.json');
 console.log(`${pkg.name}@${pkg.version}`);
 console.log(`Dependencies: ${Object.keys(pkg.dependencies).length}`);
 """
-prompt = "Package details:\n{command}"
+prompt = "Package details:\n{command_output}"
 ```
 
 ### Python Analysis
@@ -432,7 +434,7 @@ py_files = [f for f in os.listdir('.') if f.endswith('.py')]
 print(f"Python files: {len(py_files)}")
 print('\\n'.join(py_files))
 """
-prompt = "Python project files:\n{command}"
+prompt = "Python project files:\n{command_output}"
 ```
 
 ### Bun Runtime
@@ -441,7 +443,7 @@ prompt = "Python project files:\n{command}"
 [context.bun-version]
 shell = "bun"
 command = "console.log(Bun.version)"
-prompt = "Using Bun {command}"
+prompt = "Using Bun {command_output}"
 ```
 
 ### Deno Example
@@ -450,7 +452,7 @@ prompt = "Using Bun {command}"
 [context.deno-check]
 shell = "deno"
 command = "console.log(Deno.version.deno)"
-prompt = "Deno runtime: {command}"
+prompt = "Deno runtime: {command_output}"
 ```
 
 ## Where UTD is Used
@@ -462,9 +464,9 @@ prompt = "Deno runtime: {command}"
 file = "./ROLE.md"
 command = "git log -1 --format='%s'"
 prompt = """
-Role: {file}
+Role: {file_contents}
 
-Current task: {command}
+Current task: {command_output}
 """
 ```
 
@@ -478,7 +480,7 @@ required = true
 
 [context.git-status]
 command = "git status --short"
-prompt = "Repository state:\n{command}"
+prompt = "Repository state:\n{command_output}"
 ```
 
 ### [tasks.\<name\>] - System Prompt Override
@@ -490,7 +492,7 @@ command = "git diff --staged"
 prompt = """
 Review these changes:
 
-{command}
+{command_output}
 
 Instructions: {instructions}
 """
@@ -505,7 +507,7 @@ Note: Tasks reference roles by name using the `role` field. The role itself can 
 # Standard task prompt fields
 file = "./prompts/review-template.md"
 command = "git diff --staged"
-prompt = "Review this diff:\n{command}"
+prompt = "Review this diff:\n{command_output}"
 # ... other task fields
 ```
 
@@ -531,9 +533,9 @@ Commands inherit the current shell environment plus:
 
 ### Error Handling
 
-- File not found → Warning, `{file}` = empty string
-- Command fails → Warning, `{command}` = empty string (or partial output)
-- Command timeout → Warning, `{command}` = output captured before timeout
+- File not found and prompt uses `{file}` or `{file_contents}` → Warning, skip entire section
+- Command fails → Warning, `{command_output}` = empty string (or partial output)
+- Command timeout → Warning, `{command_output}` = output captured before timeout
 - Shell not found → Error, section ignored
 
 ### Security Considerations
