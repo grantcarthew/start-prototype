@@ -260,7 +260,7 @@ Executing command...
 [DEBUG] Reading local config: ./.start/config.toml
 [DEBUG] Local config loaded: 12 lines, 1 section
 [DEBUG] Merging configs...
-[DEBUG]   context.documents.agents: "./AGENTS.md" (overridden by local)
+[DEBUG]   context.agents: "./AGENTS.md" (overridden by local)
 [DEBUG]   ... (other merge details)
 
 [DEBUG] Agent resolution:
@@ -532,7 +532,7 @@ Exit code: 3
 
 **No context documents configured:**
 
-If the `[context.documents]` section is empty or missing:
+If the `[context]` section is empty or missing:
 
 ```
 Context documents: (none configured)
@@ -562,16 +562,9 @@ Run 'start init' to create initial configuration.
 
 **Local config only:**
 
-If local `./.start/config.toml` exists but no global config:
+If local `./.start/config.toml` exists but no global config, this is **valid** and the tool works normally. No error is shown. Per DR-004, agents can be defined in both global and local configs.
 
-```
-Error: No global configuration found at ~/.config/start/config.toml
-
-Run 'start init' to create global configuration, or ensure
-agents are defined in local config.
-```
-
-Note: Per DR-004, agents can be defined in both global and local configs. If using only local config, at least one agent must be defined. For shared team configurations, defining agents in local `./.start/config.toml` allows the config to be committed to version control.
+Use case: Team configurations where `./.start/` contains all necessary config (agents, roles, tasks, contexts) and is committed to version control. No global config required.
 
 **All context documents missing:**
 

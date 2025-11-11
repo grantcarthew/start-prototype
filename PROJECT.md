@@ -150,3 +150,7 @@ Documentation review is complete when:
 - `docs/cli/start.md`: Changed `start agent list` to `start config agent list`
 - `docs/cli/start-doctor.md`: Changed `start agent remove` to `start config agent remove` and `start agent test` to `start config agent test`
 - `docs/cli/start-config-agent.md`: Changed `start agent list` to `start config agent list` and two instances of `start agent remove` to `start config agent remove`
+- **Local-only config support**: Fixed documentation to reflect that local config can be used without global config
+- `docs/cli/start-config.md`: Changed "Agents: (none - agents must be defined in global config)" to "Agents: (none configured)" (line 178)
+- `docs/cli/start-config.md`: Fixed Configuration Merge Behavior section - agents, roles, and tasks can all be in both global and local configs with merge behavior (lines 889-893)
+- `docs/cli/start.md`: Fixed "Local config only" section - removed error message, clarified that local-only config is valid (no global config required)

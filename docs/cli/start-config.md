@@ -175,8 +175,8 @@ Contexts (2)
     Required: no
     Prompt: Read for agent instructions
 
-Agents: (none - agents must be defined in global config)
-Roles: (none)
+Agents: (none configured)
+Roles: (none configured)
 ```
 
 **Verbose output:**
@@ -887,9 +887,10 @@ This is the user's responsibility. `start config edit` will launch the editor as
 When both global and local configs exist:
 
 1. **Settings:** Local values override global values
-2. **Contexts:** Combined (global + local), names must be unique
-3. **Agents:** Only from global (local cannot define agents per DR-004)
-4. **Roles:** Only from global (local cannot define roles)
+2. **Contexts:** Combined (global + local), local overrides global for same name
+3. **Agents:** Combined (global + local), local overrides global for same name
+4. **Roles:** Combined (global + local), local overrides global for same name
+5. **Tasks:** Combined (global + local), local overrides global for same name
 
 **Example:**
 
