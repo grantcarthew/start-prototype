@@ -72,7 +72,7 @@ agent = "go-expert"
 description = "Review Go code with specialized agent"
 ```
 
-If omitted, uses the `default_agent` from settings, or the first agent defined in config (TOML order) if no default is set.
+If omitted, uses the `default_agent` from settings (resolved via asset resolution algorithm), or the first agent in local/global config (TOML order) if no default is set.
 
 **Use cases:**
 - Specialized agents for specific languages or domains
@@ -81,14 +81,14 @@ If omitted, uses the `default_agent` from settings, or the first agent defined i
 - Tool-specific features (vision, artifacts, etc.)
 
 **Validation:**
-- Agent name must match an existing `[agents.<name>]` section
-- Validated at task execution time
-- Also checked by `start doctor` and `start config validate`
+- Agent name resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog)
+- Resolved at task execution time (may download from catalog if `asset_download = true`)
+- Configured agents checked by `start doctor` and `start config validate`
 
 ### Role Field
 
 **role** (string, optional)
-: Preferred role for this task. Must reference a role defined in `[roles.<name>]` configuration.
+: Preferred role for this task. Resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog).
 
 **Role Selection Precedence:**
 1. CLI `--role` flag (highest priority)
@@ -104,9 +104,9 @@ description = "Security-focused code audit"
 ```
 
 **Validation:**
-- Role name must match an existing `[roles.<name>]` section
-- Validated at task execution time
-- Also checked by `start doctor` and `start config validate`
+- Role name resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog)
+- Resolved at task execution time (may download from catalog if `asset_download = true`)
+- Configured roles checked by `start doctor` and `start config validate`
 
 **Use cases:**
 - Task-specific AI personas (security auditor, code reviewer, documentation writer)

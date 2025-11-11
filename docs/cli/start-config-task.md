@@ -72,7 +72,7 @@ command_timeout = 10
 
 Optional field. If omitted, uses `default_role` setting or first role in config.
 
-- `role` - Name of role defined in `[roles.<name>]` section
+- `role` - Role name (resolved via asset resolution algorithm: local config → global config → cache → GitHub catalog)
 
 **Task Prompt (UTD):**
 

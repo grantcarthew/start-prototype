@@ -235,7 +235,7 @@ Global behavior settings. Local overrides global.
 **Fields:**
 
 **default_agent** (string, optional)
-: Which agent to use when `--agent` flag not provided. Must match an agent name defined in `[agents]` section.
+: Which agent to use when `--agent` flag not provided. Resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog).
 
 ```toml
 [settings]
@@ -243,7 +243,7 @@ default_agent = "claude"
 ```
 
 **default_role** (string, optional)
-: Which role to use when `--role` flag not provided and task doesn't specify a role. Must match a role name defined in `[roles]` section. If omitted, first role in config (TOML order) is used.
+: Which role to use when `--role` flag not provided and task doesn't specify a role. Resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog). If omitted, first role in config (TOML order) is used.
 
 ```toml
 [settings]
