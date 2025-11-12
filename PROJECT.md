@@ -290,3 +290,5 @@ Documentation review is complete when:
 - `docs/cli/start-doctor.md`: Updated verbose output to show multi-file config validation with all 5 files (lines 192-207)
 - `docs/design/design-records/dr-019-task-loading.md`: Changed task source paths from config.toml to tasks.toml (lines 16-17)
 - `docs/ideas/catalog-based-assets.md`: Changed resolution order from config.toml to tasks.toml for task resolution (lines 339-340)
+- **Fixed nested code fence in tasks.md**: Upgraded outer fence to 5 backticks for toml block containing nested diff block (broke GitHub markdown rendering)
+- `docs/tasks.md`: Changed outer fence from 3 to 5 backticks for "Task with Role Reference" example (lines 255-273)

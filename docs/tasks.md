@@ -252,7 +252,7 @@ Usage: `start task cr "check error handling"`
 
 ### Task with Role Reference
 
-```toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 description = "Review staged git changes"
@@ -270,7 +270,7 @@ Review the following git diff.
 {command_output}
 ```
 """
-```
+`````
 
 Usage: `start task gdr "focus on security"`
 
