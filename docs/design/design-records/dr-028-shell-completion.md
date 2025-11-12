@@ -72,7 +72,7 @@ start config <Tab>
 # Shows: show, edit, path, validate, agent, context, task, role
 
 start config agent <Tab>
-# Shows: list, add, test, edit, remove, default
+# Shows: list, add, new, show, test, edit, remove, default
 ```
 
 Flags:

@@ -50,28 +50,39 @@ start update                 # Update asset library
 All follow consistent pattern:
 
 ```bash
-start config agent list
-start config agent add
-start config agent edit [name]
-start config agent remove [name]
+start config agent list [scope]
+start config agent add [name] [scope]
+start config agent new [scope]
+start config agent show [name] [scope]
 start config agent test <name>
+start config agent edit [name] [scope]
+start config agent remove [name] [scope]
 start config agent default [name]
 
-start config context list
-start config context add
-start config context edit [name]
-start config context remove [name]
+start config context list [scope]
+start config context add [name] [scope]
+start config context new [scope]
+start config context show [name] [scope]
 start config context test <name>
+start config context edit [name] [scope]
+start config context remove [name] [scope]
 
-start config task list
-start config task add
-start config task edit [name]
-start config task remove [name]
+start config task list [scope]
+start config task add [name] [scope]
+start config task new [scope]
+start config task show [name] [scope]
+start config task test <name>
+start config task edit [name] [scope]
+start config task remove [name] [scope]
 
-start config role list
-start config role add
-start config role edit [name]
-start config role remove [name]
+start config role list [scope]
+start config role add [path]
+start config role new [scope]
+start config role show [scope]
+start config role test
+start config role edit [scope]
+start config role remove [scope]
+start config role default [name]
 ```
 
 ## Benefits
