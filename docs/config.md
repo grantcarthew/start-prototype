@@ -398,8 +398,8 @@ default_model = "sonnet"
 
 Agents can be defined in both **global and local** configs (per DR-004 update):
 
-- **Global agents:** `~/.config/start/config.toml` - Personal configurations
-- **Local agents:** `./.start/config.toml` - Team/project configurations (can be committed)
+- **Global agents:** `~/.config/start/agents.toml` - Personal configurations
+- **Local agents:** `./.start/agents.toml` - Team/project configurations (can be committed)
 - **Merge behavior:** Local overrides global for same agent name
 - **Use case:** Teams can commit `.start/` with standard configs; individuals maintain personal preferences
 

@@ -19,8 +19,8 @@ Tasks allow you to define reusable AI-assisted workflows. Each task can:
 
 Tasks are defined in both global and local config files:
 
-- **Global:** `~/.config/start/config.toml` - Shared tasks across all projects
-- **Local:** `./.start/config.toml` - Project-specific tasks
+- **Global:** `~/.config/start/tasks.toml` - Shared tasks across all projects
+- **Local:** `./.start/tasks.toml` - Project-specific tasks
 
 Tasks use the section name `[tasks.<name>]` where `<name>` is a unique identifier.
 
@@ -195,11 +195,11 @@ prompt = "Review the code. {instructions}"
 
 Tasks can be defined in **both global and local** configs:
 
-**Global tasks:** `~/.config/start/config.toml`
+**Global tasks:** `~/.config/start/tasks.toml`
 - Shared across all projects
 - Default tasks (cr, gdr, ct, dr)
 
-**Local tasks:** `./.start/config.toml`
+**Local tasks:** `./.start/tasks.toml`
 - Project-specific workflows
 - Override global tasks by using same name
 
@@ -352,7 +352,7 @@ Recommendations: {instructions}
 ### Project-Specific Task (Local Config)
 
 ```toml
-# ./.start/config.toml
+# ./.start/tasks.toml
 [tasks.validate-go]
 alias = "vgo"
 agent = "go-expert"
@@ -410,13 +410,13 @@ prompt = "Quick lint: {command_output}"
 ### Override Global Task (Local Config)
 
 ```toml
-# Global: ~/.config/start/config.toml
+# Global: ~/.config/start/tasks.toml
 [tasks.code-review]
 alias = "cr"
 role = "reviewer"
 prompt = "Review code: {instructions}"
 
-# Local: ./.start/config.toml (overrides global)
+# Local: ./.start/tasks.toml (overrides global)
 [tasks.code-review]
 alias = "cr"
 role = "go-expert"

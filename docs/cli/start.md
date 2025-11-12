@@ -107,8 +107,8 @@ start -d ~/my-project
 
 ### Execution Flow
 
-1. Load global config (`~/.config/start/config.toml`)
-2. Load local config (`./.start/config.toml`) if exists
+1. Load global config (`~/.config/start/`)
+2. Load local config (`./.start/`) if exists
 3. Merge configs (local overrides global)
 4. Detect ALL context documents (check which files exist)
    - Includes both `required = true` and `required = false` documents
@@ -211,8 +211,8 @@ Executing command...
 
 ```
 Loading configuration...
-  Global: ~/.config/start/config.toml
-  Local:  ./.start/config.toml (found)
+  Global: ~/.config/start/ (5 files)
+  Local:  ./.start/ (found, 2 files)
   Merged: 3 sections
 
 Resolving agent: claude (default)
@@ -255,10 +255,14 @@ Executing command...
 
 ```
 [DEBUG] Config loader initialized
-[DEBUG] Reading global config: ~/.config/start/config.toml
-[DEBUG] Global config loaded: 245 lines, 3 sections
-[DEBUG] Reading local config: ./.start/config.toml
-[DEBUG] Local config loaded: 12 lines, 1 section
+[DEBUG] Reading global config: ~/.config/start/
+[DEBUG]   config.toml: 45 lines (settings)
+[DEBUG]   agents.toml: 67 lines (2 agents)
+[DEBUG]   roles.toml: 34 lines (1 role)
+[DEBUG]   contexts.toml: 28 lines (2 contexts)
+[DEBUG]   tasks.toml: 71 lines (4 tasks)
+[DEBUG] Reading local config: ./.start/
+[DEBUG]   contexts.toml: 12 lines (1 context)
 [DEBUG] Merging configs...
 [DEBUG]   context.agents: "./AGENTS.md" (overridden by local)
 [DEBUG]   ... (other merge details)
@@ -453,11 +457,11 @@ See **Verbosity Levels** section above for detailed output examples.
 
 ## Files
 
-**~/.config/start/config.toml**
-: Global configuration file
+**~/.config/start/**
+: Global configuration directory containing config.toml (settings), agents.toml, roles.toml, contexts.toml, and tasks.toml
 
-**./.start/config.toml**
-: Local (project-specific) configuration file
+**./.start/**
+: Local (project-specific) configuration directory with same structure
 
 ## Error Handling
 
@@ -552,7 +556,7 @@ The agent launches without a system prompt. This is valid - not all agents requi
 
 **No configuration files:**
 
-If neither global (`~/.config/start/config.toml`) nor local (`./.start/config.toml`) exists:
+If neither global (`~/.config/start/`) nor local (`./.start/`) exists:
 
 ```
 Error: No configuration found.
@@ -562,7 +566,7 @@ Run 'start init' to create initial configuration.
 
 **Local config only:**
 
-If local `./.start/config.toml` exists but no global config, this is **valid** and the tool works normally. No error is shown. Per DR-004, agents can be defined in both global and local configs.
+If local `./.start/` exists but no global config, this is **valid** and the tool works normally. No error is shown. Per DR-004, agents can be defined in both global and local configs.
 
 Use case: Team configurations where `./.start/` contains all necessary config (agents, roles, tasks, contexts) and is committed to version control. No global config required.
 

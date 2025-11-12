@@ -17,7 +17,7 @@ start config context remove [name] [scope]
 
 ## Description
 
-Manages context document configurations in config files. Context documents provide background information to AI agents. Documents can be configured in global config (`~/.config/start/config.toml`) or local project config (`./.start/config.toml`).
+Manages context document configurations in config files. Context documents provide background information to AI agents. Documents can be configured in global config (`~/.config/start/contexts.toml`) or local project config (`./.start/contexts.toml`).
 
 **Context management operations:**
 
@@ -243,8 +243,8 @@ start config context add local    # Add to local config
 Prompts for context details and adds to the selected config file:
 
 1. **Select scope** (if not provided)
-   - global - Add to `~/.config/start/config.toml`
-   - local - Add to `./.start/config.toml`
+   - global - Add to `~/.config/start/contexts.toml`
+   - local - Add to `./.start/contexts.toml`
 
 2. **Context name** (required)
    - Validation: lowercase alphanumeric with hyphens
@@ -315,7 +315,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-091523.toml...
 ✓ Backup created
 
-Saving context 'environment' to ~/.config/start/config.toml...
+Saving context 'environment' to ~/.config/start/contexts.toml...
 ✓ Context added successfully
 
 Use 'start config context list global' to see all contexts.
@@ -361,7 +361,7 @@ Command timeout in seconds (or enter for default): 5
 Backing up config to config.2025-01-06-091645.toml...
 ✓ Backup created
 
-Saving context 'git-status' to ./.start/config.toml...
+Saving context 'git-status' to ./.start/contexts.toml...
 ✓ Context added successfully
 
 Use 'start config context list local' to see all contexts.
@@ -401,7 +401,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-091712.toml...
 ✓ Backup created
 
-Saving context 'project-note' to ./.start/config.toml...
+Saving context 'project-note' to ./.start/contexts.toml...
 ✓ Context added successfully
 
 Use 'start config context list local' to see all contexts.
@@ -518,7 +518,7 @@ Exit code: 2
 Backing up config to config.2025-01-06-091523.toml...
 ✗ Failed to backup config: permission denied
 
-Existing config preserved at: ~/.config/start/config.toml
+Existing config preserved at: ~/.config/start/contexts.toml
 Context not added.
 ```
 
@@ -711,7 +711,7 @@ Testing context: environment
 ─────────────────────────────────────────────────
 
 Loading configuration...
-  Config file: ~/.config/start/config.toml
+  Config file: ~/.config/start/contexts.toml
   Context section: [context.environment]
 
 Configuration details:
@@ -896,7 +896,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-092312.toml...
 ✓ Backup created
 
-Saving changes to ~/.config/start/config.toml...
+Saving changes to ~/.config/start/contexts.toml...
 ✓ Context 'environment' updated successfully
 
 Use 'start config context list global' to see changes.
@@ -935,7 +935,7 @@ Advanced options? [y/N]: n
 Backing up config to config.2025-01-06-092415.toml...
 ✓ Backup created
 
-Saving changes to ~/.config/start/config.toml...
+Saving changes to ~/.config/start/contexts.toml...
 ✓ Context 'environment' updated successfully
 ```
 
@@ -1023,7 +1023,7 @@ Remove context 'readme' from global config? [y/N]: y
 Backing up config to config.2025-01-06-093012.toml...
 ✓ Backup created
 
-Removing context 'readme' from ~/.config/start/config.toml...
+Removing context 'readme' from ~/.config/start/contexts.toml...
 ✓ Context 'readme' removed successfully
 
 Use 'start config context list global' to see remaining contexts.
@@ -1044,7 +1044,7 @@ Remove context 'readme' from global config? [y/N]: y
 Backing up config to config.2025-01-06-093045.toml...
 ✓ Backup created
 
-Removing context 'readme' from ~/.config/start/config.toml...
+Removing context 'readme' from ~/.config/start/contexts.toml...
 ✓ Context 'readme' removed successfully
 
 Use 'start config context list global' to see remaining contexts.
@@ -1083,7 +1083,7 @@ Remove context 'environment' from global config? [y/N]: y
 Backing up config to config.2025-01-06-093123.toml...
 ✓ Backup created
 
-Removing context 'environment' from ~/.config/start/config.toml...
+Removing context 'environment' from ~/.config/start/contexts.toml...
 ✓ Context 'environment' removed successfully
 
 Use 'start config context list global' to see remaining contexts.
@@ -1136,7 +1136,7 @@ Remove context 'readme' from global config? [y/N]: y
 Backing up config to config.2025-01-06-093156.toml...
 ✗ Failed to backup config: permission denied
 
-Existing config preserved at: ~/.config/start/config.toml
+Existing config preserved at: ~/.config/start/contexts.toml
 Context not removed.
 ```
 
@@ -1216,10 +1216,10 @@ Shows list of all contexts to choose from.
 
 ## Files
 
-**~/.config/start/config.toml**
+**~/.config/start/contexts.toml**
 : Global configuration file containing context definitions.
 
-**./.start/config.toml**
+**./.start/contexts.toml**
 : Local project configuration file containing project-specific contexts.
 
 Both files can contain `[context.<name>]` sections. Contexts are combined when both configs exist (global + local).
@@ -1229,7 +1229,7 @@ Both files can contain `[context.<name>]` sections. Contexts are combined when b
 ### No Configuration File
 
 ```
-Error: No configuration found at ~/.config/start/config.toml
+Error: No configuration found at ~/.config/start/
 
 Run 'start init' to create initial configuration.
 ```
@@ -1241,7 +1241,7 @@ Exit code: 1
 ```
 Error: Configuration file has invalid syntax.
 
-File: ~/.config/start/config.toml
+File: ~/.config/start/contexts.toml
 Line 42: invalid TOML syntax
 
 Fix the configuration file or restore from backup.
@@ -1255,12 +1255,12 @@ Exit code: 1
 
 Per DR-002, contexts from global and local configs are combined:
 
-**Global contexts:** `~/.config/start/config.toml`
+**Global contexts:** `~/.config/start/contexts.toml`
 - User-wide context documents
 - Managed by `start config context` commands
 - Shared across all projects
 
-**Local contexts:** `./.start/config.toml`
+**Local contexts:** `./.start/contexts.toml`
 - Project-specific context documents
 - Managed by `start config context` commands with `local` scope
 - Can override global contexts (same name)

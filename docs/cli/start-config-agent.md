@@ -530,7 +530,7 @@ Checking binary availability...
   ✓ Found: /usr/local/bin/claude
 
 Validating configuration...
-  Config file: ~/.config/start/config.toml
+  Config file: ~/.config/start/agents.toml
   Agent section: [agents.claude]
 
   Command template:
@@ -1184,7 +1184,7 @@ start config agent list --verbose
 Output:
 
 ```
-Loading configuration from: ~/.config/start/config.toml
+Loading configuration from: ~/.config/start/agents.toml
 
 Configured agents: 3
 
@@ -1226,7 +1226,7 @@ Exit code: 1
 ```
 Error: Configuration file has invalid syntax.
 
-File: ~/.config/start/config.toml
+File: ~/.config/start/agents.toml
 Line 23: invalid TOML syntax
 
 Fix the configuration file or restore from backup.
@@ -1245,7 +1245,7 @@ Per DR-004, agents can be defined in both global and local configs with merge be
 - Managed by `start config agent` commands
 - Individual preferences (model names, default models)
 
-**Local agents:** `./.start/config.toml`
+**Local agents:** `./.start/agents.toml`
 - Team-standardized configurations (can be committed to git)
 - Manually edited (not managed by `start config agent` commands)
 - Project-specific agent wrappers or custom tools

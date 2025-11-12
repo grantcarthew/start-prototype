@@ -150,7 +150,7 @@ start config role add --local           # Add to local config
 **Flags:**
 
 **--local**
-: Add to local config (`./.start/config.toml`) instead of global.
+: Add to local config (`./.start/roles.toml`) instead of global.
 
 **Behavior:**
 
@@ -234,7 +234,7 @@ Downloading general/code-reviewer...
 **Resulting configuration:**
 
 ```toml
-# In config.toml (or tasks.toml, agents.toml, contexts.toml as appropriate)
+# In roles.toml
 [roles.code-reviewer]
 description = "Expert code reviewer focused on security"
 file = "~/.config/start/assets/roles/general/code-reviewer.md"

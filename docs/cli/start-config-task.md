@@ -145,21 +145,21 @@ Global tasks (1):
     Security-focused code review
     Role: custom (code-reviewer.md + template)
     Task: command-based (git diff --staged)
-    Source: ~/.config/start/config.toml
+    Source: ~/.config/start/tasks.toml
 
 Local tasks (1):
   quick-help (qh)
     Quick help with instructions
     Role: default
     Task: inline prompt
-    Source: ./.start/config.toml
+    Source: ./.start/tasks.toml
 
 Overridden tasks (1):
   code-review (cr) [local overrides asset]
     Project-specific code review
     Role: custom (project-reviewer.md)
     Task: combination (file + command)
-    Source: ./.start/config.toml (overrides asset)
+    Source: ./.start/tasks.toml (overrides asset)
 ```
 
 **Output (global only):**
@@ -710,7 +710,7 @@ Testing task: git-diff-review
 ─────────────────────────────────────────────────
 
 Loading configuration...
-  Config file: ~/.config/start/config.toml
+  Config file: ~/.config/start/tasks.toml
   Task section: [tasks.git-diff-review]
 
 Configuration details:
@@ -1297,7 +1297,7 @@ Exit code: 1
 ```
 Error: Configuration file has invalid syntax.
 
-File: ~/.config/start/config.toml
+File: ~/.config/start/tasks.toml
 Line 123: invalid TOML syntax
 
 Fix the configuration file or restore from backup.
@@ -1327,8 +1327,8 @@ Tasks are discovered from three sources:
 In task lists, tasks are labeled by source:
 
 - `[asset]` - From `~/.config/start/assets/tasks/`
-- `[global]` - From `~/.config/start/config.toml`
-- `[local]` - From `./.start/config.toml`
+- `[global]` - From `~/.config/start/tasks.toml`
+- `[local]` - From `./.start/tasks.toml`
 - `[local overrides asset]` - Local task overrides asset task
 
 ### Unified Template Design (UTD)

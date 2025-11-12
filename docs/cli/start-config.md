@@ -601,28 +601,31 @@ Merged configuration:
 Validating configuration...
 ─────────────────────────────────────────────────
 
-Global: ~/.config/start/config.toml
-  ✓ TOML syntax valid
-  ✓ Settings section valid
-  ✓ Agents section valid (2 agents)
+Global: ~/.config/start/
+  ✓ config.toml - Settings valid
+  ✓ agents.toml - 2 agents configured
     ✓ claude
     ⚠ gemini
       Binary not found in PATH: gemini
       Command will fail unless 'gemini' is installed
-  ✓ Contexts section valid (3 contexts)
+  ✓ contexts.toml - 3 contexts configured
     ⚠ readme
       File not found: README.md
       This context will be skipped at runtime
-  ✓ Roles section valid (1 role)
+  ✓ roles.toml - 1 role configured
+  ✓ tasks.toml - (not present)
 
-Local: ./.start/config.toml
-  ✓ TOML syntax valid
-  ✓ Settings section valid
-  ✓ Contexts section valid (1 context)
+Local: ./.start/
+  ✓ config.toml - Settings valid
+  ✓ contexts.toml - 1 context configured
+  ✓ agents.toml - (not present)
+  ✓ roles.toml - (not present)
+  ✓ tasks.toml - (not present)
 
 Merged configuration:
   ✓ 4 total contexts (3 global + 1 local)
   ✓ 2 agents available
+  ✓ 1 role available
   ✓ Default agent set: claude
 
 ⚠ Configuration has 2 warnings (see above)
@@ -635,20 +638,21 @@ Merged configuration:
 Validating configuration...
 ─────────────────────────────────────────────────
 
-Global: ~/.config/start/config.toml
-  ✓ TOML syntax valid
-  ✓ Settings section valid
-  ⚠ Agents section has warnings
+Global: ~/.config/start/
+  ✓ config.toml - Settings valid
+  ⚠ agents.toml - 2 agents configured (warnings)
     ⚠ broken-agent
       Command template missing {prompt} placeholder
       Command: broken-agent --model {model}
     ⚠ test-agent
       Unknown placeholder {mdoel} in command template
       Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
-  ✓ Contexts section valid (2 contexts)
+  ✓ contexts.toml - 2 contexts configured
+  ✓ roles.toml - (not present)
+  ✓ tasks.toml - (not present)
 
-Local: ./.start/config.toml
-  ✗ TOML syntax error at line 15
+Local: ./.start/
+  ✗ config.toml - TOML syntax error at line 15
     expected '=' after key, found ']'
 
 ✗ Configuration has errors
@@ -664,18 +668,24 @@ Local: ./.start/config.toml
 Validating configuration...
 ─────────────────────────────────────────────────
 
-Global: ~/.config/start/config.toml
-  ✓ TOML syntax valid
-  ✓ Agents section valid (2 agents)
+Global: ~/.config/start/
+  ✓ config.toml - Settings valid
+  ✓ agents.toml - 2 agents configured
     ✓ claude
     ✓ gemini
+  ✓ contexts.toml - (not present)
+  ✓ roles.toml - (not present)
+  ✓ tasks.toml - (not present)
 
-Local: ./.start/config.toml
-  ✓ TOML syntax valid
-  ✓ Agents section valid (1 agent)
+Local: ./.start/
+  ✓ config.toml - Settings valid
+  ✓ agents.toml - 1 agent configured
     ⚠ claude
       Also defined in global config
       Local will override global for this agent
+  ✓ contexts.toml - (not present)
+  ✓ roles.toml - (not present)
+  ✓ tasks.toml - (not present)
 
 Merged configuration:
   ✓ 2 agents available (claude from local, gemini from global)
@@ -931,8 +941,8 @@ default_agent = "claude"   # From global (not overridden)
 
 Per DR-004 (updated 2025-01-05), agents can be defined in **both global and local** configs:
 
-- Global: `~/.config/start/config.toml` - Personal agent configurations
-- Local: `./.start/config.toml` - Team/project agent configurations (can be committed)
+- Global: `~/.config/start/agents.toml` - Personal agent configurations
+- Local: `./.start/agents.toml` - Team/project agent configurations (can be committed)
 - Merge behavior: Local overrides global for same agent name
 - `start config validate` warns if local agent overrides global
 - Rationale: Enables team standardization via committed configs while maintaining personal preferences

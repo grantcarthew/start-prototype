@@ -40,11 +40,11 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/config.md`
+Active document: `docs/tasks.md`
 
 ### Root Documentation
 
-- [ ] `docs/config.md` - Configuration reference
+- [x] `docs/config.md` - Configuration reference
 - [ ] `docs/tasks.md` - Task-specific documentation
 - [x] `docs/vision.md` - Product vision and goals
 
@@ -258,3 +258,29 @@ Documentation review is complete when:
 - **Fixed incorrect file path examples**: Corrected {file} placeholder examples to show proper path expansion
 - `docs/config.md`: Changed `/Users/username/ref/ENV.md` to `/Users/username/reference/ENVIRONMENT.md` (line 924)
 - `docs/design/design-records/dr-007-placeholders.md`: Changed example from `~/ref/ENV.md` to `~/reference/ENVIRONMENT.md` and output from `/Users/username/ref/ENV.md` to `/Users/username/reference/ENVIRONMENT.md` (line 90)
+- **Fixed configuration file references**: Corrected all references to use specific config files (tasks.toml, agents.toml, etc.) instead of generic config.toml
+- `docs/tasks.md`: Changed global/local tasks paths from config.toml to tasks.toml (lines 22-23, 198, 202)
+- `docs/tasks.md`: Updated code example comments to use tasks.toml (lines 355, 413, 419)
+- `docs/config.md`: Changed agent scope documentation from config.toml to agents.toml (lines 401-402)
+- `docs/cli/start-config-task.md`: Updated task source references from config.toml to tasks.toml in list output examples (lines 148, 155, 162)
+- `docs/cli/start-config-task.md`: Updated task source labeling from config.toml to tasks.toml (lines 1330-1331)
+- `docs/cli/start-config-task.md`: Updated test output config file reference from config.toml to tasks.toml (line 713)
+- `docs/cli/start-config.md`: Changed agent configuration scope from config.toml to agents.toml (lines 934-935)
+- `docs/cli/start-config.md`: Fixed validation output examples to show multi-file structure instead of single config.toml (lines 604-696)
+- `docs/cli/start.md`: Updated execution flow to reference config directories instead of config.toml files (lines 110-111)
+- `docs/cli/start.md`: Updated verbose output to show multi-file loading (lines 214-215)
+- `docs/cli/start.md`: Updated debug output to show individual config files being loaded (lines 258-265)
+- `docs/cli/start.md`: Updated Files section to describe config directories instead of individual config.toml files (lines 460-464)
+- `docs/cli/start.md`: Updated error handling to reference config directories (lines 559, 569)
+- `docs/cli/start-task.md`: Updated verbose output to show multi-file loading (lines 394-395)
+- `docs/cli/start-task.md`: Updated task discovery to reference tasks.toml instead of config.toml (lines 724, 731-732)
+- `docs/cli/start-config-context.md`: Changed all context management references from config.toml to contexts.toml (lines 20, 246-247, 318, 364, 404, 714, 897, 899, 938, 1026, 1047, 1086, 1219, 1222, 1258, 1263)
+- `docs/cli/start-config-role.md`: Changed --local flag description from config.toml to roles.toml (line 153)
+- `docs/cli/start-config-agent.md`: Changed agent test output config file from config.toml to agents.toml (line 533)
+- `docs/cli/start-config-agent.md`: Changed agent list output config file from config.toml to agents.toml (line 1187)
+- `docs/cli/start-config-agent.md`: Changed local agents reference from config.toml to agents.toml (line 1248)
+- `docs/cli/start-config-agent.md`: Changed invalid syntax error message from config.toml to agents.toml (line 1229)
+- `docs/cli/start-config-context.md`: Changed backup failure error messages from config.toml to contexts.toml (lines 521, 1139)
+- `docs/cli/start-config-context.md`: Changed invalid syntax error message from config.toml to contexts.toml (line 1244)
+- `docs/cli/start-config-task.md`: Changed invalid syntax error message from config.toml to tasks.toml (line 1300)
+- `docs/cli/start-config-role.md`: Changed TOML comment from "config.toml (or tasks.toml...)" to "roles.toml" (line 237)

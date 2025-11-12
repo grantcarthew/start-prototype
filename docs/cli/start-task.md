@@ -391,8 +391,8 @@ Output:
 
 ```
 Loading configuration...
-  Global: ~/.config/start/config.toml
-  Local:  ./.start/config.toml (found)
+  Global: ~/.config/start/ (5 files)
+  Local:  ./.start/ (found, 3 files)
 
 Resolving task: git-diff-review (alias: gdr)
   Description: Review git diff changes
@@ -721,15 +721,15 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 
 - Override defaults by defining tasks with same name in config
 - Add custom tasks
-- Tasks defined in local `./.start/config.toml` override global
+- Tasks defined in local `./.start/tasks.toml` override global
 
 ### Task Discovery
 
 Tasks are discovered from:
 
 1. Default tasks (embedded in binary)
-2. Global config: `~/.config/start/config.toml`
-3. Local config: `./.start/config.toml`
+2. Global config: `~/.config/start/tasks.toml`
+3. Local config: `./.start/tasks.toml`
 
 **Merge behavior:**
 
