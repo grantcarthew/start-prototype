@@ -336,8 +336,8 @@ Run 'start config task add' to browse
 
 When user runs `start task <name>`:
 
-1. **Local config** (`.start/config.toml`)
-2. **Global config** (`~/.config/start/config.toml`)
+1. **Local config** (`.start/tasks.toml`)
+2. **Global config** (`~/.config/start/tasks.toml`)
 3. **Asset cache** (`~/.config/start/assets/`)
 4. **GitHub catalog** (lazy fetch and cache)
 5. **Error:** "Task 'xyz' not found locally or in GitHub catalog"

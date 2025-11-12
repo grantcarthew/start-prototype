@@ -543,7 +543,7 @@ Commands inherit the current shell environment plus:
 **Command execution runs shell scripts with full system access:**
 
 1. **Validate command sources** - Only execute commands from trusted configs
-2. **Review local configs** - Local `./.start/config.toml` can execute arbitrary commands
+2. **Review local configs** - Local `./.start/` config files can execute arbitrary commands
 3. **Be cautious with shared configs** - Review before using configs from others
 4. **Timeout protection** - Commands are killed after timeout
 5. **No automatic sudo** - Commands run with current user permissions

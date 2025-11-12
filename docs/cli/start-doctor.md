@@ -84,8 +84,8 @@ Assets
   Run 'start update' to download latest assets.
 
 Configuration
-  ✓ Global config valid (~/.config/start/config.toml)
-  ✓ Local config valid (./.start/config.toml)
+  ✓ Global config valid (~/.config/start/)
+  ✓ Local config valid (./.start/)
   ✓ No TOML syntax errors
   ✓ All required fields present
   ✓ Merge behavior correct
@@ -191,18 +191,20 @@ Assets
 
 Configuration
   Global config:
-    Path: /Users/grant/.config/start/config.toml
-    Size: 2.3 KB
+    Directory: /Users/grant/.config/start/
+    Files: config.toml, agents.toml, roles.toml, contexts.toml, tasks.toml
+    Total size: 8.4 KB
     Modified: 2025-01-05T09:15:32Z
-    ✓ TOML syntax valid
-    ✓ Schema valid
+    ✓ All TOML syntax valid
+    ✓ All schemas valid
 
   Local config:
-    Path: /Users/grant/Projects/myapp/.start/config.toml
-    Size: 456 bytes
+    Directory: /Users/grant/Projects/myapp/.start/
+    Files: config.toml, contexts.toml
+    Total size: 654 bytes
     Modified: 2025-01-06T10:12:05Z
-    ✓ TOML syntax valid
-    ✓ Schema valid
+    ✓ All TOML syntax valid
+    ✓ All schemas valid
 
   Merged configuration:
     ✓ No section conflicts

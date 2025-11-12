@@ -284,3 +284,9 @@ Documentation review is complete when:
 - `docs/cli/start-config-context.md`: Changed invalid syntax error message from config.toml to contexts.toml (line 1244)
 - `docs/cli/start-config-task.md`: Changed invalid syntax error message from config.toml to tasks.toml (line 1300)
 - `docs/cli/start-config-role.md`: Changed TOML comment from "config.toml (or tasks.toml...)" to "roles.toml" (line 237)
+- **Additional config.toml reference corrections**: Fixed remaining single-file config references to reflect multi-file structure
+- `docs/design/unified-template-design.md`: Changed security warning from `./.start/config.toml` to `./.start/` (config files can execute commands, not just config.toml) (line 546)
+- `docs/cli/start-doctor.md`: Changed simple output from individual config.toml files to config directories (lines 87-88)
+- `docs/cli/start-doctor.md`: Updated verbose output to show multi-file config validation with all 5 files (lines 192-207)
+- `docs/design/design-records/dr-019-task-loading.md`: Changed task source paths from config.toml to tasks.toml (lines 16-17)
+- `docs/ideas/catalog-based-assets.md`: Changed resolution order from config.toml to tasks.toml for task resolution (lines 339-340)

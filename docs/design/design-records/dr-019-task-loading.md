@@ -13,8 +13,8 @@ Tasks load from global and local configs only; asset tasks serve as templates; l
 ## Task Sources
 
 **Runtime task execution** (`start task <name>`):
-- Global config: `~/.config/start/config.toml`
-- Local config: `./.start/config.toml`
+- Global config: `~/.config/start/tasks.toml`
+- Local config: `./.start/tasks.toml`
 - Assets are NOT automatically loaded at runtime
 
 **Management commands** (`start config task list/add/edit`):
