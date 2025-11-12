@@ -443,9 +443,13 @@ Check your token:
 **Settings in config.toml:**
 ```toml
 [settings]
-github_token_env = "GITHUB_TOKEN"    # Environment variable name
 asset_repo = "grantcarthew/start"    # GitHub repository
 ```
+
+**GitHub Authentication:**
+- Uses `GITHUB_TOKEN` environment variable (hardcoded, not configurable)
+- Optional, but recommended to avoid rate limiting
+- Standard across GitHub tooling (GitHub CLI, Actions, etc.)
 
 **Future: Custom repositories**
 ```toml

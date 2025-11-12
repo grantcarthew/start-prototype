@@ -258,7 +258,6 @@ command_timeout = 30
 # Asset management (NEW)
 asset_download = true                           # Auto-download from GitHub if not found
 asset_path = "~/.config/start/assets"           # Cache location
-github_token_env = "GITHUB_TOKEN"               # Env var for API token
 asset_repo = "grantcarthew/start"               # GitHub repository
 ```
 

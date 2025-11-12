@@ -51,7 +51,6 @@ shell = "bash"
 command_timeout = 30
 asset_download = true
 asset_repo = "grantcarthew/start"
-github_token_env = "GITHUB_TOKEN"
 asset_path = "~/.config/start/assets"
 ```
 
@@ -296,14 +295,6 @@ asset_download = true
 asset_repo = "grantcarthew/start"
 ```
 
-**github_token_env** (string, optional)
-: Environment variable name containing GitHub personal access token for API requests. Recommended to avoid rate limiting. Default: `"GITHUB_TOKEN"`
-
-```toml
-[settings]
-github_token_env = "GITHUB_TOKEN"
-```
-
 **asset_path** (string, optional)
 : Local directory for caching downloaded assets. Default: `"~/.config/start/assets"`
 
@@ -323,7 +314,6 @@ All fields use soft validation with fallback defaults:
 - **command_timeout** invalid → **Warning**, fall back to 30 seconds
 - **asset_download** invalid → **Warning**, fall back to `true`
 - **asset_repo** invalid format → **Warning**, fall back to `"grantcarthew/start"`
-- **github_token_env** invalid → **Warning**, fall back to `"GITHUB_TOKEN"`
 - **asset_path** invalid or inaccessible → **Warning**, fall back to `"~/.config/start/assets"`
 - Missing fields → Silent, use defaults
 
@@ -338,7 +328,6 @@ shell = "bash"
 command_timeout = 30
 asset_download = true
 asset_repo = "grantcarthew/start"
-github_token_env = "GITHUB_TOKEN"
 asset_path = "~/.config/start/assets"
 ```
 

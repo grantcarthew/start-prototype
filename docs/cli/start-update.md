@@ -519,10 +519,11 @@ start update
 
 ```toml
 [settings]
-github_token_env = "GITHUB_TOKEN"   # Environment variable name
 asset_repo = "grantcarthew/start"   # GitHub repository
 asset_download = true               # Download if not found (doesn't affect update)
 ```
+
+**GitHub Authentication:** Uses `GITHUB_TOKEN` environment variable (optional, recommended to avoid rate limits).
 
 ## See Also
 

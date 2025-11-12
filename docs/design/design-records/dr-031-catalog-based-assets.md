@@ -82,7 +82,6 @@ shell = "bash"
 command_timeout = 30
 asset_download = true  # Download from GitHub if asset not found
 asset_path = "~/.config/start/assets"
-github_token_env = "GITHUB_TOKEN"
 asset_repo = "grantcarthew/start"
 ```
 

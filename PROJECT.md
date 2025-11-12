@@ -166,15 +166,14 @@ Documentation review is complete when:
 - `docs/cli/start-config.md`: Updated Configuration Merge Behavior section (line 889)
 - **Path choice rationale**: Added explanation to DR-002 for why `./.start/` is used (not `./.config/start/`)
 - `docs/design/design-records/dr-002-config-merge.md`: Added "Path choices" section to Rationale explaining `./.start/` follows project-level tool convention (like `.vscode/`, `.github/`), while `.config/` is for user-level configs
-- **Missing settings documentation**: Added complete documentation for all 9 settings fields in [settings] section
+- **Missing settings documentation**: Added complete documentation for all settings fields in [settings] section
 - `docs/config.md`: Added field documentation for `default_role` (uses first role if not specified)
 - `docs/config.md`: Added field documentation for `asset_download` (enable/disable auto-download from GitHub, default true)
 - `docs/config.md`: Added field documentation for `asset_repo` (GitHub repository for assets, default "grantcarthew/start")
-- `docs/config.md`: Added field documentation for `github_token_env` (env var for GitHub token, default "GITHUB_TOKEN")
 - `docs/config.md`: Added field documentation for `asset_path` (cache directory, default "~/.config/start/assets")
-- `docs/config.md`: Updated Validation section to include all 9 settings
-- `docs/config.md`: Updated Example section to show all 9 settings
-- `docs/config.md`: Updated Complete Example to show all 9 settings in global config
+- `docs/config.md`: Updated Validation section to include all settings
+- `docs/config.md`: Updated Example section to show all settings
+- `docs/config.md`: Updated Complete Example to show all settings in global config
 - **Settings field name correction**: Fixed incorrect field name "verbosity" to "log_level" in examples
 - `docs/cli/start-config.md`: Changed three instances of `verbosity` to `log_level` (lines 901, 913, 924)
 - **Incomplete settings blocks**: Added missing `asset_download` field to complete settings examples
@@ -193,3 +192,10 @@ Documentation review is complete when:
 - `docs/tasks.md`: Updated role field description to reflect asset resolution algorithm (line 91)
 - `docs/tasks.md`: Updated role validation to reflect lazy loading from catalog (lines 107-109)
 - `docs/cli/start-config-task.md`: Changed role field from "defined in [roles.<name>] section" to "resolved via asset resolution algorithm" (line 75)
+- **Removed github_token_env setting**: Removed unnecessary github_token_env setting - hardcoded to use GITHUB_TOKEN env var (industry standard)
+- `docs/config.md`: Removed github_token_env field documentation and all examples
+- `docs/design/design-records/dr-031-catalog-based-assets.md`: Removed github_token_env from settings example
+- `docs/design/design-records/dr-034-github-catalog-api.md`: Removed github_token_env setting, added note about hardcoded GITHUB_TOKEN env var
+- `docs/cli/start-update.md`: Removed github_token_env from settings example, added note about GITHUB_TOKEN
+- `docs/ideas/catalog-based-assets.md`: Removed github_token_env from settings, updated GitHub Token section to clarify hardcoded env var
+- `PROJECT-backlog.md`: Removed github_token_env from settings example
