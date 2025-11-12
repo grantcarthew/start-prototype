@@ -292,3 +292,5 @@ Documentation review is complete when:
 - `docs/ideas/catalog-based-assets.md`: Changed resolution order from config.toml to tasks.toml for task resolution (lines 339-340)
 - **Fixed nested code fence in tasks.md**: Upgraded outer fence to 5 backticks for toml block containing nested diff block (broke GitHub markdown rendering)
 - `docs/tasks.md`: Changed outer fence from 3 to 5 backticks for "Task with Role Reference" example (lines 255-273)
+- **Corrected "Default Tasks" section**: Changed terminology and explanation to reflect catalog-based lazy-loading architecture
+- `docs/tasks.md`: Renamed "Default Tasks" to "Available Tasks"; removed incorrect "embedded in binary" statement; explained GitHub catalog auto-download mechanism (lines 429-450)

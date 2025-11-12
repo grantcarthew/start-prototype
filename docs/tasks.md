@@ -426,19 +426,28 @@ prompt = "Review Go code changes:\n{command_output}\n\n{instructions}"
 
 The local task completely replaces the global task with the same name.
 
-## Default Tasks
+## Available Tasks
 
-`start` ships with four default interactive review tasks:
+Tasks are available from the GitHub asset catalog and automatically download on first use (if `asset_download = true`).
 
-1. **code-review** (alias: `cr`) - General code review for quality and best practices
-2. **git-diff-review** (alias: `gdr`) - Review git diff output
-3. **comment-tidy** (alias: `ct`) - Review and tidy code comments
-4. **doc-review** (alias: `dr`) - Review and improve documentation
+**Example tasks available:**
+- **code-review** (alias: `cr`) - General code review for quality and best practices
+- **git-diff-review** (alias: `gdr`) - Review staged git changes
+- **comment-tidy** (alias: `ct`) - Review and improve code comments
+- **doc-review** (alias: `dr`) - Review and improve documentation
 
-Users can:
-- Override defaults by defining tasks with the same name in config
-- Add custom tasks (global or local)
-- The default tasks are embedded in the binary
+**How it works:**
+- Run `start task <name>` for any catalog task
+- Task downloads from GitHub and adds to your config automatically
+- Subsequent uses run from your config (no network required)
+- Browse available tasks: `start config task add`
+
+**Customization:**
+- Override catalog tasks by defining the same name in your config
+- Create custom tasks (global or local)
+- Disable auto-download: `asset_download = false` setting
+
+See [DR-033](./design/design-records/dr-033-asset-resolution-algorithm.md) for asset resolution details.
 
 ## Usage
 
