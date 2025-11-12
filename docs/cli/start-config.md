@@ -330,7 +330,7 @@ Context 'missing':
   This file will be skipped at runtime.
 
 Agent 'broken':
-  Command template missing required {prompt} placeholder
+  Command template missing {prompt} placeholder
 
 ✓ Changes saved, but configuration has warnings
   Run 'start config validate' for full validation details.
@@ -638,9 +638,9 @@ Validating configuration...
 Global: ~/.config/start/config.toml
   ✓ TOML syntax valid
   ✓ Settings section valid
-  ✗ Agents section has errors
-    ✗ broken-agent
-      Command template missing required {prompt} placeholder
+  ⚠ Agents section has warnings
+    ⚠ broken-agent
+      Command template missing {prompt} placeholder
       Command: broken-agent --model {model}
     ⚠ test-agent
       Unknown placeholder {mdoel} in command template

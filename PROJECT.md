@@ -199,3 +199,18 @@ Documentation review is complete when:
 - `docs/cli/start-update.md`: Removed github_token_env from settings example, added note about GITHUB_TOKEN
 - `docs/ideas/catalog-based-assets.md`: Removed github_token_env from settings, updated GitHub Token section to clarify hardcoded env var
 - `PROJECT-backlog.md`: Removed github_token_env from settings example
+- **Agent {prompt} placeholder validation**: Changed from required (error) to recommended (warning) - "works but warns" design
+- `docs/config.md`: Changed command field description from "Must contain" to "Should contain {prompt} placeholder" (line 349)
+- `docs/config.md`: Updated validation from error to warning: "Command doesn't contain {prompt} - composed prompt won't be passed to agent" (line 390)
+- `docs/config.md`: Updated Validation Rules section - changed to "should contain {prompt} placeholder (warns if missing)" (line 1005)
+- `docs/cli/start-config-agent.md`: Changed command field description to "Should contain {prompt} placeholder" (line 55)
+- `docs/cli/start-config-agent.md`: Updated validation checklist to "Should contain (warns if missing)" (line 225)
+- `docs/cli/start-config-agent.md`: Changed add command example from error to warning with Continue prompt (lines 366-375)
+- `docs/cli/start-config-agent.md`: Updated test validation description to "checked for {prompt} (warns if missing)" (line 423)
+- `docs/cli/start-config-agent.md`: Removed "required" from all test output examples (lines 447, 467, 490)
+- `docs/cli/start-config-agent.md`: Changed test error output to warning (⚠) for missing {prompt} (line 509, 593)
+- `docs/cli/start-config-agent.md`: Updated edit validation note to "should contain (warns if missing)" (line 653)
+- `docs/cli/start-config-agent.md`: Changed edit command example from error to warning with Continue prompt (lines 769-778)
+- `docs/cli/start-config-agent.md`: Removed "(required)" from verbose placeholder analysis output (line 542)
+- `docs/cli/start-config.md`: Changed edit output from error (✗) to warning (⚠) for missing {prompt} (line 333)
+- `docs/cli/start-config.md`: Changed validate output - agent section shows warnings instead of errors for missing {prompt} (lines 641-644)

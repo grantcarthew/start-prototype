@@ -52,7 +52,7 @@ default_model = "sonnet"
 **Fields:**
 
 **command** (required)
-: Command template to execute the agent. Supports placeholders: `{model}`, `{role}`, `{role_file}`, `{prompt}`, `{date}`.
+: Command template to execute the agent. Should contain `{prompt}` placeholder to receive the composed prompt. Supports placeholders: `{model}`, `{role}`, `{role_file}`, `{prompt}`, `{date}`.
 
 **description** (optional)
 : Human-readable description of the agent. Displayed in `start config agent list` and help output.
@@ -222,7 +222,7 @@ Prompts for agent details and adds to `~/.config/start/agents.toml`:
 
 5. **Command template** (required)
 
-   - Must contain `{prompt}` placeholder
+   - Should contain `{prompt}` placeholder (warns if missing)
    - Warns on unknown placeholders (typos)
    - Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
 
@@ -363,12 +363,12 @@ Use 'start config agent edit claude' to modify existing agent.
 
 Exit code: 1
 
-**Invalid command template (missing {prompt}):**
+**Command template missing {prompt} (warning):**
 
 ```
 Command template: my-agent --model {model}
-✗ Command template must contain {prompt} placeholder.
-  The {prompt} placeholder is required to pass context to the agent.
+⚠ Warning: Command doesn't contain {prompt} placeholder.
+  Composed prompt won't be passed to agent. Continue? [y/N]: n
 
 Command template: my-agent --model {model} '{prompt}'
 ✓ Valid command template
@@ -420,7 +420,7 @@ Validates agent configuration without executing it. Performs three checks:
 
 2. **Configuration validation**
 
-   - Command template contains required `{prompt}` placeholder
+   - Command template checked for `{prompt}` placeholder (warns if missing)
    - Unknown placeholders detected (likely typos)
    - Model aliases defined (if `{model}` used in template)
    - Default model configured or first model available
@@ -444,7 +444,7 @@ Testing agent: claude
 
 Configuration:
   ✓ Command template valid
-  ✓ Contains required {prompt} placeholder
+  ✓ Contains {prompt} placeholder
   ✓ Default model: claude-3-7-sonnet-20250219 (sonnet)
   ✓ Models configured: 3 (haiku, sonnet, opus)
 
@@ -464,7 +464,7 @@ Testing agent: my-agent
 
 Configuration:
   ✓ Command template valid
-  ✓ Contains required {prompt} placeholder
+  ✓ Contains {prompt} placeholder
   ⚠ Unknown placeholder {mdoel} in command template
     (did you mean {model}?)
   ✓ Default model: my-agent-v1 (default)
@@ -487,7 +487,7 @@ Testing agent: gemini
 
 Configuration:
   ✓ Command template valid
-  ✓ Contains required {prompt} placeholder
+  ✓ Contains {prompt} placeholder
   ✓ Default model: gemini-2.0-flash-exp (flash)
   ✓ Models configured: 2 (flash, pro-exp)
 
@@ -506,7 +506,7 @@ Testing agent: broken-agent
 ✓ Binary found: /usr/local/bin/broken-agent
 
 Configuration:
-  ✗ Command template missing required {prompt} placeholder
+  ⚠ Command template missing {prompt} placeholder
   ✗ No models configured but {model} used in template
   ✗ No default_model specified
 
@@ -539,7 +539,7 @@ Validating configuration...
   Placeholder analysis:
     ✓ {model} - valid
     ✓ {role} / {role_file} - valid
-    ✓ {prompt} - valid (required)
+    ✓ {prompt} - valid
 
   Model configuration:
     ✓ default_model: sonnet
@@ -590,7 +590,7 @@ Testing agent: broken
 ✗ Binary not found: broken
 
 Configuration:
-  ✗ Command template missing required {prompt} placeholder
+  ⚠ Command template missing {prompt} placeholder
   ⚠ Unknown placeholder {foo} in command template
   ✗ No default_model specified and no models configured
 
@@ -650,7 +650,7 @@ Interactive prompts to edit specific agent. Shows current values as defaults - p
 2. **URL** - Current value shown in brackets
 3. **Models URL** - Current value shown in brackets
 4. **Command template** - Current value shown in brackets
-   - Validates: must contain `{prompt}` placeholder
+   - Validates: should contain `{prompt}` placeholder (warns if missing)
    - Warns on unknown placeholders
 5. **Edit models?** - Show current models, ask to modify
    - Add new models
@@ -766,12 +766,12 @@ Use 'start config agent add' to add a new agent.
 
 Exit code: 2
 
-**Invalid command template (missing {prompt}):**
+**Command template missing {prompt} (warning):**
 
 ```
 Command template [claude --model {model}]: claude --other-flag
-✗ Command template must contain {prompt} placeholder.
-  The {prompt} placeholder is required to pass context to the agent.
+⚠ Warning: Command doesn't contain {prompt} placeholder.
+  Composed prompt won't be passed to agent. Continue? [y/N]: n
 
 Command template [claude --model {model}]: claude --model {model} '{prompt}'
 ✓ Valid command template

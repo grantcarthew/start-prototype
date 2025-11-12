@@ -346,7 +346,7 @@ Each agent section defines how to invoke an AI tool. Agent names should match th
 **Fields:**
 
 **command** (string, required)
-: Command template to execute the agent. Must contain `{prompt}` placeholder. Supports additional placeholders: `{model}`, `{role}`, `{role_file}`, `{date}`.
+: Command template to execute the agent. Should contain `{prompt}` placeholder to receive the composed prompt. Supports additional placeholders: `{model}`, `{role}`, `{role_file}`, `{date}`.
 
 ```toml
 [agents.claude]
@@ -387,7 +387,7 @@ default_model = "sonnet"
 
 **Validation:**
 
-- **command** must contain `{prompt}` placeholder → **Error** if missing
+- **command** missing `{prompt}` placeholder → **Warning**: "Command doesn't contain {prompt} - composed prompt won't be passed to agent"
 - If command uses `{model}` placeholder:
   - **[agents.\<name\>.models]** section MUST exist with ≥1 model → **Error** if missing
 - If **default_model** defined but not in models table → **Warning**, fall back to first model (TOML order)
@@ -1002,7 +1002,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 
 **[agents.\<name\>]:**
 - `command` must be present
-- `command` must contain `{prompt}` placeholder
+- `command` should contain `{prompt}` placeholder (warns if missing)
 
 **[context.\<name\>]:**
 - At least one of `file`, `command`, or `prompt` must be present (UTD pattern)
