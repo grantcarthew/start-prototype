@@ -378,7 +378,7 @@ models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
 ```
 
 **default_model** (string, optional)
-: Model alias to use when `--model` flag not provided. Must be a key in the `[agents.<name>.models]` table. If omitted, first model in `models` table is used.
+: Model name to use when `--model` flag not provided. Must be a key in the `[agents.<name>.models]` table. If omitted, first model in `models` table is used.
 
 ```toml
 [agents.claude]
@@ -428,19 +428,19 @@ command = "simple-agent '{prompt}'"
 
 #### [agents.\<name\>.models]
 
-Model alias mappings for the agent. User-defined aliases map to full model identifiers.
+Model name mappings for the agent. User-defined names map to full model identifiers.
 
 **Structure:**
 
 ```toml
 [agents.<name>.models]
-<alias> = "<full-model-identifier>"
+<name> = "<full-model-identifier>"
 ```
 
-**Alias names:**
+**Names:**
 - User-defined (not hardcoded)
 - lowercase, alphanumeric, hyphens
-- Each agent defines its own aliases
+- Each agent defines its own names
 - Common patterns: `haiku`, `sonnet`, `opus`, `flash`, `fast`, `best`, etc.
 
 **Examples:**
@@ -894,7 +894,7 @@ Placeholders are variables expanded during command execution.
 Available in agent command templates, prompts, and environment variables:
 
 **{model}**
-: Resolved model name (full identifier, not alias)
+: Resolved model name (full identifier)
 
 Example: `claude-3-7-sonnet-20250219`
 
@@ -1020,7 +1020,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 - Pattern: `/^[a-z0-9]+(-[a-z0-9]+)*$/`
 - Examples: `claude`, `gemini`, `my-agent`
 
-**Model aliases:**
+**Model names:**
 - Same constraints as agent names
 - Examples: `haiku`, `sonnet`, `gpt4-mini`
 
@@ -1081,7 +1081,7 @@ When both configs exist, the effective configuration is:
 
 ### Agent Configuration
 
-**Use descriptive model aliases:**
+**Use descriptive model names:**
 
 ```toml
 # Good - clear purpose

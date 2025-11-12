@@ -184,7 +184,7 @@ start prompt "quick code review" --model fast
 start prompt "comprehensive analysis" --model pro
 ```
 
-Use full model name:
+Use full model identifier:
 
 ```bash
 start prompt "review auth flow" --model claude-opus-4-20250514

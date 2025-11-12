@@ -12,8 +12,8 @@ Use single-brace placeholders (`{name}`) with specific supported variables for c
 
 Available in agent commands and all template contexts:
 
-**{model}** - Currently selected model name
-- Value: Full model name after alias resolution
+**{model}** - Currently selected model identifier
+- Value: Full model identifier after name resolution
 - Example: `"claude-3-7-sonnet-20250219"`
 - Example: `"gemini-2.0-flash-exp"`
 

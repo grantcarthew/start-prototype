@@ -45,7 +45,7 @@ Work on all commands:
 ```bash
 --agent <name>, -a <name>       # Which agent to use (overrides default)
 --role <name>, -r <name>        # Which role to use (overrides default)
---model <name>, -m <name>       # Model alias or full model name
+--model <name>, -m <name>       # Model name or full model identifier
 --directory <path>, -d <path>   # Working directory (default: pwd)
 --quiet, -q                     # Quiet mode (no output)
 --verbose                       # Verbose output (detailed info)

@@ -217,7 +217,7 @@ Loading configuration...
 
 Resolving agent: claude (default)
   Command template: claude --model {model} --append-system-prompt '{role}' '{prompt}'
-  Model alias: sonnet → claude-3-7-sonnet-20250219
+  Model name: sonnet → claude-3-7-sonnet-20250219
 
 Detecting context documents (working directory: /Users/gcarthew/Projects/my-app):
   environment: ~/reference/ENVIRONMENT.md → /Users/gcarthew/reference/ENVIRONMENT.md (exists)
@@ -268,7 +268,7 @@ Executing command...
 [DEBUG]   Command template: claude --model {model} --append-system-prompt '{role}' '{prompt}'
 
 [DEBUG] Model resolution:
-[DEBUG]   Default alias: sonnet
+[DEBUG]   Default model name: sonnet
 [DEBUG]   Resolved model: claude-3-7-sonnet-20250219
 
 [DEBUG] Context document detection:

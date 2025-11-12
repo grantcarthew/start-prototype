@@ -697,7 +697,7 @@ Adds detailed checks:
 - Each agent command template parsed
 - Each placeholder validated
 - Each context file path checked
-- Model alias validation
+- Model name validation
 - Default model resolution
 
 **Exit codes:**

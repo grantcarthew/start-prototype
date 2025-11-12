@@ -64,10 +64,10 @@ default_model = "sonnet"
 : URL to model documentation, helping users understand available models and their capabilities.
 
 **default_model** (optional)
-: Model alias to use when `--model` flag not provided. If omitted, the first model in the `models` table is used.
+: Model name to use when `--model` flag not provided. If omitted, the first model in the `models` table is used.
 
 **models** (optional)
-: Table of user-defined model aliases mapping to full model identifiers. Each agent can define its own aliases.
+: Table of user-defined model names mapping to full model identifiers. Each agent can define its own names.
 
 ## Subcommands
 
@@ -91,8 +91,8 @@ Lists all agents defined in `~/.config/start/agents.toml` with:
 - Agent name
 - Description
 - Documentation URL
-- Default model (full name and alias)
-- All available models (full name and alias)
+- Default model (full identifier and model name)
+- All available models (full identifier and model name)
 - Model documentation URL
 
 Missing optional fields are omitted from display.
@@ -229,7 +229,7 @@ Prompts for agent details and adds to `~/.config/start/agents.toml`:
 6. **Add models?** (yes/no)
 
    - If yes, loop to add multiple models
-   - Each model: alias name + full model name
+   - Each model: model name + full model identifier
    - Type "done" to finish adding models
 
 7. **Default model** (if models added)
@@ -259,15 +259,15 @@ Command template: my-agent --model {model} '{prompt}'
 
 Add models? [y/N]: y
 
-Model alias: fast
-Full model name: my-agent-fast-v1
+Model name: fast
+Full model identifier: my-agent-fast-v1
 ✓ Model added: fast → my-agent-fast-v1
 
-Model alias: best
-Full model name: my-agent-best-v2
+Model name: best
+Full model identifier: my-agent-best-v2
 ✓ Model added: best → my-agent-best-v2
 
-Model alias: done
+Model name: done
 
 Select default model:
   1) my-agent-fast-v1 (fast)
@@ -422,7 +422,7 @@ Validates agent configuration without executing it. Performs three checks:
 
    - Command template checked for `{prompt}` placeholder (warns if missing)
    - Unknown placeholders detected (likely typos)
-   - Model aliases defined (if `{model}` used in template)
+   - Model names defined (if `{model}` used in template)
    - Default model configured or first model available
    - TOML syntax valid
 
@@ -688,8 +688,8 @@ Current models:
 Edit models? [y/N]: y
 
 Add model (or "done" to finish):
-Model alias: haiku2
-Full model name: claude-3-5-haiku-20241022-v2
+Model name: haiku2
+Full model identifier: claude-3-5-haiku-20241022-v2
 ✓ Model added: haiku2 → claude-3-5-haiku-20241022-v2
 
 Add model (or "done" to finish): done
@@ -794,9 +794,9 @@ Command template [claude '{prompt}']: claude --model {model} '{prompt}'
 
 **Adding models:**
 
-- Validates alias name (same rules as agent names: lowercase, alphanumeric, hyphens)
-- Doesn't validate full model name (too variable across agents)
-- Detects duplicate aliases
+- Validates model name (same rules as agent names: lowercase, alphanumeric, hyphens)
+- Doesn't validate full model identifier (too variable across agents)
+- Detects duplicate model names
 
 **Removing models:**
 
@@ -1243,7 +1243,7 @@ Per DR-004, agents can be defined in both global and local configs with merge be
 **Global agents:** `~/.config/start/agents.toml`
 - Personal agent configurations
 - Managed by `start config agent` commands
-- Individual preferences (model aliases, default models)
+- Individual preferences (model names, default models)
 
 **Local agents:** `./.start/config.toml`
 - Team-standardized configurations (can be committed to git)
@@ -1261,7 +1261,7 @@ When `default_model` is omitted:
 
 1. Uses first model in `[agents.<name>.models]` table
 2. TOML preserves declaration order within tables
-3. If no models defined, agent must be used with `--model <full-name>`
+3. If no models defined, agent must be used with `--model <full-identifier>`
 
 **Example:**
 
@@ -1277,14 +1277,14 @@ command = "claude --model {model} '{prompt}'"
 
 Default model: `claude-3-5-haiku-20241022` (haiku)
 
-### Model Aliases
+### Model Names
 
-Model aliases are agent-specific and user-defined:
+Model names are agent-specific and user-defined:
 
 - Not hardcoded (no enforced tier names)
-- Each agent defines its own aliases
-- Aliases can be any meaningful name (haiku, sonnet, opus, flash, quick, best, etc.)
-- Full model names can always be used with `--model` flag
+- Each agent defines its own model names
+- Names can be any meaningful identifier (haiku, sonnet, opus, flash, quick, best, etc.)
+- Full model identifiers can always be used with `--model` flag
 
 See DR-004 for full rationale.
 

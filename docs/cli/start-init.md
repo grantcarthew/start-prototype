@@ -202,7 +202,7 @@ command -v aichat      # Not found
 
 - All detected agents are automatically configured
 - No user prompt for detected agents
-- Fetched configs from GitHub provide command templates and model aliases
+- Fetched configs from GitHub provide command templates and model names
 
 **Unknown agents:**
 If `command -v` finds a binary but no config exists in GitHub:
@@ -221,7 +221,7 @@ GET https://api.github.com/repos/grantcarthew/start/contents/assets/agents
 **Fetched for each agent:**
 
 - Command template with placeholders
-- Model aliases mapping
+- Model names mapping
 - Default model selection
 
 **Rate limits:**
@@ -639,13 +639,13 @@ required = true
 # asset catalog using 'start config task add'.
 ```
 
-**Note:** Agent model aliases and command templates come from GitHub. Above is illustrative only.
+**Note:** Agent model names and command templates come from GitHub. Above is illustrative only.
 
 ### Post-Init Steps
 
 After running init:
 
-1. **Edit model aliases** - Update model names to current versions:
+1. **Edit model names** - Update model identifiers to current versions:
 
    ```bash
    start config edit
