@@ -902,7 +902,9 @@ Example: `claude-3-7-sonnet-20250219`
 : Fully resolved role content (inline text). Use for agents that accept system prompts inline (Claude, aichat).
 
 **{role_file}**
-: File path to role content. Use for agents that require file-based system prompts (Gemini). Points to original file for simple roles, or temp file for UTD roles.
+: File path to role content. Use for agents that require file-based system prompts (Gemini).
+  - **Simple roles (file only):** Points to original file path
+  - **UTD roles (with command/prompt):** Role is evaluated, saved to temp file (`/tmp/start-role-*.md`), path points to temp file. Temp file cleaned up after agent execution.
 
 **{prompt}**
 : Assembled prompt text from context documents and custom prompts.

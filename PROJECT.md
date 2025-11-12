@@ -239,3 +239,6 @@ Documentation review is complete when:
 - **Final alias cleanup**: Fixed remaining model alias references found via comprehensive search
 - `docs/design/design-records/dr-004-agent-scope.md`: Changed historical update note "user-defined aliases" to "user-defined model names" (line 69)
 - `docs/cli/start.md`: Changed debug output "Default alias:" to "Default model name:" (line 271)
+- **{role_file} placeholder clarity**: Enhanced documentation to clearly explain temp file behavior for UTD roles
+- `docs/config.md`: Expanded {role_file} description to explain simple vs UTD role behavior and temp file creation/cleanup (lines 904-907)
+- `docs/cli/start-config-agent.md`: Clarified {role_file} description to mention temp file for UTD roles (line 1297)

@@ -1294,7 +1294,7 @@ Agent commands support these placeholders:
 
 - `{model}` - Resolved model name
 - `{role}` - The fully resolved role/system prompt content (inline).
-- `{role_file}` - A file path to the resolved role/system prompt content.
+- `{role_file}` - File path to role content. Simple roles: original file path. UTD roles: temp file with evaluated content (auto-created and cleaned up).
 - `{prompt}` - Built prompt from context documents
 - `{date}` - Current timestamp (ISO 8601)
 
