@@ -10,6 +10,7 @@ start config context - Manage context document configurations
 start config context list [scope]
 start config context add [name] [scope]
 start config context new [scope]
+start config context show [name] [scope]
 start config context test <name>
 start config context edit [name] [scope]
 start config context remove [name] [scope]
@@ -23,6 +24,7 @@ Manages context document configurations in config files. Context documents provi
 
 - **list** - Display all configured contexts with details
 - **add** - Add new context interactively
+- **show** - Display context configuration structure
 - **test** - Test context configuration and file availability
 - **edit** - Modify existing context configuration
 - **remove** - Delete context from configuration
@@ -520,6 +522,145 @@ Backing up config to config.2025-01-06-091523.toml...
 
 Existing config preserved at: ~/.config/start/contexts.toml
 Context not added.
+```
+
+Exit code: 3
+
+### start config context show
+
+Display current context configuration.
+
+**Synopsis:**
+
+```bash
+start config context show                 # Select context and scope interactively
+start config context show <name>          # Select scope for named context
+start config context show <name> global   # Show global context only
+start config context show <name> local    # Show local context only
+```
+
+**Behavior:**
+
+Displays context configuration from the selected scope with:
+
+- Scope (global or local)
+- Context name
+- Description (if configured)
+- Source type (file, command, inline, or combination)
+- File path (if configured)
+- Command (if configured)
+- Prompt template (if configured)
+- Required flag (true/false)
+- Shell and timeout overrides (if configured)
+
+**Output (global context - file):**
+
+```
+Context configuration: environment (global)
+═══════════════════════════════════════════════════════════
+
+Description: User environment and tool configuration
+Required: true
+
+Source: File-based
+
+File:
+  Path: ~/reference/ENVIRONMENT.md
+  Resolved: /Users/grant/reference/ENVIRONMENT.md
+
+Prompt template:
+  Read {file} for environment context.
+```
+
+**Output (local context - command-based):**
+
+```bash
+start config context show git-status local
+```
+
+```
+Context configuration: git-status (local)
+═══════════════════════════════════════════════════════════
+
+Description: Current git working tree status
+Required: false
+
+Source: Command-based
+
+Command:
+  Shell: bash
+  Timeout: 5 seconds
+  Command: git status --short
+
+Prompt template:
+  Working tree status:
+  {command_output}
+```
+
+**Output (inline context):**
+
+```
+Context configuration: note (local)
+═══════════════════════════════════════════════════════════
+
+Required: true
+
+Source: Inline prompt
+
+Prompt:
+  Important: This project uses Go 1.21
+```
+
+**No context configured:**
+
+```
+No context 'nonexistent' found in global config.
+
+Configure: start config context new global
+```
+
+**Interactive selection:**
+
+```bash
+start config context show
+```
+
+```
+Show context configuration
+─────────────────────────────────────────────────
+
+Select context:
+  1) environment
+  2) index
+  3) agents
+  4) project
+
+Select [1-4]: 1
+
+Select scope:
+  1) global
+  2) local
+
+Scope [1-2]: 1
+
+(displays context configuration)
+```
+
+**Exit codes:**
+
+- 0 - Success (context shown)
+- 1 - No context configured
+- 2 - Invalid scope argument
+- 3 - Context not found
+
+**Error handling:**
+
+**Context not found:**
+
+```
+Error: Context 'nonexistent' not found in configuration.
+
+Use 'start config context list' to see available contexts.
 ```
 
 Exit code: 3

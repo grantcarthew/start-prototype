@@ -10,6 +10,7 @@ start config agent - Manage AI agent configurations
 start config agent list [scope]
 start config agent add [name] [scope]
 start config agent new [scope]
+start config agent show [name] [scope]
 start config agent test <name>
 start config agent edit [name] [scope]
 start config agent remove [name] [scope]
@@ -24,6 +25,7 @@ Manages AI agent configurations in both global (`~/.config/start/agents.toml`) a
 
 - **list** - Display all configured agents with details
 - **add** - Add new agent interactively
+- **show** - Display agent configuration structure
 - **test** - Test agent configuration and availability
 - **edit** - Modify existing agent configuration
 - **remove** - Delete agent from configuration
@@ -395,6 +397,131 @@ Backing up config to config.2025-01-04-143022.toml...
 
 Existing config preserved at: ~/.config/start/agents.toml
 Agent not added.
+```
+
+Exit code: 3
+
+### start config agent show
+
+Display current agent configuration.
+
+**Synopsis:**
+
+```bash
+start config agent show                 # Select agent and scope interactively
+start config agent show <name>          # Select scope for named agent
+start config agent show <name> global   # Show global agent only
+start config agent show <name> local    # Show local agent only
+```
+
+**Behavior:**
+
+Displays agent configuration from the selected scope with:
+
+- Scope (global or local)
+- Command template
+- Description (if configured)
+- URL (if configured)
+- Models URL (if configured)
+- Default model (if configured)
+- All configured models
+
+**Output (global agent):**
+
+```
+Agent configuration: claude (global)
+═══════════════════════════════════════════════════════════
+
+Description: Anthropic's Claude AI assistant via Claude Code CLI
+URL: https://docs.claude.com/claude-code
+Models URL: https://docs.anthropic.com/en/docs/about-claude/models
+
+Command template:
+  claude --model {model} --append-system-prompt '{role}' '{prompt}'
+
+Default model: sonnet
+Models:
+  haiku = claude-3-5-haiku-20241022
+  sonnet = claude-3-7-sonnet-20250219
+  opus = claude-opus-4-20250514
+```
+
+**Output (local agent):**
+
+```bash
+start config agent show custom-agent local
+```
+
+```
+Agent configuration: custom-agent (local)
+═══════════════════════════════════════════════════════════
+
+Command template:
+  custom-agent '{prompt}'
+
+Default model: (first model in config)
+Models: (none)
+```
+
+**Output (minimal agent):**
+
+```
+Agent configuration: simple-agent (global)
+═══════════════════════════════════════════════════════════
+
+Command template:
+  simple-agent '{prompt}'
+```
+
+**No agent configured:**
+
+```
+No agent 'nonexistent' found in global config.
+
+Configure: start config agent new global
+```
+
+**Interactive selection:**
+
+```bash
+start config agent show
+```
+
+```
+Show agent configuration
+─────────────────────────────────────────────────
+
+Select agent:
+  1) claude
+  2) gemini
+  3) aichat
+
+Select [1-3]: 1
+
+Select scope:
+  1) global
+  2) local
+
+Scope [1-2]: 1
+
+(displays agent configuration)
+```
+
+**Exit codes:**
+
+- 0 - Success (agent shown)
+- 1 - No agent configured
+- 2 - Invalid scope argument
+- 3 - Agent not found
+
+**Error handling:**
+
+**Agent not found:**
+
+```
+Error: Agent 'nonexistent' not found in configuration.
+
+Use 'start config agent list' to see available agents.
 ```
 
 Exit code: 3

@@ -10,6 +10,7 @@ start config task - Manage task configurations
 start config task list [scope]
 start config task add [name] [scope]
 start config task new [scope]
+start config task show [name] [scope]
 start config task test <name>
 start config task edit [name] [scope]
 start config task remove [name] [scope]
@@ -23,6 +24,7 @@ Manages predefined workflow task configurations in config files. Tasks define re
 
 - **list** - Display all configured tasks with details
 - **add** - Add new task interactively
+- **show** - Display task configuration structure
 - **test** - Test task configuration and command execution
 - **edit** - Modify existing task configuration
 - **remove** - Delete task from configuration
@@ -523,6 +525,137 @@ Or add to global config instead.
 ```
 
 Exit code: 2
+
+### start config task show
+
+Display current task configuration.
+
+**Synopsis:**
+
+```bash
+start config task show                 # Select task and scope interactively
+start config task show <name>          # Select scope for named task
+start config task show <name> global   # Show global task only
+start config task show <name> local    # Show local task only
+```
+
+**Behavior:**
+
+Displays task configuration from the selected scope with:
+
+- Scope (global or local)
+- Task name and alias
+- Description (if configured)
+- Role selection (if configured)
+- Task prompt (file, command, inline, or combination)
+- Shell and timeout overrides (if configured)
+
+**Output (global task):**
+
+```
+Task configuration: git-diff-review (global)
+═══════════════════════════════════════════════════════════
+
+Alias: gdr
+Description: Review staged git changes
+Role: code-reviewer
+
+Task prompt (command-based):
+  Command: git diff --staged
+  Shell: bash
+  Timeout: 10 seconds
+
+Prompt template:
+  Review changes:
+
+  ## Instructions
+  {instructions}
+
+  ## Changes
+  ```diff
+  {command_output}
+  ```
+```
+
+**Output (local task):**
+
+```bash
+start config task show custom-task local
+```
+
+```
+Task configuration: custom-task (local)
+═══════════════════════════════════════════════════════════
+
+Alias: ct
+Description: Custom task for this project
+
+Task prompt (inline):
+  Help me with: {instructions}
+```
+
+**Output (minimal task):**
+
+```
+Task configuration: simple-task (global)
+═══════════════════════════════════════════════════════════
+
+Task prompt (inline):
+  {instructions}
+```
+
+**No task configured:**
+
+```
+No task 'nonexistent' found in global config.
+
+Configure: start config task new global
+```
+
+**Interactive selection:**
+
+```bash
+start config task show
+```
+
+```
+Show task configuration
+─────────────────────────────────────────────────
+
+Select task:
+  1) git-diff-review (gdr)
+  2) code-review (cr)
+  3) security-audit (sa)
+
+Select [1-3]: 1
+
+Select scope:
+  1) global
+  2) local
+
+Scope [1-2]: 1
+
+(displays task configuration)
+```
+
+**Exit codes:**
+
+- 0 - Success (task shown)
+- 1 - No task configured
+- 2 - Invalid scope argument
+- 3 - Task not found
+
+**Error handling:**
+
+**Task not found:**
+
+```
+Error: Task 'nonexistent' not found in configuration.
+
+Use 'start config task list' to see available tasks.
+```
+
+Exit code: 3
 
 ### start config task test
 
