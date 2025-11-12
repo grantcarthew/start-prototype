@@ -203,7 +203,7 @@ Displays task configuration including system prompt override, required contexts,
 
 Tasks are defined in `tasks.toml` using the **Unified Template Design (UTD)** pattern:
 
-````toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 agent = "claude"                        # Optional: Preferred agent
@@ -221,7 +221,7 @@ Review the following changes:
 ## Changes
 ```diff
 {command_output}
-````
+```
 
 """
 
@@ -229,7 +229,7 @@ Review the following changes:
 shell = "bash"
 command_timeout = 30
 
-````
+`````
 
 **Agent Selection:**
 - Tasks can specify preferred agent with `agent` field
@@ -251,7 +251,7 @@ See [task.md](../task.md) for complete configuration documentation.
 
 ```bash
 start task
-````
+```
 
 Output:
 

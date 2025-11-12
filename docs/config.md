@@ -828,7 +828,7 @@ This ensures critical context (like AGENTS.md, ENVIRONMENT.md) is always present
 
 **Example task (full):**
 
-````toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 description = "Review staged git changes"
@@ -850,7 +850,7 @@ Review the following changes:
 {command_output}
 ```
 """
-````
+`````
 
 **Example task (minimal):**
 

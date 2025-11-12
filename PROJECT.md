@@ -242,3 +242,7 @@ Documentation review is complete when:
 - **{role_file} placeholder clarity**: Enhanced documentation to clearly explain temp file behavior for UTD roles
 - `docs/config.md`: Expanded {role_file} description to explain simple vs UTD role behavior and temp file creation/cleanup (lines 904-907)
 - `docs/cli/start-config-agent.md`: Clarified {role_file} description to mention temp file for UTD roles (line 1297)
+- **Markdown rendering fix**: Fixed broken GitHub markdown rendering caused by incorrect backtick nesting
+- `docs/config.md`: Changed outer code fence from 4 to 5 backticks (lines 831-853) to properly handle nested 3-backtick diff blocks
+- `docs/cli/start-task.md`: Fixed line 224 from 4 to 3 backticks (closing diff block) and upgraded outer fence to 5 backticks (lines 206-232)
+- `docs/cli/start-task.md`: Fixed line 254 from 4 to 3 backticks (closing bash block)
