@@ -145,7 +145,7 @@ Running task 'pre-commit-review'...
 start task
 ```
 
-Displays all available tasks (default and custom) with aliases and descriptions.
+Displays all configured tasks with aliases and descriptions. To browse the GitHub catalog, use `start config task add`.
 
 ### With Task Name - Execute Task
 

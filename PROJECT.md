@@ -294,3 +294,8 @@ Documentation review is complete when:
 - `docs/tasks.md`: Changed outer fence from 3 to 5 backticks for "Task with Role Reference" example (lines 255-273)
 - **Corrected "Default Tasks" section**: Changed terminology and explanation to reflect catalog-based lazy-loading architecture
 - `docs/tasks.md`: Renamed "Default Tasks" to "Available Tasks"; removed incorrect "embedded in binary" statement; explained GitHub catalog auto-download mechanism (lines 429-450)
+- **Added missing --local flag documentation**: Added --local flag to start and start-prompt commands (controls where downloaded assets are added)
+- `docs/cli/start.md`: Added --local flag description after --asset-download (lines 100-101)
+- `docs/cli/start-prompt.md`: Added --asset-download and --local flag descriptions (lines 67-71)
+- **Clarified task listing behavior**: Fixed misleading "available tasks" wording; clarified `start task` lists only configured tasks, not GitHub catalog
+- `docs/cli/start-task.md`: Changed "all available tasks (default and custom)" to "all configured tasks" with pointer to catalog browsing (line 148)

@@ -97,6 +97,9 @@ start -d ~/my-project
 **--asset-download[=bool]**
 : Enable or disable downloading assets from the GitHub catalog on-demand. Defaults to `true`. Use `--asset-download=false` to prevent network requests for missing assets.
 
+**--local**
+: When downloading assets from the catalog (roles, agents, contexts), add them to local config (`./.start/`) instead of global config (`~/.config/start/`). Only applies when an asset is downloaded; has no effect if asset already exists in config or cache.
+
 **--help**, **-h**
 : Show help text.
 
