@@ -822,7 +822,7 @@ Review the following changes:
 
 **Context Inclusion:**
 
-Tasks automatically include **all contexts where `required = true`**. There is no `documents` array.
+Tasks automatically include **all contexts where `required = true`**.
 
 This ensures critical context (like AGENTS.md, ENVIRONMENT.md) is always present while excluding optional contexts. See the `required` field documentation in the **[context.\<name\>]** section above for complete behavior across all commands.
 

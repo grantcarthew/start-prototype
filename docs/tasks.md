@@ -166,7 +166,7 @@ Available in `file` content and `prompt` templates:
 
 Tasks automatically include **all contexts where `required = true`**.
 
-There is no `documents` array in task configuration. Instead:
+Context inclusion behavior:
 
 1. All contexts with `[context.<name>] required = true` are automatically included
 2. Tasks cannot exclude required contexts or include optional contexts

@@ -172,7 +172,6 @@ start task <name> [instructions]
    - UTD supports: file, command, prompt with placeholders
 6. Load required contexts:
    - Auto-includes all contexts where `required = true`
-   - No `documents` array needed
    - Missing files generate warnings and are skipped (same as `start` command behavior)
    - Order: Config definition order
 7. Run task `command` if configured (UTD):
@@ -241,7 +240,7 @@ command_timeout = 30
 - Precedence: `--role` flag > task `role` field > `default_role` setting > first role in config
 - Role must exist in `[roles.<name>]` configuration
 
-**Note:** Tasks automatically include all contexts where `required = true`. No `documents` array needed.
+**Note:** Tasks automatically include all contexts where `required = true`.
 
 See [task.md](../task.md) for complete configuration documentation.
 
@@ -639,7 +638,7 @@ Task prompt templates support these placeholders:
 
 **Automatic inclusion:**
 
-Tasks automatically include all contexts where `required = true`. No `documents` array needed in task configuration.
+Tasks automatically include all contexts where `required = true`.
 
 **Context resolution:**
 

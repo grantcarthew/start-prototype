@@ -102,8 +102,6 @@ See [Unified Template Design](../unified-template-design.md) for UTD details.
 
 Tasks **automatically include all contexts where `required = true`**.
 
-There is **no `documents` array** in task configuration (removed from original design).
-
 **Rationale:**
 - Ensures critical context (like AGENTS.md, ENVIRONMENT.md) is always present
 - Simplifies task configuration
@@ -128,7 +126,6 @@ required = false  # NOT included in tasks
 [tasks.code-review]
 role = "code-reviewer"
 prompt = "Review code: {instructions}"
-# No documents array needed - gets 'environment' automatically
 ```
 
 ## Task-Specific Placeholders
@@ -445,7 +442,7 @@ Result: Local task used, global ignored.
 - Consistent with agent field pattern
 - See [DR-005](./dr-005-role-configuration.md)
 
-**Why no documents array:**
+**Why automatic context inclusion:**
 - Required contexts always included (ensures critical context present)
 - Optional contexts for full sessions only (not tasks)
 - Simpler task configuration

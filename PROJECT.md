@@ -249,3 +249,9 @@ Documentation review is complete when:
 - `docs/cli/start-config-task.md`: Upgraded outer fence to 5 backticks for two toml blocks with nested diff blocks (lines 36-61, 420-442)
 - `docs/design/design-records/dr-009-task-structure.md`: Upgraded outer fence to 5 backticks for two toml blocks with nested diff blocks (lines 13-36, 293-310)
 - `docs/design/design-records/dr-010-default-tasks.md`: Upgraded outer fence to 5 backticks for toml block with nested diff block (lines 49-75)
+- **Removed "documents array" references**: Cleaned up outdated references to removed feature across all documentation
+- `docs/config.md`: Removed "There is no `documents` array" from Context Inclusion section (line 825)
+- `docs/tasks.md`: Changed "There is no `documents` array in task configuration. Instead:" to "Context inclusion behavior:" (line 169)
+- `docs/cli/start-config-task.md`: Removed "No `documents` array needed" from 3 locations (lines 92, 1375, 1390)
+- `docs/cli/start-task.md`: Removed "No `documents` array needed" from 3 locations (lines 175, 243, 641)
+- `docs/design/design-records/dr-009-task-structure.md`: Removed "There is **no `documents` array**" statement and comment; reframed "Why no documents array:" to "Why automatic context inclusion:" (lines 105, 129, 445)

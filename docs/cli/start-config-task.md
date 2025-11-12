@@ -89,7 +89,7 @@ At least one required:
 
 **Context Inclusion:**
 
-Tasks automatically include **all contexts where `required = true`**. No `documents` array needed.
+Tasks automatically include **all contexts where `required = true`**.
 
 ## Subcommands
 
@@ -1372,7 +1372,7 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 
 ### Required Context Auto-Inclusion
 
-Tasks automatically include **all contexts where `required = true`**. There is no `documents` array in task configuration.
+Tasks automatically include **all contexts where `required = true`**.
 
 **Rationale:**
 - Ensures critical context (like AGENTS.md) is always present
@@ -1387,7 +1387,6 @@ file = "./AGENTS.md"
 required = true
 
 [tasks.code-review]
-# No documents array needed
 # agents context is automatically included
 prompt = "Review this code"
 ```
