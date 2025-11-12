@@ -33,7 +33,7 @@ Manages predefined workflow task configurations in config files. Tasks define re
 
 Tasks use the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern for both system prompts and task prompts:
 
-```toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 description = "Review staged git changes"
@@ -58,7 +58,7 @@ Review changes:
 # Shell config (optional)
 shell = "bash"
 command_timeout = 10
-```
+`````
 
 **Metadata Fields:**
 
@@ -417,7 +417,7 @@ prompt = "Help me with: {instructions}"
 
 **Resulting config (complex task):**
 
-```toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 description = "Review staged git changes"
@@ -439,7 +439,7 @@ Review changes:
 
 shell = "bash"
 command_timeout = 10
-```
+`````
 
 **Exit codes:**
 

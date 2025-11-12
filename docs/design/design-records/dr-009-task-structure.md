@@ -10,7 +10,7 @@ Tasks are predefined workflows that reference roles by name, use the Unified Tem
 
 ## Complete Task Configuration
 
-```toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 description = "Review git diff changes"
@@ -33,7 +33,7 @@ Analyze the following git diff and act as a code reviewer.
 ```
 
 """
-```
+`````
 
 ## Task Fields
 
@@ -290,7 +290,7 @@ start task gor "verify error handling"
 
 ### Task with Dynamic Content
 
-```toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 role = "code-reviewer"
@@ -307,7 +307,7 @@ Review these changes:
 {command_output}
 ```
 """
-```
+`````
 
 Usage:
 ```bash

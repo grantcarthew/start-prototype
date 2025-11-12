@@ -242,7 +242,10 @@ Documentation review is complete when:
 - **{role_file} placeholder clarity**: Enhanced documentation to clearly explain temp file behavior for UTD roles
 - `docs/config.md`: Expanded {role_file} description to explain simple vs UTD role behavior and temp file creation/cleanup (lines 904-907)
 - `docs/cli/start-config-agent.md`: Clarified {role_file} description to mention temp file for UTD roles (line 1297)
-- **Markdown rendering fix**: Fixed broken GitHub markdown rendering caused by incorrect backtick nesting
-- `docs/config.md`: Changed outer code fence from 4 to 5 backticks (lines 831-853) to properly handle nested 3-backtick diff blocks
+- **Markdown rendering fix**: Fixed broken GitHub markdown rendering caused by incorrect backtick nesting in toml blocks containing nested code blocks
+- `docs/config.md`: Changed outer code fence to 5 backticks for two toml blocks with nested diff blocks (lines 799-813, 831-853)
 - `docs/cli/start-task.md`: Fixed line 224 from 4 to 3 backticks (closing diff block) and upgraded outer fence to 5 backticks (lines 206-232)
 - `docs/cli/start-task.md`: Fixed line 254 from 4 to 3 backticks (closing bash block)
+- `docs/cli/start-config-task.md`: Upgraded outer fence to 5 backticks for two toml blocks with nested diff blocks (lines 36-61, 420-442)
+- `docs/design/design-records/dr-009-task-structure.md`: Upgraded outer fence to 5 backticks for two toml blocks with nested diff blocks (lines 13-36, 293-310)
+- `docs/design/design-records/dr-010-default-tasks.md`: Upgraded outer fence to 5 backticks for toml block with nested diff block (lines 49-75)

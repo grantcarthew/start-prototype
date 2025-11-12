@@ -46,7 +46,7 @@ start task cr "check security"
 
 ### 2. git-diff-review (gdr)
 
-```toml
+`````toml
 [tasks.git-diff-review]
 alias = "gdr"
 role = "code-reviewer"
@@ -72,7 +72,7 @@ Provide specific feedback on:
 - Missing edge cases
 - Testing considerations
 """
-```
+`````
 
 **Usage:**
 ```bash

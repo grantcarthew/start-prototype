@@ -796,7 +796,7 @@ At least one of `file`, `command`, or `prompt` must be present.
 **prompt** (string, optional)
 : Template text with `{file}`, `{file_contents}`, `{command}`, `{command_output}`, and `{instructions}` placeholders.
 
-```toml
+`````toml
 [tasks.git-diff-review]
 command = "git diff --staged"
 prompt = """
@@ -810,7 +810,7 @@ Review the following changes:
 {command_output}
 ```
 """
-```
+`````
 
 **Additional Fields:**
 
