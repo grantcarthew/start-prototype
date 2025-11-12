@@ -87,7 +87,7 @@ Available in UTD template contexts (roles, contexts, tasks):
 
 **{file}** - File path from UTD `file` field
 - Replaced with absolute file path (~ expanded)
-- Example: `file = "~/ref/ENV.md"` → `{file}` = `"/Users/username/ref/ENV.md"`
+- Example: `file = "~/reference/ENVIRONMENT.md"` → `{file}` = `"/Users/username/reference/ENVIRONMENT.md"`
 - Use case: Instructing AI agents with file access to read files
 - Example: `prompt = "Read {file} for context."`
 

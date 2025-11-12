@@ -255,3 +255,6 @@ Documentation review is complete when:
 - `docs/cli/start-config-task.md`: Removed "No `documents` array needed" from 3 locations (lines 92, 1375, 1390)
 - `docs/cli/start-task.md`: Removed "No `documents` array needed" from 3 locations (lines 175, 243, 641)
 - `docs/design/design-records/dr-009-task-structure.md`: Removed "There is **no `documents` array**" statement and comment; reframed "Why no documents array:" to "Why automatic context inclusion:" (lines 105, 129, 445)
+- **Fixed incorrect file path examples**: Corrected {file} placeholder examples to show proper path expansion
+- `docs/config.md`: Changed `/Users/username/ref/ENV.md` to `/Users/username/reference/ENVIRONMENT.md` (line 924)
+- `docs/design/design-records/dr-007-placeholders.md`: Changed example from `~/ref/ENV.md` to `~/reference/ENVIRONMENT.md` and output from `/Users/username/ref/ENV.md` to `/Users/username/reference/ENVIRONMENT.md` (line 90)

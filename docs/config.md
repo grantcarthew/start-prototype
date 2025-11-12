@@ -921,7 +921,7 @@ Used in `prompt` field of `[context.<name>]`, `[roles.<name>]`, and `[tasks.<nam
 **{file}**
 : File path from the `file` field (absolute, with ~ expanded).
 
-Example: `file = "~/reference/ENVIRONMENT.md"` → `{file}` = `"/Users/username/ref/ENV.md"`
+Example: `file = "~/reference/ENVIRONMENT.md"` → `{file}` = `"/Users/username/reference/ENVIRONMENT.md"`
 
 **{file_contents}**
 : Content from the `file` field. The file is read and its contents replace the placeholder.
