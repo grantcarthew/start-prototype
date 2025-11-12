@@ -40,18 +40,18 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/tasks.md`
+Active document: `docs/cli/start-task.md`
 
 ### Root Documentation
 
 - [x] `docs/config.md` - Configuration reference
-- [ ] `docs/tasks.md` - Task-specific documentation
+- [x] `docs/tasks.md` - Task-specific documentation
 - [x] `docs/vision.md` - Product vision and goals
 
 ### Main Commands
 
 - [x] `docs/cli/start.md` - Main entry point, interactive sessions
-- [ ] `docs/cli/start-prompt.md` - Prompt composition and execution
+- [x] `docs/cli/start-prompt.md` - Prompt composition and execution
 - [ ] `docs/cli/start-task.md` - Task execution (needs lazy loading updates)
 - [ ] `docs/cli/start-init.md` - Configuration initialization
 - [ ] `docs/cli/start-update.md` - Asset updates (needs per-asset update model)
