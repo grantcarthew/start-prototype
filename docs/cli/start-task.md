@@ -708,20 +708,29 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 - `cat file.md` - File contents
 - `find . -name "*.go"` - File listing
 
-### Default Tasks
+### Available Tasks
 
-`start` ships with four default interactive review tasks:
+Tasks are available from the GitHub asset catalog and automatically download on first use (if `asset_download = true`).
+
+**Example tasks available:**
 
 1. **code-review (cr)** - General code review
-2. **git-diff-review (gdr)** - Review git diff output
-3. **comment-tidy (ct)** - Review and tidy code comments
-4. **doc-review (dr)** - Documentation review
+2. **git-diff-review (gdr)** - Review staged git changes
+3. **comment-tidy (ct)** - Review and improve code comments
+4. **doc-review (dr)** - Review and improve documentation
+
+**How it works:**
+
+- Run `start task <name>` for any catalog task
+- Task downloads from GitHub and adds to your config automatically
+- Subsequent uses run from your config (no network required)
+- Browse available tasks: `start config task add`
 
 **Customization:**
 
-- Override defaults by defining tasks with same name in config
-- Add custom tasks
-- Tasks defined in local `./.start/tasks.toml` override global
+- Override catalog tasks by defining the same name in your config
+- Create custom tasks (global or local)
+- Disable auto-download: `asset_download = false` setting
 
 ### Task Discovery
 

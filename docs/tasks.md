@@ -197,7 +197,6 @@ Tasks can be defined in **both global and local** configs:
 
 **Global tasks:** `~/.config/start/tasks.toml`
 - Shared across all projects
-- Default tasks (cr, gdr, ct, dr)
 
 **Local tasks:** `./.start/tasks.toml`
 - Project-specific workflows

@@ -299,3 +299,7 @@ Documentation review is complete when:
 - `docs/cli/start-prompt.md`: Added --asset-download and --local flag descriptions (lines 67-71)
 - **Clarified task listing behavior**: Fixed misleading "available tasks" wording; clarified `start task` lists only configured tasks, not GitHub catalog
 - `docs/cli/start-task.md`: Changed "all available tasks (default and custom)" to "all configured tasks" with pointer to catalog browsing (line 148)
+- **Fixed "Default Tasks" in start-task.md**: Applied same fix as tasks.md - changed to "Available Tasks" with catalog explanation
+- `docs/cli/start-task.md`: Renamed "Default Tasks" to "Available Tasks"; removed "ships with" language; explained GitHub catalog auto-download mechanism (lines 711-733)
+- **Removed remaining "Default tasks" reference**: Removed misleading bullet point about default tasks in global config
+- `docs/tasks.md`: Removed "Default tasks (cr, gdr, ct, dr)" from Global tasks description (line 200)
