@@ -8,7 +8,6 @@ start config task - Manage task configurations
 
 ```bash
 start config task list [scope]
-start config task add [name] [scope]
 start config task new [scope]
 start config task show [name] [scope]
 start config task test <name>
@@ -23,13 +22,13 @@ Manages predefined workflow task configurations in config files. Tasks define re
 **Task management operations:**
 
 - **list** - Display all configured tasks with details
-- **add** - Add new task interactively
+- **new** - Create new task interactively
 - **show** - Display task configuration structure
 - **test** - Test task configuration and command execution
 - **edit** - Modify existing task configuration
 - **remove** - Delete task from configuration
 
-**Note:** Per DR-017, tasks can be defined in both global and local configs, and are also loaded from asset library (`~/.config/start/assets/tasks/`). These commands manage user-defined tasks only (global or local config). Asset tasks are managed by `start update`.
+**Note:** Per DR-017, tasks can be defined in both global and local configs, and are also loaded from asset library (`~/.config/start/assets/tasks/`). These commands manage user-defined tasks only (global or local config). To install tasks from the catalog, use `start assets add`. To update cached assets, use `start assets update`.
 
 ## Task Configuration Structure
 
@@ -208,7 +207,8 @@ quick-help (qh)
 ```
 No tasks configured in global config.
 
-Add tasks: start config task add global
+Create task: start config task new global
+Install from catalog: start assets add
 View asset tasks: start config task list merged
 ```
 
@@ -218,35 +218,6 @@ View asset tasks: start config task list merged
 - 1 - No config file exists
 - 2 - Invalid scope argument
 
-### start config task add
-
-Add a task from the official asset catalog. This command allows you to browse and install pre-made task configurations.
-
-**Synopsis:**
-
-```bash
-start config task add              # Interactive catalog browser
-start config task add [path]       # Direct install from catalog
-start config task add [path] --local # Install to local config
-```
-
-**Arguments:**
-
-**[path]** (optional)
-: The full catalog path of the task to install (e.g., `git-workflow/pre-commit-review`). If omitted, an interactive browser is shown.
-
-**Flags:**
-
-**--local**
-: Add to local config (`./.start/tasks.toml`) instead of global.
-
-**Behavior:**
-
-This command downloads the task configuration from the asset catalog, adds it to your `tasks.toml` file (global or local), and caches it locally.
-
-(See `start config role add` for a detailed example of the interactive catalog browsing flow).
-
-
 ### start config task new
 
 Interactively add a new task to the configuration.
@@ -254,9 +225,9 @@ Interactively add a new task to the configuration.
 **Synopsis:**
 
 ```bash
-start config task add          # Select scope interactively
-start config task add global   # Add to global config
-start config task add local    # Add to local config
+start config task new          # Select scope interactively
+start config task new global   # Add to global config
+start config task new local    # Add to local config
 ```
 
 **Behavior:**
@@ -917,7 +888,7 @@ Required contexts:
 Error: Task 'nonexistent' not found in configuration.
 
 Use 'start config task list' to see available tasks.
-Use 'start config task add' to add a new task.
+Use 'start assets add' to install from catalog or 'start config task new' to create custom.
 ```
 
 Exit code: 2
@@ -1110,7 +1081,7 @@ Use 'start config task test git-diff-review' to validate.
 Error: Task 'nonexistent' not found in configuration.
 
 Use 'start config task list' to see available tasks.
-Use 'start config task add' to add a new task.
+Use 'start assets add' to install from catalog or 'start config task new' to create custom.
 ```
 
 Exit code: 2
@@ -1122,7 +1093,7 @@ Error: Task 'code-review' is from asset library.
 
 Asset tasks cannot be edited directly.
 To customize, create an override in global or local config:
-  start config task add global
+  start config task new global
 
 Or remove from assets: Remove the file from ~/.config/start/assets/tasks/
 ```
@@ -1307,7 +1278,7 @@ Exit code: 2
 ```
 No tasks configured in global config.
 
-Use 'start config task add global' to add a task.
+Use 'start config task new global' to create a task.
 View asset tasks: start config task list merged
 ```
 
@@ -1360,16 +1331,16 @@ start config task list global
 start config task list local
 ```
 
-### Add Task to Global Config
+### Create Task in Global Config
 
 ```bash
-start config task add global
+start config task new global
 ```
 
-### Add Task to Local Config
+### Create Task in Local Config
 
 ```bash
-start config task add local
+start config task new local
 ```
 
 ### Test Task
@@ -1409,7 +1380,7 @@ Shows list of all tasks to choose from.
 : Local project task definitions file containing project-specific tasks.
 
 **~/.config/start/assets/tasks/*.toml**
-: Asset library tasks (updated via `start update`). Cannot be edited directly via `start config task` commands.
+: Asset library tasks (updated via `start assets update`). Cannot be edited directly via `start config task` commands.
 
 Tasks are merged from all three sources: assets + global + local. User tasks (global/local) take precedence over asset tasks with the same name.
 
@@ -1444,7 +1415,7 @@ Exit code: 1
 
 Tasks are discovered from three sources:
 
-1. **Asset library:** `~/.config/start/assets/tasks/*.toml` (managed by `start update`)
+1. **Asset library:** `~/.config/start/assets/tasks/*.toml` (managed by `start assets update`)
 2. **Global config:** `~/.config/start/tasks.toml` (managed by `start config task`)
 3. **Local config:** `./.start/tasks.toml` (managed by `start config task`)
 
@@ -1544,18 +1515,18 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 **Asset tasks:**
 - Provided by `start` as defaults
 - Located in `~/.config/start/assets/tasks/`
-- Updated via `start update`
+- Updated via `start assets update`
 - Cannot be edited directly via `start config task`
 - Can be overridden by creating user task with same name
 
 **User tasks:**
-- Created via `start config task add`
+- Created via `start config task new` or `start assets add`
 - Located in global or local config
 - Fully customizable
 - Take precedence over asset tasks
 
 **To customize asset task:**
-1. Run `start config task add global` (or local)
+1. Run `start config task new global` (or local)
 2. Use same name as asset task
 3. Configure as desired
 4. Your task overrides the asset task

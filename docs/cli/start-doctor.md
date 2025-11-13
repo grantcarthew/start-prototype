@@ -81,7 +81,7 @@ Assets
   ⚠ Asset library is 45 days old
   Last updated: 2024-11-22
 
-  Run 'start update' to download latest assets.
+  Run 'start assets update' to download latest assets.
 
 Configuration
   ✓ Global config valid (~/.config/start/)
@@ -115,7 +115,7 @@ Tasks (4 configured)
 
   ✗ go-review (gor)
     Agent: go-expert (NOT FOUND)
-    Fix: start config agent add go-expert
+    Fix: start assets add go-expert
 
   ✓ security-audit (sec)
     Agent: claude (from task config)
@@ -145,8 +145,8 @@ Issues:
 
 Recommendations:
   1. Install aichat: brew install aichat
-  2. Add go-expert agent: start config agent add go-expert
-  3. Update assets: start update
+  2. Add go-expert agent: start assets add go-expert
+  3. Update assets: start assets update
   4. Optional: Create PROJECT.md in current directory
 ```
 
@@ -187,7 +187,7 @@ Assets
     examples/ - 2 files
 
   ⚠ Assets are 45 days old (recommended: < 30 days)
-  Run 'start update' to download latest assets.
+  Run 'start assets update' to download latest assets.
 
 Configuration
   Global config:
@@ -310,7 +310,7 @@ Verifies age and completeness of asset library.
 ```
 ✓ Asset library up to date (updated 2 days ago)
 ⚠ Assets are 45 days old
-  Run 'start update' to refresh
+  Run 'start assets update' to refresh
 ✗ Asset library missing
   Run 'start init' to initialize
 ```
@@ -463,7 +463,7 @@ Only run task if environment is healthy.
 `start doctor` runs automatically in limited form:
 
 - Asset age check runs on every `start` invocation
-- If assets > 30 days: "⚠ Assets outdated. Run 'start update'"
+- If assets > 30 days: "⚠ Assets outdated. Run 'start assets update'"
 - Non-blocking: warning only, doesn't prevent execution
 - Cached for 24 hours to avoid GitHub API rate limits
 

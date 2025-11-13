@@ -8,7 +8,6 @@ start config role - Manage role configuration
 
 ```bash
 start config role list
-start config role add [path]
 start config role new [scope]
 start config role show [scope]
 start config role edit [scope]
@@ -24,12 +23,14 @@ Manages role configuration in config files. Roles define the AI agent's persona 
 **Role management operations:**
 
 - **list** - Display all configured roles
-- **add** - Add role from catalog (interactive) or by path
+- **new** - Create new custom role interactively
 - **show** - Display current role configurations
 - **edit** - Modify a role (create if doesn't exist)
 - **remove** - Remove a role configuration
 - **default** - Set or show default role
 - **test** - Verify role configuration and file availability
+
+To install roles from the catalog, use `start assets add`.
 
 **Note:** Roles use the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern. Roles are defined as `[roles.<name>]` sections in both global and local configs. Global + local roles are combined; local overrides global for same role name.
 
@@ -129,151 +130,6 @@ Available catalog roles (4):
 
 - 0 - Success (roles listed)
 - 1 - No config file exists
-
-### start config role add
-
-Add a role from the official GitHub asset catalog.
-
-**Synopsis:**
-
-```bash
-start config role add                   # Interactive catalog browser
-start config role add general/code-reviewer  # Direct install from catalog
-start config role add --local           # Add to local config
-```
-
-**Arguments:**
-
-**[path]** (optional)
-: The full catalog path of the role to install directly (e.g., `general/code-reviewer`). If omitted, an interactive browser is shown.
-
-**Flags:**
-
-**--local**
-: Add to local config (`./.start/roles.toml`) instead of global.
-
-**Behavior:**
-
-**Interactive mode** (no path specified):
-
-1. Fetch catalog from GitHub
-2. Show categories and roles
-3. User selects role
-4. Download and cache role file
-5. Add role configuration to config file
-
-**Direct mode** (path specified):
-
-1. Check if role exists in catalog
-2. Download and cache role file
-3. Add role configuration to config file
-
-**Interactive flow:**
-
-```
-Fetching catalog from GitHub...
-✓ Found 8 roles across 3 categories
-
-Select category:
-  1. general (4 roles)
-  2. languages (2 roles)
-  3. specialized (2 roles)
-
-Choice [1-3]: 1
-
-general roles:
-  1. code-reviewer - Expert code reviewer focused on security
-  2. default - Balanced helpful assistant
-  3. pair-programmer - Collaborative programming assistant
-  4. explainer - Teaching mode that simplifies concepts
-
-Choice [1-4]: 1
-
-Selected: code-reviewer
-Description: Expert code reviewer focused on security
-Tags: review, quality, security, strict
-
-Download and add to config? [Y/n] y
-
-Downloading...
-✓ Cached to ~/.config/start/assets/roles/general/
-✓ Added to global config as 'code-reviewer'
-
-Try it: start --role code-reviewer
-    or: start task <taskname>  # Task-specific role overrides work too
-```
-
-**Direct install:**
-
-```bash
-start config role add general/code-reviewer
-```
-
-Output:
-
-```
-Downloading general/code-reviewer...
-✓ Cached to ~/.config/start/assets/roles/general/
-✓ Added to global config as 'code-reviewer'
-```
-
-**Add to local config:**
-
-```bash
-start config role add general/code-reviewer --local
-```
-
-Output:
-
-```
-Downloading general/code-reviewer...
-✓ Cached to ~/.config/start/assets/roles/general/
-✓ Added to local config as 'code-reviewer'
-```
-
-**Resulting configuration:**
-
-```toml
-# In roles.toml
-[roles.code-reviewer]
-description = "Expert code reviewer focused on security"
-file = "~/.config/start/assets/roles/general/code-reviewer.md"
-```
-
-**Error handling:**
-
-**Network unavailable:**
-
-```
-Error: Cannot fetch catalog from GitHub
-
-  Network error: dial tcp: no route to host
-
-To resolve:
-- Check internet connection
-- Add custom role: start config role edit
-```
-
-**Role not found in catalog:**
-
-```
-Error: Role 'nonexistent/role' not found in catalog
-
-Available roles:
-  - general/code-reviewer
-  - general/default
-  - languages/go-expert
-  - specialized/rubber-duck
-
-Try: start config role add  # Browse interactively
-```
-
-**Exit codes:**
-
-- 0 - Success (role added)
-- 1 - Network error (catalog unavailable)
-- 2 - Role not found
-- 3 - User cancelled
 
 ### start config role new
 
@@ -1018,7 +874,7 @@ Exit code: 2
 ```
 Error: No roles configured.
 
-Use 'start config role add' to add a role.
+Use 'start assets add' to install from catalog or 'start config role new' to create custom.
 Use 'start init' to set up roles automatically.
 ```
 
@@ -1540,7 +1396,7 @@ By convention, role definition files are stored in:
 
 **Global:** `~/.config/start/roles/*.md`
 - Personal role definitions
-- Managed via `start update` (asset roles)
+- Managed via `start assets update` (asset roles)
 - Can also be user-created
 
 **Local (per-project):** `./.start/roles/*.md` or `./roles/*.md`
@@ -1549,7 +1405,7 @@ By convention, role definition files are stored in:
 
 **Asset roles:** `~/.config/start/assets/roles/*.md`
 - Provided by `start` as defaults
-- Updated via `start update`
+- Updated via `start assets update`
 
 ### Agent Support
 

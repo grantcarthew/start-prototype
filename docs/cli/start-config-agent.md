@@ -8,7 +8,6 @@ start config agent - Manage AI agent configurations
 
 ```bash
 start config agent list [scope]
-start config agent add [name] [scope]
 start config agent new [scope]
 start config agent show [name] [scope]
 start config agent test <name>
@@ -24,12 +23,14 @@ Manages AI agent configurations in both global (`~/.config/start/agents.toml`) a
 **Agent management operations:**
 
 - **list** - Display all configured agents with details
-- **add** - Add new agent interactively
+- **new** - Create new agent interactively
 - **show** - Display agent configuration structure
 - **test** - Test agent configuration and availability
 - **edit** - Modify existing agent configuration
 - **remove** - Delete agent from configuration
 - **default** - Set or show default agent
+
+To install agents from the catalog, use `start assets add`.
 
 **Note:** Per DR-004, agents can be defined in both global and local configs. These commands can manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
 
@@ -147,42 +148,13 @@ opencode
 No agents configured.
 
 Run 'start init' to set up agents, or
-use 'start config agent add' to add an agent manually.
+use 'start assets add' to install from catalog or 'start config agent new' to create custom.
 ```
 
 **Exit codes:**
 
 - 0 - Success (agents listed)
 - 1 - No config file exists
-
-### start config agent add
-
-Add agent from the official asset catalog. This command allows you to browse and install pre-made agent configurations.
-
-**Synopsis:**
-
-```bash
-start config agent add              # Interactive catalog browser
-start config agent add [path]       # Direct install from catalog
-start config agent add [path] --local # Install to local config
-```
-
-**Arguments:**
-
-**[path]** (optional)
-: The full catalog path of the agent to install (e.g., `anthropic/claude`). If omitted, an interactive browser is shown.
-
-**Flags:**
-
-**--local**
-: Add to local config (`./.start/agents.toml`) instead of global.
-
-**Behavior:**
-
-This command downloads the agent configuration from the asset catalog, adds it to your global `agents.toml` file, and caches it locally. It is the standard way to get pre-configured agents.
-
-(See `start config role add` for a detailed example of the interactive catalog browsing flow).
-
 
 ### start config agent new
 
@@ -703,7 +675,7 @@ Dry-run command:
 Error: Agent 'nonexistent' not found in configuration.
 
 Use 'start config agent list' to see available agents.
-Use 'start config agent add' to add a new agent.
+Use 'start assets add' to install from catalog or 'start config agent new' to create custom.
 ```
 
 Exit code: 2
@@ -888,7 +860,7 @@ Saving changes to ~/.config/start/agents.toml...
 Error: Agent 'nonexistent' not found in configuration.
 
 Use 'start config agent list' to see available agents.
-Use 'start config agent add' to add a new agent.
+Use 'start assets add' to install from catalog or 'start config agent new' to create custom.
 ```
 
 Exit code: 2
@@ -1081,7 +1053,7 @@ Exit code: 2
 ```
 No agents configured.
 
-Use 'start config agent add' to add an agent.
+Use 'start assets add' to install from catalog or 'start config agent new' to create custom.
 ```
 
 Exit code: 1
@@ -1100,7 +1072,7 @@ Removing agent 'claude' from ~/.config/start/agents.toml...
 ✓ Agent 'claude' removed successfully
 ⚠ No agents remaining in configuration
 
-Use 'start config agent add' to add an agent.
+Use 'start assets add' to install from catalog or 'start config agent new' to create custom.
 Use 'start init' to set up agents automatically.
 ```
 
@@ -1270,7 +1242,7 @@ Exit code: 2
 ```
 Error: No agents configured.
 
-Use 'start config agent add' to add an agent.
+Use 'start assets add' to install from catalog or 'start config agent new' to create custom.
 Use 'start init' to set up agents automatically.
 ```
 

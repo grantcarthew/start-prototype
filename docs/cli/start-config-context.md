@@ -8,7 +8,7 @@ start config context - Manage context document configurations
 
 ```bash
 start config context list [scope]
-start config context add [name] [scope]
+start config context new [scope]
 start config context new [scope]
 start config context show [name] [scope]
 start config context test <name>
@@ -190,7 +190,7 @@ Optional contexts (2):
 ```
 No contexts configured in global config.
 
-Add contexts: start config context add global
+Create contexts: start config context new global
 ```
 
 **Exit codes:**
@@ -199,35 +199,6 @@ Add contexts: start config context add global
 - 1 - No config file exists
 - 2 - Invalid scope argument
 
-### start config context add
-
-Add a context from the official asset catalog. This command allows you to browse and install pre-made context configurations.
-
-**Synopsis:**
-
-```bash
-start config context add              # Interactive catalog browser
-start config context add [path]       # Direct install from catalog
-start config context add [path] --local # Install to local config
-```
-
-**Arguments:**
-
-**[path]** (optional)
-: The full catalog path of the context to install. If omitted, an interactive browser is shown.
-
-**Flags:**
-
-**--local**
-: Add to local config (`./.start/contexts.toml`) instead of global.
-
-**Behavior:**
-
-This command downloads the context configuration from the asset catalog, adds it to your `contexts.toml` file (global or local), and caches it locally.
-
-(See `start config role add` for a detailed example of the interactive catalog browsing flow).
-
-
 ### start config context new
 
 Interactively add a new context to the configuration.
@@ -235,9 +206,9 @@ Interactively add a new context to the configuration.
 **Synopsis:**
 
 ```bash
-start config context add          # Select scope interactively
-start config context add global   # Add to global config
-start config context add local    # Add to local config
+start config context new          # Select scope interactively
+start config context new global   # Add to global config
+start config context new local    # Add to local config
 ```
 
 **Behavior:**
@@ -897,7 +868,7 @@ Prompt template analysis:
 Error: Context 'nonexistent' not found in configuration.
 
 Use 'start config context list' to see available contexts.
-Use 'start config context add' to add a new context.
+Use 'start assets add' to install from catalog or 'start config context new' to create custom.
 ```
 
 Exit code: 2
@@ -1095,7 +1066,7 @@ Saving changes to ~/.config/start/contexts.toml...
 Error: Context 'nonexistent' not found in configuration.
 
 Use 'start config context list' to see available contexts.
-Use 'start config context add' to add a new context.
+Use 'start assets add' to install from catalog or 'start config context new' to create custom.
 ```
 
 Exit code: 2
@@ -1264,7 +1235,7 @@ Exit code: 2
 ```
 No contexts configured in global config.
 
-Use 'start config context add global' to add a context.
+Use 'start config context new global' to create a context.
 ```
 
 Exit code: 1
@@ -1315,16 +1286,16 @@ Show all contexts from both global and local configs.
 start config context list global
 ```
 
-### Add Context to Global Config
+### Create Context in Global Config
 
 ```bash
-start config context add global
+start config context new global
 ```
 
-### Add Context to Local Config
+### Create Context in Local Config
 
 ```bash
-start config context add local
+start config context new local
 ```
 
 ### Test Context

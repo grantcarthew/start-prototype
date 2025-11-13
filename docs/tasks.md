@@ -439,7 +439,7 @@ Tasks are available from the GitHub asset catalog and automatically download on 
 - Run `start task <name>` for any catalog task
 - Task downloads from GitHub and adds to your config automatically
 - Subsequent uses run from your config (no network required)
-- Browse available tasks: `start config task add`
+- Browse available tasks: `start assets add` or `start assets browse`
 
 **Customization:**
 - Override catalog tasks by defining the same name in your config

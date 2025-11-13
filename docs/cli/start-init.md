@@ -636,7 +636,7 @@ required = true
 ```toml
 # This file is created by 'start init'.
 # Add custom tasks here or install them from the
-# asset catalog using 'start config task add'.
+# asset catalog using 'start assets add'.
 ```
 
 **Note:** Agent model names and command templates come from GitHub. Above is illustrative only.

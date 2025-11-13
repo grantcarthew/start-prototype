@@ -145,7 +145,7 @@ Running task 'pre-commit-review'...
 start task
 ```
 
-Displays all configured tasks with aliases and descriptions. To browse the GitHub catalog, use `start config task add`.
+Displays all configured tasks with aliases and descriptions. To browse the GitHub catalog, use `start assets browse` or `start assets add`.
 
 ### With Task Name - Execute Task
 
@@ -588,7 +588,7 @@ Configured agents:
   claude
   opencode
 
-Add agent: start config agent add go-expert
+Add agent: start assets add go-expert
 Or override: start task go-review --agent claude
 ```
 
@@ -724,7 +724,7 @@ Tasks are available from the GitHub asset catalog and automatically download on 
 - Run `start task <name>` for any catalog task
 - Task downloads from GitHub and adds to your config automatically
 - Subsequent uses run from your config (no network required)
-- Browse available tasks: `start config task add`
+- Browse available tasks: `start assets browse` or `start assets add`
 
 **Customization:**
 

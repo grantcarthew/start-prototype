@@ -963,10 +963,10 @@ Commands that modify configs create timestamped backups for each file:
 **Backup creation triggers:**
 
 - `start config edit` (after validation warnings)
-- `start config task add|edit|remove` (before write to tasks.toml)
-- `start config agent add|edit|remove` (before write to agents.toml)
-- `start config role edit|remove` (before write to roles.toml)
-- `start config context add|edit|remove` (before write to contexts.toml)
+- `start config task new|edit|remove` (before write to tasks.toml)
+- `start config agent new|edit|remove` (before write to agents.toml)
+- `start config role new|edit|remove` (before write to roles.toml)
+- `start config context new|edit|remove` (before write to contexts.toml)
 - `start init` (when modifying existing config files)
 
 ### Context File Validation

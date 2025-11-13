@@ -367,22 +367,22 @@ Kept in cache:
 
 **CLI docs to create:**
 - ✅ `docs/cli/start-assets.md` - Main command documentation (COMPLETED)
-- ⏳ `docs/cli/start-assets-browse.md` (IN PROGRESS)
-- `docs/cli/start-assets-add.md`
-- `docs/cli/start-assets-search.md`
-- `docs/cli/start-assets-info.md`
-- `docs/cli/start-assets-update.md`
-- `docs/cli/start-assets-clean.md`
+- ✅ `docs/cli/start-assets-browse.md` (COMPLETED)
+- ✅ `docs/cli/start-assets-add.md` (COMPLETED)
+- ✅ `docs/cli/start-assets-search.md` (COMPLETED)
+- ✅ `docs/cli/start-assets-info.md` (COMPLETED)
+- ✅ `docs/cli/start-assets-update.md` (COMPLETED)
+- ✅ `docs/cli/start-assets-clean.md` (COMPLETED)
 
 **CLI docs to update:**
-- `docs/cli/start-config-task.md` - Remove `add` subcommand, reference `start assets`
-- `docs/cli/start-config-role.md` - Remove `add` subcommand, reference `start assets`
-- `docs/cli/start-config-agent.md` - Remove `add` subcommand, reference `start assets`
-- `docs/cli/start-update.md` - Mark as removed, redirect to `start assets update`
-- `docs/cli/start-show.md` - Remove `assets` subcommand, reference `start assets info`
+- ✅ `docs/cli/start-config-task.md` - Removed `add` subcommand, updated references (COMPLETED)
+- ✅ `docs/cli/start-config-role.md` - Removed `add` subcommand, updated references (COMPLETED)
+- ✅ `docs/cli/start-config-agent.md` - Removed `add` subcommand, updated references (COMPLETED)
+- ✅ `docs/cli/start-update.md` - Removed file (deprecated) (COMPLETED)
+- ✅ `docs/cli/start-show.md` - Removed Asset Catalog Viewer Mode section (COMPLETED)
 
 **Config docs to update:**
-- `docs/config.md` - Update asset catalog references
+- ✅ `docs/config.md` - Updated asset catalog references (COMPLETED)
 
 ### Implementation Notes
 
@@ -425,8 +425,8 @@ Kept in cache:
 - [x] Substring matching DR written (DR-040)
 - [x] Asset command reorganization DR written (DR-041)
 - [x] All related DRs updated (DR-017, DR-031, DR-033, DR-035, DR-037)
-- [ ] All CLI documentation created (1/7 complete)
-- [ ] All existing docs updated (0/6 complete)
+- [x] All CLI documentation created (7/7 complete)
+- [x] All existing docs updated (6/6 complete)
 
 **Implementation Phase (Code):**
 - [ ] All 6 commands implemented and tested
@@ -439,9 +439,16 @@ Kept in cache:
 
 **Documentation Phase Progress:**
 - ✅ Main command doc (start-assets.md)
-- ⏳ Browse command doc (in progress)
-- ⏳ Add command doc (pending)
-- ⏳ Search command doc (pending)
-- ⏳ Info command doc (pending)
-- ⏳ Update command doc (pending)
-- ⏳ Clean command doc (pending)
+- ✅ Browse command doc (start-assets-browse.md)
+- ✅ Add command doc (start-assets-add.md)
+- ✅ Search command doc (start-assets-search.md)
+- ✅ Info command doc (start-assets-info.md)
+- ✅ Update command doc (start-assets-update.md)
+- ✅ Clean command doc (start-assets-clean.md)
+
+**Documentation Phase: COMPLETE** (2025-01-13)
+- All 7 new CLI documentation files created
+- All 6 existing CLI documentation files updated to remove deprecated commands
+- All deprecated command references cleaned up from user-facing docs
+- All verification checks passed (ripgrep searches confirmed cleanup complete)
+- Ready for implementation phase

@@ -21,7 +21,7 @@ start                           # Start interactive session with default role
 start --role go-expert          # Start with specific role
 start task pre-commit-review    # Run a specific task
 start init                      # Initialize configuration
-start config task add           # Browse and install tasks from catalog
+start assets add                # Browse and install assets from catalog
 ```
 
 ## Architecture
