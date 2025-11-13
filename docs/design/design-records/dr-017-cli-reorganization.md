@@ -42,7 +42,17 @@ start config role <sub>      # Manage system prompts (new)
 ```bash
 start init [scope]           # Initialize configuration
 start doctor                 # Diagnose installation
-start update                 # Update asset library
+```
+
+**Asset management (DR-041):**
+```bash
+start assets browse          # Interactive catalog browser
+start assets search <query>  # Search by name/description/tags
+start assets add <query>     # Search and install asset
+start assets info <query>    # Show detailed asset information
+start assets update [query]  # Update cached assets
+start assets clean           # Remove unused cached assets
+start assets index           # Generate catalog index (contributors)
 ```
 
 ## Configuration Subcommands
@@ -51,7 +61,7 @@ All follow consistent pattern:
 
 ```bash
 start config agent list [scope]
-start config agent add [name] [scope]
+start config agent add [name] [scope]  # DEPRECATED (DR-041) - use 'start assets add'
 start config agent new [scope]
 start config agent show [name] [scope]
 start config agent test <name>
@@ -68,7 +78,7 @@ start config context edit [name] [scope]
 start config context remove [name] [scope]
 
 start config task list [scope]
-start config task add [name] [scope]
+start config task add [name] [scope]  # DEPRECATED (DR-041) - use 'start assets add'
 start config task new [scope]
 start config task show [name] [scope]
 start config task test <name>
@@ -76,7 +86,7 @@ start config task edit [name] [scope]
 start config task remove [name] [scope]
 
 start config role list [scope]
-start config role add [path]
+start config role add [path]  # DEPRECATED (DR-041) - use 'start assets add'
 start config role new [scope]
 start config role show [scope]
 start config role test
@@ -98,6 +108,23 @@ start config role default [name]
 - Design phase only - no existing users
 - `start agent` → `start config agent`
 
+## Updates (DR-041)
+
+**Asset command reorganization** introduced unified `start assets` command suite:
+
+- **Deprecated:** `start config [type] add` commands for catalog assets
+- **Deprecated:** `start update` command
+- **Replacement:** `start assets` command with subcommands:
+  - `start assets browse` - Interactive catalog browser
+  - `start assets search` - Search by description/tags
+  - `start assets add` - Universal asset installer
+  - `start assets info` - Preview asset details
+  - `start assets update` - Update cached assets
+  - `start assets clean` - Clean unused cache
+  - `start assets index` - Generate catalog index
+
+**Rationale:** Unified asset discovery and management, type-agnostic installation, better discoverability. See [DR-041](./dr-041-asset-command-reorganization.md) for complete specification.
+
 ## Rationale
 
 Clear separation between configuration (managing settings) and execution (running the tool) provides better mental model and allows consistent expansion of configuration management without top-level command pollution.
@@ -105,3 +132,4 @@ Clear separation between configuration (managing settings) and execution (runnin
 ## Related Decisions
 
 - [DR-006](./dr-006-cobra-cli.md) - CLI framework and structure
+- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (unified `start assets` suite)

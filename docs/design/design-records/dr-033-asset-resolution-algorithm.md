@@ -350,6 +350,38 @@ func getCatalog() *GitHubCatalog {
 - ✅ No prompts for assets user already downloaded
 - ✅ Cache = implementation detail
 
+## Resolution vs Discovery (DR-041)
+
+This resolution algorithm applies to **command execution** (running tasks, roles, agents).
+
+**Asset discovery commands** (`start assets search/browse/info`) work differently:
+
+| Aspect | Resolution (this DR) | Discovery (DR-040, DR-041) |
+|--------|---------------------|---------------------------|
+| **Purpose** | Execute configured asset | Find assets in catalog |
+| **Commands** | `start task <name>`, `start --role <name>` | `start assets search`, `start assets browse` |
+| **Search sources** | Local → Global → Cache → GitHub | GitHub catalog only |
+| **Match algorithm** | Exact match → prefix (DR-038) | Substring matching (DR-040) |
+| **Search fields** | Name only | Name, path, description, tags |
+| **Uses index.csv** | No | Yes (DR-039) |
+
+**Rationale for GitHub-only search:**
+- Discovery is about **exploring what's available** in the catalog
+- Local/global configs are **already known** to the user
+- Cache is a subset of GitHub catalog
+- Searching GitHub provides complete, fresh catalog view
+
+**Example distinction:**
+```bash
+# Resolution (local → global → cache → GitHub)
+start task pre-commit   # Prefix match, checks all sources
+
+# Discovery (GitHub catalog only)
+start assets search "commit"  # Substring match, GitHub only
+```
+
+After discovering an asset via `start assets`, it can be added to config and will then be found via normal resolution.
+
 ## Trade-offs Accepted
 
 **Network dependency for new assets:**
@@ -376,3 +408,6 @@ func getCatalog() *GitHubCatalog {
 - [DR-036](./dr-036-cache-management.md) - Cache structure (cache lookup)
 - [DR-026](./dr-026-offline-behavior.md) - Offline fallback (network error handling)
 - [DR-038](./dr-038-flag-value-resolution.md) - Prefix matching for flag values (extends exact match with prefix support)
+- [DR-039](./dr-039-catalog-index.md) - Catalog index file (used by discovery commands, not resolution)
+- [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm (used by discovery, not resolution)
+- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (distinction between resolution and discovery)

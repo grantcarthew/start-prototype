@@ -35,10 +35,12 @@ Transform asset distribution from a bulk download model to a catalog-driven syst
 
 ### User Workflows
 
-**Browse and install:**
+**Browse and install (DR-041):**
 ```bash
-start config task add                    # Interactive catalog browser
-start config task add git-workflow/pre-commit-review  # Direct install
+start assets browse                      # Interactive catalog browser
+start assets add "pre-commit"            # Search and install by query
+start assets search "commit"             # Search by description/tags
+start assets info "pre-commit-review"    # Preview before installing
 ```
 
 **Lazy loading:**
@@ -46,10 +48,13 @@ start config task add git-workflow/pre-commit-review  # Direct install
 start task pre-commit-review  # Not in config? Download from GitHub and add
 ```
 
-**Update cached assets:**
+**Update cached assets (DR-041):**
 ```bash
-start update                  # Check cached assets for updates via SHA comparison
+start assets update                      # Check cached assets for updates via SHA comparison
+start assets update "git"                # Update only matching assets
 ```
+
+**Note:** Original commands (`start config task add`, `start update`) deprecated in favor of unified `start assets` command suite. See [DR-041](./dr-041-asset-command-reorganization.md).
 
 ### Configuration Structure
 
@@ -133,7 +138,7 @@ When user runs `start task <name>`:
 ### Update Workflow
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
   ✓ tasks/git-workflow/pre-commit-review (updated v1.0 → v1.1)
@@ -151,9 +156,9 @@ Your existing task configurations are **never automatically overwritten**. Updat
 
 **For Users:**
 - ✅ **Immediate value** - Browse and install curated assets
-- ✅ **Discoverable** - Interactive catalog browsing
+- ✅ **Discoverable** - Interactive catalog browsing and search (DR-041)
 - ✅ **On-demand** - Only download what you use
-- ✅ **Fresh** - Check for updates anytime via `start update`
+- ✅ **Fresh** - Check for updates anytime via `start assets update`
 - ✅ **Customizable** - Mix catalog + custom assets seamlessly
 - ✅ **Offline-friendly** - Cached assets work offline
 - ✅ **No tracking** - User config is self-contained
@@ -270,6 +275,9 @@ func LoadConfig(dir string) (*Config, error) {
 - [DR-035](./dr-035-interactive-browsing.md) - TUI catalog browsing
 - [DR-036](./dr-036-cache-management.md) - Cache structure and behavior
 - [DR-037](./dr-037-asset-updates.md) - Update mechanism and SHA comparison
+- [DR-039](./dr-039-catalog-index.md) - Catalog index file (CSV schema for fast search)
+- [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm for asset search
+- [DR-041](./dr-041-asset-command-reorganization.md) - Unified `start assets` command suite
 
 **Consistent with:**
 - [DR-026](./dr-026-offline-behavior.md) - Offline fallback (cache works offline)

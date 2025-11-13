@@ -334,7 +334,13 @@ Kept in cache:
 
 **New DRs to write:**
 
-1. **DR-0XX: Substring Matching Algorithm**
+1. ✅ **DR-039: Catalog Index File** (COMPLETED)
+   - CSV schema for catalog metadata index
+   - Generation via `start assets index` command
+   - Search/browse performance optimization
+   - Fallback to Tree API if index unavailable
+
+2. ✅ **DR-040: Substring Matching Algorithm** (COMPLETED)
    - Define matching behavior for add/search/info/update
    - 3-character minimum
    - Substring match against: name, full path, description, tags
@@ -342,7 +348,7 @@ Kept in cache:
    - Case-insensitive
    - Example matching scenarios
 
-2. **DR-0XX: Asset Command Reorganization**
+3. ✅ **DR-041: Asset Command Reorganization** (COMPLETED)
    - Migrate from `start config <type> add` to `start assets add`
    - Remove `start update` top-level command
    - Semantic separation rationale
@@ -351,17 +357,17 @@ Kept in cache:
 
 **DRs to update:**
 
-- **DR-017**: CLI command reorganization - add `start assets` commands
-- **DR-031**: Catalog-based assets - reference new commands
-- **DR-033**: Asset resolution algorithm - note that `start assets` only searches GitHub
-- **DR-035**: Interactive browsing - update to reference `start assets add`
-- **DR-037**: Asset updates - update to reference `start assets update`
+- ✅ **DR-017**: CLI command reorganization - add `start assets` commands (COMPLETED)
+- ✅ **DR-031**: Catalog-based assets - reference new commands (COMPLETED)
+- ✅ **DR-033**: Asset resolution algorithm - note that `start assets` only searches GitHub (COMPLETED)
+- ✅ **DR-035**: Interactive browsing - update to reference `start assets add` (COMPLETED)
+- ✅ **DR-037**: Asset updates - update to reference `start assets update` (COMPLETED)
 
 ### Documentation Updates Needed
 
 **CLI docs to create:**
-- `docs/cli/start-assets.md` - Main command documentation
-- `docs/cli/start-assets-browse.md`
+- ✅ `docs/cli/start-assets.md` - Main command documentation (COMPLETED)
+- ⏳ `docs/cli/start-assets-browse.md` (IN PROGRESS)
 - `docs/cli/start-assets-add.md`
 - `docs/cli/start-assets-search.md`
 - `docs/cli/start-assets-info.md`
@@ -414,11 +420,28 @@ Kept in cache:
 
 ### Success Criteria
 
+**Design Phase (Documentation):**
+- [x] Catalog index DR written (DR-039)
+- [x] Substring matching DR written (DR-040)
+- [x] Asset command reorganization DR written (DR-041)
+- [x] All related DRs updated (DR-017, DR-031, DR-033, DR-035, DR-037)
+- [ ] All CLI documentation created (1/7 complete)
+- [ ] All existing docs updated (0/6 complete)
+
+**Implementation Phase (Code):**
 - [ ] All 6 commands implemented and tested
-- [ ] Substring matching DR written and implemented
-- [ ] All CLI documentation created
-- [ ] All existing docs updated
+- [ ] Substring matching algorithm implemented
+- [ ] Catalog index generation implemented
 - [ ] `start config <type> add` commands removed
 - [ ] `start update` command removed
 - [ ] Integration tests cover all commands
-- [ ] User workflows documented with examples
+- [ ] User workflows tested end-to-end
+
+**Documentation Phase Progress:**
+- ✅ Main command doc (start-assets.md)
+- ⏳ Browse command doc (in progress)
+- ⏳ Add command doc (pending)
+- ⏳ Search command doc (pending)
+- ⏳ Info command doc (pending)
+- ⏳ Update command doc (pending)
+- ⏳ Clean command doc (pending)

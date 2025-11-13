@@ -6,34 +6,45 @@
 
 ## Decision
 
-Provide interactive catalog browsing via `start config <type> add` with TUI library support, falling back to numbered selection for non-interactive environments.
+Provide interactive terminal-based catalog browsing via `start assets add` (no arguments) with TUI library support, falling back to numbered selection for non-interactive environments.
+
+**Note:** Originally specified as `start config <type> add` commands. Per [DR-041](./dr-041-asset-command-reorganization.md), terminal TUI browsing moved to `start assets add` with no arguments. Separate `start assets browse` command opens web browser to GitHub catalog.
 
 ## What This Means
 
 ### Interactive Browsing Commands
 
-**Browse and install assets:**
+**Terminal TUI browser (DR-041):**
 ```bash
-start config task add           # Interactive browser for tasks
-start config role add           # Interactive browser for roles
-start config agent add          # Interactive browser for agents
+start assets add                # Interactive TUI browser for all asset types
 ```
 
-**Direct installation (bypass browsing):**
+**Web browser (DR-041):**
 ```bash
-start config task add git-workflow/pre-commit-review
-start config role add general/code-reviewer
-start config agent add claude/sonnet
+start assets browse             # Opens GitHub catalog in web browser
+```
+
+**Search and install (DR-040, DR-041):**
+```bash
+start assets add "commit"       # Search by query (substring matching)
+start assets add git-workflow/pre-commit-review  # Direct install by path
+```
+
+**Legacy commands (deprecated):**
+```bash
+start assets add           # DEPRECATED - use 'start assets add'
+start config role add           # DEPRECATED - use 'start assets add'
+start config agent add          # DEPRECATED - use 'start assets add'
 ```
 
 ### User Experience Flow
 
-**1. Invoke browser:**
+**1. Invoke TUI browser:**
 ```bash
-$ start config task add
+$ start assets add
 
 Fetching catalog from GitHub...
-✓ Found 12 tasks across 4 categories
+✓ Found 46 assets across 4 types and 12 categories
 ```
 
 **2. Select category:**
@@ -175,14 +186,14 @@ func BrowseTaskCatalog() (*Asset, error) {
 
 **Category filtering (v1):**
 ```bash
-start config task add --category git-workflow
+start assets add --category git-workflow
 
 # Shows only git-workflow tasks, skip category selection
 ```
 
 **Search by keyword (future):**
 ```bash
-start config task add --search commit
+start assets add --search commit
 
 # Shows all tasks matching "commit" in name, description, or tags
 ```
@@ -192,10 +203,10 @@ start config task add --search commit
 **For scripts/automation:**
 ```bash
 # Direct installation (no interaction)
-start config task add git-workflow/pre-commit-review --yes
+start assets add git-workflow/pre-commit-review --yes
 
 # Error if not found
-start config task add nonexistent/task --yes
+start assets add nonexistent/task --yes
 # Exit code 1
 ```
 
@@ -210,7 +221,7 @@ start config task add nonexistent/task --yes
 
 **Network unavailable:**
 ```
-$ start config task add
+$ start assets add
 
 Error: Cannot fetch catalog from GitHub
 
@@ -219,12 +230,12 @@ Network error: dial tcp: no route to host
 To resolve:
 - Check internet connection
 - Use cached assets: start task <name>
-- Add custom task: start config task add my-task
+- Add custom task: start assets add my-task
 ```
 
 **No assets found:**
 ```
-$ start config task add --category nonexistent
+$ start assets add --category nonexistent
 
 Error: No tasks found in category 'nonexistent'
 
@@ -234,12 +245,12 @@ Available categories:
   - security
   - debugging
 
-Try: start config task add --category git-workflow
+Try: start assets add --category git-workflow
 ```
 
 **User cancels:**
 ```
-$ start config task add
+$ start assets add
 
 [... user navigates and selects task ...]
 
@@ -363,15 +374,18 @@ Choice: _
 - ❌ Extra prompt compared to flat list
 - **Mitigation:** Better organization, easier to scan large catalogs
 
-**No search in v1:**
-- ❌ Can't filter by keyword
-- **Mitigation:** Category filter helps, can add search in v2
+**No inline search in TUI:**
+- ❌ Can't filter by keyword while browsing the TUI
+- **Mitigation:** Use `start assets search <query>` instead (DR-040), or category filtering
 
 ## Related Decisions
 
 - [DR-031](./dr-031-catalog-based-assets.md) - Catalog architecture (browsing context)
 - [DR-034](./dr-034-github-catalog-api.md) - GitHub API (catalog source)
 - [DR-033](./dr-033-asset-resolution-algorithm.md) - Resolution (post-download behavior)
+- [DR-039](./dr-039-catalog-index.md) - Catalog index file (powers search/browse functionality)
+- [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm (search query matching)
+- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (TUI browser moved to `start assets add`)
 
 ## Future Considerations
 

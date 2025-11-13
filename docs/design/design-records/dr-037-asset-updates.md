@@ -8,24 +8,26 @@
 
 Use SHA-based update detection via GitHub Tree API to check for asset updates. Update only the cache, never the user's config. Provide manual-only update command with clear messaging.
 
+**Note:** Per [DR-041](./dr-041-asset-command-reorganization.md), command moved from `start assets update` to `start assets update` with optional query parameter for selective updates.
+
 ## What This Means
 
 ### Update Command
 
 **Manual update only:**
 ```bash
-start update
+start assets update
 ```
 
 **Consistent with DR-025 (no automatic checks):**
-- User explicitly runs `start update`
+- User explicitly runs `start assets update`
 - No background checks
 - No automatic downloads
 - No version checking on CLI startup
 
 ### Update Process
 
-**When user runs `start update`:**
+**When user runs `start assets update`:**
 
 1. Fetch GitHub catalog tree (SHA for every file)
 2. For each cached `.meta.toml` file:
@@ -58,7 +60,7 @@ updated = "2025-01-10T12:00:00Z"
 
 **SHA mismatch = update available**
 
-This DR defines how `start update` works.
+This DR defines how `start assets update` works.
 
 The scope of this command is limited to refreshing assets that the user has already acquired (i.e., are present in the local cache). It does not discover or add new assets from the catalog.
 
@@ -66,7 +68,7 @@ The scope of this command is limited to refreshing assets that the user has alre
 
 **Cache updates are separate from config:**
 
-When you run `start update`:
+When you run `start assets update`:
 1. The asset cache gets new versions.
 2. Your configuration files (`tasks.toml`, etc.) remain unchanged.
 3. If a task in your config references a cached file (e.g., via `prompt_file`), it will automatically use the new content on the next run.
@@ -183,7 +185,7 @@ func (t *GitHubTree) GetSHA(path string) string {
 ### Example 1: Updates Available
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
 
@@ -205,7 +207,7 @@ To see changes:
 ### Example 2: No Updates
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
 
@@ -219,7 +221,7 @@ All cached assets are up to date.
 ### Example 3: Network Error
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
 
@@ -233,7 +235,7 @@ Check your internet connection and try again.
 ### Example 4: First Run (No Cache)
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
 
@@ -266,7 +268,7 @@ diff ~/. config/start/assets/tasks/git-workflow/pre-commit-review.toml \
      /tmp/start/assets/tasks/git-workflow/pre-commit-review.toml
 ```
 
-**Future enhancement:** `start update --diff` to show changes
+**Future enhancement:** `start assets update --diff` to show changes
 
 ## Update Notifications
 
@@ -275,7 +277,7 @@ diff ~/. config/start/assets/tasks/git-workflow/pre-commit-review.toml \
 - ❌ No background update checking
 - ❌ No version checking during `start task`
 
-**User must explicitly run `start update` to check**
+**User must explicitly run `start assets update` to check**
 
 **Future consideration:** Opt-in notifications
 ```toml
@@ -283,21 +285,21 @@ diff ~/. config/start/assets/tasks/git-workflow/pre-commit-review.toml \
 check_updates_on_start = false  # Default: false (compliant with DR-025)
 ```
 
-## Selective Updates
+## Selective Updates (DR-040, DR-041)
 
-**Update specific asset type (future):**
+**No arguments - update all:**
 ```bash
-start update tasks         # Update only task assets
-start update roles         # Update only role assets
-start update --all         # Update everything (default)
+start assets update              # Update all cached assets
 ```
 
-**Update specific asset (future):**
+**With query - update matching (DR-040):**
 ```bash
-start update tasks/pre-commit-review  # Update one asset
+start assets update "commit"     # Update assets matching 'commit' (substring)
+start assets update git-workflow # Update all in git-workflow category
+start assets update pre-commit-review  # Update specific asset
 ```
 
-**v1:** Update all cached assets (simple, works for small caches)
+Uses substring matching algorithm (DR-040) to find matching assets in cache, then updates only those.
 
 ## Rollback
 
@@ -313,7 +315,7 @@ rm -rf ~/.config/start/assets/tasks/git-workflow/pre-commit-review.*
 
 **Future enhancement:** Version history
 ```bash
-start update --rollback tasks/pre-commit-review  # Restore previous SHA
+start assets update --rollback tasks/pre-commit-review  # Restore previous SHA
 ```
 
 **v1:** No rollback mechanism (delete and re-download if needed)
@@ -323,7 +325,7 @@ start update --rollback tasks/pre-commit-review  # Restore previous SHA
 ### Partial Update Failure
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
 
@@ -341,13 +343,13 @@ Checking for asset updates...
 Errors:
   - roles/code-reviewer: network timeout
 
-Try running 'start update' again to retry failed downloads.
+Try running 'start assets update' again to retry failed downloads.
 ```
 
 ### Asset Removed from Catalog
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
 
@@ -360,7 +362,7 @@ Checking for asset updates...
 ### Invalid SHA in Metadata
 
 ```bash
-$ start update
+$ start assets update
 
 Checking for asset updates...
 
@@ -397,7 +399,7 @@ Checking for asset updates...
 ## Trade-offs Accepted
 
 **No automatic notifications:**
-- ❌ User must remember to run `start update`
+- ❌ User must remember to run `start assets update`
 - **Mitigation:** Consistent with DR-025, users can set calendar reminder
 
 **No rollback in v1:**
@@ -433,13 +435,15 @@ asset_repo = "myorg/custom-assets"  # Use custom asset repository
 - [DR-034](./dr-034-github-catalog-api.md) - GitHub API (tree fetching)
 - [DR-036](./dr-036-cache-management.md) - Cache structure (where updates go)
 - [DR-025](./dr-025-no-automatic-checks.md) - No automatic operations (manual updates only)
+- [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm (query parameter support)
+- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (moved from `start update`)
 
 ## Future Considerations
 
 **Enhanced update features:**
 - Interactive update (show changes, confirm each)
 - Diff view before/after
-- Selective updates by type or asset
+- ~~Selective updates by type or asset~~ **IMPLEMENTED** via query parameter (DR-040)
 - Rollback to previous version
 - Update history and changelog
 
