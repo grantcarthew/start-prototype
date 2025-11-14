@@ -14,7 +14,7 @@ Each agent configuration file includes a `bin` field for auto-detection:
 
 ```toml
 [agents.claude]
-bin = "claude"  # Binary name for command -v detection (required)
+bin = "claude"  # Binary path or name (required)
 command = "{bin} --model {model} --prompt {prompt}"  # Must contain {bin} and {model}
 description = "Claude Code by Anthropic"
 
@@ -24,7 +24,7 @@ opus = "claude-opus-4"
 ```
 
 **Required fields:**
-- `bin` - Binary name for auto-detection via `command -v`
+- `bin` - Binary path or name for agent detection
 - `command` - Command template, must contain `{bin}` and `{model}` placeholders
 - `description` - Human-readable description
 - `models` - Model name mappings
@@ -39,7 +39,7 @@ opus = "claude-opus-4"
 ## Init Behavior
 
 1. Fetch `assets/index.csv` from GitHub (contains agent list with `bin` column)
-2. Auto-detect installed agents using `command -v <bin>` from index
+2. Auto-detect installed agents by checking if `<bin>` from index is executable
 3. Download TOML files only for detected/selected agents (lazy loading)
 4. Merge into user's `~/.config/start/agents.toml`
 

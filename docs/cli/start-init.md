@@ -34,7 +34,7 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 1. Asks for target location (global or local) unless `--local` or `--force` provided
 2. Checks for existing configuration at target location (prompts for backup unless `--force`)
 3. Fetches latest agent configurations from GitHub
-4. Auto-detects installed agents in PATH
+4. Auto-detects installed agents
 5. Interactive mode: Prompts for additional agents and default agent selection
 6. Automatic mode (`--force`): Configures all detected agents, uses first as default
 7. Creates multi-file config at target location
@@ -43,7 +43,6 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 **When to run init:**
 
 - First time setup
-- Reset configuration to defaults
 - Create local project configuration
 
 **Network requirement:**
@@ -130,7 +129,7 @@ Zero interaction. Creates global config with smart defaults:
 
 - Defaults to global (`~/.config/start/`)
 - Auto-backs up if config exists (no prompt)
-- Auto-detects and configures all agents in PATH
+- Auto-detects and configures all discovered agents
 - Sets first detected agent as default (priority: claude > gemini > aichat > others)
 - No wizard prompts
 
@@ -166,9 +165,9 @@ In interactive mode (without `--force`), init runs this wizard:
    - Timeout: 10 seconds
    - URL: `https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv`
    - Filters for `type=agents`, extracts `bin` column
-2. Auto-detect installed agents using `command -v <bin>`
-   - Checks each binary name from index (e.g., claude, gemini, aichat, opencode, codex, aider)
-   - `command -v claude` → detected if exit code 0
+2. Auto-detect installed agents by checking if `<bin>` is executable
+   - Checks each binary from index (e.g., claude, gemini, aichat, opencode, codex, aider)
+   - Binaries that are found and executable are marked as detected
 3. Download agent TOML files only for detected agents (lazy loading)
    - Fetches `assets/agents/{category}/{name}.toml` via raw.githubusercontent.com
    - Only downloads what's needed
@@ -190,7 +189,7 @@ In interactive mode (without `--force`), init runs this wizard:
 In automatic mode, init does the same steps but **skips all prompts**:
 
 1. Fetch catalog index from GitHub (same)
-2. Auto-detect installed agents using `command -v <bin>` from index (same)
+2. Auto-detect installed agents by checking if `<bin>` from index is executable (same)
 3. Download agent TOML files for detected agents (same lazy loading)
 4. **Auto**: Configure ALL detected agents (no prompt for additional agents)
 5. **Auto**: Use first detected agent as default (priority order: claude > gemini > aichat > others)
@@ -214,7 +213,7 @@ Files don't need to exist - runtime gracefully handles missing files (see DR-008
 
 ### Agent Detection
 
-Init uses the catalog index and `command -v` for agent detection:
+Init uses the catalog index to detect installed agents:
 
 **Step 1: Fetch index**
 ```
@@ -224,10 +223,10 @@ GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv
 Parses CSV to extract all agent entries with their `bin` field.
 
 **Step 2: Auto-detect**
-```bash
-command -v claude      # Exit 0 → Detected
-command -v gemini      # Exit 0 → Detected
-command -v aichat      # Exit 1 → Not found
+```
+Check if 'claude' is executable  → Detected
+Check if 'gemini' is executable  → Detected
+Check if 'aichat' is executable  → Not found
 ```
 
 **Step 3: Lazy download**
@@ -520,9 +519,9 @@ Downloading agent configs...
   [...]
 
 Detecting installed agents...
-  Checking: claude (command -v claude)
+  Checking: claude
     ✓ Found: /usr/local/bin/claude
-  Checking: gemini (command -v gemini)
+  Checking: gemini
     ✓ Found: /usr/local/bin/gemini
   [...]
 
@@ -535,7 +534,7 @@ Detecting installed agents...
 
 ```bash
 Detecting installed agents...
-✗ No agents detected in PATH
+✗ No agents detected
 
 Available agents:
   [ ] claude - Claude Code by Anthropic
@@ -824,7 +823,7 @@ Running `start init` multiple times is safe:
 
 ### Agent Detection Limitations
 
-`command -v` only finds agents in PATH. If an agent is installed but not in PATH:
+Agent detection only finds executables that are discoverable. If an agent is not found:
 
 - Not auto-detected
 - In interactive mode: Select manually from "Additional agents" list

@@ -581,8 +581,8 @@ Testing agent: gemini
 ─────────────────────────────────────────────────
 
 ✗ Binary not found: gemini
-  The 'gemini' command is not in your PATH.
-  Install gemini or check your PATH configuration.
+  The 'gemini' command is not available.
+  Install gemini or check that it's accessible.
 
 Configuration:
   ✓ Command template valid
@@ -665,7 +665,7 @@ Dry-run command:
 - 0 - Success (agent valid and binary found)
 - 1 - Configuration error (invalid config)
 - 2 - Agent not found in config
-- 4 - Binary not found in PATH (config valid but tool not installed)
+- 4 - Binary not found (config valid but tool not installed)
 
 **Error handling:**
 
@@ -694,7 +694,7 @@ Configuration:
   ✗ No default_model specified and no models configured
 
 ✗ Agent 'broken' has multiple errors:
-  - Binary not found in PATH
+  - Binary not found
   - Invalid command template
   - Missing model configuration
 ```

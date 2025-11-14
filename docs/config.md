@@ -313,7 +313,7 @@ All fields use soft validation with fallback defaults:
 - **default_agent** misconfigured or agent not found → **Warning**, fall back to first agent in config (TOML order)
 - **default_role** misconfigured or role not found → **Warning**, fall back to first role in config (TOML order)
 - **log_level** invalid value → **Warning**, fall back to `"normal"`
-- **shell** not found in PATH → **Warning**, fall back to auto-detected shell (`bash` or `sh`)
+- **shell** not found → **Warning**, fall back to auto-detected shell (`bash` or `sh`)
 - **command_timeout** invalid → **Warning**, fall back to 30 seconds
 - **asset_download** invalid → **Warning**, fall back to `true`
 - **asset_repo** invalid format → **Warning**, fall back to `"grantcarthew/start"`
@@ -349,7 +349,7 @@ Each agent section defines how to invoke an AI tool. Agent names should match th
 **Fields:**
 
 **bin** (string, required)
-: Binary name for auto-detection via `command -v` during `start init`. Must be a valid executable name. Used for lazy initialization and referenced via `{bin}` placeholder in command template.
+: Binary path or name to execute. Can be a binary name (e.g., `claude`), relative path (e.g., `./bin/agent`), or absolute path (e.g., `/usr/local/bin/claude`). Used for agent detection during `start init` and referenced via `{bin}` placeholder in command template.
 
 ```toml
 [agents.claude]

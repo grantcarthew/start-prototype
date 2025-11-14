@@ -315,5 +315,5 @@ Documentation review is complete when:
 - `docs/design/design-records/dr-007-placeholders.md`: Added {bin} placeholder to global placeholders; updated all agent examples to include bin field
 - `docs/design/design-records/dr-039-catalog-index.md`: Added `bin` column to index.csv schema; updated generation algorithm to extract bin from agent TOML files
 - `docs/config.md`: Added bin field documentation to [agents.<name>] section; updated all agent examples; updated validation rules for required {bin} and {model} placeholders
-- `docs/cli/start-init.md`: Updated agent detection to use index.csv → command -v → lazy TOML download workflow; updated GitHub Catalog Details section
+- `docs/cli/start-init.md`: Updated agent detection to use index.csv → binary detection → lazy TOML download workflow; updated GitHub Catalog Details section
 - **Validation changes**: Made {bin} and {model} placeholders required (errors), {prompt} remains recommended (warns)

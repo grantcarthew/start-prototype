@@ -475,7 +475,7 @@ File path:
 ```
 Command: nonexistent-command --flag
 ⚠ Warning: Command may not be available.
-  Test: command -v nonexistent-command
+  (Binary 'nonexistent-command' not found)
 
 Continue anyway? [y/N]: y
 ```

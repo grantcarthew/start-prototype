@@ -509,14 +509,14 @@ Exit code: 4 (agent execution error)
 
 ### Agent Tool Not Found
 
-If agent binary not in PATH:
+If agent binary is not found:
 
 ```
 Error: Agent tool 'gemini' not found.
 
 Command attempted: gemini --model gemini-2.0-flash-exp '...'
 
-Make sure 'gemini' is installed and in your PATH.
+Make sure 'gemini' is installed and available.
 ```
 
 Exit code: 4

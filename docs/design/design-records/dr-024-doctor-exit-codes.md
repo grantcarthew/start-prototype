@@ -35,7 +35,7 @@ Issues are categorized in output for clarity, but all result in exit code `1`:
 - Asset directory corrupted or empty
 
 **Agent Issues:**
-- Agent binary not found in PATH
+- Agent binary not found
 - Agent binary not executable
 
 **Environment Issues:**
@@ -158,7 +158,7 @@ Asset Information:
   Action:          Run 'start init' to download assets
 
 Agents:
-  claude:          ✗ Binary not found in PATH
+  claude:          ✗ Binary not found
   aider:           ✓ Binary found at ~/.local/bin/aider
 
 Overall Status:   ✗ Critical issues found
@@ -188,14 +188,14 @@ Asset Information:
   Status:          ⚠ Updates available (but cannot use until config fixed)
 
 Agents:
-  claude:          ✗ Binary not found in PATH
+  claude:          ✗ Binary not found
   aider:           ✓ Binary found at ~/.local/bin/aider
 
 Issues Found:
 
 Errors (2):
   • Local config has invalid TOML syntax
-  • Agent 'claude' binary not found in PATH
+  • Agent 'claude' binary not found
 
 Warnings (1):
   • Asset updates available
@@ -237,7 +237,7 @@ $ echo $?
 - **Never errors** (informational only)
 
 ### Agents
-- **Check:** Each configured agent binary in PATH
+- **Check:** Each configured agent binary is discoverable
 - **Check:** Binary is executable
 - **Error if:** Binary not found or not executable
 - **Never warns** (binary either works or doesn't)

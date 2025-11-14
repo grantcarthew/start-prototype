@@ -420,7 +420,7 @@ Output:
 
 ```
 Error: Editor command failed: badeditor
-  Command not found in PATH
+  Command not found
 
 Set $EDITOR to a valid editor command.
 Available editors: vi, vim, nvim, nano, emacs
@@ -606,7 +606,7 @@ Global: ~/.config/start/
   ✓ agents.toml - 2 agents configured
     ✓ claude
     ⚠ gemini
-      Binary not found in PATH: gemini
+      Binary not found: gemini
       Command will fail unless 'gemini' is installed
   ✓ contexts.toml - 3 contexts configured
     ⚠ readme
