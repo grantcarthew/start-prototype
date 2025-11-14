@@ -1,0 +1,7 @@
+[metadata]
+name = "review-docs"
+description = "Full documentation reconciliation and lint detection"
+tags = ["documentation", "review", "reconciliation", "lint", "ddd", "quality"]
+sha = "a8cfb656d5ee113653b8cbbc7e4f26a86a9f070c"
+created = "2025-11-14T03:04:52Z"
+updated = "2025-11-14T03:39:52Z"

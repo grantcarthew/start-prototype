@@ -1,0 +1,8 @@
+# Documentation Review Task
+# Performs comprehensive documentation reconciliation and lint detection
+# Following Document Driven Development (DDD) best practices
+
+[tasks.review-docs]
+alias = "rd"
+description = "Full documentation reconciliation and lint detection"
+file = "~/.config/start/assets/tasks/docs/review-docs.md"
