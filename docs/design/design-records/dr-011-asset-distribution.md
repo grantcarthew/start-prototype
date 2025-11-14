@@ -6,7 +6,7 @@
 
 ## Decision
 
-Assets fetched from GitHub repository; `start init` downloads on first run; `start update` refreshes asset library
+Assets fetched from GitHub repository; `start init` downloads on first run; `start assets update` refreshes asset library
 
 ## Asset Installation Location
 
@@ -27,7 +27,7 @@ Assets fetched from GitHub repository; `start init` downloads on first run; `sta
 - Downloaded on-demand (not embedded in binary)
 - Updateable without new release
 - `start init` performs initial download
-- `start update` refreshes asset library
+- `start assets update` refreshes asset library
 - Network required for download (can work offline after initial setup)
 
 ## Asset Usage Patterns
@@ -40,7 +40,7 @@ Assets fetched from GitHub repository; `start init` downloads on first run; `sta
 **Role files:**
 - Located in `~/.config/start/assets/roles/`
 - Referenced in config: `file = "~/.config/start/assets/roles/code-reviewer.md"`
-- Updates flow automatically when `start update` is run
+- Updates flow automatically when `start assets update` is run
 
 **Task definitions:**
 - Located in `~/.config/start/assets/tasks/`

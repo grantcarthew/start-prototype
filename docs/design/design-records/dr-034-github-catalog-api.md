@@ -342,7 +342,7 @@ Total API calls: 0-1 (tree) + 0 (download) = 0-1
 ### Pattern 3: Update Check
 
 ```
-User: start update
+User: start assets update
 
 1. getCatalog() → fetchGitHubTree() (1 API call)
 

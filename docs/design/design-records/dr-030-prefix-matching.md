@@ -17,7 +17,7 @@ Users can type partial commands as long as they're unambiguous:
 **Top-level commands:**
 ```bash
 start d          → start doctor
-start u          → start update
+start u          → start (ambiguous: start-assets-update)
 start con        → start config
 start t mytask   → start task mytask
 ```

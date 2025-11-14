@@ -17,7 +17,7 @@ start init workflow:
 3. Call shared asset update logic
 4. Display success message
 
-start update workflow:
+start assets update workflow:
 1. Call shared asset update logic
 2. Display what changed
 ```
@@ -51,10 +51,10 @@ func UpdateAssets() error {
 start init (network fails):
   ✓ Config created successfully
   ⚠ Warning: Asset download failed (network unavailable)
-    Assets can be downloaded later with 'start update'
+    Assets can be downloaded later with 'start assets update'
   Exit code: 0 (success)
 
-start update (network fails):
+start assets update (network fails):
   ✗ Error: Cannot reach GitHub (network unavailable)
     Check network connection and try again
   Exit code: 1 (failure)

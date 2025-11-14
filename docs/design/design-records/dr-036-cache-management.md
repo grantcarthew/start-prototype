@@ -84,7 +84,7 @@ start task pre-commit-review
 **Automatic updates:**
 ```bash
 # User updates cache
-start update
+start assets update
 
 # Checks GitHub for newer SHAs
 # Downloads updated assets to cache
@@ -147,7 +147,7 @@ func cacheAsset(asset *Asset, metadata *AssetMetadata) error {
 }
 ```
 
-**Update (during `start update`):**
+**Update (during `start assets update`):**
 ```go
 func updateCachedAsset(asset *Asset, newMetadata *AssetMetadata) error {
     // Overwrite existing files
@@ -176,7 +176,7 @@ prompt_file = "~/.config/start/assets/tasks/git-workflow/pre-commit-review.md"
 # On new machine:
 # 1. Copy config files
 # 2. Run tasks - cache populated automatically
-# 3. OR run: start update (download all assets)
+# 3. OR run: start assets update (download all assets)
 ```
 
 ## Size Estimates
@@ -233,7 +233,7 @@ asset_path = "/custom/path/to/assets"
 ```bash
 # Delete and re-download
 rm -rf ~/.config/start/assets
-start update  # Re-download all configured assets
+start assets update  # Re-download all configured assets
 ```
 
 **Asset not found but should be cached?**

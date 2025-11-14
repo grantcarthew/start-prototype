@@ -6,7 +6,7 @@
 
 ## Decision
 
-Check GitHub Releases API for latest CLI version on every execution of `start doctor` and `start update`, with no caching.
+Check GitHub Releases API for latest CLI version on every execution of `start doctor` and `start assets update`, with no caching.
 
 ## API Endpoint
 
@@ -48,10 +48,10 @@ CLI Version Check:
   Update via:      brew upgrade grantcarthew/tap/start
 ```
 
-### `start update`
+### `start assets update`
 Checks CLI version after updating assets:
 ```bash
-$ start update
+$ start assets update
 Checking for asset updates...
 ✓ Downloaded 3 updated files
 ✓ Asset library updated to commit def5678
@@ -65,7 +65,7 @@ CLI Version Check:
 
 If up to date:
 ```bash
-$ start update
+$ start assets update
 Asset library is up to date (commit: def5678)
 
 CLI Version Check:
@@ -210,7 +210,7 @@ Version check failures should **not** cause command to fail:
 - Rate limiting: Show friendly message, continue
 - Parse errors: Log error, show "Unknown"
 
-Only `start update` should fail if **asset** update fails. CLI version check is informational only.
+Only `start assets update` should fail if **asset** update fails. CLI version check is informational only.
 
 ### Installation Method Detection
 
@@ -295,7 +295,7 @@ No caching simplifies implementation and ensures users always see current inform
 - [ ] Implement `CompareVersions()` with semver parsing
 - [ ] Implement `DetectInstallMethod()` for update suggestions
 - [ ] Add version check to `start doctor` command
-- [ ] Add version check to `start update` command
+- [ ] Add version check to `start assets update` command
 - [ ] Handle all error cases gracefully (network, API, parsing)
 - [ ] Add unit tests for version comparison logic
 - [ ] Document GH_TOKEN usage for rate limit increases

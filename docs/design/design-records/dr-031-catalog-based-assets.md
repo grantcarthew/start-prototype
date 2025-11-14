@@ -13,7 +13,7 @@ Transform asset distribution from a bulk download model to a catalog-driven syst
 ### Core Architecture Shift
 
 **Previous model (DR-014, DR-015):**
-- Bulk download all assets during `start init` or `start update`
+- Bulk download all assets during `start init` or `start assets update`
 - Track versions in `asset-version.toml`
 - All-or-nothing update mechanism
 
@@ -54,7 +54,7 @@ start assets update                      # Check cached assets for updates via S
 start assets update "git"                # Update only matching assets
 ```
 
-**Note:** Original commands (`start config task add`, `start update`) deprecated in favor of unified `start assets` command suite. See [DR-041](./dr-041-asset-command-reorganization.md).
+**Note:** Original commands (`start config task add`, `start assets update`) deprecated in favor of unified `start assets` command suite. See [DR-041](./dr-041-asset-command-reorganization.md).
 
 ### Configuration Structure
 
@@ -121,7 +121,7 @@ When user runs `start task <name>`:
 
 **Cache is invisible:**
 - Automatically populated when downloading from GitHub
-- Updated via `start update` (SHA-based detection)
+- Updated via `start assets update` (SHA-based detection)
 - Never auto-cleaned (files are tiny)
 - No user-facing cache management commands
 - User can manually delete `~/.config/start/assets/` if desired
@@ -183,7 +183,7 @@ Your existing task configurations are **never automatically overwritten**. Updat
 - **Mitigation:** Files are tiny text files, acceptable trade-off for simplicity
 
 **No automatic overwrites of user config:**
-- ❌ `start update` does not change your configured tasks. You must manually apply asset updates to your `tasks.toml` if desired.
+- ❌ `start assets update` does not change your configured tasks. You must manually apply asset updates to your `tasks.toml` if desired.
 - **Mitigation:** Preserves user customizations, prevents breaking changes.
 
 **GitHub dependency:**

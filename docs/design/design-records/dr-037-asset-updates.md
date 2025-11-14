@@ -436,7 +436,7 @@ asset_repo = "myorg/custom-assets"  # Use custom asset repository
 - [DR-036](./dr-036-cache-management.md) - Cache structure (where updates go)
 - [DR-025](./dr-025-no-automatic-checks.md) - No automatic operations (manual updates only)
 - [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm (query parameter support)
-- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (moved from `start update`)
+- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (moved from `start assets update`)
 
 ## Future Considerations
 

@@ -20,7 +20,7 @@ The CLI does **not** perform automatic background health checks or cache health 
 
 **User-initiated only:**
 - `start doctor` - explicitly checks health
-- `start update` - explicitly updates assets and checks CLI version
+- `start assets update` - explicitly updates assets and checks CLI version
 - All other commands (`start`, `start task`, etc.) - no health checks
 
 ### No Result Caching
@@ -86,7 +86,7 @@ Many CLI tools do automatic checks. We explicitly choose not to:
 ```bash
 # No automatic checks
 # User runs 'start doctor' when they want to check
-# User runs 'start update' when they want to update
+# User runs 'start assets update' when they want to update
 ```
 
 ## User Experience
@@ -119,7 +119,7 @@ $ start doctor
 ### Explicit Update
 
 ```bash
-$ start update
+$ start assets update
 # User explicitly requests update
 # Downloads new assets
 # Checks CLI version
@@ -164,7 +164,7 @@ $ start update
 
 **Commands that check health:**
 - `start doctor` - always checks, always fresh
-- `start update` - always checks, always fresh
+- `start assets update` - always checks, always fresh
 
 **Commands that don't check:**
 - `start` - no checks
@@ -200,7 +200,7 @@ normal commands fast and respects your workflow.
 
 To check for updates:
 - Run `start doctor` to check health and version status
-- Run `start update` to update the asset library
+- Run `start assets update` to update the asset library
 
 We recommend running `start doctor` occasionally to check
 for CLI and asset updates.

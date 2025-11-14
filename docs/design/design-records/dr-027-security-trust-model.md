@@ -47,7 +47,7 @@ Trust GitHub's HTTPS infrastructure and the specific repository (`grantcarthew/s
 **Always latest from main branch:**
 - No commit SHA pinning in config
 - No git tag/release pinning
-- Users always get latest when running `start update`
+- Users always get latest when running `start assets update`
 - Matches DR-022 (assets from main branch)
 
 **No configuration options for:**
@@ -161,7 +161,7 @@ const (
 
 **No configuration options:**
 - No `asset_repository` in config file
-- No `--repo` flag on `start update`
+- No `--repo` flag on `start assets update`
 - No environment variable override
 - Repository URL is compile-time constant
 
@@ -211,7 +211,7 @@ cat ~/.config/start/asset-version.toml
 
 **Users control updates:**
 - Per DR-025: No automatic updates
-- `start update` is user-initiated
+- `start assets update` is user-initiated
 - `start doctor` shows asset age
 - Users decide when to update
 
@@ -241,7 +241,7 @@ cat ~/.config/start/asset-version.toml
 
 **Asset hygiene:**
 - Run `start doctor` periodically to check for updates
-- Review asset changes after `start update` (check git history)
+- Review asset changes after `start assets update` (check git history)
 - Inspect role/task templates before using
 - Report suspicious content to maintainer
 
@@ -299,13 +299,13 @@ git verify-commit abc123def456
 **Option 2: Asset checksums from separate source**
 ```bash
 # Checksums published via DNS TXT record or separate repo
-start update --verify-checksums
+start assets update --verify-checksums
 ```
 
 **Option 3: Reproducible asset builds**
 ```bash
 # Assets generated deterministically, users can reproduce
-start update --verify-reproducible
+start assets update --verify-reproducible
 ```
 
 **Current stance:** Don't implement unless threat landscape changes or users request it. Current model is appropriate for content distribution.
@@ -336,7 +336,7 @@ You can inspect downloaded assets:
 - View: cat ~/.config/start/assets/roles/code-reviewer.md
 
 Updates are user-initiated only:
-- Run `start update` when you want to update
+- Run `start assets update` when you want to update
 - Review changes: git log in the repository
 ```
 

@@ -1424,7 +1424,7 @@ Not all AI agents support roles (system prompts):
 - start-config-agent(1) - Manage AI agents
 - start-config-context(1) - Manage context documents
 - start-config-task(1) - Manage task configurations
-- start-update(1) - Update asset library
+- start-assets-update(1) - Update asset library
 - DR-002 - Configuration file structure and merge behavior
 - DR-005 - Role configuration & selection
 - DR-017 - CLI command reorganization

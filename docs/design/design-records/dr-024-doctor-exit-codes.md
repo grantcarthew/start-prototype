@@ -120,7 +120,7 @@ Asset Information:
   Current Commit:  abc1234 (45 days ago)
   Latest Commit:   def5678 (2 hours ago)
   Status:          ⚠ Updates available
-  Action:          Run 'start update' to refresh
+  Action:          Run 'start assets update' to refresh
 
 CLI Version Check:
   Current:         v1.2.3

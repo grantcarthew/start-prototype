@@ -244,7 +244,7 @@ file = "~/my-custom-reviewer.md"
 **Task location:**
 - Default tasks are in the asset library: `~/.config/start/assets/tasks/`
 - Not embedded in binary
-- Downloaded during `start init` and `start update`
+- Downloaded during `start init` and `start assets update`
 
 **Loading order:**
 1. Load global config tasks

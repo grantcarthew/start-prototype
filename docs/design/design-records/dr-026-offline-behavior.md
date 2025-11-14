@@ -32,7 +32,7 @@ The CLI handles network unavailability gracefully with clear error messages and 
 - Informs user they can create their own config manually
 - Exit code: 0 (success, config created despite asset download failure)
 
-**start update:**
+**start assets update:**
 - Informs about network failure
 - Exits immediately (fails)
 - Does not modify existing assets
@@ -75,7 +75,7 @@ You can create your own configuration manually:
   start config edit global
 
 Or try downloading assets later:
-  start update
+  start assets update
 ```
 
 Exit code: 0 (success)
@@ -83,7 +83,7 @@ Exit code: 0 (success)
 ### update with network failure
 
 ```bash
-$ start update
+$ start assets update
 
 Error: Cannot connect to GitHub
 
@@ -173,7 +173,7 @@ Exit code: 0 (task added successfully)
 **Why network failure in init is non-fatal?**
 - Config file creation is the primary goal
 - User can create config manually if needed
-- Assets can be downloaded later via `start update`
+- Assets can be downloaded later via `start assets update`
 - Per DR-018: init invokes update logic but continues on failure
 
 **Why network failure in update is fatal?**
@@ -213,7 +213,7 @@ func runInit() error {
     // Try to download assets
     if err := assets.Update(); err != nil {
         log.Warn("Unable to download assets: %v", err)
-        log.Info("You can download assets later: start update")
+        log.Info("You can download assets later: start assets update")
         // Continue - don't return error
     }
 
@@ -221,7 +221,7 @@ func runInit() error {
 }
 ```
 
-**start update:**
+**start assets update:**
 ```go
 func runUpdate() error {
     // Network is required - fail fast
@@ -257,7 +257,7 @@ func runDoctor() error {
 Warning: Asset templates not available.
 
 To download asset templates:
-  start update
+  start assets update
 ```
 
 **For network errors:**
@@ -297,12 +297,12 @@ If air-gapped environments become a requirement, we could add:
 
 **Option 1: Manual asset directory support**
 ```bash
-start update --from-directory /path/to/assets
+start assets update --from-directory /path/to/assets
 ```
 
 **Option 2: Bundled asset snapshots**
 ```bash
-start update --from-bundle assets-v1.2.3.tar.gz
+start assets update --from-bundle assets-v1.2.3.tar.gz
 ```
 
 **Current stance:** Don't implement unless users explicitly request it. The added complexity isn't justified by current use cases.

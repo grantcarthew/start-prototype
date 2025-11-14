@@ -20,7 +20,7 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Objectives
 
-1. Review all documentation files (3 root docs + 11 CLI commands) for accuracy
+1. Review all documentation files (3 root docs + 17 CLI commands) for accuracy
 2. Fix inconsistencies, outdated information, and errors
 3. Ensure alignment with design decisions (DRs)
 4. Verify examples, flags, and usage patterns are correct
@@ -40,7 +40,7 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/cli/start-init.md`
+Active document: `docs/cli/start-assets.md`
 
 ### Root Documentation
 
@@ -53,9 +53,18 @@ Active document: `docs/cli/start-init.md`
 - [x] `docs/cli/start.md` - Main entry point, interactive sessions
 - [x] `docs/cli/start-prompt.md` - Prompt composition and execution
 - [x] `docs/cli/start-task.md` - Task execution
-- [ ] `docs/cli/start-init.md` - Configuration initialization
-- [ ] `docs/cli/start-update.md` - Asset updates (needs per-asset update model)
+- [x] `docs/cli/start-init.md` - Configuration initialization
 - [ ] `docs/cli/start-doctor.md` - System diagnostics
+
+### Asset Commands
+
+- [ ] `docs/cli/start-assets.md` - Asset management overview
+- [ ] `docs/cli/start-assets-add.md` - Add assets from catalog
+- [ ] `docs/cli/start-assets-browse.md` - Browse catalog in browser
+- [ ] `docs/cli/start-assets-search.md` - Search catalog
+- [ ] `docs/cli/start-assets-info.md` - Show asset information
+- [ ] `docs/cli/start-assets-update.md` - Update assets
+- [ ] `docs/cli/start-assets-clean.md` - Clean asset cache
 
 ### Configuration Commands
 
@@ -81,7 +90,7 @@ Ensure all documentation aligns with these key design decisions:
 
 Documentation review is complete when:
 
-- [ ] All 14 documents (3 root + 11 CLI) reviewed and corrected
+- [ ] All 20 documents (3 root + 17 CLI) reviewed and corrected
 - [ ] Examples are accurate and tested conceptually
 - [ ] Flags and options are consistent across commands
 - [ ] Multi-file config structure correctly documented
@@ -196,7 +205,7 @@ Documentation review is complete when:
 - `docs/config.md`: Removed github_token_env field documentation and all examples
 - `docs/design/design-records/dr-031-catalog-based-assets.md`: Removed github_token_env from settings example
 - `docs/design/design-records/dr-034-github-catalog-api.md`: Removed github_token_env setting, added note about hardcoded GITHUB_TOKEN env var
-- `docs/cli/start-update.md`: Removed github_token_env from settings example, added note about GITHUB_TOKEN
+- `docs/cli/start-assets-update.md`: Removed github_token_env from settings example, added note about GITHUB_TOKEN
 - `docs/ideas/catalog-based-assets.md`: Removed github_token_env from settings, updated GitHub Token section to clarify hardcoded env var
 - `PROJECT-backlog.md`: Removed github_token_env from settings example
 - **Agent {prompt} placeholder validation**: Changed from required (error) to recommended (warning) - "works but warns" design
@@ -317,3 +326,25 @@ Documentation review is complete when:
 - `docs/config.md`: Added bin field documentation to [agents.<name>] section; updated all agent examples; updated validation rules for required {bin} and {model} placeholders
 - `docs/cli/start-init.md`: Updated agent detection to use index.csv → binary detection → lazy TOML download workflow; updated GitHub Catalog Details section
 - **Validation changes**: Made {bin} and {model} placeholders required (errors), {prompt} remains recommended (warns)
+- **Deprecated command cleanup in start-init.md**: Fixed 2 references from `start config agent add` to `start assets add` (lines 254, 831)
+- **Removed shell-specific command -v references**: Made documentation implementation-agnostic for Go implementation
+- `docs/cli/start-init.md`: Changed "command -v" to "checking if bin is executable" throughout agent detection sections
+- `docs/config.md`: Changed bin field from "auto-detection via command -v" to "auto-detection in PATH" → "Binary path or name to execute"
+- `docs/design/design-records/dr-013-agent-templates.md`: Changed "command -v detection" to "Binary path or name for agent detection"
+- `docs/design/design-records/dr-024-doctor-exit-codes.md`: Changed "Binary not found in PATH" to "Binary not found" throughout
+- `docs/cli/start.md`: Changed "in your PATH" to "installed and available"
+- `docs/cli/start-config.md`: Changed "Binary not found in PATH" to "Binary not found"
+- `docs/cli/start-config-agent.md`: Changed "not in your PATH" to "not available"
+- `docs/cli/start-config-task.md`: Changed error message from "not found in PATH" to "not found"
+- `PROJECT.md`: Changed changelog "command -v" to "binary detection"
+- **Binary detection language made implementation-agnostic**: Removed PATH-only assumptions; bin field can be name, relative path, or absolute path
+- `docs/config.md`: Updated bin field to document support for binary name, relative path, or absolute path
+- `docs/cli/start-init.md`: Changed "only finds binaries in PATH" to "only finds executables that are discoverable"
+- `docs/design/design-records/dr-024-doctor-exit-codes.md`: Changed "binary in PATH" to "binary is discoverable"
+- **Agent asset file correction**: Fixed documentation showing agents have 3 files; agents only have 2 (.toml and .meta.toml, no .md file)
+- `docs/cli/start-init.md`: Corrected agent asset downloads from 3 files to 2 files (removed .md reference) - agents don't use UTD pattern
+- **Updated PROJECT.md command structure**: Removed obsolete `start-update.md` reference; added 7 asset commands (start-assets.md and subcommands); updated document count from 14 to 20
+- **Fixed all `start update` to `start assets update` references**: Updated 18 design records and 4 CLI docs to use current command name
+- Living (non-archived) design records updated: dr-010, dr-011, dr-018, dr-021, dr-022, dr-024, dr-025, dr-026, dr-027, dr-030, dr-031, dr-034, dr-036, dr-037
+- CLI docs updated: start-config-task.md, start-doctor.md, start-config-role.md
+- Preserved historical references in archive files, DR-017 (deprecation record), and DR-041 (migration record)

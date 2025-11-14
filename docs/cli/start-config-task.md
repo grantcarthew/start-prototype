@@ -1538,7 +1538,7 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 - start-config-agent(1) - Manage AI agents
 - start-config-context(1) - Manage context documents
 - start-config-role(1) - Manage system prompts
-- start-update(1) - Update asset library
+- start-assets-update(1) - Update asset library
 - DR-009 - Task structure and placeholders
 - DR-010 - Default task definitions
 - DR-017 - CLI command reorganization

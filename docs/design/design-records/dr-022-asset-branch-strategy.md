@@ -6,7 +6,7 @@
 
 ## Decision
 
-Asset library updates (`start update` and `start init`) always pull from the **latest commit on the main branch**, not from GitHub Releases.
+Asset library updates (`start assets update` and `start init`) always pull from the **latest commit on the main branch**, not from GitHub Releases.
 
 ## Rationale
 
@@ -26,7 +26,7 @@ Content updates have lower risk than binary code updates and benefit from rapid 
   - Changed via your manual release process
 
 - **Asset library**: Tied to main branch commits
-  - Users update via: `start update`
+  - Users update via: `start assets update`
   - Can iterate independently of CLI releases
   - Improvements available immediately
 
@@ -59,7 +59,7 @@ GET /repos/grantcarthew/start/git/trees/{tag}?recursive=1
 The `asset-version.toml` file tracks the main branch commit SHA:
 
 ```toml
-# Asset version tracking - managed by 'start update'
+# Asset version tracking - managed by 'start assets update'
 # Last updated: 2025-01-06T10:30:00Z
 
 commit = "abc123def456"  # Latest commit SHA from main branch
@@ -77,7 +77,7 @@ branch = "main"  # Always main
 ### Update Flow
 
 ```bash
-$ start update
+$ start assets update
 
 Checking asset library...
   Current commit:  abc1234 (3 days ago)
@@ -113,7 +113,7 @@ CLI Version Check:
    - Could add `--branch develop` flag later if needed
 
 3. **Validation on update** (future consideration)
-   - `start update` could validate TOML syntax before installing
+   - `start assets update` could validate TOML syntax before installing
    - Rollback on validation failure (DR-015)
    - Show warnings for deprecated fields
 
@@ -123,7 +123,7 @@ CLI Version Check:
 |--------|------------|---------------|
 | **Source** | GitHub Releases | Main branch commits |
 | **Version** | Semantic (v1.2.3) | Git commit SHA |
-| **Update Command** | `brew upgrade` / `go install` | `start update` |
+| **Update Command** | `brew upgrade` / `go install` | `start assets update` |
 | **Update Frequency** | Manual releases | Every commit to main |
 | **Testing** | Full release process | Commit to main |
 | **Stability** | High (release process) | Medium (review before merge) |
@@ -134,9 +134,9 @@ CLI Version Check:
 **Branch selection flag** (not implementing now):
 ```bash
 # Could add later if needed
-start update --branch develop  # Bleeding edge
-start update --branch main     # Default
-start update --tag v1.2.0      # Pin to specific version
+start assets update --branch develop  # Bleeding edge
+start assets update --branch main     # Default
+start assets update --tag v1.2.0      # Pin to specific version
 ```
 
 **Asset channels** (not implementing now):
@@ -173,7 +173,7 @@ Assets are content that benefits from rapid iteration. Pulling from main branch 
 - Adding new context configurations for common patterns
 - Iterating on examples based on user feedback
 
-Users control when they get updates (via `start update`), so they're not forced to take changes immediately. The CLI binary remains tied to stable releases for safety.
+Users control when they get updates (via `start assets update`), so they're not forced to take changes immediately. The CLI binary remains tied to stable releases for safety.
 
 ## Related Decisions
 
@@ -220,6 +220,6 @@ No "version number" for assets - just commit SHA and timestamp.
 - [ ] Update `internal/assets/updater.go` to target main branch
 - [ ] Ensure `asset-version.toml` tracks branch field
 - [ ] Update `start doctor` to show asset commit and age
-- [ ] Update `start update` output to show current/latest commits
+- [ ] Update `start assets update` output to show current/latest commits
 - [ ] Document in README that assets come from main branch
 - [ ] Add validation for TOML syntax before installing assets (optional)
