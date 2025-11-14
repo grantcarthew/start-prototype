@@ -480,7 +480,7 @@ Global: ~/.config/start/ ✓
 Local:  ./.start/ (not found)
 
 Use 'start config edit global' to edit global settings.
-Use 'start init local' to create local config.
+Use 'start init --local' to create local config.
 ```
 
 **Output (neither exists):**

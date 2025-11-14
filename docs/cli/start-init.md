@@ -7,18 +7,22 @@ start init - Initialize start configuration
 ## Synopsis
 
 ```bash
-start init [scope]
+start init [flags]
 ```
 
 ## Description
 
 Interactive wizard to create `start` configuration files. Detects installed AI agents, fetches current agent configurations from GitHub, and creates a working multi-file configuration.
 
-**Scopes:**
-- **global** - Personal config at `~/.config/start/` (default, recommended)
-- **local** - Project config at `./.start/` (for team use)
+**Interactive by default** - Prompts for configuration choices unless `--force` flag is used.
+
+**Target locations:**
+
+- **global** - Personal config at `~/.config/start/` (default)
+- **local** - Project config at `./.start/` (use `--local` flag)
 
 **Configuration files created** (per DR-031):
+
 - `config.toml` - Settings only
 - `agents.toml` - Agent configurations
 - `roles.toml` - Role definitions
@@ -27,13 +31,13 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 
 **What init does:**
 
-1. Checks for existing configuration (offers backup if found)
-2. Asks where to create config (global or local) if scope not specified
+1. Asks for target location (global or local) unless `--local` or `--force` provided
+2. Checks for existing configuration at target location (prompts for backup unless `--force`)
 3. Fetches latest agent configurations from GitHub
 4. Auto-detects installed agents in PATH
-5. Prompts for additional agents to configure
-6. Prompts for default agent selection
-7. Creates config at chosen location
+5. Interactive mode: Prompts for additional agents and default agent selection
+6. Automatic mode (`--force`): Configures all detected agents, uses first as default
+7. Creates multi-file config at target location
 8. Adds default context document configuration
 
 **When to run init:**
@@ -45,127 +49,127 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 **Network requirement:**
 Init attempts to download asset catalog from GitHub. If offline, creates config files without downloading assets (per DR-026).
 
-## Arguments
-
-**[scope]** (optional)
-: Where to create the configuration. If omitted, init will ask interactively.
-
-- `global` - Create config files in `~/.config/start/` (personal, default)
-- `local` - Create config files in `./.start/` (project, can be committed)
-
-```bash
-start init          # Interactive: asks where to create
-start init global   # Create global config
-start init local    # Create local config
-```
-
 ## Flags
 
-**--force**, **-f**
-: Skip backup confirmation prompt. Automatically backs up existing config and continues.
+**--local**, **-l**
+: Create config in `./.start/` (project config). Without this flag, init will ask interactively or default to global with `--force`.
 
 ```bash
-start init --force
+start init          # Interactive: asks global or local
+start init --local  # Create local config (still interactive for wizard)
 ```
+
+**--force**, **-f**
+: Fully automatic mode. Skips all prompts (location choice, backup confirmation, agent wizard). Auto-configures all detected agents, uses first detected as default, auto-backs up if config exists.
+
+```bash
+start init --force         # Automatic global config
+start init --local --force # Automatic local config (perfect for CI/CD)
+```
+
+**--version**, **-v**
+: Display version information and exit.
 
 This command also supports the standard global flags for verbosity and help: `--verbose`, `--debug`, and `--help`.
 
 ## Behavior
 
-### Smart Behavior (No Scope Argument)
+### Interactive Mode (Default)
 
-When run without scope argument, init detects existing configs and asks where to create.
-
-**Scenario 1: No global, no local (first-time user)**
+**`start init` with no flags:**
 
 ```
 Initialize start configuration
 
-No existing configuration found.
-
 Where should this configuration be created?
-  1) Global (~/.config/start/) [RECOMMENDED]
+  1) Global (~/.config/start/)
      Personal config across all projects
   2) Local (./.start/)
-     Project config (for team use)
+     Project config (can be committed to git)
 
 Select [1-2] (default: 1):
 ```
 
-Press Enter → Creates global (default)
+Then continues with wizard (see Main Wizard section below).
 
-**Scenario 2: Global exists, no local**
-
-```
-Initialize start configuration
-
-Existing global config found: ~/.config/start/
-
-What would you like to do?
-  1) Replace global config [BACKUP WILL BE CREATED]
-  2) Create local config for this project
-  3) Cancel
-
-Select [1-3] (default: 1):
-```
-
-Option 1 → Backup config files to `*.YYYY-MM-DD-HHMMSS.toml`, create new global
-Option 2 → Create local, keep global untouched
-Option 3 → Exit
-
-**Scenario 3: Global exists, local exists**
+**If config exists at chosen location:**
 
 ```
-Initialize start configuration
+Existing config found: ~/.config/start/
 
-Existing configs found:
-  Global: ~/.config/start/
-  Local:  ./.start/
-
-Which would you like to replace? [BACKUP WILL BE CREATED]
-  1) Replace global config
-  2) Replace local config
-  3) Cancel
-
-Select [1-3] (default: 1):
+Backup and reinitialize? [y/N]:
 ```
 
-**Scenario 4: No global, local exists**
+- Answer `y` → Backup config files to `*.YYYY-MM-DD-HHMMSS.toml`, continue with wizard
+- Answer `N` or press Enter → Exit gracefully (exit code 0)
 
-```
-Initialize start configuration
+### Partially Interactive (--local)
 
-Existing local config found: ./.start/
+**`start init --local`:**
 
-What would you like to do?
-  1) Create global config [RECOMMENDED]
-  2) Replace local config [BACKUP WILL BE CREATED]
-  3) Cancel
-
-Select [1-3] (default: 1):
-```
-
-### Explicit Scope Behavior
-
-When scope argument provided, skip prompts and create specified config:
+Skips location question, creates local config at `./.start/`.
+Still runs backup prompt (if exists) and agent wizard.
 
 ```bash
-start init global    # Force global (backup if exists)
-start init local     # Force local (backup if exists)
+start init --local
 ```
 
-Both create backups automatically if replacing existing config.
+```
+Initialize start configuration
 
-**Main wizard:**
+Creating local config at ./.start/...
+
+[...agent wizard prompts...]
+```
+
+### Fully Automatic (--force)
+
+**`start init --force`:**
+
+Zero interaction. Creates global config with smart defaults:
+
+- Defaults to global (`~/.config/start/`)
+- Auto-backs up if config exists (no prompt)
+- Auto-detects and configures all agents in PATH
+- Sets first detected agent as default (priority: claude > gemini > aichat > others)
+- No wizard prompts
+
+```bash
+start init --force
+```
+
+```
+Initialize start configuration
+
+Creating global config at ~/.config/start/...
+✓ Backed up existing config
+✓ Fetched agent configs from GitHub
+✓ Detected and configured: claude, gemini
+✓ Default agent: claude
+✓ Config created successfully
+```
+
+**`start init --local --force`:**
+
+Same automatic behavior, but creates local config at `./.start/`.
+Perfect for CI/CD pipelines or scripting.
+
+```bash
+start init --local --force
+```
+
+### Main Wizard (Interactive Mode)
+
+In interactive mode (without `--force`), init runs this wizard:
 
 1. Fetch agent configs from GitHub (`assets/agents/*.toml`)
    - Timeout: 10 seconds
    - Endpoint: `https://api.github.com/repos/grantcarthew/start/contents/assets/agents`
 2. Auto-detect installed agents using `command -v`
    - Checks for: claude, gemini, aichat, opencode, codex, aider
-3. Auto-configure all detected agents
-4. Prompt for additional agents (from fetched configs)
-5. Prompt for default agent selection
+3. Display detected agents
+4. **Prompt**: Additional agents to configure (from fetched configs)
+5. **Prompt**: Default agent selection
 6. Create multi-file configuration:
    - `config.toml` - Settings (default_agent, default_role, etc.)
    - `agents.toml` - Agent configurations for each selected agent
@@ -174,6 +178,19 @@ Both create backups automatically if replacing existing config.
    - `tasks.toml` - Default task definitions
 7. Write all config files to chosen directory
 8. Display success message
+
+### Automatic Mode (--force)
+
+In automatic mode, init does the same steps but **skips all prompts**:
+
+1. Fetch agent configs from GitHub (same)
+2. Auto-detect installed agents (same)
+3. **Auto**: Configure ALL detected agents (no prompt)
+4. **Auto**: Use first detected agent as default (priority order: claude > gemini > aichat > others)
+5. Create config files (same structure)
+6. Display success message
+
+If no agents detected: Creates config with empty `[agents]` section (user can add later).
 
 **Default context documents:**
 These documents are always added to the config:
@@ -236,7 +253,7 @@ GET https://api.github.com/repos/grantcarthew/start/contents/assets/agents
 
 ## Examples
 
-### First Time Setup (Interactive)
+### Interactive Setup
 
 ```bash
 start init
@@ -247,13 +264,11 @@ Output:
 ```
 Initialize start configuration
 
-No existing configuration found.
-
 Where should this configuration be created?
-  1) Global (~/.config/start/) [RECOMMENDED]
+  1) Global (~/.config/start/)
      Personal config across all projects
   2) Local (./.start/)
-     Project config (for team use)
+     Project config (can be committed to git)
 
 Select [1-2] (default: 1): 1
 
@@ -266,16 +281,11 @@ Detecting installed agents...
 ✓ claude (Claude Code by Anthropic)
 ✓ gemini (Gemini CLI by Google)
 
-Configuring detected agents...
-✓ claude configured
-✓ gemini configured
-
 Additional agents available (not detected):
   [ ] aichat - All-in-one multi-provider CLI
   [ ] opencode - Open-source coding agent
   [ ] codex - OpenAI Codex CLI
   [ ] aider - Popular coding assistant
-  [ ] Other...
 
 Select additional agents to configure (space to select, enter to continue):
 
@@ -289,6 +299,7 @@ Creating configuration at ~/.config/start/...
 ✓ agents.toml created
 ✓ roles.toml created
 ✓ contexts.toml created
+✓ tasks.toml created
 
 Default context documents configured:
   ~/reference/ENVIRONMENT.md (required)
@@ -300,35 +311,36 @@ Run 'start config show' to see your configuration.
 Run 'start' to launch!
 ```
 
-### Create Global Config (Explicit)
+### Local Config (Interactive)
 
 ```bash
-start init global
+start init --local
 ```
 
-Skips scope prompt, creates global config directly.
-
-### Create Local Config (Explicit)
-
-```bash
-start init local
-```
-
-Output:
+Skips location question, creates local config, still runs wizard:
 
 ```
+Initialize start configuration
+
+Creating local config at ./.start/...
+
 Welcome to start!
 
 Fetching latest agent configurations from GitHub...
 ✓ Found 6 agent configurations
 
-[...agent detection and wizard...]
+Detecting installed agents...
+✓ claude (Claude Code by Anthropic)
+✓ gemini (Gemini CLI by Google)
 
-Creating configuration at ./.start/...
+[...wizard prompts for additional agents and default selection...]
+
+Writing configuration files...
 ✓ config.toml created
 ✓ agents.toml created
 ✓ roles.toml created
 ✓ contexts.toml created
+✓ tasks.toml created
 
 Default context documents configured:
   ~/reference/ENVIRONMENT.md (required)
@@ -341,6 +353,59 @@ Run 'start config show' to see your configuration.
 Run 'start' to launch!
 ```
 
+### Automatic Mode
+
+```bash
+start init --force
+```
+
+Zero interaction, smart defaults:
+
+```
+Initialize start configuration
+
+Creating global config at ~/.config/start/...
+
+Fetching latest agent configurations from GitHub...
+✓ Found 6 agent configurations
+
+Detecting installed agents...
+✓ claude (Claude Code by Anthropic)
+✓ gemini (Gemini CLI by Google)
+
+Auto-configuring detected agents...
+✓ claude configured
+✓ gemini configured
+✓ Default agent: claude
+
+Writing configuration files...
+✓ config.toml created
+✓ agents.toml created
+✓ roles.toml created
+✓ contexts.toml created
+✓ tasks.toml created
+
+Configuration created successfully.
+Run 'start' to launch!
+```
+
+### Automatic Local Config (CI/CD)
+
+```bash
+start init --local --force
+```
+
+Perfect for automated setup in CI/CD or team onboarding scripts:
+
+```
+Initialize start configuration
+
+Creating local config at ./.start/...
+✓ Detected and configured: claude, gemini
+✓ Default agent: claude
+✓ Config created successfully
+```
+
 ### Reinitialize Existing Config
 
 ```bash
@@ -350,15 +415,26 @@ start init
 Output:
 
 ```
-Configuration already exists at ~/.config/start/
+Initialize start configuration
+
+Where should this configuration be created?
+  1) Global (~/.config/start/)
+     Personal config across all projects
+  2) Local (./.start/)
+     Project config (can be committed to git)
+
+Select [1-2] (default: 1): 1
+
+Existing config found: ~/.config/start/
 
 Backup and reinitialize? [y/N]: y
 
 Backing up config files...
-✓ config.2025-01-04-103045.toml
-✓ agents.2025-01-04-103045.toml
-✓ roles.2025-01-04-103045.toml
-✓ contexts.2025-01-04-103045.toml
+✓ config.2025-01-14-143045.toml
+✓ agents.2025-01-14-143045.toml
+✓ roles.2025-01-14-143045.toml
+✓ contexts.2025-01-14-143045.toml
+✓ tasks.2025-01-14-143045.toml
 
 Welcome to start!
 [...continues with wizard...]
@@ -370,7 +446,17 @@ Welcome to start!
 start init --force
 ```
 
-Skips backup prompt, automatically backs up and continues.
+Automatically backs up and reinitializes without any prompts:
+
+```
+Initialize start configuration
+
+Creating global config at ~/.config/start/...
+✓ Backed up existing config (config.2025-01-14-143045.toml, ...)
+✓ Detected and configured: claude, gemini
+✓ Default agent: claude
+✓ Config created successfully
+```
 
 ### Verbose Mode
 
@@ -575,16 +661,25 @@ Init continues with other agents. Does not exit.
 
 ### First Time vs Reinitialize
 
-**Backup prompt behavior:**
+**Prompt behavior summary:**
 
-- Shown only if `~/.config/start/` directory contains config files
-- Skipped with `--force` flag
+| Command | Location prompt | Backup prompt | Agent wizard |
+|---------|----------------|---------------|--------------|
+| `start init` | Yes | Yes (if exists) | Yes |
+| `start init --local` | No (→ local) | Yes (if exists) | Yes |
+| `start init --force` | No (→ global) | No (auto-backup) | No (auto-config) |
+| `start init --local --force` | No (→ local) | No (auto-backup) | No (auto-config) |
+
+**Backup prompt:**
+- Shown in interactive mode if config exists at target location
+- Skipped with `--force` flag (auto-backs up instead)
 - Answer 'N' exits gracefully (exit code 0)
 
 **Backup naming:**
 Format: `<filename>.YYYY-MM-DD-HHMMSS.toml`
 
 Examples:
+
 - `config.2025-01-04-103045.toml`
 - `agents.2025-01-04-103045.toml`
 - `roles.2025-01-04-103045.toml`
@@ -603,6 +698,7 @@ Standard permissions: `0755` (drwxr-xr-x)
 Init creates 5 configuration files. Example content shown below:
 
 **config.toml** (settings):
+
 ```toml
 [settings]
 default_agent = "claude"
@@ -611,6 +707,7 @@ default_role = "code-reviewer"
 ```
 
 **agents.toml** (agent configurations):
+
 ```toml
 [agents.claude]
 command = "claude --model {model} ..."
@@ -618,6 +715,7 @@ command = "claude --model {model} ..."
 ```
 
 **roles.toml** (role definitions):
+
 ```toml
 [roles.code-reviewer]
 description = "Expert code reviewer"
@@ -625,6 +723,7 @@ file = "./ROLE.md"
 ```
 
 **contexts.toml** (context documents):
+
 ```toml
 [context.environment]
 file = "~/reference/ENVIRONMENT.md"
@@ -633,6 +732,7 @@ required = true
 ```
 
 **tasks.toml** (task definitions):
+
 ```toml
 # This file is created by 'start init'.
 # Add custom tasks here or install them from the
@@ -690,17 +790,18 @@ Running `start init` multiple times is safe:
 
 **Common reasons to re-run:**
 
-- Add newly installed agents
+- Add newly installed agents (`start init --force` for quick refresh)
 - Reset to defaults after config errors
 - Update agent templates from GitHub
+- Create team config for new project (`start init --local --force`)
 
 ### Agent Detection Limitations
 
 `command -v` only finds agents in PATH. If an agent is installed but not in PATH:
 
 - Not auto-detected
-- Select manually from "Additional agents" list
-- Or select "Other..." for custom configuration
+- In interactive mode: Select manually from "Additional agents" list
+- In automatic mode (`--force`): Not configured (add later with `start config agent add`)
 
 ### GitHub Repository Structure
 

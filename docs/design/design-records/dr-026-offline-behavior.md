@@ -62,9 +62,9 @@ Defined in individual command specs:
 ### init with network failure
 
 ```bash
-$ start init global
+$ start init
 
-Creating config at ~/.config/start/config.toml...
+Creating config at ~/.config/start/...
 
 Warning: Unable to download assets from GitHub.
   Network error: dial tcp: no route to host

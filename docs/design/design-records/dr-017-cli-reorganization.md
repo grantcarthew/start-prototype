@@ -40,7 +40,7 @@ start config role <sub>      # Manage system prompts (new)
 
 **Utility commands:**
 ```bash
-start init [scope]           # Initialize configuration
+start init [--local]         # Initialize configuration
 start doctor                 # Diagnose installation
 ```
 
