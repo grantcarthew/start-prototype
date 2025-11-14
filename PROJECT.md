@@ -303,3 +303,17 @@ Documentation review is complete when:
 - `docs/cli/start-task.md`: Renamed "Default Tasks" to "Available Tasks"; removed "ships with" language; explained GitHub catalog auto-download mechanism (lines 711-733)
 - **Removed remaining "Default tasks" reference**: Removed misleading bullet point about default tasks in global config
 - `docs/tasks.md`: Removed "Default tasks (cr, gdr, ct, dr)" from Global tasks description (line 200)
+- **Replaced start init [scope] with --local flag**: Changed positional scope argument to --local flag for consistency with rest of CLI
+- `docs/cli/start-init.md`: Changed synopsis from `start init [scope]` to `start init [flags]`; replaced location choice with `--local` flag; updated all examples and behavior documentation
+- `docs/cli/start-config.md`: Changed `start init local` to `start init --local` (line 483)
+- `docs/design/design-records/dr-026-offline-behavior.md`: Changed `start init global` to `start init` (line 65)
+- `docs/design/design-records/dr-017-cli-reorganization.md`: Updated synopsis to show `[--local]` flag (line 43)
+- **Enhanced init command with interactive/automatic modes**: Added three interaction levels controlled by --local and --force flags
+- `docs/cli/start-init.md`: Added interactive mode (asks location), partially interactive (--local skips location), and fully automatic (--force skips all prompts)
+- **Added bin field to agent TOML structure**: New required field for auto-detection and DRY command templates
+- `docs/design/design-records/dr-013-agent-templates.md`: Added bin field specification, {bin} placeholder usage, and updated init behavior to use index.csv
+- `docs/design/design-records/dr-007-placeholders.md`: Added {bin} placeholder to global placeholders; updated all agent examples to include bin field
+- `docs/design/design-records/dr-039-catalog-index.md`: Added `bin` column to index.csv schema; updated generation algorithm to extract bin from agent TOML files
+- `docs/config.md`: Added bin field documentation to [agents.<name>] section; updated all agent examples; updated validation rules for required {bin} and {model} placeholders
+- `docs/cli/start-init.md`: Updated agent detection to use index.csv → command -v → lazy TOML download workflow; updated GitHub Catalog Details section
+- **Validation changes**: Made {bin} and {model} placeholders required (errors), {prompt} remains recommended (warns)

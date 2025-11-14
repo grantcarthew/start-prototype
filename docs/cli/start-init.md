@@ -162,33 +162,40 @@ start init --local --force
 
 In interactive mode (without `--force`), init runs this wizard:
 
-1. Fetch agent configs from GitHub (`assets/agents/*.toml`)
+1. Fetch catalog index from GitHub (`assets/index.csv`)
    - Timeout: 10 seconds
-   - Endpoint: `https://api.github.com/repos/grantcarthew/start/contents/assets/agents`
-2. Auto-detect installed agents using `command -v`
-   - Checks for: claude, gemini, aichat, opencode, codex, aider
-3. Display detected agents
-4. **Prompt**: Additional agents to configure (from fetched configs)
-5. **Prompt**: Default agent selection
-6. Create multi-file configuration:
+   - URL: `https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv`
+   - Filters for `type=agents`, extracts `bin` column
+2. Auto-detect installed agents using `command -v <bin>`
+   - Checks each binary name from index (e.g., claude, gemini, aichat, opencode, codex, aider)
+   - `command -v claude` → detected if exit code 0
+3. Download agent TOML files only for detected agents (lazy loading)
+   - Fetches `assets/agents/{category}/{name}.toml` via raw.githubusercontent.com
+   - Only downloads what's needed
+4. Display detected agents
+5. **Prompt**: Additional agents to configure (from catalog index)
+6. Download TOML files for any additional selected agents
+7. **Prompt**: Default agent selection
+8. Create multi-file configuration:
    - `config.toml` - Settings (default_agent, default_role, etc.)
    - `agents.toml` - Agent configurations for each selected agent
    - `roles.toml` - Default role definitions
    - `contexts.toml` - Context document references (4 default documents)
    - `tasks.toml` - Default task definitions
-7. Write all config files to chosen directory
-8. Display success message
+9. Write all config files to chosen directory
+10. Display success message
 
 ### Automatic Mode (--force)
 
 In automatic mode, init does the same steps but **skips all prompts**:
 
-1. Fetch agent configs from GitHub (same)
-2. Auto-detect installed agents (same)
-3. **Auto**: Configure ALL detected agents (no prompt)
-4. **Auto**: Use first detected agent as default (priority order: claude > gemini > aichat > others)
-5. Create config files (same structure)
-6. Display success message
+1. Fetch catalog index from GitHub (same)
+2. Auto-detect installed agents using `command -v <bin>` from index (same)
+3. Download agent TOML files for detected agents (same lazy loading)
+4. **Auto**: Configure ALL detected agents (no prompt for additional agents)
+5. **Auto**: Use first detected agent as default (priority order: claude > gemini > aichat > others)
+6. Create config files (same structure)
+7. Display success message
 
 If no agents detected: Creates config with empty `[agents]` section (user can add later).
 
@@ -207,48 +214,68 @@ Files don't need to exist - runtime gracefully handles missing files (see DR-008
 
 ### Agent Detection
 
-Init uses `command -v` to detect installed agents:
+Init uses the catalog index and `command -v` for agent detection:
 
-```bash
-command -v claude      # Detected
-command -v gemini      # Detected
-command -v aichat      # Not found
+**Step 1: Fetch index**
 ```
+GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv
+```
+
+Parses CSV to extract all agent entries with their `bin` field.
+
+**Step 2: Auto-detect**
+```bash
+command -v claude      # Exit 0 → Detected
+command -v gemini      # Exit 0 → Detected
+command -v aichat      # Exit 1 → Not found
+```
+
+**Step 3: Lazy download**
+
+Only downloads TOML files for detected/selected agents:
+```
+GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.toml
+```
+
+**Benefits:**
+- Efficient: 1 index download + N agent downloads (only what's needed)
+- Fast: No rate limits on raw.githubusercontent.com
+- Lazy: Only downloads agents you actually use
 
 **Auto-configuration:**
 
 - All detected agents are automatically configured
-- No user prompt for detected agents
-- Fetched configs from GitHub provide command templates and model names
+- Downloaded configs provide: `bin` field, command template with `{bin}` placeholder, model names, default model
 
 **Unknown agents:**
-If `command -v` finds a binary but no config exists in GitHub:
 
-- Agent is skipped
-- User can select "Other..." to see manual configuration docs
+If a binary is installed but not in the catalog index:
+- Not auto-detected (index is source of truth for available agents)
+- User can manually add later with `start assets add`
 
-### GitHub Fetch Details
+### GitHub Catalog Details
 
-**API endpoint:**
-
+**Index file:**
 ```
-GET https://api.github.com/repos/grantcarthew/start/contents/assets/agents
+URL: https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv
+Format: CSV with columns: type,category,name,description,tags,bin,sha,size,created,updated
+Filter: type=agents
+Extract: bin column for detection
 ```
 
-**Fetched for each agent:**
-
-- Command template with placeholders
-- Model names mapping
-- Default model selection
+**Agent TOML files:**
+```
+URL pattern: https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.toml
+Contains: bin, command (with {bin} placeholder), description, models, default_model
+```
 
 **Rate limits:**
-
-- Unauthenticated: 60 requests/hour
-- Init uses 1-2 requests total
+- raw.githubusercontent.com has no rate limits
+- Fast and reliable for init workflow
 
 **Timeout:**
-
-- 10 seconds for API calls
+- 10 seconds for index fetch
+- 5 seconds per agent TOML download
 - Error and exit if timeout reached
 
 ## Examples
@@ -801,7 +828,7 @@ Running `start init` multiple times is safe:
 
 - Not auto-detected
 - In interactive mode: Select manually from "Additional agents" list
-- In automatic mode (`--force`): Not configured (add later with `start config agent add`)
+- In automatic mode (`--force`): Not configured (add later with `start assets add`)
 
 ### GitHub Repository Structure
 

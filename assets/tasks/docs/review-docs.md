@@ -24,7 +24,7 @@ Run these exact commands and analyze results:
 
 ```bash
 # Check for old directory paths
-rg 'design\/decisions' docs/
+rg '<any-discovered-old-dir>' docs/
 
 # Check for broken DR links
 rg '\[DR-[0-9]+\]' docs/ -n

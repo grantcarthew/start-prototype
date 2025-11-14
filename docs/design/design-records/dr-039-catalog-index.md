@@ -28,7 +28,7 @@ Without an index, searching by description/tags is impractical at scale.
 
 **Columns:**
 ```csv
-type,category,name,description,tags,sha,size,created,updated
+type,category,name,description,tags,bin,sha,size,created,updated
 ```
 
 **Field definitions:**
@@ -38,6 +38,7 @@ type,category,name,description,tags,sha,size,created,updated
 - **name** - Asset name (filename without extension)
 - **description** - Human-readable summary (from .meta.toml)
 - **tags** - Semicolon-separated keywords (e.g., `git;review;quality`)
+- **bin** - Binary name for agent auto-detection (agents only, empty for other types)
 - **sha** - Git blob SHA of content file (for update detection)
 - **size** - File size in bytes
 - **created** - ISO 8601 timestamp when asset was created
@@ -47,11 +48,11 @@ type,category,name,description,tags,sha,size,created,updated
 
 **Example:**
 ```csv
-type,category,name,description,tags,sha,size,created,updated
-agents,anthropic,claude,Anthropic Claude AI via Claude Code CLI,claude;anthropic;ai,a1b2c3d4,1024,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
-roles,general,code-reviewer,Expert code reviewer focusing on security,review;security;quality,b2c3d4e5,2048,2025-01-10T00:00:00Z,2025-01-12T00:00:00Z
-tasks,git-workflow,commit-message,Generate conventional commit message,git;commit;conventional,c3d4e5f6,1536,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
-tasks,git-workflow,pre-commit-review,Review staged changes before committing,git;review;quality;pre-commit,d4e5f6a1,2048,2025-01-10T00:00:00Z,2025-01-11T00:00:00Z
+type,category,name,description,tags,bin,sha,size,created,updated
+agents,anthropic,claude,Anthropic Claude AI via Claude Code CLI,claude;anthropic;ai,claude,a1b2c3d4,1024,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
+roles,general,code-reviewer,Expert code reviewer focusing on security,review;security;quality,,b2c3d4e5,2048,2025-01-10T00:00:00Z,2025-01-12T00:00:00Z
+tasks,git-workflow,commit-message,Generate conventional commit message,git;commit;conventional,,c3d4e5f6,1536,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
+tasks,git-workflow,pre-commit-review,Review staged changes before committing,git;review;quality;pre-commit,,d4e5f6a1,2048,2025-01-10T00:00:00Z,2025-01-11T00:00:00Z
 ```
 
 ### Generation Process
@@ -70,6 +71,7 @@ tasks,git-workflow,pre-commit-review,Review staged changes before committing,git
 3. For each .meta.toml:
    - Parse TOML
    - Extract: type, category (from path), name, description, tags, sha, created, updated
+   - If type=agents: extract bin from corresponding .toml file
    - Validate all required fields present
 4. Sort entries alphabetically by type → category → name
 5. Write CSV to assets/index.csv with header row
@@ -154,10 +156,11 @@ func loadCatalogIndex() (*CatalogIndex, error) {
             Name:        record[2],
             Description: record[3],
             Tags:        strings.Split(record[4], ";"),
-            SHA:         record[5],
-            Size:        parseInt(record[6]),
-            Created:     parseTime(record[7]),
-            Updated:     parseTime(record[8]),
+            Bin:         record[5],  // Empty for non-agent assets
+            SHA:         record[6],
+            Size:        parseInt(record[7]),
+            Created:     parseTime(record[8]),
+            Updated:     parseTime(record[9]),
         }
         assets = append(assets, asset)
     }
@@ -259,7 +262,7 @@ assets/tasks/git-workflow/pre-commit-review.meta.toml
 
 Index contains **one entry**:
 ```csv
-tasks,git-workflow,pre-commit-review,Review staged changes,git;review,abc123,2048,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
+tasks,git-workflow,pre-commit-review,Review staged changes,git;review,,abc123,2048,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
 ```
 
 When downloading the asset, fetch all files with matching name prefix.
@@ -316,12 +319,12 @@ Follow RFC 4180 CSV standard:
 
 **Fields containing commas:**
 ```csv
-tasks,workflow,my-task,"Review code, check tests, verify docs",testing,abc123,1024,2025-01-13T00:00:00Z,2025-01-13T00:00:00Z
+tasks,workflow,my-task,"Review code, check tests, verify docs",testing,,abc123,1024,2025-01-13T00:00:00Z,2025-01-13T00:00:00Z
 ```
 
 **Fields containing quotes:**
 ```csv
-tasks,workflow,my-task,"Review ""special"" cases",testing,abc123,1024,2025-01-13T00:00:00Z,2025-01-13T00:00:00Z
+tasks,workflow,my-task,"Review ""special"" cases",testing,,abc123,1024,2025-01-13T00:00:00Z,2025-01-13T00:00:00Z
 ```
 
 Standard Go `encoding/csv` package handles this automatically.
@@ -374,6 +377,15 @@ func scanAssets() ([]AssetMeta, error) {
             meta.Category = parts[2]  // "git-workflow"
         }
 
+        // For agents, extract bin from the agent TOML file
+        if meta.Type == "agents" {
+            agentPath := strings.TrimSuffix(path, ".meta.toml") + ".toml"
+            bin, err := extractAgentBin(agentPath)
+            if err == nil {
+                meta.Bin = bin
+            }
+        }
+
         assets = append(assets, meta)
         return nil
     })
@@ -415,7 +427,7 @@ func writeIndex(assets []AssetMeta) error {
     // Header row
     writer.Write([]string{
         "type", "category", "name", "description",
-        "tags", "sha", "size", "created", "updated",
+        "tags", "bin", "sha", "size", "created", "updated",
     })
 
     // Data rows
@@ -426,6 +438,7 @@ func writeIndex(assets []AssetMeta) error {
             asset.Name,
             asset.Description,
             strings.Join(asset.Tags, ";"),
+            asset.Bin,  // Empty for non-agent assets
             asset.SHA,
             strconv.Itoa(asset.Size),
             asset.Created.Format(time.RFC3339),

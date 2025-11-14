@@ -12,6 +12,12 @@ Use single-brace placeholders (`{name}`) with specific supported variables for c
 
 Available in agent commands and all template contexts:
 
+**{bin}** - Agent binary name
+- Value: Binary name from agent's `bin` field
+- Example: `"claude"`
+- Example: `"gemini"`
+- Required in agent commands (enforces DRY, prevents bin/command mismatch)
+
 **{model}** - Currently selected model identifier
 - Value: Full model identifier after name resolution
 - Example: `"claude-3-7-sonnet-20250219"`
@@ -45,16 +51,19 @@ Available in agent commands and all template contexts:
 **When to use {role}:**
 ```toml
 [agents.claude]
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
+bin = "claude"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
 
 [agents.aichat]
-command = "AICHAT_SYSTEM_PROMPT='{role}' aichat --model {model} '{prompt}'"
+bin = "aichat"
+command = "AICHAT_SYSTEM_PROMPT='{role}' {bin} --model {model} '{prompt}'"
 ```
 
 **When to use {role_file}:**
 ```toml
 [agents.gemini]
-command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
+bin = "gemini"
+command = "GEMINI_SYSTEM_MD='{role_file}' {bin} --model {model} '{prompt}'"
 ```
 
 **Temporary file behavior for {role_file}:**
@@ -158,8 +167,9 @@ command = "VAR1='{role}' VAR2='{date}' custom-ai --model {model} '{prompt}'"
 
 ```toml
 [agents.claude]
+bin = "claude"
 description = "Claude with inline system prompt"
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
 ```
 
@@ -167,8 +177,9 @@ default_model = "sonnet"
 
 ```toml
 [agents.gemini]
+bin = "gemini"
 description = "Gemini with file-based system prompt"
-command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} --include-directories ~/reference '{prompt}'"
+command = "GEMINI_SYSTEM_MD='{role_file}' {bin} --model {model} --include-directories ~/reference '{prompt}'"
 default_model = "flash"
 ```
 
@@ -176,8 +187,9 @@ default_model = "flash"
 
 ```toml
 [agents.aichat]
+bin = "aichat"
 description = "aichat with system prompt in env var"
-command = "AICHAT_SYSTEM_PROMPT='{role}' aichat --model {model} '{prompt}'"
+command = "AICHAT_SYSTEM_PROMPT='{role}' {bin} --model {model} '{prompt}'"
 default_model = "gpt4-mini"
 ```
 
@@ -260,6 +272,7 @@ Instructions: {instructions}
 
 | Placeholder       | Agent Commands | Roles | Contexts | Tasks |
 |-------------------|----------------|-------|----------|-------|
+| {bin}             | ✓              | -     | -        | -     |
 | {model}           | ✓              | ✓     | ✓        | ✓     |
 | {date}            | ✓              | ✓     | ✓        | ✓     |
 | {prompt}          | ✓              | -     | -        | -     |

@@ -8,12 +8,40 @@
 
 Fetch agent configurations from GitHub during `start init` rather than embedding in binary
 
+## Agent TOML Structure
+
+Each agent configuration file includes a `bin` field for auto-detection:
+
+```toml
+[agents.claude]
+bin = "claude"  # Binary name for command -v detection (required)
+command = "{bin} --model {model} --prompt {prompt}"  # Must contain {bin} and {model}
+description = "Claude Code by Anthropic"
+
+[agents.claude.models]
+sonnet = "claude-sonnet-4-5"
+opus = "claude-opus-4"
+```
+
+**Required fields:**
+- `bin` - Binary name for auto-detection via `command -v`
+- `command` - Command template, must contain `{bin}` and `{model}` placeholders
+- `description` - Human-readable description
+- `models` - Model name mappings
+
+**Required placeholders in command:**
+- `{bin}` - References the bin field, enforces consistency
+- `{model}` - Model selection placeholder
+
+**Recommended placeholders:**
+- `{prompt}` - Composed prompt (warns if missing)
+
 ## Init Behavior
 
-1. Fetch agent list from GitHub API: `GET /repos/grantcarthew/start/contents/assets/agents`
-2. Auto-detect installed agents using `command -v`
-3. Download config files for selected agents
-4. Merge into user's `~/.config/start/config.toml`
+1. Fetch `assets/index.csv` from GitHub (contains agent list with `bin` column)
+2. Auto-detect installed agents using `command -v <bin>` from index
+3. Download TOML files only for detected/selected agents (lazy loading)
+4. Merge into user's `~/.config/start/agents.toml`
 
 ## Technical Details
 

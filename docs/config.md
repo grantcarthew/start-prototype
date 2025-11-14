@@ -72,10 +72,11 @@ file = "~/.config/start/roles/reviewer.md"
 
 ```toml
 [agents.claude]
+bin = "claude"
 description = "Anthropic's Claude AI assistant via Claude Code CLI"
 url = "https://docs.claude.com/claude-code"
 models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
 
   [agents.claude.models]
@@ -84,10 +85,11 @@ default_model = "sonnet"
   opus = "claude-opus-4-20250514"
 
 [agents.gemini]
+bin = "gemini"
 description = "Google's Gemini AI via CLI"
 url = "https://github.com/example/gemini-cli"
 models_url = "https://ai.google.dev/models/gemini"
-command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'"
+command = "GEMINI_SYSTEM_MD='{role_file}' {bin} --model {model} '{prompt}'"
 default_model = "flash"
 
   [agents.gemini.models]
@@ -95,9 +97,10 @@ default_model = "flash"
   pro-exp = "gemini-2.0-pro-exp"
 
 [agents.aichat]
+bin = "aichat"
 description = "All-in-one multi-provider AI chat tool"
 url = "https://github.com/sigoden/aichat"
-command = "aichat --model {model} '{prompt}'"
+command = "{bin} --model {model} '{prompt}'"
 default_model = "gpt4-mini"
 
   [agents.aichat.models]
@@ -345,12 +348,21 @@ Each agent section defines how to invoke an AI tool. Agent names should match th
 
 **Fields:**
 
-**command** (string, required)
-: Command template to execute the agent. Should contain `{prompt}` placeholder to receive the composed prompt. Supports additional placeholders: `{model}`, `{role}`, `{role_file}`, `{date}`.
+**bin** (string, required)
+: Binary name for auto-detection via `command -v` during `start init`. Must be a valid executable name. Used for lazy initialization and referenced via `{bin}` placeholder in command template.
 
 ```toml
 [agents.claude]
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
+bin = "claude"
+```
+
+**command** (string, required)
+: Command template to execute the agent. Must contain `{bin}` and `{model}` placeholders (required). Should contain `{prompt}` placeholder (recommended). Supports additional placeholders: `{role}`, `{role_file}`, `{date}`.
+
+```toml
+[agents.claude]
+bin = "claude"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
 ```
 
 **description** (string, optional)
@@ -387,10 +399,13 @@ default_model = "sonnet"
 
 **Validation:**
 
+- **bin** field missing → **Error**: "Agent requires bin field for auto-detection"
+- **bin** not a valid executable name → **Warning**: "Invalid bin name (contains path separators or special characters)"
+- **command** missing `{bin}` placeholder → **Error**: "Command must contain {bin} placeholder"
+- **command** missing `{model}` placeholder → **Error**: "Command must contain {model} placeholder"
 - **command** missing `{prompt}` placeholder → **Warning**: "Command doesn't contain {prompt} - composed prompt won't be passed to agent"
-- If command uses `{model}` placeholder:
-  - **[agents.\<name\>.models]** section MUST exist with ≥1 model → **Error** if missing
-- If **default_model** defined but not in models table → **Warning**, fall back to first model (TOML order)
+- **[agents.\<name\>.models]** section missing or empty → **Error**: "Agent requires at least one model definition"
+- **default_model** defined but not in models table → **Warning**: Fall back to first model (TOML order)
 - Unknown placeholders in command → **Warning**: `"Unknown placeholder {mdoel} (did you mean {model}?)"`
 - Same agent name in global and local → **Info**: Local overrides global
 
@@ -1003,8 +1018,12 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 ### Required Fields
 
 **[agents.\<name\>]:**
+- `bin` must be present (required for auto-detection)
 - `command` must be present
+- `command` must contain `{bin}` placeholder (required)
+- `command` must contain `{model}` placeholder (required)
 - `command` should contain `{prompt}` placeholder (warns if missing)
+- `[agents.<name>.models]` table must exist with at least one model
 
 **[context.\<name\>]:**
 - At least one of `file`, `command`, or `prompt` must be present (UTD pattern)
