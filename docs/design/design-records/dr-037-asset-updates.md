@@ -246,7 +246,7 @@ Checking for asset updates...
 No cached assets found.
 
 To download assets:
-  - Browse catalog: start config task add
+  - Browse catalog: start assets add
   - Use a task: start task <name>
 ```
 

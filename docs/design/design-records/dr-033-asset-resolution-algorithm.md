@@ -180,8 +180,8 @@ Error: Task 'pre-commit-review' not found
 
 To resolve:
   - Enable: start task pre-commit-review --asset-download
-  - Add manually: start config task add
-  - Browse catalog: start config task add
+  - Add manually: start assets add
+  - Browse catalog: start assets add
 ```
 
 ### Example 4: Override with Flag
@@ -198,7 +198,7 @@ Error: Task 'pre-commit-review' not found
 
 To resolve:
   - Remove flag to allow download
-  - Add manually: start config task add
+  - Add manually: start assets add
 ```
 
 ### Example 5: Found in Cache
@@ -227,7 +227,7 @@ Error: Task 'pre-commit-review' not found
 
 To resolve:
   - Check spelling: 'pre-commit-review'
-  - Add manually when online: start config task add
+  - Add manually when online: start assets add
   - Use a configured task: start config task list
 ```
 
@@ -245,8 +245,8 @@ Error: Task 'nonexistent-task' not found
 
 To resolve:
   - Check spelling: 'nonexistent-task'
-  - Browse available: start config task add
-  - Create custom: start config task add nonexistent-task
+  - Browse available: start assets add
+  - Create custom: start assets add nonexistent-task
 ```
 
 ## Implementation Details

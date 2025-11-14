@@ -54,8 +54,7 @@ Defined in individual command specs:
 - Role references fail at runtime with clear error (expected)
 
 **Pattern 2: Reduced functionality**
-- `start config task add` - Can't offer templates, inline creation still works
-- `start config agent add` - Can't offer templates, manual entry still works
+- `start assets add` - Can't browse catalog, manual creation still works
 - `start config role` - No asset roles, user-defined roles still work
 
 ## Examples
@@ -143,12 +142,12 @@ Exit code: 0 (local checks healthy)
 ### task add without assets
 
 ```bash
-$ start config task add global
+$ start assets add
 
-Add new task
+Add new asset
 ─────────────────────────────────────────────────
 
-⚠ Asset library not available (no templates)
+⚠ Asset library not available (catalog unavailable)
 
 Task name: my-task
 Alias (optional): mt

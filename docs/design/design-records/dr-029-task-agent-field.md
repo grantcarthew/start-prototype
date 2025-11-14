@@ -79,7 +79,7 @@ Configured agents:
   claude
   opencode
 
-Add agent: start config agent add go-expert
+Add agent: start assets add go-expert
 Or override: start task go-review --agent claude
 ```
 
@@ -94,7 +94,7 @@ start doctor
 ```
 Configuration Issues:
   ✗ Task 'go-review' references undefined agent 'go-expert'
-    Fix: start config agent add go-expert
+    Fix: start assets add go-expert
     Or: Remove agent field from task configuration
 ```
 

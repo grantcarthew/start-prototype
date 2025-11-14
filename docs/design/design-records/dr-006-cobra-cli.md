@@ -27,8 +27,8 @@ start task code-review             # By name
 start task cr                      # By alias
 start task cr --agent gemini       # With specific agent
 
-# Agent management (updated in DR-017)
-start config agent add             # Add new agent (interactive)
+# Agent management (updated in DR-017, DR-041)
+start assets add                   # Add new asset (interactive)
 start config agent list            # List configured agents
 start config agent test <name>     # Test agent configuration
 

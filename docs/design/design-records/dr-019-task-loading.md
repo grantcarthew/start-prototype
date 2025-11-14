@@ -172,7 +172,7 @@ Available asset tasks (4):
 
 Note: Asset tasks with same name as user tasks are shown separately (no "override" concept since assets aren't active).
 
-## Task Adding Workflow (start config task add)
+## Task Adding Workflow (start assets add)
 
 Interactive flow with template option:
 

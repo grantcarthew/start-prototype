@@ -481,7 +481,7 @@ command = "VAR1='{role}' VAR2='{date}' custom-ai --model {model} '{prompt}'"
 - Supports multiple variables easily
 - Works with any shell command syntax
 
-See [DR-005](./design/decisions/dr-005-role-configuration.md) for details on `{role}` and `{role_file}` placeholders.
+See [DR-005](./design/design-records/dr-005-role-configuration.md) for details on `{role}` and `{role_file}` placeholders.
 
 ---
 
@@ -535,7 +535,7 @@ Roles are passed to agents via two placeholders:
 - `{role}` - Inline content (fully resolved, for Claude, aichat)
 - `{role_file}` - File path (for Gemini and file-based agents)
 
-See [DR-005](./design/decisions/dr-005-role-configuration.md) and [DR-007](./design/decisions/dr-007-placeholders.md) for details.
+See [DR-005](./design/design-records/dr-005-role-configuration.md) and [DR-007](./design/design-records/dr-007-placeholders.md) for details.
 
 **Merge behavior:**
 
@@ -781,7 +781,7 @@ agent = "claude"
 description = "Security-focused code audit"
 ```
 
-Validated at task execution time and by `start doctor` / `start config validate`. See [DR-005](./design/decisions/dr-005-role-configuration.md) for role configuration details.
+Validated at task execution time and by `start doctor` / `start config validate`. See [DR-005](./design/design-records/dr-005-role-configuration.md) for role configuration details.
 
 **Task Prompt (UTD Pattern):**
 

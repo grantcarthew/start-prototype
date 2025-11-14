@@ -25,7 +25,7 @@ start t mytask   → start task mytask
 **Nested commands:**
 ```bash
 start con ag l           → start config agent list
-start config t a task1   → start config task add task1
+start ass a task1        → start assets add task1
 start con r e myRole     → start config role edit myRole
 ```
 

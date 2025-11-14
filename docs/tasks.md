@@ -113,7 +113,7 @@ description = "Security-focused code audit"
 - Different perspectives for same codebase
 - Specialized domain knowledge (Go expert, API validator, etc.)
 
-See [DR-005](./design/decisions/dr-005-role-configuration.md) for role configuration details.
+See [DR-005](./design/design-records/dr-005-role-configuration.md) for role configuration details.
 
 ### Task Prompt
 

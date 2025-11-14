@@ -34,7 +34,7 @@ Assets fetched from GitHub repository; `start init` downloads on first run; `sta
 
 **Agent templates:**
 - Located in `~/.config/start/assets/agents/`
-- Used during `start config agent add` to pre-fill configurations
+- Used during `start assets add` to pre-fill configurations
 - User selects template, values are copied to `config.toml`
 
 **Role files:**

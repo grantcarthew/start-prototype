@@ -49,7 +49,7 @@ Tasks can be downloaded from the GitHub catalog on first use, cached locally for
 - Comment cleanup
 - Any repeatable AI-assisted workflow
 
-Tasks are defined in `tasks.toml` and can be customized per user or per project. See [DR-031](../design/decisions/dr-031-catalog-based-assets.md) for catalog architecture and [DR-033](../design/decisions/dr-033-asset-resolution-algorithm.md) for resolution details.
+Tasks are defined in `tasks.toml` and can be customized per user or per project. See [DR-031](../design/design-records/dr-031-catalog-based-assets.md) for catalog architecture and [DR-033](../design/design-records/dr-033-asset-resolution-algorithm.md) for resolution details.
 
 ## Arguments
 

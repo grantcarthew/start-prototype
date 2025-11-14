@@ -301,7 +301,7 @@ func (t *GitHubTree) Find(assetType, name string) string {
 ### Pattern 1: Browse Catalog
 
 ```
-User: start config task add
+User: start assets add
 
 1. getCatalog() → Check in-memory cache
    - Cache miss → fetchGitHubTree() (1 API call)
