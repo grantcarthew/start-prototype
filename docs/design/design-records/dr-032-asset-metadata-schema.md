@@ -34,6 +34,7 @@ assets/tasks/git-workflow/
 
 ```toml
 # pre-commit-review.meta.toml
+[metadata]
 name = "pre-commit-review"
 description = "Review staged changes before committing"
 tags = ["git", "review", "quality", "pre-commit"]
@@ -60,7 +61,9 @@ updated = "2025-01-10T00:00:00Z"
 - Example: `["git", "review", "quality", "pre-commit"]`
 
 **sha** (string)
-- Git blob SHA of the content file (not metadata file)
+- Git blob SHA of all asset files concatenated (excludes `.meta.toml`)
+- For single-file assets: SHA of that file
+- For multi-file assets: SHA of files concatenated in sorted order
 - 40-character hexadecimal string
 - Used for update detection via comparison
 - Example: `"a1b2c3d4e5f6789012345678901234567890abcd"`
@@ -192,24 +195,37 @@ func LoadMetadata(metaPath string) (*AssetMetadata, error) {
 
 ### SHA Generation
 
-**For asset creators:**
+**For single-file assets:**
 ```bash
-# Generate SHA for content file
+# Generate SHA for single content file
 sha=$(git hash-object pre-commit-review.toml)
-echo "sha = \"$sha\"" >> pre-commit-review.meta.toml
+echo "sha = \"$sha\""
 ```
 
-**Or in Go:**
+**For multi-file assets:**
+```bash
+# Concatenate all files (sorted, excluding .meta.toml) and hash
+cat review-docs.md review-docs.toml | git hash-object --stdin
+```
+
+**In Go (multi-file safe):**
 ```go
-func GenerateContentSHA(filePath string) (string, error) {
-    content, err := os.ReadFile(filePath)
-    if err != nil {
-        return "", err
+func GenerateAssetSHA(assetFiles []string) (string, error) {
+    // Sort files for consistent ordering
+    sort.Strings(assetFiles)
+
+    var combined []byte
+    for _, file := range assetFiles {
+        content, err := os.ReadFile(file)
+        if err != nil {
+            return "", err
+        }
+        combined = append(combined, content...)
     }
 
     // Git blob SHA: "blob <size>\0<content>"
-    header := fmt.Sprintf("blob %d\x00", len(content))
-    data := append([]byte(header), content...)
+    header := fmt.Sprintf("blob %d\x00", len(combined))
+    data := append([]byte(header), combined...)
 
     hash := sha1.Sum(data)
     return hex.EncodeToString(hash[:]), nil
@@ -222,6 +238,7 @@ func GenerateContentSHA(filePath string) (string, error) {
 
 ```toml
 # assets/tasks/git-workflow/pre-commit-review.meta.toml
+[metadata]
 name = "pre-commit-review"
 description = "Review staged changes before committing"
 tags = ["git", "review", "quality", "pre-commit"]
@@ -234,6 +251,7 @@ updated = "2025-01-10T12:30:00Z"
 
 ```toml
 # assets/roles/general/code-reviewer.meta.toml
+[metadata]
 name = "code-reviewer"
 description = "Strict quality and security focused code reviewer"
 tags = ["review", "quality", "security", "strict"]
@@ -246,6 +264,7 @@ updated = "2025-01-10T00:00:00Z"
 
 ```toml
 # assets/agents/claude/sonnet.meta.toml
+[metadata]
 name = "sonnet"
 description = "Balanced Claude Sonnet model for general use"
 tags = ["claude", "balanced", "recommended", "default"]

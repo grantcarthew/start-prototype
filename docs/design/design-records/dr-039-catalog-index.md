@@ -91,6 +91,7 @@ cd start
 # Add new asset with metadata
 mkdir -p assets/tasks/my-category
 cat > assets/tasks/my-category/my-task.meta.toml <<EOF
+[metadata]
 name = "my-task"
 description = "My new task"
 tags = ["workflow", "custom"]
