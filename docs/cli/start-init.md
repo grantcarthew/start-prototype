@@ -168,12 +168,12 @@ In interactive mode (without `--force`), init runs this wizard:
 2. Auto-detect installed agents by checking if `<bin>` is executable
    - Checks each binary from index (e.g., claude, gemini, aichat, opencode, codex, aider)
    - Binaries that are found and executable are marked as detected
-3. Download agent TOML files only for detected agents (lazy loading)
-   - Fetches `assets/agents/{category}/{name}.toml` via raw.githubusercontent.com
+3. Download agent asset files only for detected agents (lazy loading)
+   - Fetches `assets/agents/{category}/{name}.toml` and `.meta.toml` via raw.githubusercontent.com
    - Only downloads what's needed
 4. Display detected agents
 5. **Prompt**: Additional agents to configure (from catalog index)
-6. Download TOML files for any additional selected agents
+6. Download asset files for any additional selected agents
 7. **Prompt**: Default agent selection
 8. Create multi-file configuration:
    - `config.toml` - Settings (default_agent, default_role, etc.)
@@ -190,7 +190,7 @@ In automatic mode, init does the same steps but **skips all prompts**:
 
 1. Fetch catalog index from GitHub (same)
 2. Auto-detect installed agents by checking if `<bin>` from index is executable (same)
-3. Download agent TOML files for detected agents (same lazy loading)
+3. Download agent asset files for detected agents (same lazy loading)
 4. **Auto**: Configure ALL detected agents (no prompt for additional agents)
 5. **Auto**: Use first detected agent as default (priority order: claude > gemini > aichat > others)
 6. Create config files (same structure)
@@ -231,10 +231,13 @@ Check if 'aichat' is executable  → Not found
 
 **Step 3: Lazy download**
 
-Only downloads TOML files for detected/selected agents:
+Only downloads asset files for detected/selected agents:
 ```
 GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.toml
+GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.meta.toml
 ```
+
+Each agent asset consists of 2 files: configuration (`.toml`) and metadata (`.meta.toml`).
 
 **Benefits:**
 - Efficient: 1 index download + N agent downloads (only what's needed)
@@ -262,10 +265,14 @@ Filter: type=agents
 Extract: bin column for detection
 ```
 
-**Agent TOML files:**
+**Agent asset files:**
 ```
-URL pattern: https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.toml
-Contains: bin, command (with {bin} placeholder), description, models, default_model
+URL patterns:
+  https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.toml
+  https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.meta.toml
+
+TOML contains: bin, command (with {bin} placeholder), description, models, default_model
+Meta contains: SHA, size, timestamps for cache management
 ```
 
 **Rate limits:**
