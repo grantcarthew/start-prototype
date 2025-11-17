@@ -40,3 +40,19 @@ Complete documentation is in the `docs/` directory:
 - `docs/config.md` - Configuration reference
 
 For detailed information about commands, configuration, and design decisions, refer to the documentation files.
+
+---
+
+## Document Driven Development (DDD)
+
+This project uses Document Driven Development. Design decisions are documented in Design Records (DRs) before implementation.
+
+**For complete DR writing guidelines:** See [docs/design/dr-writing-guide.md](docs/design/dr-writing-guide.md)
+
+**Location:** `docs/design/design-records/`
+
+**Quick reference:**
+
+- Create DRs for: Architectural decisions, algorithms, breaking changes, API/CLI structure
+- Get next DR number from: `docs/design/design-records/README.md`
+- Follow reconciliation process after 5-10 DRs (see dr-writing-guide.md)

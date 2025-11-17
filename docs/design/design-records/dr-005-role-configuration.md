@@ -1,18 +1,94 @@
 # DR-005: Role Configuration & Selection
 
-**Date:** 2025-01-03 (original), 2025-01-07 (rewritten)
-**Status:** Accepted
-**Category:** Configuration
+- Date: 2025-01-03 (original), 2025-01-07 (rewritten)
+- Status: Accepted
+- Category: Configuration
+
+## Problem
+
+System prompts (roles) need to be:
+
+- Configurable and reusable across multiple tasks
+- Selectable at runtime (task-specific, CLI override, defaults)
+- Compatible with different agent APIs (inline content vs file-based)
+- Support both simple (static file) and complex (dynamic, templated) definitions
+- Work in both global (personal) and local (project/team) scopes
+
+The design must balance simplicity for basic use cases with flexibility for advanced scenarios.
 
 ## Decision
 
 Roles (system prompts) are configured as named entities using the Unified Template Design (UTD) pattern, selected via precedence rules, and made available to agents through two placeholders: `{role}` (content) and `{role_file}` (file path).
 
+Role selection precedence:
+
+1. CLI `--role` flag (highest priority)
+2. Task `role` field (if executing a task)
+3. `default_role` setting
+4. First role in config (TOML order)
+
+Agent integration:
+
+- `{role}` placeholder - inline content (for agents with inline API)
+- `{role_file}` placeholder - file path (for agents with file-based API)
+
+## Why
+
+Named roles for reusability:
+
+- Define once, reference in multiple tasks
+- Consistent with `[agents.<name>]` and `[tasks.<name>]` pattern
+- Clear mental model: "Role" describes what the AI is
+- Easy to swap roles via `--role` flag
+
+Two-placeholder design for agent compatibility:
+
+- Some agents accept inline content (Claude: `--append-system-prompt`)
+- Other agents require files (Gemini: `GEMINI_SYSTEM_MD` env var pointing to file)
+- Agents with file-based APIs can read original file directly (efficient)
+- Agents with inline APIs get content directly (no extra I/O)
+
+UTD pattern for flexibility:
+
+- Simple case: just a file reference
+- Advanced: dynamic content via commands, templating
+- One pattern supports both static and dynamic roles
+
+Precedence rules for flexibility:
+
+- Tasks can specify default role
+- Users can override via CLI flag
+- Global default prevents requiring explicit role selection
+- Clear, predictable order
+
+Temporary files for UTD roles:
+
+- `{role_file}` always returns a file path (consistency)
+- Simple roles return original file path (no overhead)
+- UTD roles create temp file with resolved content
+- File-based agents work with both simple and complex roles
+
+## Trade-offs
+
+Accept:
+
+- Two placeholders to learn (`{role}` vs `{role_file}`)
+- Temporary file management for UTD roles with `{role_file}`
+- Users must understand precedence rules for role selection
+- Slightly more complex than single system_prompt field
+
+Gain:
+
+- Works with all agent API styles (inline and file-based)
+- Reusable roles across tasks
+- Runtime selection flexibility
+- Supports both static and dynamic roles
+- Natural merge behavior with global/local configs
+- Efficient (no temp files unless needed)
+
 ## Configuration Structure
 
-### Role Definition
-
-Roles use the `[roles.<name>]` section with full UTD support:
+Roles use `[roles.<name>]` section with full UTD support:
 
 ```toml
 [roles.code-reviewer]
@@ -26,17 +102,16 @@ Review date: {command}
 """
 ```
 
-**Fields:**
+Fields:
+
 - `description` (optional) - Human-readable description
 - `file` (optional) - Path to role content file
 - `command` (optional) - Shell command for dynamic content
 - `prompt` (optional) - Template with `{file}` and `{command}` placeholders
 
-**UTD Requirement:** At least one of `file`, `command`, or `prompt` must be present.
+UTD Requirement: At least one of `file`, `command`, or `prompt` must be present.
 
-See [DR-007](./dr-007-placeholders.md) for UTD pattern details.
-
-### Default Role
+Default role:
 
 ```toml
 [settings]
@@ -45,20 +120,20 @@ default_role = "code-reviewer"
 
 If `default_role` is not specified, the first role defined in the config (TOML order) is used.
 
-### No [system_prompt] Section
+File: `roles.toml`
 
-The `[system_prompt]` section from earlier designs is **removed**. All system prompts are defined as named roles in `[roles.<name>]` sections.
+No `[system_prompt]` section - all system prompts are defined as named roles.
 
 ## Role Selection Precedence
 
-When executing `start`, `start prompt`, or `start task`, the role is selected using this priority order:
+When executing `start`, `start prompt`, or `start task`:
 
-1. **CLI `--role` flag** (highest priority)
-2. **Task `role` field** (if executing a task)
-3. **`default_role` setting**
-4. **First role in config** (TOML order)
+1. CLI `--role` flag (highest priority)
+2. Task `role` field (if executing a task)
+3. `default_role` setting
+4. First role in config (TOML order)
 
-**Examples:**
+Examples:
 
 ```bash
 # Uses default_role
@@ -82,19 +157,15 @@ start task security-scan --role code-reviewer
 
 ## Agent Integration
 
-Roles are made available to agents through two placeholders in agent commands:
+Roles are made available to agents through two placeholders:
 
-### {role} Placeholder
+`{role}` placeholder:
 
-Contains the **fully resolved role content** (inline text).
+- Contains fully resolved role content (inline text)
+- Use for agents that accept system prompts inline via command flags or env vars
+- Resolution: file content (simple role) or full UTD processing result (complex role)
 
-**Use for:** Agents that accept system prompts inline via command flags or environment variables.
-
-**Resolution:**
-- Simple role (file only): Content of the file
-- UTD role: Content after full UTD processing (file + command execution + template rendering)
-
-**Example:**
+Example:
 
 ```toml
 [agents.claude]
@@ -104,35 +175,30 @@ command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
 command = "AICHAT_SYSTEM_PROMPT='{role}' aichat --model {model} '{prompt}'"
 ```
 
-### {role_file} Placeholder
+`{role_file}` placeholder:
 
-Contains a **file path** to the role content.
+- Contains a file path to the role content
+- Use for agents that require system prompts from a file
+- Simple role (file only): returns the original file path (expanded, absolute)
+- UTD role (complex): creates temporary file with resolved content, returns temp file path
 
-**Use for:** Agents that require system prompts to be read from a file.
-
-**Resolution:**
-- **Simple role (file only):** Returns the original file path (expanded, absolute)
-- **UTD role (complex):** Creates a temporary file with resolved content, returns temp file path
-
-**Example:**
+Example:
 
 ```toml
 [agents.gemini]
 command = "GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} --prompt '{prompt}'"
 ```
 
-### Temporary File Handling
+Temporary file handling for UTD roles:
 
-When `{role_file}` is used with a UTD role (one that uses `command` or complex `prompt` processing):
+1. Create temp file at `/tmp/start-role-{random}.md`
+2. Write fully resolved content (after UTD processing)
+3. Set permissions to 0600 (owner read/write only)
+4. Replace `{role_file}` with temp file path
+5. Execute agent (reads from temp file)
+6. Delete temp file after agent completes
 
-1. **Before execution:** Create temp file at `/tmp/start-role-{random}.md`
-2. **Write content:** Fully resolved role content (after UTD processing)
-3. **Set permissions:** 0600 (owner read/write only)
-4. **Replace placeholder:** `{role_file}` → temp file path
-5. **Execute agent:** Agent reads from temp file
-6. **Cleanup:** Delete temp file after agent completes (success or failure)
-
-**Simple role example (no temp file):**
+Simple role example (no temp file):
 
 ```toml
 [roles.reviewer]
@@ -141,7 +207,7 @@ file = "~/.config/start/roles/reviewer.md"
 
 `{role_file}` → `/Users/username/.config/start/roles/reviewer.md`
 
-**UTD role example (creates temp file):**
+UTD role example (creates temp file):
 
 ```toml
 [roles.dynamic]
@@ -154,16 +220,18 @@ prompt = "{file}\n\nDate: {command}"
 
 ## Scope and Merge Behavior
 
-**Allowed scopes:**
+Allowed scopes:
+
 - Global: `~/.config/start/roles.toml`
 - Local: `./.start/roles.toml`
 
-**Merge behavior:**
-- Global + local roles are **combined**
-- Local role **replaces** global role with same name (no field merging)
+Merge behavior:
+
+- Global + local roles are combined
+- Local role replaces global role with same name (no field merging)
 - All roles from both configs available for selection
 
-**Example:**
+Example:
 
 ```toml
 # Global: ~/.config/start/roles.toml
@@ -189,33 +257,25 @@ command = "git diff --staged"
 prompt = "Audit: {command}"
 ```
 
-**Role selection for tasks:**
-1. CLI `--role` flag
-2. Task `role` field
-3. `default_role` setting
-4. First role in config
-
-See [DR-009](./dr-009-task-structure.md) for task structure details.
+Role selection for tasks follows same precedence rules.
 
 ## Validation
 
-**At configuration load time:**
+At configuration load time:
+
 - Verify role has at least one of: `file`, `command`, or `prompt` (UTD requirement)
 - Role names must match pattern: `/^[a-z0-9]+(-[a-z0-9]+)*$/`
 - `default_role` must reference an existing role (if specified)
 
-**At execution time:**
+At execution time:
+
 - Selected role must exist in merged config
 - If role has `file` field, file must exist (or warning + empty content)
 - Task `role` field must reference existing role (if specified)
 
-**Validation commands:**
-- `start doctor` - Checks role configuration validity
-- `start config validate` - Validates all config including roles
+## Usage Examples
 
-## Examples
-
-### Simple Role (File Only)
+Simple role (file only):
 
 ```toml
 [roles.general-assistant]
@@ -223,7 +283,7 @@ description = "General purpose AI assistant"
 file = "~/.config/start/roles/general.md"
 ```
 
-### Role with Template Framing
+Role with template framing:
 
 ```toml
 [roles.code-reviewer]
@@ -239,7 +299,7 @@ Additional Instructions:
 """
 ```
 
-### Role with Dynamic Content
+Role with dynamic content:
 
 ```toml
 [roles.go-expert]
@@ -255,7 +315,7 @@ Apply Go-specific best practices and idioms.
 """
 ```
 
-### Inline Role (No File)
+Inline role (no file):
 
 ```toml
 [roles.documentation-writer]
@@ -271,17 +331,16 @@ Guidelines:
 """
 ```
 
-### Project-Specific Role (Local Config)
+Project-specific role (local config):
 
 ```toml
-# ./.start/config.toml
+# ./.start/roles.toml
 [roles.project-reviewer]
 description = "Project-specific reviewer"
 file = "./ROLE.md"
-# Relative path resolves from working directory
 ```
 
-### Role Usage Examples
+Command line usage:
 
 ```bash
 # Use default role
@@ -294,69 +353,39 @@ start --role security-auditor
 start --role code-reviewer prompt "Review authentication code"
 
 # Task inherits role
-start task code-review  # Uses task's role field
+start task code-review
 
 # Override task's role
 start task code-review --role go-expert
 ```
 
-## Rationale
+## Alternatives
 
-**Why named roles instead of [system_prompt] section:**
-
-1. **Consistency:** Matches pattern of `[agents.<name>]` and `[tasks.<name>]`
-2. **Reusability:** Define once, use in multiple tasks
-3. **Mix-and-match:** Easy to swap roles via `--role` flag
-4. **Clear mental model:** "Role" is what the AI is, easier to understand than "system prompt"
-5. **Selection flexibility:** Precedence rules allow override at multiple levels
-
-**Why two placeholders ({role} and {role_file}):**
-
-1. **Agent compatibility:** Some agents accept inline content, others require files
-2. **Efficiency:** Agents with file-based APIs (Gemini) can read original file directly
-3. **Transparency:** Clear which pattern each agent uses
-4. **Flexibility:** Supports both content-based and file-based agent designs
-
-**Why temp files for UTD roles with {role_file}:**
-
-1. **Consistency:** `{role_file}` always returns a file path, regardless of role complexity
-2. **Agent compatibility:** File-based agents work with both simple and complex roles
-3. **Clean abstraction:** Agent config doesn't need to know if role is simple or complex
-
-**Why remove [agents.<name>.env] section:**
-
-1. **Simplicity:** Standard shell syntax `VAR=value command` is universally understood
-2. **Fewer concepts:** One less config section to implement and document
-3. **Flexibility:** Can set multiple env vars easily: `VAR1=a VAR2=b command`
-4. **No special handling:** No need for separate env var processing logic
-
-## Alternatives Considered
-
-**Alternative 1: Keep [system_prompt] section**
+Single `[system_prompt]` section:
 
 ```toml
 [system_prompt]
 file = "ROLE.md"
 ```
 
-Rejected: Inconsistent with named pattern used for agents and tasks. No reusability, no selection flexibility.
+- Pro: Simpler - only one system prompt
+- Pro: Fewer concepts to learn
+- Con: No reusability across tasks
+- Con: No selection flexibility
+- Con: Cannot have different roles for different tasks
+- Con: Inconsistent with `[agents.<name>]` and `[tasks.<name>]` pattern
+- Rejected: Too limiting, inconsistent naming pattern
 
-**Alternative 2: Single placeholder {system_prompt}**
+Single placeholder `{system_prompt}` (content only):
 
-Use only `{system_prompt}` with content, create temp files implicitly for all agents.
+- Pro: Only one placeholder to learn
+- Pro: Simpler agent config
+- Con: Must create temp files for all agents (wasteful for inline agents)
+- Con: Extra I/O overhead for common case (Claude, aichat support inline)
+- Con: Less explicit about agent API requirements
+- Rejected: Inefficient, hides agent API requirements
 
-Rejected: Wasteful for agents that accept inline content (Claude, aichat). Extra I/O for common case.
-
-**Alternative 3: Keep [agents.<name>.env] section**
-
-```toml
-[agents.gemini.env]
-GEMINI_SYSTEM_MD = "{role_file}"
-```
-
-Rejected: Adds complexity. Standard shell syntax works fine and is more familiar.
-
-**Alternative 4: Task system_prompt_* fields (original design)**
+Task `system_prompt_*` fields (original design):
 
 ```toml
 [tasks.review]
@@ -365,59 +394,44 @@ system_prompt_command = "..."
 system_prompt = "..."
 ```
 
-Rejected: Verbose, duplicative. Defining reusable roles is cleaner. Changed in this DR.
+- Pro: System prompt defined directly in task
+- Pro: No separate role to reference
+- Con: Verbose and repetitive
+- Con: No reusability (duplicate role definitions across tasks)
+- Con: Cannot easily swap roles for experimentation
+- Con: Difficult to maintain (change role = update all tasks using it)
+- Rejected: Poor reusability, maintenance burden
+
+Agent `[agents.<name>.env]` section for env vars:
+
+```toml
+[agents.gemini.env]
+GEMINI_SYSTEM_MD = "{role_file}"
+```
+
+- Pro: Explicit env var configuration
+- Pro: Structured config for environment
+- Con: Adds complexity (new config section)
+- Con: Standard shell syntax works fine: `VAR=value command`
+- Con: Less flexible (can't easily set multiple env vars)
+- Con: One more concept to implement and document
+- Rejected: Standard shell syntax is simpler and well-understood
 
 ## Breaking Changes from Original Design
 
-This is a **complete redesign** of DR-005. Changes from original:
+This is a complete redesign of DR-005. Changes from original:
 
-1. **Removed:** `[system_prompt]` section
-2. **Added:** `[roles.<name>]` sections with UTD
-3. **Added:** `default_role` setting
-4. **Added:** `{role}` and `{role_file}` placeholders
-5. **Removed:** `{system_prompt}` placeholder
-6. **Added:** Role selection precedence rules
-7. **Added:** `--role` CLI flag
-8. **Added:** `role` field for tasks
-9. **Removed:** Task `system_prompt_*` fields (moved to role reference)
-10. **Removed:** `[agents.<name>.env]` sections
+1. Removed: `[system_prompt]` section
+2. Added: `[roles.<name>]` sections with UTD
+3. Added: `default_role` setting
+4. Added: `{role}` and `{role_file}` placeholders
+5. Removed: `{system_prompt}` placeholder
+6. Added: Role selection precedence rules
+7. Added: `--role` CLI flag
+8. Added: `role` field for tasks
+9. Removed: Task `system_prompt_*` fields (moved to role reference)
+10. Removed: `[agents.<name>.env]` sections
 
-## Related Decisions
+## Updates
 
-- [DR-002](./dr-002-config-merge.md) - Config merge behavior (roles follow same rules)
-- [DR-003](./dr-003-named-documents.md) - Named sections pattern (roles use same pattern)
-- [DR-004](./dr-004-agent-scope.md) - Agent scope rules (roles follow same scope rules)
-- [DR-007](./dr-007-placeholders.md) - Placeholder system and UTD pattern
-- [DR-009](./dr-009-task-structure.md) - Task structure (tasks reference roles)
-- [DR-019](./dr-019-task-loading.md) - Task loading (role selection during task execution)
-- [DR-029](./dr-029-task-agent-field.md) - Task agent field (parallel to role field)
-
-## Implementation Notes
-
-**Role Resolution Steps:**
-
-1. Determine selected role (precedence rules)
-2. Load role configuration from merged config
-3. Resolve UTD fields (file, command, prompt)
-4. Generate `{role}` content (fully resolved)
-5. Generate `{role_file}` path:
-   - Simple role: original file path (expanded)
-   - UTD role: create temp file, return temp path
-6. Replace placeholders in agent command
-7. Execute agent
-8. Cleanup temp files
-
-**Error Handling:**
-
-- Missing role file: Warning + use empty content
-- Invalid role name: Error at config load
-- Task references non-existent role: Error at execution
-- `default_role` references non-existent role: Error at config load
-- Temp file creation fails: Error at execution
-
-**Performance Considerations:**
-
-- Role content cached after first resolution (within single execution)
-- Temp files only created when needed (`{role_file}` + UTD role)
-- File I/O minimized (read once, cache content)
-- Temp file cleanup in defer/finally blocks (guaranteed cleanup)
+- 2025-01-07: Complete redesign - named roles with UTD, two placeholders, precedence rules
