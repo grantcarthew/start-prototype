@@ -1,27 +1,162 @@
 # DR-019: Task Loading and Merging Algorithm
 
-**Date:** 2025-01-06
-**Status:** Updated by DR-031
-**Category:** Tasks
+- Date: 2025-01-06
+- Status: Updated by DR-031 and DR-033
+- Category: Tasks
 
-> **Note:** This DR remains valid but has been extended. See [DR-031](./dr-031-catalog-based-assets.md) for the catalog architecture and [DR-033](./dr-033-asset-resolution-algorithm.md) for the updated resolution algorithm that includes cache and GitHub catalog.
+Note: This DR remains valid but has been extended by DR-031 (catalog architecture) and DR-033 (asset resolution algorithm including cache and GitHub catalog).
+
+## Problem
+
+Task loading needs clear rules for multiple sources and conflict resolution. The system must:
+
+- Support global tasks (shared across all projects)
+- Support local tasks (project-specific)
+- Support asset catalog tasks (curated, downloadable)
+- Define clear precedence when same task name appears in multiple sources
+- Handle alias conflicts across scopes
+- Provide transparency about task sources (security consideration)
+- Allow local projects to override global tasks
+- Enable task discovery without cluttering runtime execution
+- Follow consistent replacement patterns with other config types (roles, agents)
+- Support on-demand downloading from catalog
 
 ## Decision
 
-Tasks load from global and local configs only; asset tasks serve as templates; local completely replaces global for same task name
+Tasks load from multiple sources with clear precedence: local config → global config → asset cache → GitHub catalog (per DR-033). Local completely replaces global for same task name (no field merging). Asset tasks available via catalog resolution.
 
-## Task Sources
+Task sources:
 
-**Runtime task execution** (`start task <name>`):
-- Global config: `~/.config/start/tasks.toml`
+Runtime execution (`start task <name>`):
 - Local config: `./.start/tasks.toml`
-- Assets are NOT automatically loaded at runtime
+- Global config: `~/.config/start/tasks.toml`
+- Asset cache: `~/.config/start/assets/tasks/`
+- GitHub catalog: Query and download if `asset_download = true`
 
-**Management commands** (`start config task list/add/edit`):
-- Assets at `~/.config/start/assets/tasks/*.toml` shown as available templates
-- Users explicitly add asset tasks to their config to activate them
+Management commands (`start config task list/add/edit`):
+- Shows all configured tasks (local + global merged)
+- Asset tasks visible via `start assets search` or `start assets add`
 
-## Loading Algorithm (Runtime)
+## Why
+
+Clear precedence hierarchy:
+
+- Local config wins (project-specific customization)
+- Global config next (user's personal defaults)
+- Asset cache next (previously downloaded from catalog)
+- GitHub catalog last (on-demand discovery and download)
+- First match wins, no merging (predictable behavior)
+
+Complete replacement not field merging:
+
+- Consistent with role replacement behavior (DR-005)
+- Predictable: local task completely overrides global
+- No hidden inheritance complexity
+- Users know exactly what they configured
+
+Source metadata for security:
+
+- Shows where task came from (local vs global vs cache vs catalog)
+- User can see if project contains suspicious local task
+- Transparency before execution
+- Security warning if downloading from catalog
+
+Asset catalog integration:
+
+- Tasks discoverable via `start assets search`
+- Auto-download on first use when `asset_download = true`
+- Cache populated transparently
+- No bulk downloads required
+
+Alias priority:
+
+- Aliases treated as short names for tasks
+- Same precedence as task names (local → global → cache → catalog)
+- Warnings for shadowed aliases
+- Prevents accidental conflicts
+
+## Trade-offs
+
+Accept:
+
+- Local task completely replaces global (no partial override)
+- Must configure task in local or global to make it "active"
+- Alias conflicts require manual resolution
+- Source metadata increases memory footprint slightly
+- Four-level resolution adds complexity
+
+Gain:
+
+- Predictable replacement behavior (no hidden merging)
+- Security transparency (source always visible)
+- Consistent with role replacement pattern
+- On-demand catalog access without bulk downloads
+- Local projects can completely override global defaults
+- Clear mental model (local wins, then global, then cache, then catalog)
+
+## Alternatives
+
+Field-level merging (shallow merge):
+
+```toml
+# Global
+[tasks.code-review]
+alias = "cr"
+description = "Security review"
+command = "git diff"
+
+# Local
+[tasks.code-review]
+description = "Project review"
+# Inherits: alias="cr", command="git diff"
+```
+
+- Pro: Less duplication when overriding single fields
+- Pro: Can "extend" global tasks
+- Con: Hidden inheritance complexity
+- Con: Not obvious which fields come from where
+- Con: Different behavior from roles (inconsistent)
+- Con: Harder to reason about final configuration
+- Rejected: Complete replacement is more predictable
+
+Deep merging (recursive merge):
+
+- Pro: Maximum inheritance capability
+- Con: Very complex to reason about
+- Con: Unclear which fields come from which source
+- Con: Debugging becomes difficult
+- Rejected: Too complex, unpredictable behavior
+
+Global always wins (no local override):
+
+- Pro: Simpler (one source only)
+- Con: No project-specific customization
+- Con: Can't adapt global tasks for specific projects
+- Rejected: Too restrictive
+
+Asset tasks auto-loaded at runtime:
+
+```go
+// Load order: global → local → assets (all active)
+```
+
+- Pro: Asset tasks immediately available without config
+- Con: Performance impact (loading all asset files)
+- Con: Namespace pollution (dozens of auto-loaded tasks)
+- Con: Security risk (assets executed without user awareness)
+- Rejected: Catalog resolution provides better balance
+
+Three-way merge (global + local + assets):
+
+- Pro: Could combine best of all sources
+- Con: Extremely complex resolution rules
+- Con: Unclear which field comes from which source
+- Con: Performance impact
+- Rejected: Too complex, unpredictable
+
+## Loading Algorithm
+
+Runtime execution:
 
 ```go
 func LoadTasksForExecution() map[string]Task {
@@ -45,9 +180,60 @@ func LoadTasksForExecution() map[string]Task {
 }
 ```
 
+Task resolution (includes catalog per DR-033):
+
+```go
+func ResolveTask(input string) (*Task, error) {
+    // 1. Local task name (exact match)
+    if task, exists := localTasks[input]; exists {
+        return task, nil
+    }
+
+    // 2. Local alias
+    if taskName, exists := localAliases[input]; exists {
+        return localTasks[taskName], nil
+    }
+
+    // 3. Global task name (exact match)
+    if task, exists := globalTasks[input]; exists {
+        return task, nil
+    }
+
+    // 4. Global alias
+    if taskName, exists := globalAliases[input]; exists {
+        return globalTasks[taskName], nil
+    }
+
+    // 5. Asset cache (DR-033)
+    cachePath := findInCache("tasks", input)
+    if cachePath != "" {
+        task := loadFromCache(cachePath)
+        return task, nil
+    }
+
+    // 6. GitHub catalog (DR-033)
+    if !opts.AssetDownload {
+        return nil, ErrNotFoundNoDownload
+    }
+
+    catalog := getCatalog()
+    githubPath := catalog.Find("tasks", input)
+    if githubPath == "" {
+        return nil, ErrNotFound
+    }
+
+    // Download, cache, add to config
+    task := downloadAsset(githubPath)
+    cacheAsset(task)
+    addToConfig(task, opts.Scope)
+
+    return task, nil
+}
+```
+
 ## Replacement Behavior
 
-When local defines same task name as global, local **completely replaces** global (no field merging):
+When local defines same task name as global, local completely replaces global (no field merging):
 
 ```toml
 # Global
@@ -66,47 +252,9 @@ prompt = "Review for style"
 
 This matches role replacement behavior (DR-005).
 
-## Task Resolution Algorithm
+## Source Metadata
 
-When user runs `start task <input>`, resolution priority:
-
-```go
-func ResolveTask(input string) *Task {
-    // 1. Local task name (exact match)
-    if task, exists := localTasks[input]; exists {
-        return task
-    }
-
-    // 2. Local alias
-    if taskName, exists := localAliases[input]; exists {
-        return localTasks[taskName]
-    }
-
-    // 3. Global task name (exact match)
-    if task, exists := globalTasks[input]; exists {
-        return task
-    }
-
-    // 4. Global alias
-    if taskName, exists := globalAliases[input]; exists {
-        return globalTasks[taskName]
-    }
-
-    return nil // Task not found
-}
-```
-
-## Alias Priority
-
-Aliases are treated as short names for tasks. Local always wins.
-
-Resolution:
-- `start task cr` → Local alias wins over global alias
-- Warning displayed at runtime about shadowed global alias
-
-## Source Metadata Tracking
-
-Every loaded task includes source metadata for transparency/security:
+Every loaded task includes source metadata for transparency and security:
 
 ```go
 type Task struct {
@@ -118,8 +266,8 @@ type Task struct {
     // ... UTD fields ...
 
     // Metadata (not in config file)
-    Source      string  // "global" or "local"
-    SourcePath  string  // Full path to config file
+    Source      string  // "local", "global", "cache", "catalog"
+    SourcePath  string  // Full path to config file or cache location
 }
 ```
 
@@ -130,7 +278,7 @@ Normal output shows task source for transparency:
 ```
 Starting task: code-review
 ─────────────────────────────────────────────────
-Task source: local (./.start/config.toml)
+Task source: local (./.start/tasks.toml)
 Agent: claude (model: sonnet)
 Role: code-reviewer
 
@@ -141,11 +289,11 @@ Context documents:
 Executing...
 ```
 
-**Use case:** If repository contains malicious `.start/config.toml` with suspicious task, user sees it's from local config and can stop execution.
+Use case: If repository contains malicious `.start/tasks.toml` with suspicious task, user sees it's from local config and can stop execution.
 
-## Task Listing (start config task list)
+## Task Listing
 
-Show all three sources:
+Show configured tasks with source indicators:
 
 ```
 Configured tasks:
@@ -161,84 +309,81 @@ Global tasks (2):
 Local tasks (1):
   code-review (cr)
     Project-specific code review
-
-Available asset tasks (4):
-  code-review (cr)
-    Review code for quality and best practices
-
-  git-diff-review (gdr)
-    Review staged git changes
 ```
 
-Note: Asset tasks with same name as user tasks are shown separately (no "override" concept since assets aren't active).
-
-## Task Adding Workflow (start assets add)
-
-Interactive flow with template option:
-
-```
-Add new task
-─────────────────────────────────────────────────
-
-Select scope:
-  1) global (all projects)
-  2) local (this project only)
-
-Scope [1-2]: 1
-
-Start from template or create new?
-  1) Use asset template
-  2) Create from scratch
-
-Select [1-2]: 1
-
-Available templates:
-  1) code-review (cr) - Review code for quality and best practices
-  2) git-diff-review (gdr) - Review staged git changes
-  ...
-
-(Interactive prompts for each field with template values as defaults)
+Asset catalog tasks shown via:
+```bash
+start assets search "review"
+start assets add  # Interactive TUI
 ```
 
-## Rationale
+## Alias Priority
 
-- **Simplicity:** Two sources only (global + local), assets as templates
-- **Predictability:** Local always wins (name or alias)
-- **Transparency:** Source shown at runtime for security
-- **Flexibility:** Asset templates make common tasks easy to adopt
-- **Consistency:** Replacement behavior matches role replacement (DR-005)
-- **Discoverability:** Asset tasks visible in list command
-- **Safety:** Conflict warnings prevent accidental shadowing
+Aliases are treated as short names for tasks. Local always wins.
 
-## Implementation Notes
+Resolution:
+- `start task cr` → Local alias wins over global alias
+- Warning displayed at runtime about shadowed global alias
 
-```go
-// Package: internal/config
+## Usage Examples
 
-type TaskRegistry struct {
-    tasks   map[string]*Task
-    aliases map[string]string  // alias -> task name
-}
+Complete replacement behavior:
 
-func (r *TaskRegistry) Load(globalCfg, localCfg *Config) {
-    // Load global first
-    // Load local second (overwrites)
-    // Build alias map with local precedence
-}
+```toml
+# Global ~/.config/start/tasks.toml
+[tasks.review]
+alias = "r"
+role = "code-reviewer"
+command = "git diff --staged"
+prompt = "Review: {command_output}"
 
-func (r *TaskRegistry) Resolve(input string) (*Task, error) {
-    // Check local name -> local alias -> global name -> global alias
-}
-
-func (r *TaskRegistry) CheckConflicts(scope, name, alias string) []Conflict {
-    // Return warnings about shadowing
-}
+# Local .start/tasks.toml
+[tasks.review]
+role = "security-auditor"
+prompt = "Security check"
+# alias and command NOT inherited - must be redefined if needed
 ```
 
-## Related Decisions
+Catalog resolution:
 
-- [DR-005](./dr-005-role-configuration.md) - Role configuration (same replacement behavior)
-- [DR-009](./dr-009-task-structure.md) - Task structure (includes role field)
-- [DR-011](./dr-011-asset-distribution.md) - Asset templates
-- [DR-016](./dr-016-asset-discovery.md) - Task directory structure
-- [DR-029](./dr-029-task-agent-field.md) - Task agent field (parallel to role field)
+```bash
+# Task not in config, auto-downloads from catalog
+start task pre-commit-review
+
+# Output:
+# Task 'pre-commit-review' not found locally.
+# Found in GitHub catalog: tasks/git-workflow/pre-commit-review
+# Downloading...
+# ✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+# ✓ Added to global config as 'pre-commit-review'
+# Running task 'pre-commit-review'...
+```
+
+Source transparency:
+
+```bash
+start task code-review
+
+# Output shows source:
+# Starting task: code-review
+# Task source: local (./.start/tasks.toml)
+# [execution continues]
+```
+
+## Validation
+
+At configuration load:
+
+- Task names must be unique within scope (local or global)
+- Aliases must be unique within scope
+- Warn if local task/alias shadows global task/alias
+
+At execution time:
+
+- Selected task exists in merged config or catalog
+- Task's role (if specified) exists
+- Task's agent (if specified) exists
+
+## Updates
+
+- 2025-01-10: Extended by DR-031 (catalog architecture) and DR-033 (asset resolution algorithm including cache and GitHub catalog)

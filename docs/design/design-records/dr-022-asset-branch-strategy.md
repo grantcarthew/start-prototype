@@ -1,192 +1,204 @@
 # DR-022: Asset Branch Strategy
 
-**Date:** 2025-01-06
-**Status:** Accepted
-**Category:** Asset Management
+- Date: 2025-01-06
+- Status: Updated by DR-031 and DR-039
+- Category: Asset Management
+
+Note: Core decision (main branch vs releases) remains valid. Implementation updated by DR-031 (catalog architecture) and DR-039 (catalog index from main branch).
+
+## Problem
+
+Asset catalog needs to know which GitHub branch to fetch assets from. The system must:
+
+- Define which branch contains the authoritative asset catalog
+- Support rapid iteration on asset content (tasks, roles, agents, contexts)
+- Decouple asset updates from CLI binary releases
+- Allow fixing typos and adding new assets without cutting releases
+- Provide users with current assets without requiring CLI updates
+- Balance stability with freshness for content vs code
+- Work with catalog index file (index.csv) and individual assets
+- Support different update cycles for content (frequent) vs binaries (stable)
 
 ## Decision
 
-Asset library updates (`start assets update` and `start init`) always pull from the **latest commit on the main branch**, not from GitHub Releases.
+Asset catalog always fetched from **main branch**, not GitHub Releases.
 
-## Rationale
+Catalog operations using main branch:
+- `start assets search` - downloads `assets/index.csv` from main
+- `start assets add` - downloads catalog index and assets from main
+- `start assets update` - checks for updates on main branch
+- Lazy loading - downloads individual assets from main on first use
 
-**Assets are content, not code:**
+CLI binary versioning (separate concern):
+- CLI releases use GitHub Releases (semantic versioning)
+- Users update CLI via `brew upgrade` or `go install`
+- Version checks compare against latest release (DR-021)
+
+## Why
+
+Assets are content not code:
+
 - Roles: Markdown prompt documents
 - Agents: TOML configuration templates
 - Tasks: TOML task definitions
 - Contexts: TOML context configurations
-- Examples: TOML reference configurations
+- Content updates have lower risk than binary code updates
+- Benefit from rapid iteration without release overhead
 
-Content updates have lower risk than binary code updates and benefit from rapid iteration.
+Decoupled update cycles:
 
-**Decoupled update cycles:**
-- **CLI binary**: Tied to GitHub Releases (DR-021)
-  - Users update via: `brew upgrade` or `go install`
-  - Versioned, tested, stable releases
-  - Changed via your manual release process
+- CLI binary: Tied to GitHub Releases (stable, tested, versioned)
+- Asset catalog: Tied to main branch commits (frequent, current)
+- Users get content improvements immediately via `start assets update`
+- No CLI release needed to fix typo in role prompt
+- No CLI release needed to add new task template
 
-- **Asset library**: Tied to main branch commits
-  - Users update via: `start assets update`
-  - Can iterate independently of CLI releases
-  - Improvements available immediately
+Catalog index from main:
 
-**Benefits:**
-- Iterate on tasks/roles/agents/contexts without cutting CLI releases
-- Users get content improvements immediately
-- Simple mental model: "Code = releases, Content = main branch"
-- Faster feedback loop for asset improvements
+- `index.csv` fetched from main branch via raw.githubusercontent.com
+- Always shows current catalog state
+- No rate limits (raw content, not API)
+- Individual assets also fetched from main
+- Consistent branch across all catalog operations
 
-## Implementation
+Faster feedback loop:
 
-### Asset Update Target
+- Iterate on task templates without cutting releases
+- Add new roles as they're created
+- Update agent configs for new model versions
+- Fix documentation typos immediately
+- Community contributions available faster
 
-Using DR-014's Tree API mechanism:
+User control:
+
+- Users control when they get updates (via `start assets update`)
+- Not forced to take changes immediately
+- Can review asset changes before updating
+- Lazy loading means download on first use only
+
+Simple mental model:
+
+- Code (CLI binary) = GitHub Releases (stable)
+- Content (assets) = main branch (current)
+- Clear separation of concerns
+
+## Trade-offs
+
+Accept:
+
+- Broken assets could reach users if merged to main
+- No "stable" vs "bleeding edge" channel choice for assets
+- Assets always from latest main (no version pinning)
+- Must keep main branch stable for assets
+- Content changes visible immediately after merge
+
+Gain:
+
+- Faster iteration on asset content without release overhead
+- Users get improvements immediately
+- Simple architecture (one branch, no channel complexity)
+- Lower risk (content files vs executable binaries)
+- Community contributions flow faster
+- No release coordination needed for content updates
+
+## Alternatives
+
+Assets from GitHub Releases (matching CLI version):
 
 ```bash
-# Always pull from main branch
-GET /repos/grantcarthew/start/git/trees/main?recursive=1
+# Assets tied to CLI release tags
+GET /repos/grantcarthew/start/releases/latest
+# Extract tag: v1.3.0
+GET https://raw.githubusercontent.com/grantcarthew/start/v1.3.0/assets/index.csv
 ```
 
-**Not from releases:**
+- Pro: Assets perfectly matched to CLI version
+- Pro: More stable (only released versions)
+- Pro: Version pinning built-in
+- Con: Cannot update assets without cutting CLI release
+- Con: Typo fixes require full release process
+- Con: Slower feedback for content improvements
+- Con: Couples asset updates to code releases
+- Rejected: Too slow for content iteration
+
+Assets from develop branch:
+
 ```bash
-# ❌ Don't do this for assets
-GET /repos/grantcarthew/start/releases/latest  # Get tag
-GET /repos/grantcarthew/start/git/trees/{tag}?recursive=1
+GET https://raw.githubusercontent.com/grantcarthew/start/develop/assets/index.csv
 ```
 
-### Version Tracking
+- Pro: Even more bleeding edge than main
+- Pro: Could have main for stable, develop for experimental
+- Con: Adds complexity (which branch to use?)
+- Con: Users must choose stability level
+- Con: Two catalogs to maintain
+- Con: Main would become stale if develop is where changes go
+- Rejected: Unnecessary complexity, keep main stable instead
 
-The `asset-version.toml` file tracks the main branch commit SHA:
+Per-user branch selection:
 
 ```toml
-# Asset version tracking - managed by 'start assets update'
-# Last updated: 2025-01-06T10:30:00Z
-
-commit = "abc123def456"  # Latest commit SHA from main branch
-timestamp = "2025-01-06T10:30:00Z"
-repository = "github.com/grantcarthew/start"
-branch = "main"  # Always main
-
-[files]
-"agents/claude.toml" = "a1b2c3d4e5f6..."
-"agents/gemini.toml" = "e5f6g7h8i9j0..."
-"roles/code-reviewer.md" = "i9j0k1l2m3n4..."
-# ... etc
+[settings]
+asset_branch = "main"  # or "develop", "stable", etc.
 ```
 
-### Update Flow
+- Pro: User choice of stability level
+- Pro: Power users can use bleeding edge
+- Con: Configuration complexity
+- Con: Multiple branches to maintain
+- Con: Support burden (which branch did user use?)
+- Con: Testing across multiple branches
+- Rejected: Over-engineering for minimal benefit
 
-```bash
-$ start assets update
+Asset channels (stable/latest/develop):
 
-Checking asset library...
-  Current commit:  abc1234 (3 days ago)
-  Latest commit:   def5678 (2 hours ago)
-  Branch:          main
-
-Downloading updates...
-  ✓ roles/golang-expert.md (updated)
-  ✓ tasks/code-review.toml (updated)
-  ✓ agents/claude.toml (unchanged, skipped)
-
-✓ Asset library updated to commit def5678
-
-CLI Version Check:
-  Current:         v1.2.3
-  Latest Release:  v1.3.0
-  Status:          ⚠ Update available
-  Update via:      brew upgrade grantcarthew/tap/start
-```
-
-## Asset Stability Strategy
-
-**To prevent broken assets reaching users:**
-
-1. **Keep main branch stable**
-   - Test assets before merging to main
-   - Don't commit broken TOML or malformed markdown
-   - Review asset changes like code
-
-2. **Optional: Use develop branch** (future consideration)
-   - Develop new assets in `develop` branch
-   - Only merge to `main` when tested
-   - Could add `--branch develop` flag later if needed
-
-3. **Validation on update** (future consideration)
-   - `start assets update` could validate TOML syntax before installing
-   - Rollback on validation failure (DR-015)
-   - Show warnings for deprecated fields
-
-## Comparison: CLI vs Assets
-
-| Aspect | CLI Binary | Asset Library |
-|--------|------------|---------------|
-| **Source** | GitHub Releases | Main branch commits |
-| **Version** | Semantic (v1.2.3) | Git commit SHA |
-| **Update Command** | `brew upgrade` / `go install` | `start assets update` |
-| **Update Frequency** | Manual releases | Every commit to main |
-| **Testing** | Full release process | Commit to main |
-| **Stability** | High (release process) | Medium (review before merge) |
-| **Risk** | High (executable code) | Low (config templates) |
-
-## Future Considerations
-
-**Branch selection flag** (not implementing now):
-```bash
-# Could add later if needed
-start assets update --branch develop  # Bleeding edge
-start assets update --branch main     # Default
-start assets update --tag v1.2.0      # Pin to specific version
-```
-
-**Asset channels** (not implementing now):
 ```toml
-# Could allow users to choose stability level
 [settings]
 asset_channel = "stable"   # From releases
 asset_channel = "latest"   # From main (default)
 asset_channel = "develop"  # From develop branch
 ```
 
-These are **not** part of this decision - keeping it simple with main branch only.
+- Pro: Flexibility for different user preferences
+- Pro: Could satisfy both conservative and experimental users
+- Con: Multiple catalogs to maintain
+- Con: Which channel gets tested?
+- Con: Support complexity
+- Con: Configuration burden on users
+- Rejected: Assets are templates, one stable channel sufficient
 
-## Benefits
+Version pinning for assets:
 
-- ✅ **Faster iteration** - Improve assets without CLI releases
-- ✅ **Simple** - One branch, no channel complexity
-- ✅ **Immediate availability** - Users get improvements on next update
-- ✅ **Decoupled** - Asset improvements independent of CLI changes
-- ✅ **Lower risk** - Content files vs executable binaries
+```bash
+start assets update --tag v1.2.0  # Pin to specific asset version
+```
 
-## Trade-offs Accepted
+- Pro: Reproducible builds with specific asset versions
+- Pro: Can rollback to known-good state
+- Con: Requires tagging assets separately from CLI
+- Con: More complex version management
+- Con: Users must track asset versions
+- Rejected: Assets change frequently, pinning adds overhead
 
-- ❌ Broken assets could reach users (mitigated: keep main stable)
-- ❌ No "stable" vs "bleeding edge" choice (acceptable: assets are templates)
-- ❌ No version pinning for assets (acceptable: users control update timing)
+## Structure
 
-## Rationale Summary
+Catalog index fetch:
 
-Assets are content that benefits from rapid iteration. Pulling from main branch allows:
-- Fixing typos in role prompts without a release
-- Adding new task templates as they're created
-- Updating agent configs for new model versions
-- Adding new context configurations for common patterns
-- Iterating on examples based on user feedback
+```bash
+# Always from main branch
+GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv
+```
 
-Users control when they get updates (via `start assets update`), so they're not forced to take changes immediately. The CLI binary remains tied to stable releases for safety.
+Individual asset fetch:
 
-## Related Decisions
+```bash
+# Download from main branch
+GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/tasks/git-workflow/pre-commit-review.toml
+GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/tasks/git-workflow/pre-commit-review.md
+GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/tasks/git-workflow/pre-commit-review.meta.toml
+```
 
-- [DR-014](./dr-014-github-tree-api.md) - GitHub Tree API mechanism (how we fetch)
-- [DR-015](./dr-015-atomic-updates.md) - Atomic updates with rollback
-- [DR-018](./dr-018-init-update-integration.md) - Init and update integration
-- [DR-021](./dr-021-github-version-check.md) - CLI version checking (releases)
-
-## Implementation Notes
-
-### Code Location
-
-Update `internal/assets/updater.go`:
+Constants in code:
 
 ```go
 const (
@@ -195,31 +207,153 @@ const (
     AssetsBasePath  = "assets"
 )
 
-func FetchLatestAssets(ctx context.Context) error {
-    // GET /repos/grantcarthew/start/git/trees/main?recursive=1
-    // Use Tree API from DR-014
+func FetchCatalogIndex(ctx context.Context) (*CatalogIndex, error) {
+    url := fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/index.csv",
+        AssetRepository, AssetBranch, AssetsBasePath)
+    // Download and parse
+}
+
+func FetchAsset(path string) ([]byte, error) {
+    url := fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s",
+        AssetRepository, AssetBranch, path)
+    // Download asset
 }
 ```
 
-### Asset Version Display
+## Asset Stability Strategy
 
-`start doctor` shows asset commit and age:
+To prevent broken assets reaching users:
+
+Keep main branch stable:
+- Test assets before merging to main
+- Don't commit broken TOML or malformed markdown
+- Review asset changes like code
+- Use PRs for asset contributions
+- Validate metadata in PR reviews
+
+Validation on catalog index generation:
+- `start assets index` validates TOML syntax
+- Checks required metadata fields
+- Errors on missing/invalid data
+- Catches issues before merge
+
+Per-asset validation (future consideration):
+- Could validate TOML syntax before caching
+- Could check for required fields
+- Could rollback individual asset on failure
+- Not implemented initially (keep simple)
+
+## Usage Examples
+
+Searching catalog (downloads index.csv from main):
 
 ```bash
-Asset Information:
-  Commit:        abc1234
-  Branch:        main
-  Last Updated:  2 days ago
-  Status:        ✓ Up to date
+$ start assets search "commit"
+
+Searching catalog...
+✓ Loaded index from main branch (46 assets)
+
+Found 3 matches:
+  tasks/git-workflow/commit-message
+  tasks/git-workflow/pre-commit-review
+  tasks/workflows/post-commit-hook
 ```
 
-No "version number" for assets - just commit SHA and timestamp.
+Adding asset (downloads from main):
 
-## Implementation Checklist
+```bash
+$ start assets add tasks/git-workflow/pre-commit-review
 
-- [ ] Update `internal/assets/updater.go` to target main branch
-- [ ] Ensure `asset-version.toml` tracks branch field
-- [ ] Update `start doctor` to show asset commit and age
-- [ ] Update `start assets update` output to show current/latest commits
-- [ ] Document in README that assets come from main branch
-- [ ] Add validation for TOML syntax before installing assets (optional)
+Found in catalog:
+  Name: pre-commit-review
+  Description: Review staged changes before committing
+  Branch: main
+
+Downloading from main branch...
+✓ Downloaded to cache: ~/.config/start/assets/tasks/git-workflow/
+✓ Added to global config
+
+Ready to use: start task pre-commit-review
+```
+
+Updating cached assets (checks main branch):
+
+```bash
+$ start assets update
+
+Checking for updates on main branch...
+✓ Found 2 updated assets
+  - tasks/git-workflow/commit-message (SHA changed)
+  - roles/code-reviewer (SHA changed)
+
+Downloading updates...
+✓ Updated 2 cached assets
+
+Cache refreshed from main branch
+```
+
+Lazy loading (downloads from main on first use):
+
+```bash
+$ start task pre-commit-review
+
+Task 'pre-commit-review' not found locally.
+Found in catalog (main branch): tasks/git-workflow/pre-commit-review
+Downloading...
+✓ Cached and added to config
+
+Running task 'pre-commit-review'...
+```
+
+## Comparison: CLI vs Assets
+
+| Aspect | CLI Binary | Asset Catalog |
+|--------|------------|---------------|
+| Source | GitHub Releases | Main branch |
+| Version | Semantic (v1.2.3) | Branch commit (main) |
+| Update Command | `brew upgrade` / `go install` | `start assets update` |
+| Update Frequency | Manual releases | Every commit to main |
+| Testing | Full release process | PR review before merge |
+| Stability | High (release process) | Medium (main branch stability) |
+| Risk | High (executable code) | Low (config templates) |
+| Fetch Method | Binary download | raw.githubusercontent.com |
+
+## Implementation
+
+Code location: `internal/assets/catalog.go`
+
+```go
+const (
+    AssetRepository = "grantcarthew/start"
+    AssetBranch     = "main"  // Always main
+    AssetsBasePath  = "assets"
+)
+
+// FetchCatalogIndex downloads index.csv from main branch
+func FetchCatalogIndex(ctx context.Context) (*CatalogIndex, error) {
+    url := fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/index.csv",
+        AssetRepository, AssetBranch, AssetsBasePath)
+
+    resp, err := http.Get(url)
+    if err != nil {
+        return nil, fmt.Errorf("download index: %w", err)
+    }
+    defer resp.Body.Close()
+
+    return parseCatalogIndex(resp.Body)
+}
+```
+
+Implementation checklist:
+
+- Use main branch constant in all catalog operations
+- Fetch index.csv from main branch
+- Download individual assets from main branch
+- Update cached assets by comparing with main branch
+- Document in README that assets come from main branch
+- No version tracking file needed (catalog system handles SHA comparison per asset)
+
+## Updates
+
+- 2025-01-10: Updated by DR-031 (catalog architecture) - catalog-based implementation instead of bulk downloads
+- 2025-01-13: Updated by DR-039 (catalog index) - index.csv fetched from main branch for catalog metadata

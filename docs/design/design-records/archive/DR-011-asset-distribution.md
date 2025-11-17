@@ -1,12 +1,23 @@
 # DR-011: Asset Distribution and Update System
 
-**Date:** 2025-01-03, Updated 2025-01-06
-**Status:** Accepted
-**Category:** Distribution
+- Date: 2025-01-03, Updated 2025-01-06, Superseded 2025-01-17
+- Status: Superseded by DR-031 (Catalog-Based Assets)
+- Category: Distribution
 
-## Decision
+## Superseded
 
-Assets fetched from GitHub repository; `start init` downloads on first run; `start assets update` refreshes asset library
+This design record is superseded by DR-031 (Catalog-Based Assets). The bulk download model is replaced by catalog-driven, on-demand asset loading.
+
+The catalog system replaces the bulk download approach because:
+
+- NO bulk downloads during `start init` - catalog queries GitHub on-demand
+- NO `asset-version.toml` tracking file - filesystem IS the state
+- Lazy loading: assets downloaded on first use via `start task <name>` or `start assets add`
+- Per-asset updates: `start assets update` uses SHA comparison for individual cached assets
+- Interactive discovery: `start assets add` (TUI browser) or `start assets search "query"`
+- Cache is transparent: `~/.config/start/assets/` automatically populated as needed
+
+The bulk download model (download entire library upfront) is incompatible with the catalog model (query and download on-demand).
 
 ## Asset Installation Location
 

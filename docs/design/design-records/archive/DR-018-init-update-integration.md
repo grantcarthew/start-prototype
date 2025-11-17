@@ -1,12 +1,23 @@
 # DR-018: Init and Update Command Integration
 
-**Date:** 2025-01-06
-**Status:** Accepted
-**Category:** Asset Management
+- Date: 2025-01-06, Superseded 2025-01-17
+- Status: Superseded by DR-031 (Catalog-Based Assets)
+- Category: Asset Management
 
-## Decision
+## Superseded
 
-`start init` always invokes asset update logic; both commands share identical implementation
+This design record is superseded by DR-031 (Catalog-Based Assets). The bulk download integration model is replaced by catalog-driven, on-demand asset loading.
+
+The catalog system eliminates the need for init/update integration because:
+
+- NO bulk downloads during `start init` - init creates config files only, no asset downloads
+- NO `asset-version.toml` tracking file - filesystem IS the state
+- NO shared update logic for bulk downloads - assets are lazy loaded on first use
+- `start init` focuses on config creation and optional agent detection (prompts to download detected agents)
+- `start assets update` updates individual cached assets via per-asset SHA comparison (not bulk update)
+- Assets downloaded on-demand: via `start task <name>`, `start assets add`, or auto-download when `asset_download = true`
+
+The bulk download model (init always downloads all assets) is incompatible with the catalog model (query and download on-demand).
 
 ## Integration Strategy
 

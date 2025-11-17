@@ -1,21 +1,191 @@
 # DR-021: GitHub Version Checking
 
-**Date:** 2025-01-06
-**Status:** Accepted
-**Category:** Version Management
+- Date: 2025-01-06
+- Status: Accepted
+- Category: Version Management
+
+## Problem
+
+Users need to know when newer CLI versions are available. The system must:
+
+- Check GitHub for latest CLI release version
+- Compare current version with latest release
+- Provide clear update instructions
+- Work with different installation methods (brew, go install, manual)
+- Handle rate limiting gracefully
+- Not block or fail commands when version check fails
+- Only check when user explicitly runs commands (no automatic background checks)
+- Support both release and development builds
+- Detect network errors and provide friendly messages
+- Respect GitHub API rate limits
 
 ## Decision
 
 Check GitHub Releases API for latest CLI version on every execution of `start doctor` and `start assets update`, with no caching.
 
-## API Endpoint
+API endpoint: `GET /repos/grantcarthew/start/releases/latest`
 
-**Latest Release:**
+Version checks occur:
+- `start doctor` - as part of health check
+- `start assets update` - after updating cached assets
+
+No caching (fresh API call each time), with rate limit protection (skip check if remaining < 10 requests).
+
+## Why
+
+User-initiated checks only:
+
+- No automatic background checks (respectful, non-intrusive)
+- Users explicitly run doctor or update (expect network calls)
+- Clear intent to check system status
+- No surprise network traffic
+
+No caching for simplicity:
+
+- Always shows current information (no stale data)
+- No cache file management needed
+- No cache invalidation logic
+- Simpler implementation
+- Rate limit check prevents abuse
+
+Rate limiting protection:
+
+- Check remaining API calls before version check
+- Skip if < 10 remaining (preserve quota)
+- Show friendly message when rate limited
+- Respects `GH_TOKEN` env var for authenticated requests
+- Anonymous: 60 requests/hour (usually sufficient)
+- Authenticated: 5000 requests/hour
+
+Non-blocking error handling:
+
+- Version check failures don't stop commands
+- Network errors show warning, continue
+- Rate limiting shows friendly message, continue
+- Parse errors log and show "Unknown"
+- Only informational, not critical
+
+Installation method detection:
+
+- Detects how user installed (brew, go install, manual)
+- Provides appropriate update command
+- Helpful guidance for users
+- Reduces friction for updates
+
+Development build handling:
+
+- Parses version strings like `v1.2.3-5-gabc1234`
+- Extracts base version for comparison
+- Shows status appropriate to build type
+- Handles dirty builds, ahead-of-release builds
+
+## Trade-offs
+
+Accept:
+
+- API call on every doctor/update execution
+- Requires network connection for version check
+- Slower than cached check (additional network round-trip)
+- Two API calls (rate limit check + release check)
+- May be rate limited if user runs frequently
+
+Gain:
+
+- Always shows current information (no stale cache)
+- Simple implementation (no cache management)
+- User-initiated only (respectful, no nagging)
+- Clear error messages when network unavailable
+- Rate limit protection (doesn't exhaust quota)
+- Non-blocking (errors don't stop commands)
+
+## Alternatives
+
+Cached version check with TTL:
+
+```go
+// Cache latest release for 24 hours
+type VersionCache struct {
+    LatestVersion string
+    CachedAt      time.Time
+    TTL           time.Duration
+}
+```
+
+- Pro: Fewer API calls (respects rate limits better)
+- Pro: Faster response (no network call if cached)
+- Con: May show stale data (up to TTL old)
+- Con: Cache file management needed
+- Con: Cache invalidation complexity
+- Con: Must handle cache corruption/missing
+- Rejected: Simplicity more important than speed for infrequent checks
+
+Automatic background checks:
+
+```go
+// Check on every command execution
+if time.Since(lastCheck) > 24*time.Hour {
+    go checkVersionInBackground()
+}
+```
+
+- Pro: Users always informed of updates
+- Pro: More discoverable
+- Con: Intrusive (surprise network calls)
+- Con: Violates user expectations
+- Con: Privacy concern (phones home automatically)
+- Con: Can't control when checks happen
+- Rejected: Too intrusive, violates user control
+
+Version file bundled with binary:
+
+```
+start/
+├── start (binary)
+└── LATEST_VERSION
+```
+
+- Pro: No network call needed
+- Pro: Always available offline
+- Con: Always stale (bundle time, not current)
+- Con: Deployment complexity (two files)
+- Con: Defeats purpose (can't show actual latest)
+- Rejected: Misses the point of checking latest
+
+Environment variable for version URL:
+
+```bash
+START_VERSION_URL=https://custom.com/version start doctor
+```
+
+- Pro: Customizable for private forks
+- Pro: Can point to different sources
+- Con: Most users won't set this
+- Con: Adds configuration complexity
+- Con: Not discoverable
+- Rejected: Over-engineering for uncommon use case
+
+Only check on explicit command:
+
+```bash
+start version check
+```
+
+- Pro: Even more explicit user control
+- Pro: Separate concern from doctor/update
+- Con: Users must know about separate command
+- Con: Less discoverable
+- Con: Extra command to remember
+- Rejected: Doctor/update are natural places to check
+
+## Structure
+
+API endpoint:
+
 ```
 GET /repos/grantcarthew/start/releases/latest
 ```
 
-**Response:**
+Response:
 ```json
 {
   "tag_name": "v1.3.0",
@@ -25,58 +195,7 @@ GET /repos/grantcarthew/start/releases/latest
 }
 ```
 
-## When Checks Occur
-
-### `start doctor`
-Checks and reports CLI version status as part of health check:
-```bash
-$ start doctor
-Version Information:
-  CLI Version:     1.2.3
-  Commit:          abc1234
-  Build Date:      2025-01-06T10:30:00Z
-
-Asset Information:
-  Asset Version:   1.1.0 (commit: def5678)
-  Last Updated:    2 days ago
-  Status:          ✓ Up to date
-
-CLI Version Check:
-  Current:         v1.2.3
-  Latest Release:  v1.3.0
-  Status:          ⚠ Update available
-  Update via:      brew upgrade grantcarthew/tap/start
-```
-
-### `start assets update`
-Checks CLI version after updating assets:
-```bash
-$ start assets update
-Checking for asset updates...
-✓ Downloaded 3 updated files
-✓ Asset library updated to commit def5678
-
-CLI Version Check:
-  Current:         v1.2.3
-  Latest Release:  v1.3.0
-  Status:          ⚠ Update available
-  Update via:      brew upgrade grantcarthew/tap/start
-```
-
-If up to date:
-```bash
-$ start assets update
-Asset library is up to date (commit: def5678)
-
-CLI Version Check:
-  Current:         v1.3.0
-  Latest Release:  v1.3.0
-  Status:          ✓ Up to date
-```
-
-## Rate Limiting Strategy
-
-Before checking latest release:
+Rate limiting strategy:
 
 ```
 1. GET /rate_limit
@@ -92,20 +211,12 @@ Before checking latest release:
    → Compare versions
 ```
 
-**Authentication:**
-- Respect `GH_TOKEN` environment variable (like DR-014)
-- Anonymous: 60 requests/hour (usually sufficient)
+Authentication:
+- Respects `GH_TOKEN` environment variable
+- Anonymous: 60 requests/hour
 - Authenticated: 5000 requests/hour
 
-**No Caching:**
-- Every execution makes fresh API call
-- Simple implementation (no cache file management)
-- Always shows current data
-- Rate limit check prevents abuse
-
-## Version Comparison Logic
-
-### Semantic Version Parsing
+Version comparison logic:
 
 ```go
 // Strip 'v' prefix from tags
@@ -133,38 +244,22 @@ if current.LessThan(latest) {
 }
 ```
 
-### Build Type Handling
+## Usage Examples
 
-**Release build:**
-```
-Current: v1.2.3
-Status: ✓ Up to date
-```
+start doctor with update available:
 
-**Development build:**
-```
-Current: v1.2.3-5-gabc1234 (development build)
-Status: ✓ Base version up to date
-```
+```bash
+$ start doctor
+Version Information:
+  CLI Version:     1.2.3
+  Commit:          abc1234
+  Build Date:      2025-01-06T10:30:00Z
+  Go Version:      go1.22.0
 
-**Dirty build:**
-```
-Current: v1.2.3-dirty (uncommitted changes)
-Status: ✓ Up to date
-```
+Asset Information:
+  Asset Cache:     ~/.config/start/assets/
+  Cached Assets:   12 tasks, 8 roles, 4 agents
 
-**Ahead of release:**
-```
-Current: v1.4.0-dirty
-Latest:  v1.3.0
-Status: ℹ Ahead of latest release
-```
-
-## Output Formats
-
-### When Update Available
-
-```
 CLI Version Check:
   Current:         v1.2.3
   Latest Release:  v1.3.0
@@ -172,16 +267,61 @@ CLI Version Check:
   Update via:      brew upgrade grantcarthew/tap/start
 ```
 
-### When Up to Date
+start assets update with version check:
 
+```bash
+$ start assets update
+Checking for asset updates...
+✓ Updated 3 cached assets
+✓ Asset cache refreshed
+
+CLI Version Check:
+  Current:         v1.2.3
+  Latest Release:  v1.3.0
+  Status:          ⚠ Update available
+  Update via:      brew upgrade grantcarthew/tap/start
 ```
+
+When up to date:
+
+```bash
+$ start assets update
+Asset cache is up to date
+
 CLI Version Check:
   Current:         v1.3.0
   Latest Release:  v1.3.0
   Status:          ✓ Up to date
 ```
 
-### When Rate Limited
+Build type handling:
+
+Release build:
+```
+Current: v1.2.3
+Status: ✓ Up to date
+```
+
+Development build:
+```
+Current: v1.2.3-5-gabc1234 (development build)
+Status: ✓ Base version up to date
+```
+
+Dirty build:
+```
+Current: v1.2.3-dirty (uncommitted changes)
+Status: ✓ Up to date
+```
+
+Ahead of release:
+```
+Current: v1.4.0-dirty
+Latest:  v1.3.0
+Status: ℹ Ahead of latest release
+```
+
+When rate limited:
 
 ```
 CLI Version Check:
@@ -190,7 +330,7 @@ CLI Version Check:
   Status:          Unknown
 ```
 
-### When Network Error
+When network error:
 
 ```
 CLI Version Check:
@@ -199,22 +339,20 @@ CLI Version Check:
   Status:          Unknown
 ```
 
-## Implementation Notes
+## Error Handling
 
-### Error Handling
-
-Version check failures should **not** cause command to fail:
+Version check failures should not cause command to fail:
 
 - Network errors: Show warning, continue
 - API errors: Show warning, continue
 - Rate limiting: Show friendly message, continue
 - Parse errors: Log error, show "Unknown"
 
-Only `start assets update` should fail if **asset** update fails. CLI version check is informational only.
+Only `start assets update` should fail if asset update fails. CLI version check is informational only.
 
-### Installation Method Detection
+## Installation Method Detection
 
-Update suggestion should detect installation method:
+Update suggestion detects installation method:
 
 ```go
 // Check if installed via Homebrew
@@ -235,9 +373,9 @@ if gopath := os.Getenv("GOPATH"); gopath != "" {
 return "See https://github.com/grantcarthew/start#installation"
 ```
 
-### Package Structure
+## Implementation
 
-Create `internal/version/checker.go`:
+Package structure - create `internal/version/checker.go`:
 
 ```go
 package version
@@ -264,38 +402,18 @@ func DetectInstallMethod() string {
 }
 ```
 
-## Benefits
+Implementation checklist:
 
-- ✅ **Always fresh** - No stale cached data
-- ✅ **Simple** - No cache file management
-- ✅ **User-initiated** - Only checks when user runs doctor/update
-- ✅ **Non-blocking** - Errors don't stop commands
-- ✅ **Informative** - Clear update instructions
-- ✅ **Respectful** - No automatic nagging or background checks
+- Create `internal/version/checker.go`
+- Implement `CheckLatestRelease()` with rate limit check
+- Implement `CompareVersions()` with semver parsing
+- Implement `DetectInstallMethod()` for update suggestions
+- Add version check to `start doctor` command
+- Add version check to `start assets update` command
+- Handle all error cases gracefully (network, API, parsing)
+- Add unit tests for version comparison logic
+- Document GH_TOKEN usage for rate limit increases
 
-## Trade-offs Accepted
+## Updates
 
-- ❌ API call on every doctor/update (mitigated: rate limit check)
-- ❌ Requires network connection (acceptable: shows friendly error)
-- ❌ Slower than cached check (acceptable: users expect network call)
-
-## Rationale
-
-No caching simplifies implementation and ensures users always see current information. Since checks are user-initiated (not automatic), the API call overhead is acceptable. Rate limiting protection prevents abuse of GitHub API.
-
-## Related Decisions
-
-- [DR-020](./dr-020-version-injection.md) - Binary version injection (source of current version)
-- [DR-014](./dr-014-github-tree-api.md) - GitHub API usage patterns and rate limiting
-
-## Implementation Checklist
-
-- [ ] Create `internal/version/checker.go`
-- [ ] Implement `CheckLatestRelease()` with rate limit check
-- [ ] Implement `CompareVersions()` with semver parsing
-- [ ] Implement `DetectInstallMethod()` for update suggestions
-- [ ] Add version check to `start doctor` command
-- [ ] Add version check to `start assets update` command
-- [ ] Handle all error cases gracefully (network, API, parsing)
-- [ ] Add unit tests for version comparison logic
-- [ ] Document GH_TOKEN usage for rate limit increases
+- 2025-01-17: Updated doctor output to show asset cache info instead of asset version tracking (aligns with catalog system per DR-031)
