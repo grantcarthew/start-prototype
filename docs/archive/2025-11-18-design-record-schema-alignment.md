@@ -151,6 +151,12 @@ During alignment, we discovered and fixed these issues:
 12. DR-018: "Init always invokes asset update logic" with bulk downloads and asset-version.toml tracking incompatible with catalog-based lazy loading (DR-031) - DR-018 SUPERSEDED and moved to archive/
 13. DR-021: Doctor output showed "Asset Version" tracking which doesn't exist in catalog system - FIXED to show asset cache info instead (aligns with DR-031)
 14. DR-022: Bulk download implementation (asset-version.toml, tree API) incompatible with catalog system - UPDATED to catalog-based approach (index.csv from main, per-asset downloads) while preserving core decision (main branch vs releases)
+15. DR-024: Referenced asset-version.toml and ~/.config/start/assets/ from bulk download model, incompatible with catalog-based cache system - FIXED to reference asset cache directory and catalog index
+16. DR-025: Referenced superseded DR-014 (GitHub Tree API) and DR-023 (Asset Staleness Check) for asset caching behavior - REMOVED cross-references, updated asset caching description to catalog system
+17. DR-026: Referenced superseded DR-011, DR-014, DR-018 for asset management behavior - REMOVED cross-references, updated to catalog-based asset system
+18. DR-027: Referenced superseded DR-011, DR-014, DR-015 and asset-version.toml; referenced ~/.config/start/assets/ path from bulk download model - REMOVED cross-references, updated asset paths to cache directory for catalog system
+19. DR-031, DR-033: Used ~/.cache/start/ instead of actual cache path ~/.config/start/assets/ - FIXED to use correct cache path and asset_path setting name
+20. DR-031: Described `start assets browse` as "Interactive TUI for catalog browsing" but DR-017 and DR-041 specify it should open web browser to GitHub catalog - FIXED to "Open GitHub catalog in web browser" (3 locations)
 
 Continue to flag any inconsistencies discovered during alignment.
 
@@ -168,7 +174,7 @@ DRs that have been superseded and moved to archive/:
 
 Location: `docs/design/design-records/`
 
-Progress: 16 of 34 active (47%) - 3 superseded and archived
+Progress: 34 of 34 active (100%) - 3 superseded and archived
 
 - [x] DR-001: TOML Format
 - [x] DR-002: Config Merge
@@ -189,24 +195,24 @@ Progress: 16 of 34 active (47%) - 3 superseded and archived
 - [x] DR-020: Version Injection
 - [x] DR-021: GitHub Version Check
 - [x] DR-022: Asset Branch Strategy
-- [ ] DR-024: Doctor Exit Codes
-- [ ] DR-025: No Automatic Checks
-- [ ] DR-026: Offline Behavior
-- [ ] DR-027: Security Trust Model
-- [ ] DR-028: Shell Completion
-- [ ] DR-029: Task Agent Field
-- [ ] DR-030: Prefix Matching
-- [ ] DR-031: Catalog-Based Assets
-- [ ] DR-032: Asset Metadata Schema
-- [ ] DR-033: Asset Resolution Algorithm
-- [ ] DR-034: GitHub Catalog API
-- [ ] DR-035: Interactive Browsing
-- [ ] DR-036: Cache Management
-- [ ] DR-037: Asset Updates
-- [ ] DR-038: Flag Value Resolution
-- [ ] DR-039: Catalog Index
-- [ ] DR-040: Substring Matching
-- [ ] DR-041: Asset Command Reorganization
+- [x] DR-024: Doctor Exit Codes
+- [x] DR-025: No Automatic Checks
+- [x] DR-026: Offline Behavior
+- [x] DR-027: Security Trust Model
+- [x] DR-028: Shell Completion
+- [x] DR-029: Task Agent Field
+- [x] DR-030: Prefix Matching
+- [x] DR-031: Catalog-Based Assets
+- [x] DR-032: Asset Metadata Schema
+- [x] DR-033: Asset Resolution Algorithm
+- [x] DR-034: GitHub Catalog API
+- [x] DR-035: Interactive Browsing
+- [x] DR-036: Cache Management
+- [x] DR-037: Asset Updates
+- [x] DR-038: Flag Value Resolution
+- [x] DR-039: Catalog Index
+- [x] DR-040: Substring Matching
+- [x] DR-041: Asset Command Reorganization
 
 ## Notes for Continuation
 

@@ -1,18 +1,14 @@
 # DR-041: Asset Command Reorganization
 
-**Date:** 2025-01-13
-**Status:** Accepted
-**Category:** CLI Design
-
-## Decision
-
-Create a unified `start assets` command suite for all asset discovery, installation, and management operations. Deprecate scattered asset-related commands (`start config [type] add`, `start update`, `start show assets`).
+- Date: 2025-01-13
+- Status: Accepted
+- Category: CLI Design
 
 ## Problem
 
 Asset management functionality is scattered across multiple commands with inconsistent interfaces:
 
-**Old structure:**
+Old structure:
 ```bash
 # Adding assets - different paths per type
 start config task add [query]    # Add task from catalog
@@ -26,29 +22,30 @@ start update                     # Update all cached assets
 start show assets                # List cached assets
 ```
 
-**Issues:**
+Issues:
 
-1. **Discovery is hard** - No search or browse functionality
-2. **Inconsistent UX** - Each asset type uses different command pattern
-3. **No asset information** - Can't preview before installing
-4. **Update is unclear** - `start update` name conflicts with "update CLI binary"
-5. **No cache management** - Can't clean old/unused assets
-6. **Type coupling** - Must know asset type before discovering
+- Discovery is hard (no search or browse functionality)
+- Inconsistent UX (each asset type uses different command pattern)
+- No asset information (can't preview before installing)
+- Update is unclear (start update name conflicts with "update CLI binary")
+- No cache management (can't clean old/unused assets)
+- Type coupling (must know asset type before discovering)
 
-## Solution
+## Decision
 
-### Unified Command Structure
+Create unified start assets command suite for all asset discovery, installation, and management operations.
 
-Create `start assets` as the central hub for all asset operations:
+Command structure:
 
 ```bash
 # Discovery and search
-start assets browse              # Interactive catalog browser (tree UI)
+start assets browse              # Open GitHub catalog in web browser
 start assets search <query>      # Search by name/description/tags
 start assets info <query>        # Show detailed asset information
 
 # Installation
 start assets add <query>         # Search and install asset
+start assets add                 # Interactive terminal browser (no args)
 
 # Management
 start assets update [query]      # Update cached assets (all or matching query)
@@ -58,58 +55,385 @@ start assets clean               # Remove unused cached assets
 start assets index               # Generate catalog index.csv
 ```
 
-**Key principle:** Asset-first design - discover assets, then install to appropriate config.
+Key principle: Asset-first design - discover assets, then install to appropriate config.
 
-### Command Details
+Replaces scattered commands:
 
-#### start assets browse
+| Old Command | Replacement |
+|-------------|-------------|
+| start config task add | start assets add |
+| start config role add | start assets add |
+| start config agent add | start assets add |
+| start update | start assets update |
+| start show assets | start assets browse |
 
-Interactive tree-based catalog browser.
+## Why
 
-**Behavior:**
-1. Download catalog index
-2. Display hierarchical tree by type → category
-3. Navigate with arrow keys, select with enter
-4. Show asset details in preview pane
-5. Select action: add, info, cancel
+Unified discovery simplifies asset management:
 
-**Example:**
+- One place for all asset operations (not scattered across config/update/show)
+- Searchable (find assets by description, tags, not just name)
+- Preview before install (see details with start assets info)
+- Type-agnostic (don't need to know if something is a task/role/agent)
+- Clear organization (logical grouping under assets command)
+
+Consistent implementation improves maintainability:
+
+- Same code paths for all asset types (universal installer)
+- Easier to extend (add new asset types without new commands)
+- Better testing (unified test suite for asset operations)
+- Shared functionality (search, download, cache all reused)
+
+Clearer discoverability for users:
+
+- Help is clearer (start assets --help shows all operations)
+- Intuitive naming ("assets" clearly indicates catalog operations)
+- Less cognitive load (one command to remember, not four)
+- Natural grouping (related operations together)
+
+Better cache management:
+
+- Explicit cleanup command (start assets clean)
+- See what's unused (shows list before removing)
+- Control cache growth (prevent indefinite growth)
+- Clear ownership (assets command owns cache)
+
+Clearer update semantics:
+
+- Explicit scope (start assets update clearly updates assets)
+- No ambiguity (not "update CLI binary")
+- Selective updates (update matching query only)
+- Predictable behavior (update asset cache, not config)
+
+## Trade-offs
+
+Accept:
+
+- Breaking change (requires migration for existing scripts/workflows, but clear replacement mapping provided)
+- Command is longer (start assets add vs start config task add, but supports search shortcuts with prefix matching)
+- Learning curve for existing users (must learn new command structure, but clearer long-term)
+
+Gain:
+
+- Unified discovery (one place for all asset operations, searchable, preview before install, type-agnostic, clear organization)
+- Consistent implementation (same code paths for all asset types, easier to extend, better testing, shared functionality)
+- Clearer discoverability (help is clearer, intuitive naming, less cognitive load, natural grouping)
+- Better cache management (explicit cleanup, see unused, control growth, clear ownership)
+- Clearer update semantics (explicit scope, no ambiguity, selective updates, predictable behavior)
+
+## Alternatives
+
+Keep scattered commands:
+
+Example: Maintain current structure with separate commands per type
+```bash
+start config task add "foo"
+start config role add "bar"
+start config agent add "baz"
+start update
+start show assets
 ```
-Catalog Browser (46 assets)
-═══════════════════════════════════════════════════════════
 
-▼ tasks (28 assets)
-  ▼ git-workflow (12 assets)
-    ▸ commit-message
-    ▸ pre-commit-review      ← Preview
-    ▸ post-commit-hook
-  ▸ quality (8 assets)
-  ▸ documentation (8 assets)
+Pros:
+- No breaking changes (existing users unaffected)
+- No migration needed (current scripts work)
+- Shorter commands (config task add vs assets add)
+- Familiar pattern (users already know it)
 
-▼ roles (12 assets)
-▸ agents (4 assets)
-▸ contexts (2 assets)
+Cons:
+- No unified discovery (must know asset type first)
+- No search functionality (can't find by description/tags)
+- No preview capability (can't see details before installing)
+- Inconsistent UX (different patterns per type)
+- Harder to extend (new asset type needs new command)
+- Confusing update (start update ambiguous)
+- No cache management (can't clean unused)
+- Poor discoverability (commands scattered across CLI)
 
-─────────────────────────────────────────────────────────────
-Preview: pre-commit-review
+Rejected: Unified command suite provides much better UX. Breaking change is acceptable with clear migration mapping.
 
-Description: Review staged changes before committing
+Use subcommands under config instead of new assets command:
+
+Example: Keep under config but unify pattern
+```bash
+start config assets browse
+start config assets search <query>
+start config assets add <query>
+start config assets update
+```
+
+Pros:
+- Less top-level command pollution (nested under config)
+- Still unifies asset operations
+- Familiar location (near existing config commands)
+
+Cons:
+- Confusing semantics (assets command modifies cache, not config)
+- Longer commands (start config assets add vs start assets add)
+- Misleading grouping (config is about user settings, assets about catalog)
+- Harder to discover (buried under config)
+- Semantic mismatch (browsing catalog not configuring)
+
+Rejected: start assets is clearer - assets are distinct from user config. Cache management and catalog browsing don't belong under config.
+
+Add browse/search without deprecating old commands:
+
+Example: Add new discovery commands but keep old add commands
+```bash
+start assets browse              # New
+start assets search <query>      # New
+start assets info <query>        # New
+start config task add <query>    # Keep
+start config role add <query>    # Keep
+start update                     # Keep
+```
+
+Pros:
+- No breaking changes (old commands still work)
+- Adds discovery features (browse, search, info)
+- Gradual migration (users can switch over time)
+
+Cons:
+- Duplicated functionality (two ways to add assets)
+- Inconsistent UX (new way vs old way coexist)
+- Confusing for new users (which command to use?)
+- Maintenance burden (support both paths indefinitely)
+- No incentive to migrate (old commands never go away)
+- Cluttered help output (too many similar commands)
+
+Rejected: Clean break better. Duplicated functionality creates confusion.
+
+Use single command with type flag:
+
+Example: Single add command with --type flag
+```bash
+start assets add "foo" --type task
+start assets add "bar" --type role
+start assets add "baz" --type agent
+```
+
+Pros:
+- Single command (one add instead of multiple)
+- Explicit type (clear what's being added)
+- Consistent pattern (same command for all types)
+
+Cons:
+- Requires knowing type (defeats type-agnostic discovery)
+- Extra typing (--type flag every time)
+- Less ergonomic (more verbose)
+- Type is implementation detail (users shouldn't need to specify)
+- Search can infer type (from catalog path)
+
+Rejected: Type-agnostic discovery is key feature. Asset type is metadata, not user concern. Let search/browse determine type automatically.
+
+## Structure
+
+Command structure:
+
+start assets browse:
+- Open GitHub catalog in web browser
+- URL: https://github.com/{org}/{repo}/tree/main/assets
+- Uses system default browser
+- Fallback: If browser fails to open, print URL to terminal for manual click
+- No terminal interaction (pure web browsing)
+
+start assets search <query>:
+- Search catalog using substring matching (DR-040)
+- Match against name, path, description, tags
+- Display results grouped by type/category
+- Interactive selection if multiple matches
+- Auto-select if single exact match
+- Minimum 3 characters required
+
+start assets add <query>:
+- Search catalog using substring matching
+- Single match: auto-select and proceed
+- Multiple matches: interactive selection
+- Show asset details and confirm installation
+- Download to cache (~/.config/start/assets/)
+- Add to global or local config (via --local flag)
+- Display usage instructions after installation
+
+start assets add (no arguments):
+- Interactive terminal browser with numbered selection (DR-035)
+- Download catalog index
+- Category-first navigation
+- Select asset from numbered list
+- Confirm before installing
+- Download and add to config
+
+start assets info <query>:
+- Search for asset (same matching as add)
+- Display full metadata from .meta.toml
+- Show description and tags
+- Show file size and dates
+- Show installation status (cached, in global/local config)
+- Optional full file contents preview
+
+start assets update [query]:
+- Download catalog index.csv
+- Find cached .meta.toml files
+- Filter by query if provided (substring matching)
+- Compare local SHA with index SHA
+- Download updates for changed assets
+- Update cache only (never modify user config)
+- Report updated count and unchanged count
+- See DR-037 for complete algorithm
+
+start assets clean:
+- Scan asset cache (~/.config/start/assets/)
+- Find assets not referenced in global or local config
+- Display list of unused assets with sizes
+- Prompt for confirmation (default: no removal)
+- Remove confirmed assets
+- Report freed space
+- Support --force flag to skip confirmation prompt
+
+start assets index:
+- Validate git repository structure
+- Scan assets/ directory for .meta.toml files
+- Parse metadata from each file
+- For agents: extract bin from .toml file
+- Sort alphabetically (type → category → name)
+- Write CSV to assets/index.csv with header row
+- Report generated asset count
+- See DR-039 for complete specification
+
+Scope control:
+
+Downloaded assets added to config based on --local flag:
+- Default: global config (~/.config/start/tasks.toml)
+- With --local flag: local config (.start/tasks.toml)
+- Local creates or updates the .start/ directory
+
+Cache behavior:
+
+Cached assets used immediately without prompting:
+- Cache is transparent implementation detail
+- No user interaction needed for cached assets
+- Reduces network calls automatically
+
+## Usage Examples
+
+Discovery workflow (before):
+
+```bash
+# Can't search, must know exact name
+start config task add "pre-commit-review"  # Hope it exists
+
+# Can't browse, must check GitHub web
+# No way to see what's available
+```
+
+Discovery workflow (after):
+
+```bash
+# Browse in web browser
+start assets browse
+# Opens https://github.com/grantcarthew/start/tree/main/assets
+
+# Or search by description in terminal
+start assets search "commit"
+
+# Or use interactive terminal browser
+start assets add
+# Shows numbered category and asset selection
+
+# Preview before installing
+start assets info "pre-commit-review"
+
+# Install when ready
+start assets add "pre-commit-review"
+```
+
+Update workflow (before):
+
+```bash
+start update              # Updates what? CLI? Assets? Both?
+```
+
+Update workflow (after):
+
+```bash
+start assets update       # Clear: updates cached assets
+start assets update "git" # Update only git-related assets
+```
+
+Cache management (before):
+
+```bash
+# No way to clean unused assets
+# Cache grows indefinitely
+```
+
+Cache management (after):
+
+```bash
+start assets clean        # Remove unused assets (with confirmation)
+start assets clean --force  # Remove without confirmation
+```
+
+Open web browser to catalog (success):
+
+```bash
+$ start assets browse
+
+Opening GitHub catalog in browser...
+✓ Opened https://github.com/grantcarthew/start/tree/main/assets
+```
+
+Open web browser to catalog (fallback when browser fails):
+
+```bash
+$ start assets browse
+
+Opening GitHub catalog in browser...
+⚠ Could not open browser automatically
+
+Visit the catalog at:
+https://github.com/grantcarthew/start/tree/main/assets
+```
+
+Interactive terminal browser:
+
+```bash
+$ start assets add
+
+Fetching catalog from GitHub...
+✓ Found 46 assets across 4 types and 12 categories
+
+Select category:
+  1. git-workflow (4 tasks)
+  2. code-quality (4 tasks)
+  3. security (2 tasks)
+  4. debugging (2 tasks)
+  5. [view all tasks]
+
+> 1
+
+git-workflow tasks:
+  1. pre-commit-review - Review staged changes before commit
+  2. pr-ready - Complete PR preparation checklist
+  3. commit-message - Generate conventional commit message
+  4. explain-changes - Understand what changed in commits
+
+> 1
+
+Selected: pre-commit-review
+Description: Review staged changes before commit
 Tags: git, review, quality, pre-commit
-Size: 2.1 KB
-Updated: 2025-01-10
 
-[a] Add  [i] Info  [q] Quit
+Download and add to config? [Y/n] y
+
+Downloading...
+✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+✓ Added to global config as 'pre-commit-review'
+
+Try it: start task pre-commit-review
 ```
 
-See [DR-035](./dr-035-interactive-browsing.md) for detailed UI specification.
+Search and install:
 
-#### start assets search \<query\>
-
-Search catalog by substring matching (name, path, description, tags).
-
-Uses [DR-040](./dr-040-substring-matching.md) substring matching algorithm.
-
-**Example:**
 ```bash
 $ start assets search "commit"
 
@@ -128,22 +452,20 @@ roles/
   git/
     [5] commit-specialist      Expert in git commit best practices
 
-Select asset [1-5] (or 'q' to quit): _
+Select asset [1-5] (or 'q' to quit): 2
+
+Found 1 match:
+  tasks/git-workflow/pre-commit-review
+
+Downloading...
+✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+✓ Added to global config as 'pre-commit-review'
+
+Use 'start task pre-commit-review' to run.
 ```
 
-#### start assets add \<query\>
+Exact match (auto-select):
 
-Search for asset and install to config.
-
-**Behavior:**
-1. Search catalog using substring matching
-2. If single match → auto-select
-3. If multiple matches → interactive selection
-4. Show asset details and confirm installation
-5. Download to cache
-6. Add to global or local config (via --local flag)
-
-**Example:**
 ```bash
 $ start assets add "pre-commit-review"
 
@@ -157,7 +479,8 @@ Downloading...
 Use 'start task pre-commit-review' to run.
 ```
 
-**With --local flag:**
+Add to local config:
+
 ```bash
 $ start assets add "code-reviewer" --local
 
@@ -171,18 +494,8 @@ Downloading...
 Use 'start --role code-reviewer' to use this role.
 ```
 
-#### start assets info \<query\>
+Asset info:
 
-Show detailed information about an asset without installing.
-
-**Displays:**
-- Full metadata from .meta.toml
-- Description and tags
-- File size and dates
-- Installation status (cached, installed in global/local)
-- Full file contents preview (optional)
-
-**Example:**
 ```bash
 $ start assets info "pre-commit-review"
 
@@ -214,11 +527,8 @@ Use 'start assets add pre-commit-review --local' to add to local config.
 Use 'start task pre-commit-review' to run.
 ```
 
-#### start assets update [query]
+Update all cached assets:
 
-Update cached assets from GitHub catalog.
-
-**Without query (update all):**
 ```bash
 $ start assets update
 
@@ -231,7 +541,8 @@ Checking for updates...
 Updated 2 assets, 1 up to date.
 ```
 
-**With query (update matching):**
+Update matching assets:
+
 ```bash
 $ start assets update "commit"
 
@@ -244,17 +555,8 @@ Checking for updates to assets matching 'commit'...
 Updated 2 assets, 1 up to date.
 ```
 
-See [DR-037](./dr-037-asset-updates.md) for update algorithm.
+Clean unused cache (with confirmation):
 
-#### start assets clean
-
-Remove unused cached assets.
-
-**Definition of "unused":**
-- Cached but NOT referenced in global or local config
-- Orphaned cache files from removed assets
-
-**Behavior:**
 ```bash
 $ start assets clean
 
@@ -272,35 +574,25 @@ Remove 2 unused assets (2.0 KB)? [y/N]: y
 Cache: 46 assets (125 KB)
 ```
 
-**Dry run:**
-```bash
-$ start assets clean --dry-run
+Clean unused cache (force without confirmation):
 
-Would remove:
+```bash
+$ start assets clean --force
+
+Scanning cache...
+
+Unused assets (not in any config):
   tasks/experimental/old-task (1.2 KB)
   roles/deprecated/old-role (850 bytes)
 
-Total: 2 assets (2.0 KB)
+✓ Removed 2 assets
+✓ Freed 2.0 KB
 
-Use 'start assets clean' to remove.
+Cache: 46 assets (125 KB)
 ```
 
-#### start assets index
+Generate catalog index:
 
-Generate `assets/index.csv` for catalog contributors.
-
-**Context:** Must be run in catalog repository clone.
-
-**Behavior:**
-1. Validate git repository structure
-2. Scan assets/ directory for .meta.toml files
-3. Parse metadata
-4. Generate sorted CSV index
-5. Write to assets/index.csv
-
-See [DR-039](./dr-039-catalog-index.md) for complete specification.
-
-**Example:**
 ```bash
 $ cd ~/projects/start-catalog-fork
 $ start assets index
@@ -323,251 +615,6 @@ Ready to commit:
   git commit -m "Regenerate catalog index"
 ```
 
-### Deprecated Commands
+## Updates
 
-**Removed commands:**
-
-| Old Command | Replacement | Notes |
-|-------------|-------------|-------|
-| `start config task add` | `start assets add` | Universal asset installer |
-| `start config role add` | `start assets add` | Universal asset installer |
-| `start config agent add` | `start assets add` | Universal asset installer |
-| `start update` | `start assets update` | Clearer naming |
-| `start show assets` | `start assets browse` | Better discovery UX |
-
-**Backward compatibility:**
-
-Old commands remain as **deprecated aliases** for one major version:
-
-```bash
-$ start config task add "code-review"
-
-⚠ Deprecated: 'start config task add' is deprecated.
-  Use: start assets add "code-review"
-
-Redirecting to 'start assets add'...
-
-[proceeds with new command]
-```
-
-After deprecation period, commands removed entirely with error:
-
-```bash
-$ start config task add "code-review"
-
-Error: Command removed. Use 'start assets add "code-review"'
-See: https://github.com/grantcarthew/start#migration-guide
-```
-
-### Migration Path
-
-**Phase 1: Introduce (current release)**
-- Add `start assets` command suite
-- Mark old commands as deprecated (with warnings)
-- Update all documentation to use new commands
-
-**Phase 2: Deprecation (next major version)**
-- Old commands removed from help output
-- Deprecated warnings become more prominent
-- Migration guide published
-
-**Phase 3: Removal (major version after that)**
-- Old commands removed entirely
-- Error messages with migration instructions
-
-**Migration guide provided:**
-```bash
-# Old → New command mapping
-
-# Adding assets
-start config task add "foo"  →  start assets add "foo"
-start config role add "bar"  →  start assets add "bar"
-start config agent add "baz" →  start assets add "baz"
-
-# Updating assets
-start update                 →  start assets update
-
-# Browsing assets
-start show assets            →  start assets browse
-
-# New capabilities (no old equivalent)
-start assets search "query"  # Search by description/tags
-start assets info "asset"    # Preview before installing
-start assets clean           # Remove unused cache
-```
-
-## Benefits
-
-**User experience:**
-- ✅ **Unified discovery** - One place for all asset operations
-- ✅ **Searchable** - Find assets by description, tags, not just name
-- ✅ **Preview before install** - See details with `start assets info`
-- ✅ **Type-agnostic** - Don't need to know if something is a task/role/agent
-- ✅ **Clear organization** - Logical grouping under `assets` command
-
-**Developer experience:**
-- ✅ **Consistent implementation** - Same code paths for all asset types
-- ✅ **Easier to extend** - Add new asset types without new commands
-- ✅ **Better testing** - Unified test suite for asset operations
-
-**Discoverability:**
-- ✅ **Help is clearer** - `start assets --help` shows all operations
-- ✅ **Intuitive naming** - "assets" clearly indicates catalog operations
-- ✅ **Less cognitive load** - One command to remember, not four
-
-## Trade-offs Accepted
-
-**Learning curve for existing users:**
-- ❌ Users must learn new command structure
-- **Mitigation:** Deprecation warnings with command mapping, migration guide
-
-**Command is longer:**
-- ❌ `start assets add` is longer than `start config task add`
-- **Mitigation:**
-  - Still supports search shortcuts: `start assets add "pre"` (prefix matching)
-  - Most users will use interactive browse or search anyway
-
-**Breaking change:**
-- ❌ Requires migration for existing scripts/workflows
-- **Mitigation:** Phased deprecation with long transition period
-
-## Implementation Strategy
-
-### Phase 1: Add new commands (parallel)
-
-```go
-// New unified command
-func assetsCmd() *cobra.Command {
-    cmd := &cobra.Command{
-        Use:   "assets",
-        Short: "Discover and manage catalog assets",
-    }
-
-    cmd.AddCommand(assetsBrowseCmd())
-    cmd.AddCommand(assetsSearchCmd())
-    cmd.AddCommand(assetsAddCmd())
-    cmd.AddCommand(assetsInfoCmd())
-    cmd.AddCommand(assetsUpdateCmd())
-    cmd.AddCommand(assetsCleanCmd())
-    cmd.AddCommand(assetsIndexCmd())
-
-    return cmd
-}
-
-// Shared implementation
-func addAsset(query string, scope string) error {
-    // Universal asset installer
-    // Used by: start assets add
-    // Also used by: deprecated start config [type] add
-}
-```
-
-### Phase 2: Deprecate old commands
-
-```go
-// Deprecated command with warning
-func configTaskAddCmd() *cobra.Command {
-    cmd := &cobra.Command{
-        Use:        "add",
-        Short:      "Add task from catalog (DEPRECATED - use 'start assets add')",
-        Deprecated: "Use 'start assets add' instead",
-        Run: func(cmd *cobra.Command, args []string) {
-            printDeprecationWarning("start config task add", "start assets add")
-            // Delegate to new implementation
-            addAsset(args[0], "tasks")
-        },
-    }
-    return cmd
-}
-```
-
-### Phase 3: Remove old commands
-
-```go
-// Remove command entirely, show error
-// (In future version after deprecation period)
-```
-
-## Examples
-
-### Discovery Workflow (New)
-
-**Before (scattered, no search):**
-```bash
-# Can't search, must know exact name
-start config task add "pre-commit-review"  # Hope it exists
-
-# Can't browse, must check GitHub web
-# No way to see what's available
-```
-
-**After (unified search and browse):**
-```bash
-# Browse interactively
-start assets browse
-
-# Or search by description
-start assets search "commit"
-
-# Preview before installing
-start assets info "pre-commit-review"
-
-# Install when ready
-start assets add "pre-commit-review"
-```
-
-### Update Workflow
-
-**Before (unclear command):**
-```bash
-start update              # Updates what? CLI? Assets? Both?
-```
-
-**After (explicit):**
-```bash
-start assets update       # Clear: updates cached assets
-start assets update "git" # Update only git-related assets
-```
-
-### Cache Management
-
-**Before (no cache management):**
-```bash
-# No way to clean unused assets
-# Cache grows indefinitely
-```
-
-**After (explicit cleanup):**
-```bash
-start assets clean        # Remove unused assets
-start assets clean --dry-run  # See what would be removed
-```
-
-## Related Decisions
-
-- [DR-017](./dr-017-cli-reorganization.md) - CLI command reorganization (general structure)
-- [DR-031](./dr-031-catalog-based-assets.md) - Catalog-based assets (asset architecture)
-- [DR-035](./dr-035-interactive-browsing.md) - Interactive browsing (browse command)
-- [DR-037](./dr-037-asset-updates.md) - Asset updates (update command)
-- [DR-039](./dr-039-catalog-index.md) - Catalog index (powers search)
-- [DR-040](./dr-040-substring-matching.md) - Substring matching (search algorithm)
-
-## Future Considerations
-
-**Asset collections/bundles:**
-- Could add `start assets add-collection "go-dev"` for installing related asset groups
-- Example: "go-dev" installs go-expert role, go-related tasks, etc.
-
-**Asset ratings/popularity:**
-- Could add metadata for download counts, ratings
-- Show in search results: "★★★★☆ (234 downloads)"
-
-**Local asset repositories:**
-- Could support custom asset sources (not just GitHub)
-- `start assets add "foo" --from private-repo`
-
-**Asset dependencies:**
-- Tasks could declare required roles/contexts
-- Auto-install dependencies when installing asset
-
-**Current stance:** Ship with core functionality. Monitor usage patterns and add advanced features based on user feedback.
+- 2025-01-17: Initial version aligned with schema; removed implementation code and detailed migration/deprecation phases; corrected start assets browse to open web browser (not terminal TUI); added URL fallback when browser fails to open; corrected start assets clean to use --force flag instead of --dry-run

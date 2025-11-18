@@ -1,64 +1,256 @@
 # DR-031: Catalog-Based Asset Architecture
 
-**Date:** 2025-01-10
-**Status:** Accepted
-**Category:** Asset Management
+- Date: 2025-01-10
+- Status: Accepted
+- Category: Asset Management
+
+## Problem
+
+Asset distribution needs a scalable, user-friendly system. The design must address:
+
+- Distribution model (how users get assets)
+- Discovery mechanism (how users find available assets)
+- Installation workflow (download all upfront vs on-demand)
+- Update management (version tracking, update detection, user control)
+- Offline usability (work without network after initial setup)
+- Cache management (where assets stored, how updates tracked)
+- User customization (how catalog assets relate to user config)
+- Storage efficiency (avoid duplicating content)
+- Scalability (support growing catalog without performance issues)
+- GitHub dependency (API limits, availability, fallback strategies)
+- Search performance (fast metadata-rich searching across catalog)
 
 ## Decision
 
-Transform asset distribution from a bulk download model to a catalog-driven system where assets are discovered via GitHub, downloaded on-demand, cached locally, and lazily loaded at runtime.
+Use catalog-driven asset distribution where assets are discovered via GitHub catalog index, downloaded on-demand, cached locally, and lazily loaded at runtime.
 
-## What This Means
+Core architecture:
 
-### Core Architecture Shift
-
-**Previous model (DR-014, DR-015):**
-- Bulk download all assets during `start init` or `start assets update`
-- Track versions in `asset-version.toml`
-- All-or-nothing update mechanism
-
-**New catalog model:**
 - GitHub repository IS the catalog database
+- Catalog index (assets/index.csv) enables fast metadata-rich search
 - Download individual assets on first use (lazy loading)
-- Cache locally for offline use (`~/.config/start/assets/`)
-- User config is separate from cached assets
-- In-memory catalog cache (no disk tracking)
+- Cache locally at ~/.config/start/assets/ for offline use
+- User config separate from cached assets
+- No local tracking files (filesystem IS the state)
+- SHA-based update detection (no version manifest)
 
-### Key Principles
+Key principles:
 
-1. **GitHub as Source of Truth** - Assets live in GitHub repo, not bundled with binary
-2. **Lazy Loading** - Download on first use, not upfront
-3. **Filesystem = State** - No tracking files; if cached, it exists
-4. **On-Demand Installation** - Browse and install only what you need
-5. **Hash-Based Versioning** - SHA comparison for update detection
-6. **Offline-Friendly** - Cached assets work offline, manual config always possible
+1. GitHub as source of truth: Assets live in GitHub repo, not bundled with binary
+2. Index-driven discovery: Single CSV index file (assets/index.csv) for fast search
+3. Lazy loading: Download on first use, not upfront
+4. Filesystem as state: No tracking files; if cached file exists, asset is cached
+5. On-demand installation: Browse and install only what you need
+6. Hash-based versioning: SHA comparison for update detection
+7. Offline-friendly: Cached assets work offline, manual config always possible
 
-### User Workflows
+Catalog index system:
 
-**Browse and install (DR-041):**
-```bash
-start assets browse                      # Interactive catalog browser
-start assets add "pre-commit"            # Search and install by query
-start assets search "commit"             # Search by description/tags
-start assets info "pre-commit-review"    # Preview before installing
+Index file structure:
+- Location: assets/index.csv in catalog repository
+- Format: CSV with columns (type, category, name, description, tags, bin, sha, size, created, updated)
+- Downloaded fresh on every search/browse operation (no local caching)
+- Small file (~10-50KB for hundreds of assets)
+- Enables fast metadata-rich searching without downloading individual .meta.toml files
+
+Fallback mechanism:
+- If index.csv unavailable: Fall back to GitHub Tree API for directory listing
+- Tree API provides name/path only (no descriptions/tags)
+- Degraded but functional search capability
+
+Asset resolution order (when user runs start task <name>):
+
+1. Local config (.start/tasks.toml)
+2. Global config (~/.config/start/tasks.toml)
+3. Asset cache (~/.config/start/assets/tasks/)
+4. GitHub catalog (query index.csv, prompt, download if asset_download enabled)
+5. Error (not found anywhere)
+
+Cache behavior:
+
+Cache is invisible to users:
+- Automatically populated when downloading from GitHub
+- Updated via start assets update (SHA-based detection)
+- Never auto-cleaned (files are tiny text files)
+- No user-facing cache management commands
+- User can manually delete cache directory if desired
+
+Cache contains:
+- Asset content files (.toml, .md)
+- Sidecar metadata files (.meta.toml)
+- SHA tracking for update detection
+
+Cache does NOT contain:
+- User modifications (those go in config files)
+- State tracking files (filesystem IS the state)
+- Catalog index (downloaded fresh each time)
+
+Update workflow:
+
+- start assets update checks cached assets for updates
+- Compares local SHA with GitHub SHA (from index.csv)
+- Downloads updated assets to cache
+- Never automatically overwrites user config
+- User reviews changes and manually updates config if desired
+
+## Why
+
+Lazy loading provides better user experience:
+
+- Users download only what they use (no large upfront download)
+- Immediate value from browsing catalog
+- Faster initial setup (no bulk download during init)
+- Progressive asset discovery (learn as you go)
+
+Index-driven search scales efficiently:
+
+- Single ~10-50KB download vs 200+ individual .meta.toml requests
+- Fast in-memory search with rich metadata (descriptions, tags)
+- No API rate limits (uses raw.githubusercontent.com)
+- Always fresh data (downloaded on each use)
+- Graceful degradation (fallback to Tree API if index unavailable)
+
+On-demand installation scales:
+
+- Catalog can grow to hundreds of assets without impacting performance
+- Users not forced to download entire catalog
+- Add new assets without affecting existing users
+- Bandwidth-efficient for users who need few assets
+
+GitHub as catalog enables rapid iteration:
+
+- Update assets without CLI releases
+- Community can contribute assets via PRs
+- Asset improvements immediately available
+- Simple content management (files in repo, index generated via start assets index)
+
+Cache separation maintains flexibility:
+
+- User config independent of catalog
+- Mix catalog and custom assets seamlessly
+- Catalog updates don't overwrite user customizations
+- Clear separation of concerns (config vs cache)
+
+Offline support after first use:
+
+- Cached assets work offline
+- Manual config always possible
+- No network required for execution
+- Graceful degradation when network unavailable
+
+Simple implementation and maintenance:
+
+- No version tracking files needed
+- Filesystem IS the state (if file exists, cached)
+- SHA comparison for updates (simple and reliable)
+- CSV index for fast search (standard format)
+- Text files (easy to inspect and debug)
+
+## Trade-offs
+
+Accept:
+
+- Network dependency for discovery (browsing/searching catalog requires network, but cached assets work offline)
+- Index downloaded on every search (not cached locally, ~10-50KB per search, acceptable for always-fresh data)
+- Potential content duplication (same asset in cache and config, acceptable for tiny text files)
+- No automatic config updates (user must manually apply asset updates to their config)
+- GitHub dependency (relies on GitHub availability, but graceful degradation via Tree API fallback)
+- Cache grows over time (never auto-cleaned, but files are tiny)
+- More complex resolution (check multiple locations: local, global, cache, GitHub)
+- Manual index regeneration (contributors must run start assets index after changes)
+
+Gain:
+
+- Immediate user value (browse and install curated assets on-demand)
+- Highly discoverable (fast metadata-rich searching via index.csv)
+- Download only what you use (no forced bulk download)
+- Fresh content anytime (check for updates via start assets update)
+- Seamlessly customizable (mix catalog and custom assets)
+- Offline-friendly (cached assets work without network)
+- No tracking files (user config is self-contained, simple)
+- Extensible architecture (add asset types easily)
+- Scalable to hundreds of assets (single index download, fast search)
+- Maintainable (update assets without CLI releases, regenerate index)
+- Community-ready (others can contribute assets, index generated automatically)
+- Focused separation (binary is code, content is assets)
+- Graceful degradation (Tree API fallback if index unavailable)
+
+## Alternatives
+
+Bundled assets in binary:
+
+Example: Include all assets in CLI binary at build time
+- Assets compiled into executable
+- No network dependency ever
+- Simple deployment
+
+Pros:
+- Zero network dependency (100% offline)
+- Guaranteed availability (assets always present)
+- Fast access (no download or cache lookup)
+- Simple distribution (single binary)
+
+Cons:
+- Large binary size (grows with asset count)
+- Can't update assets without CLI release
+- No community contributions between releases
+- Inflexible (users can't choose which assets to include)
+- Couples content updates to code releases
+- Binary grows indefinitely as catalog expands
+
+Rejected: Couples content to code releases. Can't update assets independently. Binary size grows uncontrollably.
+
+Plugin system with separate asset repositories:
+
+Example: Users add asset repos like apt sources
+```toml
+[asset_sources]
+official = "github.com/grantcarthew/start"
+community = "github.com/start-community/assets"
+personal = "github.com/myuser/my-assets"
 ```
 
-**Lazy loading:**
-```bash
-start task pre-commit-review  # Not in config? Download from GitHub and add
-```
+Pros:
+- Multiple asset sources (community ecosystems)
+- Decentralized asset hosting
+- Users can create private asset repos
+- Flexible and extensible
 
-**Update cached assets (DR-041):**
-```bash
-start assets update                      # Check cached assets for updates via SHA comparison
-start assets update "git"                # Update only matching assets
-```
+Cons:
+- Complex configuration (users must manage sources)
+- Trust and security issues (which sources are safe?)
+- Discovery fragmentation (assets spread across repos)
+- Namespace collisions (same asset name in different repos)
+- More implementation complexity
+- Overwhelming for typical users
 
-**Note:** Original commands (`start config task add`, `start assets update`) deprecated in favor of unified `start assets` command suite. See [DR-041](./dr-041-asset-command-reorganization.md).
+Rejected: Over-engineered for v1. Single trusted source is simpler and sufficient. Can add later if needed.
 
-### Configuration Structure
+Download all .meta.toml files for search:
 
-**Multi-file configuration:**
+Example: Fetch all metadata files individually for search
+- Query GitHub Tree API for asset list
+- Download each .meta.toml file (200+ HTTP requests)
+- Parse and search in memory
+
+Pros:
+- No index file needed (one less thing to maintain)
+- Always absolutely fresh (no derived file)
+- Source of truth directly accessed
+
+Cons:
+- Extremely slow (200+ HTTP requests for large catalog)
+- API rate limits (GitHub API has limits)
+- Poor user experience (long wait for searches)
+- Doesn't scale (worse as catalog grows)
+
+Rejected: Performance unacceptable. Index.csv pattern is proven (npm, cargo, homebrew all use it).
+
+## Structure
+
+Configuration structure:
+
+Directory layout:
 ```
 ~/.config/start/
 ├── config.toml      # Settings only
@@ -66,18 +258,19 @@ start assets update "git"                # Update only matching assets
 ├── tasks.toml       # All task definitions
 ├── agents.toml      # All agent configurations
 ├── contexts.toml    # All context configurations
-└── assets/          # Cached catalog assets
-    ├── tasks/
-    │   └── git-workflow/
-    │       ├── pre-commit-review.toml
-    │       ├── pre-commit-review.md
-    │       └── pre-commit-review.meta.toml
-    ├── roles/
-    ├── agents/
-    └── contexts/
+
+~/.config/start/assets/      # Cached catalog assets (separate from config)
+├── tasks/
+│   └── git-workflow/
+│       ├── pre-commit-review.toml
+│       ├── pre-commit-review.md
+│       └── pre-commit-review.meta.toml
+├── roles/
+├── agents/
+└── contexts/
 ```
 
-**Settings (config.toml):**
+Settings configuration (config.toml):
 ```toml
 [settings]
 default_agent = "claude"
@@ -90,7 +283,7 @@ asset_path = "~/.config/start/assets"
 asset_repo = "grantcarthew/start"
 ```
 
-**Task configuration (tasks.toml):**
+Task configuration (tasks.toml):
 ```toml
 # Downloaded from catalog - inlined completely
 [tasks.pre-commit-review]
@@ -107,38 +300,144 @@ command = "git diff"
 prompt = "Check for issues"
 ```
 
-### Asset Resolution Order
+Catalog index system:
 
-When user runs `start task <name>`:
+Index file (assets/index.csv):
+- Location: assets/index.csv in catalog repository
+- Format: CSV with header row
+- Columns: type, category, name, description, tags, bin, sha, size, created, updated
+- Sorted: Alphabetically by type → category → name
+- Generated: Via start assets index command (run by maintainers)
+- Downloaded: Fresh on every search/browse (no local caching)
+- Size: ~10-50KB for hundreds of assets
 
-1. **Local config** (`.start/tasks.toml`)
-2. **Global config** (`~/.config/start/tasks.toml`)
-3. **Asset cache** (`~/.config/start/assets/tasks/`)
-4. **GitHub catalog** (query, prompt, download if `asset_download = true`)
-5. **Error** - Not found anywhere
+Search workflow:
+1. Download index.csv from raw.githubusercontent.com
+2. Parse CSV into in-memory structure
+3. Search by substring matching (name, description, tags)
+4. Display results with rich metadata
+5. If index unavailable: Fall back to Tree API (name/path only)
 
-### Cache Behavior
+Asset resolution algorithm:
 
-**Cache is invisible:**
-- Automatically populated when downloading from GitHub
-- Updated via `start assets update` (SHA-based detection)
-- Never auto-cleaned (files are tiny)
-- No user-facing cache management commands
-- User can manually delete `~/.config/start/assets/` if desired
+When user runs start task <name>:
 
-**Cache contains:**
-- Asset content files (`.toml`, `.md`)
-- Sidecar metadata files (`.meta.toml`)
-- SHA tracking for update detection
+1. Check local config (.start/tasks.toml)
+   - If found: use it (highest priority)
+   - If not found: continue to step 2
 
-**Cache does NOT contain:**
-- User modifications (those go in config files)
-- State tracking files (filesystem IS the state)
+2. Check global config (~/.config/start/tasks.toml)
+   - If found: use it
+   - If not found: continue to step 3
 
-### Update Workflow
+3. Check asset cache (~/.config/start/assets/tasks/)
+   - If found: use cached asset
+   - If not found: continue to step 4
+
+4. Check if downloads allowed (asset_download setting)
+   - If disabled: return error (not found, no download)
+   - If enabled: continue to step 5
+
+5. Query GitHub catalog
+   - Download index.csv
+   - Search for asset by name
+   - If found: download asset files, cache them, add to config
+   - If not found: return error (not found anywhere)
+
+Cache behavior:
+
+Automatic population:
+- Assets downloaded from GitHub cached automatically
+- Cache location: ~/.config/start/assets/
+- Organized by asset type (tasks/, roles/, agents/, contexts/)
+
+Update detection:
+- start assets update downloads index.csv
+- Compares SHA from index with SHA of cached files
+- Downloads updated assets to cache
+- Shows what changed (version, description)
+
+Preservation of user config:
+- Cache updates never overwrite user config files
+- User must manually apply updates to tasks.toml if desired
+- Preserves customizations and prevents breaking changes
+
+No cleanup:
+- Cache never auto-cleaned
+- Files are tiny text files (storage not a concern)
+- User can manually delete cache directory if needed
+
+Command flags and options:
+
+start task <name> [flags]:
+- --local: Add downloaded asset to local config (default: global)
+- --asset-download[=bool]: Download from GitHub if not found (default: from settings)
+
+start assets browse:
+- Open GitHub catalog in web browser
+
+start assets add <query>:
+- Search catalog and install matching asset (uses index.csv)
+
+start assets update [query]:
+- Update cached assets (all or matching query, uses index.csv for SHA comparison)
+
+start assets search <query>:
+- Search catalog by description/tags (uses index.csv)
+
+start assets info <name>:
+- Preview asset before installing (uses index.csv)
+
+start assets index:
+- Generate index.csv from .meta.toml files (maintainer command)
+
+## Usage Examples
+
+Browse and install assets:
+
+```bash
+$ start assets browse
+# Opens web browser to GitHub catalog
+
+$ start assets add "pre-commit"
+# Search for assets matching "pre-commit", prompt to install
+
+$ start assets search "commit"
+# Show all assets related to "commit" (from index.csv)
+
+$ start assets info "pre-commit-review"
+# Show details about specific asset before installing
+```
+
+Lazy loading on first use:
+
+```bash
+$ start task pre-commit-review
+# Asset not in config? Download from GitHub and add automatically
+
+Task 'pre-commit-review' not found locally.
+
+Found in catalog:
+  Name: pre-commit-review
+  Description: Review staged changes before committing
+  Tags: git, review, quality, pre-commit
+
+Download and add to config? [Y/n] y
+
+✓ Downloaded pre-commit-review
+✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+✓ Added to ~/.config/start/tasks.toml
+
+Running task...
+```
+
+Update cached assets:
 
 ```bash
 $ start assets update
+
+Downloading catalog index...
+✓ Loaded index (46 assets)
 
 Checking for asset updates...
   ✓ tasks/git-workflow/pre-commit-review (updated v1.0 → v1.1)
@@ -150,150 +449,130 @@ Note: Your task configurations are unchanged.
 Review changes and manually update tasks.toml if desired.
 ```
 
-Your existing task configurations are **never automatically overwritten**. Updates only affect the cache.
-
-## Benefits
-
-**For Users:**
-- ✅ **Immediate value** - Browse and install curated assets
-- ✅ **Discoverable** - Interactive catalog browsing and search (DR-041)
-- ✅ **On-demand** - Only download what you use
-- ✅ **Fresh** - Check for updates anytime via `start assets update`
-- ✅ **Customizable** - Mix catalog + custom assets seamlessly
-- ✅ **Offline-friendly** - Cached assets work offline
-- ✅ **No tracking** - User config is self-contained
-
-**For Project:**
-- ✅ **Extensible** - Add asset types easily
-- ✅ **Scalable** - Can grow to hundreds of assets
-- ✅ **Maintainable** - Update assets without releases
-- ✅ **Community-ready** - Others can contribute assets
-- ✅ **Focused** - Binary is code, content is assets
-- ✅ **Simple** - No manifest files, no version tracking
-
-## Trade-offs Accepted
-
-**Network dependency:**
-- ❌ Initial download requires network access
-- ❌ Browsing catalog requires network
-- **Mitigation:** Cached assets work offline, manual config always possible
-
-**Potential duplication:**
-- ❌ Same asset content in cache and config
-- **Mitigation:** Files are tiny text files, acceptable trade-off for simplicity
-
-**No automatic overwrites of user config:**
-- ❌ `start assets update` does not change your configured tasks. You must manually apply asset updates to your `tasks.toml` if desired.
-- **Mitigation:** Preserves user customizations, prevents breaking changes.
-
-**GitHub dependency:**
-- ❌ Relies on GitHub API availability
-- **Mitigation:** Graceful degradation per DR-026, raw.githubusercontent.com has no rate limit
-
-## Implementation Notes
-
-### Resolution Algorithm
-
-```go
-func ResolveAsset(assetType, name string, opts ResolveOptions) (*Asset, error) {
-    // 1. Local config
-    if asset := localConfig.Get(assetType, name); asset != nil {
-        return asset, nil
-    }
-
-    // 2. Global config
-    if asset := globalConfig.Get(assetType, name); asset != nil {
-        return asset, nil
-    }
-
-    // 3. Asset cache
-    if asset := loadFromCache(assetType, name); asset != nil {
-        return asset, nil
-    }
-
-    // 4. Check if downloads allowed
-    if !opts.AssetDownload {
-        return nil, ErrNotFoundNoDownload
-    }
-
-    // 5. GitHub catalog (in-memory cached tree)
-    catalog := getCatalog()  // See DR-034
-    asset := downloadAsset(catalog.Find(assetType, name))
-    cacheAsset(asset)
-
-    // 6. Add to config (global by default, local if --local)
-    scope := ternary(opts.Local, "local", "global")
-    addToConfig(asset, scope)
-
-    return asset, nil
-}
-```
-
-### Command Flags
+Update specific assets by query:
 
 ```bash
-start task <name> [flags]
+$ start assets update "git"
 
-Flags:
-  --local                  Add downloaded asset to local config (default: global)
-  --asset-download[=bool]  Download from GitHub if not found (default: from settings)
+Downloading catalog index...
+Checking assets matching "git"...
+  ✓ tasks/git-workflow/pre-commit-review (updated)
+  ✓ tasks/git-workflow/commit-message (up to date)
+
+Cache updated.
 ```
 
-### Multi-File Config Loading
+Search with index (normal operation):
 
-```go
-type Config struct {
-    Settings map[string]interface{}
-    Tasks    map[string]*Task
-    Agents   map[string]*Agent
-    Contexts map[string]*Context
-}
+```bash
+$ start assets search "commit"
 
-func LoadConfig(dir string) (*Config, error) {
-    cfg := &Config{}
-    cfg.Settings = loadTOML(filepath.Join(dir, "config.toml"))
-    cfg.Tasks = loadTOML(filepath.Join(dir, "tasks.toml"))
-    cfg.Agents = loadTOML(filepath.Join(dir, "agents.toml"))
-    cfg.Contexts = loadTOML(filepath.Join(dir, "contexts.toml"))
-    return cfg
-}
+Downloading catalog index...
+✓ Loaded index (46 assets)
+
+Found 3 matches:
+
+tasks/git-workflow/commit-message
+  Description: Generate conventional commit message
+  Tags: git, commit, conventional
+
+tasks/git-workflow/pre-commit-review
+  Description: Review staged changes before committing
+  Tags: git, review, quality, pre-commit
+
+tasks/workflows/post-commit-hook
+  Description: Post-commit validation workflow
+  Tags: git, commit, hooks, validation
 ```
 
-## Related Decisions
+Search without index (fallback to Tree API):
 
-**Supersedes/updates:**
-- [DR-014](./dr-014-github-tree-api.md) - GitHub Tree API (now for catalog browsing)
-- [DR-015](./dr-015-atomic-updates.md) - Atomic updates (now per-asset)
-- [DR-016](./dr-016-asset-discovery.md) - Asset discovery (now interactive browsing)
-- [DR-019](./dr-019-task-loading.md) - Task loading (now includes cache resolution)
-- [DR-023](./dr-023-asset-staleness-check.md) - Staleness checking (now per-asset SHA)
+```bash
+$ start assets search "commit"
 
-**New DRs (detailed decisions):**
-- [DR-032](./dr-032-asset-metadata-schema.md) - Sidecar metadata format
-- [DR-033](./dr-033-asset-resolution-algorithm.md) - Resolution priority and behavior
-- [DR-034](./dr-034-github-catalog-api.md) - GitHub API strategy and caching
-- [DR-035](./dr-035-interactive-browsing.md) - TUI catalog browsing
-- [DR-036](./dr-036-cache-management.md) - Cache structure and behavior
-- [DR-037](./dr-037-asset-updates.md) - Update mechanism and SHA comparison
-- [DR-039](./dr-039-catalog-index.md) - Catalog index file (CSV schema for fast search)
-- [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm for asset search
-- [DR-041](./dr-041-asset-command-reorganization.md) - Unified `start assets` command suite
+Downloading catalog index...
+⚠ Index unavailable, using directory listing (limited metadata)
 
-**Consistent with:**
-- [DR-026](./dr-026-offline-behavior.md) - Offline fallback (cache works offline)
-- [DR-025](./dr-025-no-automatic-checks.md) - No automatic checks (explicit updates)
+Found 3 matches:
 
-## Future Considerations
+tasks/git-workflow/commit-message
+  (Metadata unavailable - not in index)
 
-**Community contributions:**
-- Asset submission process (PRs to catalog repo)
-- Quality control and review process
-- Asset namespacing for user repos
+tasks/git-workflow/pre-commit-review
+  (Metadata unavailable - not in index)
 
-**Additional features:**
-- Search/filter functionality across catalog
-- Asset dependencies (tasks requiring specific roles)
-- Workspace templates (preset configurations)
-- Additional asset types (metaprompts, snippets)
+tasks/workflows/post-commit-hook
+  (Metadata unavailable - not in index)
+```
 
-**Current stance:** Ship v1 with minimal viable set (28 assets across 4 types), iterate based on user feedback.
+Configuration showing catalog and custom assets:
+
+```toml
+# tasks.toml
+# Mix of catalog and custom assets
+
+[tasks.pre-commit-review]  # From catalog
+alias = "pcr"
+description = "Review staged changes before committing"
+command = "git diff --staged"
+prompt_file = "~/.config/start/assets/tasks/git-workflow/pre-commit-review.md"
+
+[tasks.my-review]  # Custom user task
+alias = "mr"
+description = "My custom review workflow"
+command = "git diff"
+prompt = "Check for security issues and code quality"
+```
+
+Offline behavior with cached assets:
+
+```bash
+# Network available - browse catalog
+$ start assets browse
+[Opens web browser to GitHub catalog]
+
+# Download and cache
+$ start task pre-commit-review
+✓ Downloaded and cached to ~/.config/start/assets/
+
+# Network unavailable - cached assets still work
+$ start task pre-commit-review
+[Executes from cache, no network needed]
+
+# Trying to browse without network
+$ start assets browse
+Error: Cannot connect to GitHub
+Catalog browsing requires network access.
+
+Cached assets are still available:
+  start task pre-commit-review
+```
+
+Maintainer workflow - generating index:
+
+```bash
+$ cd ~/projects/start-catalog-fork
+
+$ start assets index
+
+Validating repository structure...
+✓ Git repository detected
+✓ Assets directory found
+
+Scanning assets/...
+Found 46 assets
+
+Sorting assets (type → category → name)...
+Writing index to assets/index.csv...
+
+✓ Generated index with 46 assets
+Updated: assets/index.csv
+
+Ready to commit:
+  git add assets/
+  git commit -m "Regenerate catalog index"
+```
+
+## Updates
+
+- 2025-01-17: Initial version aligned with schema; incorporated index.csv system from DR-039

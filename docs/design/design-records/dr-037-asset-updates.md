@@ -1,213 +1,362 @@
 # DR-037: Asset Update Mechanism
 
-**Date:** 2025-01-10
-**Status:** Accepted
-**Category:** Asset Management
+- Date: 2025-01-10
+- Status: Accepted
+- Category: Asset Management
+
+## Problem
+
+Cached assets need an update mechanism to get new versions from GitHub. The update strategy must address:
+
+- Update detection (how to know if new version available)
+- Update scope (what gets updated - cache, config, or both)
+- User control (automatic vs manual updates)
+- Versioning approach (semantic versioning vs content hashing)
+- Selective updates (all assets vs specific assets)
+- Config preservation (never overwrite user customizations)
+- Error handling (partial failures, removed assets, network issues)
+- Performance (efficient update checking without excessive API calls)
+- Notification strategy (when/how to inform user of updates)
 
 ## Decision
 
-Use SHA-based update detection via GitHub Tree API to check for asset updates. Update only the cache, never the user's config. Provide manual-only update command with clear messaging.
+Use SHA-based update detection via catalog index to check for asset updates. Update only the cache, never user config. Provide manual-only update command with optional selective updates.
 
-**Note:** Per [DR-041](./dr-041-asset-command-reorganization.md), command moved from `start assets update` to `start assets update` with optional query parameter for selective updates.
+Key aspects:
 
-## What This Means
+Command: start assets update [query]
+- Manual-only (user explicitly runs command)
+- No automatic checks (consistent with no automatic operations principle)
+- Optional query parameter for selective updates
+- Updates cache only (never modifies user config)
 
-### Update Command
+Update process:
+1. Download index.csv from GitHub (contains current SHAs)
+2. For each cached .meta.toml file:
+   - Read local SHA
+   - Find asset in index by path
+   - Compare SHAs
+   - Download if different
+3. Update cached files (content + metadata)
+4. Report what was updated
+5. Never touch user config files
 
-**Manual update only:**
+SHA-based versioning:
+- No semantic versioning (v1.2.3)
+- Git blob SHA IS the version
+- SHA comparison for update detection
+- Content hash guarantees integrity
+- Simple and reliable
+
+Cache-only updates:
+- Cache gets new versions
+- User config remains unchanged
+- Tasks referencing cached files (via prompt_file) automatically use new content
+- Tasks with inlined content require manual update
+- Clear separation (cache vs config)
+
+Selective updates:
+- No query: Update all cached assets
+- With query: Update matching assets only (substring matching)
+- Examples: start assets update "commit", start assets update git-workflow
+
+## Why
+
+SHA-based versioning is reliable:
+
+- Content hash IS the version (can't be wrong)
+- No version number maintenance (automatic from git)
+- SHA comparison bulletproof (same SHA = identical content)
+- Guarantees integrity (can verify downloaded content)
+- Simple implementation (just string comparison)
+
+Index.csv enables efficient updates:
+
+- Single download via raw.githubusercontent.com (no API rate limit)
+- Contains SHAs for all assets
+- Fast comparison (load index once, compare all cached assets)
+- Zero API calls (raw URL download)
+- Always fresh data (downloaded on each update check)
+
+Cache-only updates preserve user customizations:
+
+- User config never automatically modified
+- Customizations preserved (user changes not lost)
+- Explicit is better (user controls when config changes)
+- Clear separation (cache is implementation detail, config is user's)
+- Safe to update cache (can always delete and re-download)
+
+Manual-only updates provide control:
+
+- User explicitly opts in (no surprise updates)
+- Consistent with no automatic operations principle
+- User controls timing (update when convenient)
+- No background checks (no network usage without consent)
+- No startup delays (no version checking on CLI start)
+
+Selective updates add flexibility:
+
+- Update all: start assets update (default behavior)
+- Update by query: start assets update "commit" (fewer downloads)
+- Update specific asset: start assets update pre-commit-review
+- Substring matching (consistent with search/browse)
+- Fast for targeted updates (only download what's needed)
+
+## Trade-offs
+
+Accept:
+
+- No automatic notifications (user must remember to run update, can set calendar reminder if desired)
+- No rollback in v1 (can't revert to previous version, but cache is disposable so delete and re-download)
+- Manual config updates (user must manually apply cache changes to config, but preserves customizations)
+- No diff view in v1 (can't see what changed before updating, use file tools to compare if needed)
+- No update history (can't see changelog, add if users request)
+
+Gain:
+
+- Reliable versioning (SHA comparison bulletproof, content hash guarantees integrity)
+- User control (manual updates only, explicit opt-in, user controls timing)
+- Simple implementation (single index download, SHA comparison straightforward, zero API calls)
+- Cache-only updates (safe to update cache, user modifications preserved, clear separation)
+- Efficient performance (index.csv via raw URL, zero rate limit impact, fast downloads)
+- Selective updates (update all or specific assets, flexible workflow, saves bandwidth)
+
+## Alternatives
+
+Semantic versioning with version field:
+
+Example: Use semver in .meta.toml instead of SHA
+```toml
+[metadata]
+version = "1.2.3"
+```
+- Compare version numbers instead of SHAs
+- Check if remote version > local version
+- Download if newer version available
+
+Pros:
+- Human-readable versions (v1.2.3 easier to understand)
+- Semantic meaning (major/minor/patch conveys change type)
+- Familiar pattern (developers understand semver)
+- Can detect breaking changes (major version bump)
+
+Cons:
+- Manual maintenance required (must remember to bump version)
+- Can be wrong (version bumped but content unchanged, or vice versa)
+- No automatic detection (can't tell if version should change)
+- Requires discipline (easy to forget to update)
+- Version conflicts possible (merge conflicts on version field)
+
+Rejected: SHA is more reliable - automatic, always accurate, no manual maintenance. SHA comparison IS the version check.
+
+Use Tree API for update checking:
+
+Example: Fetch GitHub Tree API instead of index.csv
+- Call Tree API to get all file SHAs
+- Compare with cached SHAs
+- Download updates
+
+Pros:
+- No index file needed (one less thing to maintain)
+- Always absolutely fresh (direct from GitHub API)
+- Source of truth directly accessed
+
+Cons:
+- Counts against rate limit (60/hour anonymous, 5,000/hour authenticated)
+- Slower than raw URL (API overhead)
+- Can hit rate limit with frequent checks
+- Doesn't scale as well (API limits)
+
+Rejected: Index.csv via raw URL is more efficient - zero API calls, no rate limits, fast downloads. Tree API only needed as fallback.
+
+Automatic updates to cache:
+
+Example: Auto-update cache on CLI startup or task execution
+- Check for updates automatically
+- Download silently in background
+- Keep cache fresh without user action
+
+Pros:
+- Always up to date (cache automatically refreshed)
+- No user action needed (convenient)
+- Fresh content always available
+
+Cons:
+- Violates no automatic operations principle
+- Surprise network usage (privacy/security concern)
+- Startup delays (checking for updates adds latency)
+- Unexpected changes (assets change without user knowledge)
+- Can break workflows (new version incompatible)
+
+Rejected: Violates no automatic operations principle. User control more important than convenience. Manual updates better.
+
+Update both cache and config:
+
+Example: Update cache and automatically update user config
+- Download new asset version
+- Update cache
+- Update tasks.toml with new content
+- User config always matches cache
+
+Pros:
+- Consistent (config always matches latest assets)
+- No manual config updates (automatic sync)
+- Simpler mental model (one source of truth)
+
+Cons:
+- Overwrites user customizations (modifications lost)
+- Breaking changes forced (no user control)
+- Surprising behavior (config changes unexpectedly)
+- Loss of user work (custom modifications gone)
+- Can break workflows (new version incompatible)
+
+Rejected: Preserving user customizations critical. Cache-only updates keep config safe. Explicit manual updates better.
+
+## Structure
+
+Update command:
+
+Syntax: start assets update [query]
+- No query: Update all cached assets
+- With query: Update assets matching query (substring matching)
+
+Update algorithm:
+
+1. Download catalog index
+   - Fetch index.csv from raw.githubusercontent.com
+   - Zero API calls (no rate limit)
+   - Parse CSV into memory
+
+2. Find cached assets
+   - Glob ~/.config/start/assets/**/*.meta.toml
+   - Read each .meta.toml file
+   - Extract name, category, type, SHA
+
+3. Filter by query (if provided)
+   - Substring match against asset name, category, path
+   - Only check matching assets
+   - Skip non-matching assets
+
+4. Compare SHAs
+   - For each cached asset:
+     - Find in index by path (assets/{type}/{category}/{name}.toml)
+     - Compare local SHA with index SHA
+     - If same: skip (up to date)
+     - If different: mark for update
+
+5. Download updates
+   - For each asset with different SHA:
+     - Download via raw.githubusercontent.com (zero API calls)
+     - Download all asset files (.toml, .md if exists, .meta.toml)
+     - Overwrite cached files
+     - Report update
+
+6. Report results
+   - Show updated count
+   - Show unchanged count
+   - Remind user that config is unchanged
+   - Suggest manual config review if updates occurred
+
+Cache update behavior:
+
+Update cache files:
+- Overwrite existing .toml, .md, .meta.toml files
+- Preserve directory structure
+- Update SHA in .meta.toml
+- Update timestamp in .meta.toml
+
+Never modify config:
+- ~/.config/start/tasks.toml unchanged
+- ~/.config/start/roles.toml unchanged
+- User customizations preserved
+- User must manually review and apply changes
+
+Effect on config:
+- Tasks with prompt_file: Automatically use new content (references cache file)
+- Tasks with inlined prompt: Require manual update (user must copy new content)
+
+Selective updates:
+
+Update all cached assets:
 ```bash
 start assets update
 ```
 
-**Consistent with DR-025 (no automatic checks):**
-- User explicitly runs `start assets update`
-- No background checks
-- No automatic downloads
-- No version checking on CLI startup
-
-### Update Process
-
-**When user runs `start assets update`:**
-
-1. Fetch GitHub catalog tree (SHA for every file)
-2. For each cached `.meta.toml` file:
-   - Read local SHA
-   - Find corresponding file in GitHub tree by path
-   - Compare local SHA with remote SHA
-   - If different → download new version
-   - Update cached files (content + metadata)
-3. Report what was updated
-4. **Never touch user's config files**
-
-### SHA-Based Versioning
-
-**No semantic versioning** - Git blob SHA IS the version:
-
-```toml
-# Local cached metadata
-# ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
-sha = "a1b2c3d4e5f6789012345678901234567890abcd"
-updated = "2025-01-10T12:00:00Z"
+Update assets matching query:
+```bash
+start assets update "commit"             # Match "commit" in name/category/path
+start assets update git-workflow         # Match category
+start assets update pre-commit-review    # Match specific asset name
 ```
 
-**GitHub Tree API provides current SHA:**
-```json
-{
-  "path": "assets/tasks/git-workflow/pre-commit-review.toml",
-  "sha": "b2c3d4e5f6789012345678901234567890abcdef"  // Different!
-}
-```
+Matching algorithm: Substring matching (case-insensitive)
+- Search name, category, path
+- Match anywhere in string
+- Returns all matching assets from cache
 
-**SHA mismatch = update available**
+Error handling:
 
-This DR defines how `start assets update` works.
+Network unavailable:
+- Message: "Cannot connect to GitHub"
+- Show network error
+- Exit with error code
 
-The scope of this command is limited to refreshing assets that the user has already acquired (i.e., are present in the local cache). It does not discover or add new assets from the catalog.
+Asset removed from catalog:
+- Warning: "Asset not found in catalog: {name}"
+- Keep cached version (don't delete)
+- Continue with other assets
 
-## User Config Never Automatically Overwritten
+Invalid SHA in metadata:
+- Error: "Invalid SHA in {name}.meta.toml"
+- Skip this asset
+- Suggest: Delete cache and re-download
 
-**Cache updates are separate from config:**
+Partial update failure:
+- Update what succeeded
+- Report failures separately
+- Suggest retry
 
-When you run `start assets update`:
-1. The asset cache gets new versions.
-2. Your configuration files (`tasks.toml`, etc.) remain unchanged.
-3. If a task in your config references a cached file (e.g., via `prompt_file`), it will automatically use the new content on the next run.
-4. If a task in your config has inlined content copied from an asset, you must manually update it to reflect the changes.
+## Usage Examples
 
-
-## Implementation
-
-### Update Algorithm
-
-```go
-func RunUpdate() error {
-    fmt.Println("Checking for asset updates...")
-
-    // Fetch current catalog tree
-    catalog, err := fetchGitHubTree()
-    if err != nil {
-        return fmt.Errorf("failed to fetch catalog: %w", err)
-    }
-
-    // Find all cached metadata files
-    metaFiles := findCachedMetadata()
-
-    var updated, unchanged int
-
-    for _, metaPath := range metaFiles {
-        // Load local metadata
-        localMeta, err := LoadMetadata(metaPath)
-        if err != nil {
-            log.Warn("Failed to load %s: %v", metaPath, err)
-            continue
-        }
-
-        // Find asset in GitHub tree
-        assetPath := reconstructAssetPath(localMeta)
-        remoteSHA := catalog.GetSHA(assetPath)
-
-        if remoteSHA == "" {
-            log.Warn("Asset not found in catalog: %s", assetPath)
-            continue
-        }
-
-        // Compare SHAs
-        if localMeta.SHA == remoteSHA {
-            unchanged++
-            log.Debug("%s (up to date)", localMeta.Name)
-            continue
-        }
-
-        // Download new version
-        fmt.Printf("  ⬇ Updating %s/%s...\n", localMeta.AssetType, localMeta.Name)
-        asset := downloadAsset(assetPath)
-        remoteMeta := downloadMetadata(assetPath + ".meta.toml")
-
-        // Update cache
-        cacheAsset(asset, remoteMeta)
-        updated++
-    }
-
-    // Report results
-    fmt.Printf("\n✓ Update complete\n")
-    fmt.Printf("  Updated: %d assets\n", updated)
-    fmt.Printf("  Unchanged: %d assets\n", unchanged)
-
-    if updated > 0 {
-        fmt.Println("\nNote: Your configuration files are unchanged.")
-        fmt.Println("Review updated assets and manually update config if desired.")
-    }
-
-    return nil
-}
-```
-
-### Finding Cached Metadata
-
-```go
-func findCachedMetadata() []string {
-    pattern := filepath.Join(assetPath, "**/*.meta.toml")
-    matches, _ := filepath.Glob(pattern)
-    return matches
-}
-```
-
-### Reconstructing Asset Path
-
-```go
-func reconstructAssetPath(meta *AssetMetadata) string {
-    // From: ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
-    // To: assets/tasks/git-workflow/pre-commit-review.toml
-
-    return fmt.Sprintf("assets/%s/%s/%s.toml",
-        meta.AssetType,
-        meta.Category,
-        meta.Name,
-    )
-}
-```
-
-### Comparing SHAs
-
-```go
-func (t *GitHubTree) GetSHA(path string) string {
-    for _, item := range t.Tree {
-        if item.Path == path && item.Type == "blob" {
-            return item.SHA
-        }
-    }
-    return ""
-}
-```
-
-## User Experience
-
-### Example 1: Updates Available
+Update all cached assets:
 
 ```bash
 $ start assets update
+
+Downloading catalog index...
+✓ Loaded index (46 assets)
 
 Checking for asset updates...
+  ✓ tasks/git-workflow/pre-commit-review (updated v1.0 → v1.1)
+  ✓ roles/general/code-reviewer (up to date)
+  ✓ tasks/git-workflow/pr-ready (up to date)
 
-  ⬇ Updating tasks/pre-commit-review...
-  ⬇ Updating roles/code-reviewer...
+Cache updated with 1 new version.
 
-✓ Update complete
-  Updated: 2 assets
-  Unchanged: 10 assets
-
-Note: Your configuration files are unchanged.
-Review updated assets and manually update config if desired.
-
-To see changes:
-  diff ~/.config/start/assets/tasks/git-workflow/pre-commit-review.toml \
-       <(git show b2c3d4e:assets/tasks/git-workflow/pre-commit-review.toml)
+Note: Your task configurations are unchanged.
+Review changes and manually update tasks.toml if desired.
 ```
 
-### Example 2: No Updates
+Update specific assets by query:
+
+```bash
+$ start assets update "commit"
+
+Downloading catalog index...
+Checking assets matching "commit"...
+  ✓ tasks/git-workflow/pre-commit-review (updated)
+  ✓ tasks/git-workflow/commit-message (up to date)
+
+Cache updated with 1 new version.
+```
+
+No updates available:
 
 ```bash
 $ start assets update
+
+Downloading catalog index...
+✓ Loaded index (46 assets)
 
 Checking for asset updates...
 
@@ -218,24 +367,13 @@ Checking for asset updates...
 All cached assets are up to date.
 ```
 
-### Example 3: Network Error
+First run (no cache):
 
 ```bash
 $ start assets update
 
-Checking for asset updates...
-
-Error: Cannot connect to GitHub
-
-  Network error: dial tcp: no route to host
-
-Check your internet connection and try again.
-```
-
-### Example 4: First Run (No Cache)
-
-```bash
-$ start assets update
+Downloading catalog index...
+✓ Loaded index (46 assets)
 
 Checking for asset updates...
 
@@ -250,90 +388,30 @@ To download assets:
   - Use a task: start task <name>
 ```
 
-## Comparing Updates
-
-**User wants to see what changed:**
-
-```bash
-# View updated asset content
-cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.toml
-
-# View updated metadata
-cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
-
-# Diff with GitHub (if git available)
-cd /tmp
-git clone --depth=1 https://github.com/grantcarthew/start.git
-diff ~/. config/start/assets/tasks/git-workflow/pre-commit-review.toml \
-     /tmp/start/assets/tasks/git-workflow/pre-commit-review.toml
-```
-
-**Future enhancement:** `start assets update --diff` to show changes
-
-## Update Notifications
-
-**Per DR-025 (no automatic checks):**
-- ❌ No "updates available" message on CLI startup
-- ❌ No background update checking
-- ❌ No version checking during `start task`
-
-**User must explicitly run `start assets update` to check**
-
-**Future consideration:** Opt-in notifications
-```toml
-[settings]
-check_updates_on_start = false  # Default: false (compliant with DR-025)
-```
-
-## Selective Updates (DR-040, DR-041)
-
-**No arguments - update all:**
-```bash
-start assets update              # Update all cached assets
-```
-
-**With query - update matching (DR-040):**
-```bash
-start assets update "commit"     # Update assets matching 'commit' (substring)
-start assets update git-workflow # Update all in git-workflow category
-start assets update pre-commit-review  # Update specific asset
-```
-
-Uses substring matching algorithm (DR-040) to find matching assets in cache, then updates only those.
-
-## Rollback
-
-**User wants previous version:**
-
-```bash
-# Manual rollback (delete cache, re-download old version)
-rm -rf ~/.config/start/assets/tasks/git-workflow/pre-commit-review.*
-
-# Use config version (if user saved it)
-# Config references cache, but user can inline content if needed
-```
-
-**Future enhancement:** Version history
-```bash
-start assets update --rollback tasks/pre-commit-review  # Restore previous SHA
-```
-
-**v1:** No rollback mechanism (delete and re-download if needed)
-
-## Error Handling
-
-### Partial Update Failure
+Network error:
 
 ```bash
 $ start assets update
 
+Downloading catalog index...
+
+Error: Cannot connect to GitHub
+
+Network error: dial tcp: no route to host
+
+Check your internet connection and try again.
+```
+
+Partial update failure:
+
+```bash
+$ start assets update
+
+Downloading catalog index...
 Checking for asset updates...
 
-  ⬇ Updating tasks/pre-commit-review...
   ✓ Updated tasks/pre-commit-review
-
-  ⬇ Updating roles/code-reviewer...
-  ✗ Failed: download error
+  ✗ Failed: roles/code-reviewer (download error)
 
 ✓ Update partially complete
   Updated: 1 asset
@@ -346,105 +424,83 @@ Errors:
 Try running 'start assets update' again to retry failed downloads.
 ```
 
-### Asset Removed from Catalog
+Asset removed from catalog:
 
 ```bash
 $ start assets update
 
+Downloading catalog index...
 Checking for asset updates...
 
   ⚠ Warning: tasks/deprecated-task not found in catalog
     (asset exists in cache but removed from GitHub)
+    Keeping cached version.
 
-  Keep cached version? [Y/n] _
+✓ Update complete
+  Updated: 0 assets
+  Unchanged: 11 assets
+  Not in catalog: 1 asset
 ```
 
-### Invalid SHA in Metadata
+Reviewing updated cache files:
 
 ```bash
-$ start assets update
+# View updated asset content
+$ cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.toml
 
-Checking for asset updates...
-
-  ✗ Error: Invalid SHA in tasks/pre-commit-review.meta.toml
-    Expected 40-char hex, got: "invalid"
-
-  Skipping this asset.
-  To fix: Delete cache and re-download
-    rm ~/.config/start/assets/tasks/git-workflow/pre-commit-review.*
+# View updated metadata
+$ cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
+[metadata]
+name = "pre-commit-review"
+description = "Review staged changes before committing"
+tags = ["git", "review", "quality", "pre-commit"]
+sha = "b2c3d4e5f6789012345678901234567890abcdef"  # Updated SHA
+created = "2025-01-10T00:00:00Z"
+updated = "2025-01-15T14:30:00Z"  # Updated timestamp
 ```
 
-## Benefits
+Automatic use of updated cache:
 
-**Reliable versioning:**
-- ✅ SHA comparison is bulletproof
-- ✅ No version number conflicts
-- ✅ Content hash guarantees integrity
+```bash
+# Task references cache via prompt_file
+# tasks.toml:
+[tasks.pre-commit-review]
+prompt_file = "~/.config/start/assets/tasks/git-workflow/pre-commit-review.md"
 
-**User control:**
-- ✅ Manual updates only (DR-025 compliant)
-- ✅ User config never auto-modified
-- ✅ Explicit opt-in to updates
+# After update, task automatically uses new content
+$ start task pre-commit-review
+# Uses updated prompt from cache (no config change needed)
+```
 
-**Simple implementation:**
-- ✅ Single Tree API call
-- ✅ SHA comparison is straightforward
-- ✅ No complex version constraints
+Manual config update required:
 
-**Cache-only updates:**
-- ✅ Cache refresh is safe
-- ✅ User modifications preserved
-- ✅ Clear separation of concerns
+```bash
+# Task has inlined prompt
+# tasks.toml:
+[tasks.pre-commit-review]
+prompt = "Old prompt content here..."
 
-## Trade-offs Accepted
+# After cache update, user must manually update config
+$ cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.md
+# Review new content, copy to config if desired
+```
 
-**No automatic notifications:**
-- ❌ User must remember to run `start assets update`
-- **Mitigation:** Consistent with DR-025, users can set calendar reminder
+Configuration:
 
-**No rollback in v1:**
-- ❌ Can't easily revert to previous version
-- **Mitigation:** Cache is disposable, can delete and re-download
-
-**No selective updates in v1:**
-- ❌ Must update all cached assets
-- **Mitigation:** Updates are fast, can add selective updates in v2
-
-**Manual config updates:**
-- ❌ User must manually update config after cache update
-- **Mitigation:** Preserves user customizations, explicit is better
-
-## Configuration
-
-**Settings in config.toml:**
 ```toml
+# config.toml
 [settings]
 asset_repo = "grantcarthew/start"  # Repository to check for updates
 ```
 
-**Custom repository:**
+Custom repository:
+
 ```toml
+# config.toml
 [settings]
 asset_repo = "myorg/custom-assets"  # Use custom asset repository
 ```
 
-## Related Decisions
+## Updates
 
-- [DR-031](./dr-031-catalog-based-assets.md) - Catalog architecture (update context)
-- [DR-032](./dr-032-asset-metadata-schema.md) - Metadata schema (SHA field)
-- [DR-034](./dr-034-github-catalog-api.md) - GitHub API (tree fetching)
-- [DR-036](./dr-036-cache-management.md) - Cache structure (where updates go)
-- [DR-025](./dr-025-no-automatic-checks.md) - No automatic operations (manual updates only)
-- [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm (query parameter support)
-- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (moved from `start assets update`)
-
-## Future Considerations
-
-**Enhanced update features:**
-- Interactive update (show changes, confirm each)
-- Diff view before/after
-- ~~Selective updates by type or asset~~ **IMPLEMENTED** via query parameter (DR-040)
-- Rollback to previous version
-- Update history and changelog
-
-**Current stance:** Keep v1 simple. Update all cached assets, report results. Enhance based on user feedback.
+- 2025-01-17: Initial version aligned with schema; removed implementation code, Related Decisions, and Future Considerations sections; updated to use index.csv instead of Tree API per DR-034

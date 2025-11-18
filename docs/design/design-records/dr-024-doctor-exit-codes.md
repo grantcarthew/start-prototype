@@ -1,72 +1,206 @@
 # DR-024: Doctor Exit Code System
 
-**Date:** 2025-01-06
-**Status:** Accepted
-**Category:** CLI Design
+- Date: 2025-01-06
+- Status: Accepted
+- Category: CLI Design
+
+## Problem
+
+The `start doctor` command performs system health checks and reports issues with configuration, assets, agents, and environment. The tool needs an exit code strategy that:
+
+- Indicates whether issues were found for scripting and automation
+- Works in CI/CD pipelines and health check scripts
+- Balances simplicity with informativeness
+- Remains appropriate for a user-facing CLI tool (not a monitoring system)
+- Handles both critical errors and informational warnings
+- Provides clear feedback without complex exit code interpretation
 
 ## Decision
 
-`start doctor` uses simple binary exit codes: `0` for healthy, `1` for any issues found.
+`start doctor` uses simple binary exit codes: `0` for healthy (no issues), `1` for any issues found (errors or warnings).
 
-## Exit Code Strategy
+Exit codes do not distinguish between error severity and warning severity. Output categorizes issues by severity (errors vs warnings), but the exit code remains binary.
 
-**Simple Binary:**
-- `0` = Everything is healthy (no issues)
-- `1` = One or more issues found (warnings or errors)
+## Why
 
-**Not severity-based:**
-- Don't distinguish between warning severity vs error severity in exit code
-- Output shows severity (errors vs warnings), but exit code is simple
-- Appropriate for a user-facing tool (not a CI/monitoring tool)
+Simple binary exit codes match user expectations for CLI tools:
 
-## Issue Categories
+- Users need to know "is there a problem?" not "what kind of problem?"
+- Output provides full details about severity and specific issues
+- Script writers can use simple `if [ $? -eq 0 ]` checks
+- No need to memorize exit code meanings (3 = config error, 4 = agent error, etc.)
+- Appropriate for user-facing tools, not monitoring systems
 
-Issues are categorized in output for clarity, but all result in exit code `1`:
+Binary approach simplifies automation:
 
-### Errors (Critical - Prevent Operation)
+- CI/CD scripts: health check passes or fails
+- Pre-flight checks: proceed or investigate
+- No complex exit code interpretation needed
+- Works with standard shell error handling
 
-**Configuration Issues:**
-- Config file has invalid TOML syntax
-- Config file references non-existent files
-- Required context documents missing
+All issues result in exit code 1 because:
 
-**Asset Issues:**
-- Assets not initialized (`start init` never run)
-- Asset directory corrupted or empty
+- Even warnings indicate suboptimal state
+- Users should investigate warnings before critical work
+- Outdated CLI or assets may cause unexpected behavior
+- Better to be conservative (flag issues) than permissive (ignore warnings)
 
-**Agent Issues:**
-- Agent binary not found
-- Agent binary not executable
+Output categorization provides severity information:
 
-**Environment Issues:**
-- Required environment variables not set (if specified in config)
+- Errors clearly marked as critical (prevent operation)
+- Warnings marked as informational (suboptimal but functional)
+- Overall status message reflects worst issue type
+- Users get severity details from output, not exit code
 
-### Warnings (Non-Critical - Informational)
+## Trade-offs
 
-**Update Availability:**
-- CLI update available
-- Asset updates available
+Accept:
 
-**Configuration Warnings:**
-- Optional environment variables not set
-- Deprecated configuration fields used
+- Cannot distinguish warning vs error from exit code alone (must read output)
+- Cannot detect specific issue type from exit code (config vs agent vs asset)
+- Scripts cannot differentiate "update available" from "config broken"
+- All issues treated equally in exit code (warning = error = 1)
 
-**Environment Warnings:**
-- GH_TOKEN not set (API rate limits apply)
-- EDITOR not set (manual editing required)
+Gain:
 
-## Priority Rules
+- Extremely simple exit code interpretation (0 or 1)
+- Works with standard shell error handling and automation
+- No need to memorize or document multiple exit codes
+- Output provides full severity and category information
+- Appropriate simplicity for user-facing CLI tool
+- Easy to use in scripts and CI/CD pipelines
+- Consistent with common CLI tool behavior
 
-When multiple issues are found:
+## Alternatives
 
-1. **Show all issues** - Display both errors and warnings in output
-2. **Categorize by severity** - Group errors together, warnings together
-3. **Exit code is 1** - Any issue (error or warning) results in exit code 1
-4. **Overall status reflects worst** - If any errors, show "Critical issues found"
+Severity-based exit codes (0, 1, 2):
 
-## Output Format
+- Exit 0: Healthy (no issues)
+- Exit 1: Warnings only (update available, optional env vars missing)
+- Exit 2: Errors (config broken, agent missing, critical issues)
 
-### All Healthy
+Pros:
+- Scripts could differentiate warnings from errors
+- Could auto-proceed on warnings, stop on errors
+- More nuanced status reporting
+
+Cons:
+- More complex for users to understand
+- Scripts must handle three cases instead of two
+- Boundary between "warning" and "error" can be fuzzy
+- Users still need to read output for details
+- Overkill for user-facing tool
+
+Rejected: Complexity outweighs benefits for a diagnostic command. Users always read output anyway.
+
+Category-based exit codes (0-7):
+
+- Exit 0: Healthy
+- Exit 1: Configuration issues
+- Exit 2: Asset issues
+- Exit 3: Agent issues
+- Exit 4: Environment issues
+- Exit 5: Multiple categories
+- Exit 6+: Reserved
+
+Pros:
+- Scripts could react differently to each issue type
+- Specific automation based on category
+- Very detailed status encoding
+
+Cons:
+- Complex to document and remember
+- Scripts rarely need category-specific handling
+- Users must check multiple exit codes
+- Overkill for diagnostic tool
+- Better suited for monitoring systems, not CLI tools
+
+Rejected: Far too complex for user-facing diagnostic command. Category information available in output.
+
+Always exit 0 (never fail):
+
+Pros:
+- Never breaks scripts or automation
+- Doctor always runs successfully
+
+Cons:
+- Cannot use in CI/CD health checks
+- Scripts cannot detect issues programmatically
+- Must parse output text (fragile)
+- Users may ignore doctor output if it never "fails"
+
+Rejected: Makes doctor useless for automation and health checks.
+
+## Structure
+
+Exit code values:
+
+- 0: Everything healthy (no issues found)
+- 1: One or more issues found (warnings or errors)
+
+Issue categories for output organization:
+
+Errors (critical - prevent operation):
+
+- Configuration issues (invalid TOML, missing required fields, file reference errors)
+- Asset issues (cache empty, catalog unreachable when needed)
+- Agent issues (binary not found, not executable)
+- Environment issues (required environment variables missing)
+
+Warnings (non-critical - informational):
+
+- Update availability (CLI update available, asset updates available)
+- Configuration warnings (deprecated fields, optional issues)
+- Environment warnings (GH_TOKEN not set, EDITOR not set)
+
+Priority rules when multiple issues found:
+
+1. Display all issues (both errors and warnings)
+2. Categorize by severity (group errors together, warnings together)
+3. Exit code is 1 for any issue (error or warning)
+4. Overall status message reflects worst severity (errors take precedence)
+
+Check definitions:
+
+Version Information:
+- Source: Version injection from build process
+- Always succeeds (informational only)
+- Displays: CLI version, commit hash, build date, Go version
+
+Configuration:
+- Check: TOML syntax validation for each file (settings.toml, agents.toml, tasks.toml, roles.toml, contexts.toml)
+- Check: File references exist
+- Check: Required fields present
+- Error if: Invalid syntax, missing required fields
+- Warning if: Deprecated fields used, optional issues found
+
+Asset Information:
+- Check: Asset cache directory exists and accessible
+- Check: Catalog connectivity (GitHub API reachable)
+- Check: Compare local cache with latest catalog index
+- Error if: Cache corrupted or inaccessible
+- Warning if: Updates available in catalog
+
+CLI Version Check:
+- Check: Latest release from GitHub
+- Warning if: Update available
+- Never errors (informational only)
+
+Agents:
+- Check: Each configured agent binary is discoverable in PATH
+- Check: Binary is executable
+- Error if: Binary not found or not executable
+- Never warns (binary either works or doesn't)
+
+Environment:
+- Check: Required environment variables (if specified in config)
+- Check: Optional environment variables (EDITOR, GH_TOKEN)
+- Error if: Required env var missing
+- Warning if: Optional env var missing
+
+## Usage Examples
+
+All healthy output:
 
 ```bash
 $ start doctor
@@ -78,14 +212,24 @@ Version Information:
   Go Version:      go1.22.0
 
 Configuration:
-  Global Config:   ✓ ~/.config/start/config.toml
-  Local Config:    ✓ .start/config.toml
+  Global Config:
+    settings.toml: ✓ ~/.config/start/settings.toml
+    agents.toml:   ✓ ~/.config/start/agents.toml
+    tasks.toml:    ✓ ~/.config/start/tasks.toml
+    roles.toml:    ✓ ~/.config/start/roles.toml
+    contexts.toml: ✓ ~/.config/start/contexts.toml
+  Local Config:
+    settings.toml: ✓ .start/settings.toml
+    agents.toml:   ✓ .start/agents.toml
+    tasks.toml:    ✓ .start/tasks.toml
+    roles.toml:    ✓ .start/roles.toml
+    contexts.toml: ✓ .start/contexts.toml
   Validation:      ✓ Valid
 
 Asset Information:
-  Current Commit:  abc1234 (2 days ago)
-  Latest Commit:   abc1234
-  Status:          ✓ Up to date
+  Cache Status:    ✓ Initialized
+  Latest Check:    2 hours ago
+  Updates:         ✓ No updates available
 
 CLI Version Check:
   Current:         v1.3.0
@@ -101,7 +245,6 @@ Environment:
   EDITOR:          ✓ Set (vim)
 
 Overall Status:   ✓ Healthy
-Exit Code:        0
 ```
 
 ```bash
@@ -109,7 +252,7 @@ $ echo $?
 0
 ```
 
-### Warnings Only
+Warnings only output:
 
 ```bash
 $ start doctor
@@ -117,9 +260,9 @@ $ start doctor
 # ... other checks ...
 
 Asset Information:
-  Current Commit:  abc1234 (45 days ago)
-  Latest Commit:   def5678 (2 hours ago)
-  Status:          ⚠ Updates available
+  Cache Status:    ✓ Initialized
+  Latest Check:    45 days ago
+  Updates:         ⚠ Updates available
   Action:          Run 'start assets update' to refresh
 
 CLI Version Check:
@@ -133,7 +276,6 @@ Environment:
   EDITOR:          ✓ Set (vim)
 
 Overall Status:   ⚠ Updates available
-Exit Code:        1
 ```
 
 ```bash
@@ -141,7 +283,7 @@ $ echo $?
 1
 ```
 
-### Errors Present
+Errors present output:
 
 ```bash
 $ start doctor
@@ -149,20 +291,29 @@ $ start doctor
 # ... other checks ...
 
 Configuration:
-  Global Config:   ✓ ~/.config/start/config.toml
-  Local Config:    ✗ Invalid TOML syntax at line 15
+  Global Config:
+    settings.toml: ✓ ~/.config/start/settings.toml
+    agents.toml:   ✓ ~/.config/start/agents.toml
+    tasks.toml:    ✓ ~/.config/start/tasks.toml
+    roles.toml:    ✓ ~/.config/start/roles.toml
+    contexts.toml: ✓ ~/.config/start/contexts.toml
+  Local Config:
+    settings.toml: ✗ Invalid TOML syntax at line 15
+    agents.toml:   - Not found
+    tasks.toml:    - Not found
+    roles.toml:    - Not found
+    contexts.toml: - Not found
   Validation:      ✗ Failed
 
 Asset Information:
-  Status:          ✗ Not initialized
-  Action:          Run 'start init' to download assets
+  Cache Status:    ✗ Not initialized
+  Action:          Assets will download on-demand or run 'start init'
 
 Agents:
   claude:          ✗ Binary not found
   aider:           ✓ Binary found at ~/.local/bin/aider
 
 Overall Status:   ✗ Critical issues found
-Exit Code:        1
 ```
 
 ```bash
@@ -170,7 +321,7 @@ $ echo $?
 1
 ```
 
-### Mixed (Errors + Warnings)
+Mixed errors and warnings output:
 
 ```bash
 $ start doctor
@@ -178,14 +329,24 @@ $ start doctor
 # ... checks ...
 
 Configuration:
-  Global Config:   ✓ ~/.config/start/config.toml
-  Local Config:    ✗ Invalid TOML syntax at line 15
+  Global Config:
+    settings.toml: ✓ ~/.config/start/settings.toml
+    agents.toml:   ✓ ~/.config/start/agents.toml
+    tasks.toml:    ✓ ~/.config/start/tasks.toml
+    roles.toml:    ✓ ~/.config/start/roles.toml
+    contexts.toml: ✓ ~/.config/start/contexts.toml
+  Local Config:
+    settings.toml: ✗ Invalid TOML syntax at line 15
+    agents.toml:   - Not found
+    tasks.toml:    - Not found
+    roles.toml:    - Not found
+    contexts.toml: - Not found
   Validation:      ✗ Failed
 
 Asset Information:
-  Current Commit:  abc1234 (45 days ago)
-  Latest Commit:   def5678 (2 hours ago)
-  Status:          ⚠ Updates available (but cannot use until config fixed)
+  Cache Status:    ✓ Initialized
+  Latest Check:    45 days ago
+  Updates:         ⚠ Updates available (cannot use until config fixed)
 
 Agents:
   claude:          ✗ Binary not found
@@ -194,14 +355,13 @@ Agents:
 Issues Found:
 
 Errors (2):
-  • Local config has invalid TOML syntax
+  • Local settings.toml has invalid TOML syntax
   • Agent 'claude' binary not found
 
 Warnings (1):
   • Asset updates available
 
 Overall Status:   ✗ Critical issues found
-Exit Code:        1
 ```
 
 ```bash
@@ -209,48 +369,9 @@ $ echo $?
 1
 ```
 
-**Note:** When both errors and warnings exist, overall status shows "Critical issues found" (errors take precedence in messaging).
+Note: When both errors and warnings exist, overall status shows "Critical issues found" (errors take precedence in messaging).
 
-## Check Definitions
-
-### Version Information
-- **Source:** `internal/version` package (DR-020)
-- **Always succeeds** (informational only)
-
-### Configuration
-- **Check:** TOML syntax validation
-- **Check:** File references exist
-- **Check:** Required fields present
-- **Error if:** Invalid syntax, missing required fields
-- **Warning if:** Deprecated fields, optional issues
-
-### Asset Information
-- **Check:** `asset-version.toml` exists and valid
-- **Check:** Asset files exist in `~/.config/start/assets/`
-- **Check:** Latest commit from GitHub (DR-023)
-- **Error if:** Not initialized
-- **Warning if:** Updates available
-
-### CLI Version Check
-- **Check:** Latest release from GitHub (DR-021)
-- **Warning if:** Update available
-- **Never errors** (informational only)
-
-### Agents
-- **Check:** Each configured agent binary is discoverable
-- **Check:** Binary is executable
-- **Error if:** Binary not found or not executable
-- **Never warns** (binary either works or doesn't)
-
-### Environment
-- **Check:** Required environment variables (if specified in config)
-- **Check:** Optional environment variables (EDITOR, GH_TOKEN)
-- **Error if:** Required env var missing
-- **Warning if:** Optional env var missing
-
-## Scripting Examples
-
-### Basic Health Check
+Basic health check script:
 
 ```bash
 #!/bin/bash
@@ -261,7 +382,7 @@ else
 fi
 ```
 
-### Pre-flight Check
+Pre-flight check script:
 
 ```bash
 #!/bin/bash
@@ -276,7 +397,7 @@ if [ $? -ne 0 ]; then
 fi
 ```
 
-### Automation
+Automation script:
 
 ```bash
 #!/bin/bash
@@ -287,97 +408,45 @@ if ! start doctor --quiet; then
 fi
 ```
 
-## Implementation Notes
-
-### Check Order
-
-Run checks in this order (user-facing priority):
-
-1. Version Information (always shown first)
-2. Configuration (critical - affects everything)
-3. Asset Information (needed for tasks/roles)
-4. CLI Version Check (informational)
-5. Agents (needed for execution)
-6. Environment (helpful context)
-
-### Error Accumulation
-
-```go
-type DoctorResult struct {
-    Errors   []Issue
-    Warnings []Issue
-}
-
-type Issue struct {
-    Category    string  // "Configuration", "Assets", "Agents", etc.
-    Description string
-    Action      string  // Suggested fix
-}
-
-// Determine exit code
-func (r *DoctorResult) ExitCode() int {
-    if len(r.Errors) > 0 || len(r.Warnings) > 0 {
-        return 1
-    }
-    return 0
-}
-
-// Overall status message
-func (r *DoctorResult) Status() string {
-    if len(r.Errors) > 0 {
-        return "✗ Critical issues found"
-    }
-    if len(r.Warnings) > 0 {
-        return "⚠ Updates available"
-    }
-    return "✓ Healthy"
-}
-```
-
-### Quiet Mode
-
-For scripting, support `--quiet` flag:
+Quiet mode usage:
 
 ```bash
 $ start doctor --quiet
 # Only shows issues, no verbose output
 # Exit code still 0 or 1
 
-# Or if healthy, no output at all
+# If healthy, no output at all
 $ start doctor --quiet
 $ echo $?
 0
 ```
 
-## Benefits
+## Execution Flow
 
-- ✅ **Simple** - Binary exit code, easy to understand
-- ✅ **Scriptable** - Works in automation/CI
-- ✅ **Informative** - Output categorizes severity
-- ✅ **User-friendly** - Appropriate for CLI tool
-- ✅ **Consistent** - All issues treated equally in exit code
+Check execution order (user-facing priority):
 
-## Trade-offs Accepted
+1. Version Information (always shown first, informational)
+2. Configuration (critical - affects everything else)
+3. Asset Information (needed for tasks and roles)
+4. CLI Version Check (informational)
+5. Agents (needed for execution)
+6. Environment (helpful context)
 
-- ❌ Can't distinguish warning vs error in exit code (acceptable: output shows severity)
-- ❌ Can't detect "which issue" from exit code alone (acceptable: run doctor to see)
+Error and warning accumulation:
 
-## Rationale
+- Run all checks regardless of failures (don't short-circuit)
+- Collect errors in one list, warnings in another
+- Display both lists in output with clear categorization
+- Calculate exit code: 0 if both lists empty, 1 if either has items
+- Generate overall status message based on worst issue type
 
-A simple binary exit code (0 or 1) is appropriate for a user-facing tool. Users need to know "is there an issue?" and can read the output for details. Complex exit codes (0, 1, 2, 3...) are better suited for monitoring tools or CI systems, which this is not.
+Quiet mode behavior:
 
-## Related Decisions
+- Suppress verbose output (only show issues)
+- If healthy: no output at all
+- Exit code remains 0 or 1 regardless of quiet mode
+- Use for scripting and automation
 
-- [DR-021](./dr-021-github-version-check.md) - CLI version checking
-- [DR-023](./dr-023-asset-staleness-check.md) - Asset staleness checking
+## Updates
 
-## Implementation Checklist
-
-- [ ] Create `internal/doctor/checker.go` with `DoctorResult` struct
-- [ ] Implement each check function (config, assets, agents, env)
-- [ ] Accumulate errors and warnings during checks
-- [ ] Display results with severity categorization
-- [ ] Return exit code based on `DoctorResult.ExitCode()`
-- [ ] Add `--quiet` flag for minimal output
-- [ ] Add unit tests for each check type
-- [ ] Document exit codes in `start doctor --help`
+- 2025-01-17: Updated Asset Information check to reflect catalog-based cache system (DR-031), removed asset-version.toml references

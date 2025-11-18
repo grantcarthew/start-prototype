@@ -1,51 +1,252 @@
 # DR-036: Cache Management
 
-**Date:** 2025-01-10
-**Status:** Accepted
-**Category:** Asset Management
+- Date: 2025-01-10
+- Status: Accepted
+- Category: Asset Management
+
+## Problem
+
+Asset caching needs a management strategy. The approach must address:
+
+- Cache location (where to store cached assets)
+- User visibility (can users see what's cached)
+- Management commands (list, clean, prune operations)
+- Cleanup policies (age-based, size-based, manual only)
+- Cache operations (read, write, update, delete)
+- Persistence (per-machine vs synchronized)
+- Configuration (customizable location)
+- Troubleshooting (how to debug cache issues)
+- Complexity vs benefit (KISS principle for tiny files)
 
 ## Decision
 
-Asset cache is an invisible implementation detail with no user-facing management commands. Users can manually delete the cache directory if needed.
+Asset cache is invisible implementation detail with no user-facing management commands. Cache stored at ~/.config/start/assets/ with manual deletion only.
 
-## What This Means
+Key aspects:
 
-### Cache is Invisible
+Location: ~/.config/start/assets/
+- Separate subdirectory under config directory
+- Configurable via asset_path setting
+- Standard directory structure
 
-**No cache commands:**
-- ❌ No `start cache list`
-- ❌ No `start cache clean`
-- ❌ No `start cache info`
-- ❌ No `start cache prune`
+No management commands:
+- No start cache list
+- No start cache clean
+- No start cache info
+- No start cache prune
 
-**Why no commands?**
-- Asset files are tiny text files (typically < 5KB)
-- Even hundreds of assets = < 1MB total
-- No need for size limits or cleanup
-- Adds complexity for minimal benefit
-- KISS principle
+Manual deletion:
+- rm -rf ~/.config/start/assets/ to clear cache
+- Assets re-download automatically on next use
+- start assets update to bulk re-download
 
-**If user wants to clear cache:**
+No cleanup policies:
+- Cache persists until manually deleted
+- No age-based cleanup
+- No size-based cleanup
+- Consistent with no automatic operations principle
+
+Filesystem as state:
+- No tracking files
+- File existence IS the cache state
+- Standard directory structure
+- Human-readable text files
+
+Configurable location:
+- Default: ~/.config/start/assets/
+- Customizable: asset_path setting in config.toml
+- Useful for network drives, shared caches, testing
+
+## Why
+
+Files are tiny (no need for management):
+
+- Asset files typically < 5KB each
+- 28 assets = ~62KB total
+- 200 assets = ~600KB total
+- Negligible disk space on modern systems
+- No need for size limits or cleanup policies
+- Growth is minimal even with hundreds of assets
+
+KISS principle:
+
+- Don't build features speculatively
+- Cache management adds complexity for minimal benefit
+- Simple manual deletion works fine
+- Users rarely need to manage cache
+- Keeps binary small and code simple
+
+Filesystem as state is simpler:
+
+- No tracking files (no drift possible)
+- File existence IS the cache state
+- Easy to inspect with standard tools (ls, cat, tree)
+- Easy to reset (delete directory)
+- No database or index needed
+- Reliable and transparent
+
+Fast re-download makes cache disposable:
+
+- Raw.githubusercontent.com has no rate limits
+- Assets are small (< 5KB typically)
+- Re-downloading is fast
+- Network cost minimal
+- Cache is disposable implementation detail
+- No penalty for clearing cache
+
+Transparency via filesystem:
+
+- Human-readable text files
+- Standard directory structure
+- Can inspect manually with ls, cat, tree
+- No special tools needed
+- Debugging is straightforward
+- Users understand how it works
+
+## Trade-offs
+
+Accept:
+
+- No cache visibility commands (can't see what's cached via CLI, use ls or tree instead)
+- No automatic cleanup (cache grows over time, but files tiny so negligible growth)
+- No cache statistics (can't see cache size via CLI, can add to start doctor if requested)
+- Manual deletion only (can't selectively remove via CLI, but cache is disposable so rm -rf works)
+- Per-machine cache (not synchronized across machines, but re-download is fast and painless)
+
+Gain:
+
+- Simple implementation (no cache commands, no management logic, no size limits, no cleanup policies)
+- Transparent operation (standard filesystem directory, human-readable text files, easy to inspect)
+- Reliable state (filesystem IS the state, no tracking files to corrupt, easy to reset)
+- Efficient lookups (filesystem cache fast, no database needed, minimal disk space < 1MB)
+- Easy troubleshooting (use standard tools, delete and re-download, no complex debugging)
+- KISS compliance (don't build features speculatively, cache management not needed for tiny files)
+
+## Alternatives
+
+Add cache management commands:
+
+Example: Implement start cache list, start cache clean, start cache info
 ```bash
-# Simple manual deletion
-rm -rf ~/.config/start/assets
-
-# Assets re-download automatically on next use
+start cache list       # List cached assets
+start cache clean      # Remove unused assets
+start cache info       # Show cache statistics
+start cache prune --older-than 30d  # Remove old assets
 ```
 
-### Cache Structure
+Pros:
+- User visibility (can see what's cached via CLI)
+- Selective cleanup (remove specific assets)
+- Statistics available (cache size, asset count)
+- Familiar pattern (like npm cache, yarn cache)
+
+Cons:
+- Added complexity (implement multiple commands, maintain cache metadata)
+- Minimal benefit (files are tiny < 1MB, cleanup not needed)
+- Over-engineering (cache management for negligible disk space)
+- Violates KISS (building features speculatively)
+- More code to maintain (commands, help text, error handling)
+
+Rejected: Files are tiny (< 1MB even for large catalogs). Cache management adds complexity for no real benefit. Manual deletion sufficient.
+
+Automatic cleanup policies:
+
+Example: Age-based or size-based automatic cleanup
+```toml
+[settings]
+cache_max_size = "10MB"
+cache_max_age_days = 90
+```
+- Automatically delete assets older than 90 days
+- Automatically delete oldest assets when size exceeds 10MB
+
+Pros:
+- Automatic maintenance (no user intervention)
+- Bounded growth (cache won't grow indefinitely)
+- Familiar pattern (like browser cache)
+
+Cons:
+- Violates no automatic operations principle
+- Added complexity (implement cleanup logic, track timestamps)
+- Unnecessary (files tiny, growth negligible)
+- Surprising behavior (assets disappear unexpectedly)
+- Can break workflows (delete assets user relies on)
+
+Rejected: Violates no automatic operations principle. Unnecessary for tiny files. Manual deletion simpler and more predictable.
+
+SQLite database for cache metadata:
+
+Example: Track cache in database instead of filesystem
+```
+~/.config/start/cache.db (SQLite database)
+- Table: cached_assets (name, type, category, sha, size, downloaded_at)
+- Assets stored separately
+```
+
+Pros:
+- Fast queries (can query cache by various fields)
+- Statistics built-in (count, size, dates)
+- Easy to add features (cache commands, cleanup policies)
+
+Cons:
+- Over-engineering (database for tiny text files)
+- Added complexity (database schema, migrations)
+- Another thing to corrupt (database can break)
+- Drift possible (database vs filesystem state)
+- Overkill for simple cache
+
+Rejected: Filesystem IS the state. Database overkill for tiny files. KISS principle violated.
+
+Synchronized cache across machines:
+
+Example: Cloud-synced cache directory
+```toml
+[settings]
+asset_path = "~/Dropbox/start-cache"  # Synced via Dropbox
+```
+- Cache synced across all machines
+- One download, available everywhere
+
+Pros:
+- Convenience (download once, available everywhere)
+- Faster setup (new machine has cache immediately)
+- Bandwidth savings (no re-downloads)
+
+Cons:
+- Sync conflicts possible (multiple machines downloading simultaneously)
+- Dependency on sync service (Dropbox, iCloud, etc.)
+- More complex setup (user must configure)
+- Can cause issues (sync service down, conflicts)
+
+Rejected: Re-download is fast (no rate limits, tiny files). Sync adds complexity and potential issues. Local cache per machine is simpler.
+
+## Structure
+
+Cache location:
+
+Default: ~/.config/start/assets/
+- Subdirectory under config directory
+- Configurable via asset_path setting
+- Standard directory structure
+
+Configuration:
+```toml
+# config.toml
+[settings]
+asset_path = "~/.config/start/assets"  # Default location
+```
+
+Custom location:
+```toml
+# config.toml
+[settings]
+asset_path = "/custom/path/to/assets"  # Custom location
+```
+
+Directory structure:
 
 ```
 ~/.config/start/assets/
-├── roles/
-│   ├── general/
-│   │   ├── code-reviewer.md
-│   │   ├── code-reviewer.meta.toml
-│   │   ├── default.md
-│   │   └── default.meta.toml
-│   └── languages/
-│       ├── go-expert.md
-│       └── go-expert.meta.toml
 ├── tasks/
 │   ├── git-workflow/
 │   │   ├── pre-commit-review.toml
@@ -56,266 +257,219 @@ rm -rf ~/.config/start/assets
 │   │   └── pr-ready.meta.toml
 │   └── code-quality/
 │       └── ...
-└── agents/
-    └── claude/
-        ├── sonnet.toml
-        └── sonnet.meta.toml
+├── roles/
+│   ├── general/
+│   │   ├── code-reviewer.md
+│   │   ├── code-reviewer.meta.toml
+│   │   ├── default.md
+│   │   └── default.meta.toml
+│   └── languages/
+│       ├── go-expert.md
+│       └── go-expert.meta.toml
+├── agents/
+│   └── anthropic/
+│       ├── claude.toml
+│       └── claude.meta.toml
+└── contexts/
+    └── reference/
+        ├── environment.toml
+        └── environment.meta.toml
 ```
 
-**Properties:**
-- **Location:** `~/.config/start/assets/` (configurable via `asset_path`)
-- **Structure:** `{type}/{category}/{name}.{ext}`
-- **Contents:** Asset files + sidecar metadata
-- **State:** Filesystem IS the state (no tracking files)
+Structure pattern: {cache}/{type}/{category}/{name}.{ext}
+- {cache}: ~/.config/start/assets/ (or custom via asset_path)
+- {type}: tasks, roles, agents, contexts
+- {category}: git-workflow, general, anthropic, reference, etc.
+- {name}: Asset name (matches metadata name field)
+- {ext}: .toml (content), .md (prompt file), .meta.toml (metadata)
 
-### Cache Behavior
+Cache operations:
 
-**Automatic population:**
-```bash
-# User downloads asset
-start task pre-commit-review
+Automatic population:
+- User runs: start task pre-commit-review
+- Asset not in config/cache
+- Downloads from GitHub
+- Caches to ~/.config/start/assets/tasks/git-workflow/
+- Adds to config
+- Uses cached version on subsequent runs
 
-# Cache populated automatically:
-#   ~/.config/start/assets/tasks/git-workflow/pre-commit-review.toml
-#   ~/.config/start/assets/tasks/git-workflow/pre-commit-review.md
-#   ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
-```
+Automatic updates:
+- User runs: start assets update
+- Checks GitHub for newer SHAs (via index.csv)
+- Downloads updated assets to cache
+- User config remains unchanged
+- User must manually apply updates to config
 
-**Automatic updates:**
-```bash
-# User updates cache
-start assets update
+Manual deletion:
+- User runs: rm -rf ~/.config/start/assets/
+- Cache cleared completely
+- Assets re-download automatically on next use
+- OR user runs: start assets update to bulk re-download
 
-# Checks GitHub for newer SHAs
-# Downloads updated assets to cache
-# User config remains unchanged
-```
+Cache persistence:
 
-**No automatic cleanup:**
-- Cache persists until manually deleted
-- No age-based cleanup
-- No size-based cleanup
-- Consistent with DR-025 (no automatic operations)
-
-### Cache Operations
-
-**Read (during resolution):**
-```go
-func findInCache(assetType, name string) string {
-    pattern := filepath.Join(
-        assetPath,
-        assetType,
-        "*",  // Any category
-        fmt.Sprintf("%s.toml", name),
-    )
-    matches, _ := filepath.Glob(pattern)
-    if len(matches) > 0 {
-        return matches[0]
-    }
-    return ""
-}
-```
-
-**Write (after download):**
-```go
-func cacheAsset(asset *Asset, metadata *AssetMetadata) error {
-    // Determine cache location
-    cachePath := filepath.Join(
-        assetPath,
-        asset.Type,
-        metadata.Category,
-    )
-
-    // Create directory structure
-    os.MkdirAll(cachePath, 0755)
-
-    // Write asset content
-    contentPath := filepath.Join(cachePath, fmt.Sprintf("%s.toml", asset.Name))
-    os.WriteFile(contentPath, asset.Content, 0644)
-
-    // Write prompt file (if exists)
-    if asset.PromptContent != nil {
-        promptPath := filepath.Join(cachePath, fmt.Sprintf("%s.md", asset.Name))
-        os.WriteFile(promptPath, asset.PromptContent, 0644)
-    }
-
-    // Write metadata
-    metaPath := filepath.Join(cachePath, fmt.Sprintf("%s.meta.toml", asset.Name))
-    writeMetadata(metaPath, metadata)
-
-    return nil
-}
-```
-
-**Update (during `start assets update`):**
-```go
-func updateCachedAsset(asset *Asset, newMetadata *AssetMetadata) error {
-    // Overwrite existing files
-    return cacheAsset(asset, newMetadata)
-}
-```
-
-### Cache Persistence
-
-**Cache is local only:**
+Per-machine only:
 - Not synchronized across machines
 - Not backed up automatically
-- Each machine has its own cache
+- Each machine has independent cache
 
-**Re-downloading is fast:**
-- Using raw.githubusercontent.com (no rate limit per DR-034)
-- Assets are small (< 5KB typically)
-- Network cost is minimal
+Re-download is fast:
+- Raw.githubusercontent.com (no rate limits)
+- Assets small (< 5KB typically)
+- Network cost minimal
+- Cache is disposable
 
-**User config is portable:**
+User config portable:
 ```toml
-# User's tasks.toml can reference cache
+# tasks.toml references cached assets
 [tasks.pre-commit-review]
 prompt_file = "~/.config/start/assets/tasks/git-workflow/pre-commit-review.md"
 
 # On new machine:
 # 1. Copy config files
 # 2. Run tasks - cache populated automatically
-# 3. OR run: start assets update (download all assets)
+# 3. OR: start assets update (download all assets referenced in config)
 ```
 
-## Size Estimates
+## Usage Examples
 
-### Minimal Viable Set (28 assets)
+Automatic cache population:
 
-**Tasks (12):**
-- 12 × 3KB (toml + md + meta) = 36KB
-
-**Roles (8):**
-- 8 × 2KB (md + meta) = 16KB
-
-**Agents (6):**
-- 6 × 1KB (toml + meta) = 6KB
-
-**Templates (2):**
-- 2 × 2KB (toml + meta) = 4KB
-
-**Total: ~62KB** (tiny!)
-
-### Large Catalog (200 assets)
-
-**Assuming average 3KB per asset:**
-- 200 × 3KB = 600KB
-
-**Still trivial for modern systems.**
-
-### Conclusion
-
-No need for size limits or cleanup. Even a large catalog is negligible.
-
-## Configuration
-
-**Settings in config.toml:**
-```toml
-[settings]
-asset_path = "~/.config/start/assets"  # Cache location
-```
-
-**Custom cache location:**
-```toml
-[settings]
-asset_path = "/custom/path/to/assets"
-```
-
-**Useful for:**
-- Network drives
-- Shared team caches
-- Testing/development
-
-## Troubleshooting
-
-**Cache corrupted or broken?**
 ```bash
-# Delete and re-download
-rm -rf ~/.config/start/assets
-start assets update  # Re-download all configured assets
+$ start task pre-commit-review
+
+# If not in cache:
+# 1. Downloads from GitHub
+# 2. Caches to ~/.config/start/assets/tasks/git-workflow/
+# 3. Adds to config
+# 4. Runs task
+
+# Subsequent runs use cache (no download)
 ```
 
-**Asset not found but should be cached?**
-```bash
-# Check cache contents
-ls -lR ~/.config/start/assets/tasks/
+Update cache:
 
-# Check for metadata file
-cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
+```bash
+$ start assets update
+
+Downloading catalog index...
+✓ Loaded index (46 assets)
+
+Checking for asset updates...
+  ✓ tasks/git-workflow/pre-commit-review (updated v1.0 → v1.1)
+  ✓ roles/general/code-reviewer (up to date)
+
+Cache updated with 1 new version.
+
+Note: Your task configurations are unchanged.
+Review changes and manually update tasks.toml if desired.
 ```
 
-**Want to see what's cached?**
+Manual cache inspection:
+
 ```bash
-# Simple directory listing
-find ~/.config/start/assets -name "*.toml" -not -name "*.meta.toml"
+# List cached assets
+$ find ~/.config/start/assets -name "*.toml" -not -name "*.meta.toml"
+/Users/user/.config/start/assets/tasks/git-workflow/pre-commit-review.toml
+/Users/user/.config/start/assets/tasks/git-workflow/pr-ready.toml
+/Users/user/.config/start/assets/roles/general/code-reviewer.toml
 
 # Or use tree
-tree ~/.config/start/assets
+$ tree ~/.config/start/assets
+/Users/user/.config/start/assets
+├── tasks
+│   └── git-workflow
+│       ├── pre-commit-review.toml
+│       ├── pre-commit-review.md
+│       └── pre-commit-review.meta.toml
+└── roles
+    └── general
+        ├── code-reviewer.md
+        └── code-reviewer.meta.toml
+
+# View metadata
+$ cat ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
+[metadata]
+name = "pre-commit-review"
+description = "Review staged changes before committing"
+tags = ["git", "review", "quality", "pre-commit"]
+sha = "a1b2c3d4e5f6789012345678901234567890abcd"
+created = "2025-01-10T00:00:00Z"
+updated = "2025-01-10T12:30:00Z"
 ```
 
-**Future consideration:** If users request it, add `start doctor` check for cache health.
+Manual cache deletion:
 
-## Benefits
+```bash
+# Clear entire cache
+$ rm -rf ~/.config/start/assets/
 
-**Simple:**
-- ✅ No user-facing cache commands
-- ✅ No cache management logic
-- ✅ No size limits to implement
-- ✅ No cleanup policies
+# Assets re-download automatically on next use
+$ start task pre-commit-review
+Downloading...
+✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+✓ Running task...
+```
 
-**Transparent:**
-- ✅ Standard filesystem directory
-- ✅ Human-readable text files
-- ✅ Easy to inspect manually
-- ✅ Can use standard tools (ls, cat, rm)
+Troubleshooting - cache corrupted:
 
-**Reliable:**
-- ✅ Filesystem is the state (no drift)
-- ✅ No tracking files to corrupt
-- ✅ Easy to reset (delete directory)
-- ✅ Automatic re-population
+```bash
+# Delete and re-download
+$ rm -rf ~/.config/start/assets/
+$ start assets update
 
-**Efficient:**
-- ✅ Fast lookups (filesystem cache)
-- ✅ No database or index needed
-- ✅ Minimal disk space usage
-- ✅ No background processes
+Downloading catalog index...
+Checking for asset updates...
+✓ Downloaded 28 assets
 
-## Trade-offs Accepted
+Cache populated.
+```
 
-**No visibility into cache:**
-- ❌ Can't easily see what's cached without ls
-- **Mitigation:** Users rarely need to know, can use filesystem tools
+Troubleshooting - asset not found:
 
-**No automatic cleanup:**
-- ❌ Cache grows over time (slightly)
-- **Mitigation:** Files are tiny, growth is negligible
+```bash
+# Check if cached
+$ ls ~/.config/start/assets/tasks/git-workflow/
+pre-commit-review.toml
+pre-commit-review.md
+pre-commit-review.meta.toml
 
-**No cache statistics:**
-- ❌ Can't see "cache size: 142KB, 28 assets"
-- **Mitigation:** Not needed for tiny files, can add to `start doctor` if requested
+# If missing, re-download
+$ start assets update git-workflow
+```
 
-**Manual deletion only:**
-- ❌ Can't selectively remove cached assets via CLI
-- **Mitigation:** User config is source of truth, cache is disposable
+Custom cache location:
 
-## Related Decisions
+```toml
+# config.toml
+[settings]
+asset_path = "/mnt/shared/start-cache"  # Network drive
+```
 
-- [DR-031](./dr-031-catalog-based-assets.md) - Catalog architecture (cache role)
-- [DR-033](./dr-033-asset-resolution-algorithm.md) - Resolution (cache lookup)
-- [DR-034](./dr-034-github-catalog-api.md) - GitHub API (cache population)
-- [DR-037](./dr-037-asset-updates.md) - Updates (cache refresh)
-- [DR-025](./dr-025-no-automatic-checks.md) - No automatic operations (no auto-cleanup)
+```bash
+# Cache uses custom location
+$ start task pre-commit-review
+✓ Cached to /mnt/shared/start-cache/tasks/git-workflow/
+```
 
-## Future Considerations
+Cache size estimates:
 
-**If cache management becomes necessary:**
+Minimal viable set (28 assets):
+```
+Tasks (12): 12 × 3KB = 36KB
+Roles (8): 8 × 2KB = 16KB
+Agents (6): 6 × 1KB = 6KB
+Contexts (2): 2 × 2KB = 4KB
+Total: ~62KB (tiny!)
+```
 
-Potential additions (not in v1):
-- `start doctor` cache health check
-- `start doctor --fix` cache repair
-- Cache statistics in `start doctor` output
-- Shared cache for team environments
+Large catalog (200 assets):
+```
+200 × 3KB = 600KB
+Still trivial for modern systems
+No cleanup needed
+```
 
-**Current stance:** Keep it simple. Cache is invisible. Users can always delete the directory manually if needed.
+## Updates
+
+- 2025-01-17: Initial version aligned with schema; removed implementation code, Related Decisions, and Future Considerations sections

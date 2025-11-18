@@ -1,360 +1,326 @@
 # DR-027: Security and Trust Model for Assets
 
-**Date:** 2025-01-07
-**Status:** Accepted
-**Category:** Asset Management
+- Date: 2025-01-07
+- Status: Accepted
+- Category: Asset Management
+
+## Problem
+
+The CLI downloads assets (roles, tasks, agent templates) from a remote source. The security strategy must address:
+
+- Trust model (what sources do we trust and why?)
+- Transport security (how to prevent man-in-the-middle attacks?)
+- Content authenticity (how to verify assets are legitimate?)
+- Tampering detection (how to detect modified assets?)
+- Repository security (how to prevent typosquatting or malicious repos?)
+- Key management (if using signatures, how to distribute and verify keys?)
+- Attack surface (how to minimize security-related code complexity?)
+- Threat priorities (what threats matter most for non-executable content?)
+- User control (how to let users verify and inspect assets?)
+- Maintainability (how to keep security simple and auditable?)
 
 ## Decision
 
-Trust GitHub's HTTPS infrastructure and the specific repository (`grantcarthew/start`). No cryptographic signatures. No commit pinning. Always fetch latest from main branch.
+Trust GitHub's HTTPS infrastructure and the specific hardcoded repository. No cryptographic signatures. No commit pinning. Always fetch latest from main branch.
 
-## What This Means
+Trust model:
 
-### Trust Model (17a)
+- Trust GitHub's infrastructure and HTTPS transport security
+- Trust the specific hardcoded repository: github.com/grantcarthew/start
+- Trust repository maintainer's account security (2FA, strong credentials)
+- Do not trust arbitrary repositories (no user-configurable repo URLs)
+- Do not trust manual asset installations (network-only per DR-026)
 
-**We trust:**
-- GitHub's infrastructure and HTTPS transport security
-- The specific repository: `github.com/grantcarthew/start`
-- Repository maintainer's account security (2FA, strong credentials)
+No signature verification:
 
-**We do NOT trust:**
-- Arbitrary repositories (no user-configurable repo URLs)
-- Unsigned/unverified sources
-- Manual asset installations (per DR-026)
-
-**Protection mechanisms:**
-- HTTPS prevents man-in-the-middle attacks during download
-- SHA-based caching (DR-014) detects file tampering after first download
-- Hardcoded repository URL in binary (no config override)
-
-### No Signature Verification (17b)
-
-**No cryptographic signatures on assets:**
 - No GPG signing of commits
 - No individual file signatures
 - No signature verification during download
 - Trust GitHub's HTTPS as sufficient
 
-**Rationale:**
-- Assets are not executables (markdown and TOML files)
-- Users review assets before using (templates, roles, tasks)
-- HTTPS + GitHub infrastructure provides adequate security
-- Signatures add complexity without proportional security benefit
-- No automatic execution means low risk
+No commit pinning:
 
-### No Commit Pinning (17c)
-
-**Always latest from main branch:**
-- No commit SHA pinning in config
+- Always latest from main branch (no commit SHA pinning in config)
 - No git tag/release pinning
-- Users always get latest when running `start assets update`
-- Matches DR-022 (assets from main branch)
+- Users always get latest when running start assets update
+- No configuration options for custom repository URLs, commit SHAs, or tags
 
-**No configuration options for:**
-- Custom repository URLs
-- Commit SHA pins
-- Git tag/release references
-- Asset source override
+Protection mechanisms:
 
-## Rationale
+- HTTPS prevents man-in-the-middle attacks during download
+- Hardcoded repository URL in binary (no config override)
+- Assets cached locally after download
+- Users can inspect all assets before and after use
 
-### Pragmatic Security Posture
+## Why
 
-**Assets are low-risk content:**
+Assets are low-risk content:
+
 - Markdown files (role definitions) - human-readable text
 - TOML files (agent configs, tasks) - configuration data
-- No executables, no scripts auto-executed
+- No executables, no auto-executed scripts
 - Users review templates before using them
 - Users can inspect asset files anytime
+- Content is visible and auditable
 
-**Protection is proportional:**
-- HTTPS prevents network interception
-- SHA checking detects post-download tampering
-- Hardcoded repo prevents typosquatting
-- Simple implementation reduces attack surface
+HTTPS provides adequate security:
 
-### HTTPS is Sufficient
+- Transport encryption via TLS
+- Server authentication via certificate verification
+- Data integrity via TLS checksums
+- Industry-standard security trusted by GitHub
+- System certificate store for verification (no custom pinning needed)
 
-**GitHub's HTTPS provides:**
-- Transport encryption (TLS)
-- Server authentication (certificate verification)
-- Data integrity (TLS checksums)
-- Industry-standard security
+Hardcoded repository prevents attacks:
 
-**Additional signatures would add:**
-- Key management complexity
-- Public key distribution problem
-- Verification failure handling
-- Minimal security improvement for non-executable content
+- No typosquatting (users can't misconfigure malicious repo URL)
+- No user configuration of asset source (compile-time constant)
+- Clear single source of truth
+- Reduces attack surface (no URL parsing or validation)
 
-### Simplicity Over Paranoia
+Simplicity reduces attack surface:
 
-**Complexity costs:**
-- More code = more bugs = more attack surface
-- Key management is hard to get right
-- Signature verification can fail (expired keys, clock skew, etc.)
-- User confusion when verification fails
+- Less code means fewer bugs and vulnerabilities
+- No key management complexity (distribution, rotation, revocation)
+- No signature verification failure handling
+- Easier to audit and reason about
+- Clearer security model for users and developers
 
-**Benefits of simplicity:**
-- Less code to audit
-- Fewer failure modes
-- Clearer security model
-- Easier to reason about
+User control provides safety:
 
-## Threat Model
+- Users initiate all updates (no automatic downloads)
+- Users can inspect assets before use
+- Users can review asset changes via GitHub commit history
+- Users decide when to update (control timing)
 
-### Threats We Mitigate
+Protection is proportional to risk:
 
-**1. Man-in-the-Middle (MITM) attacks:**
-- **Threat:** Attacker intercepts network traffic and injects malicious assets
-- **Mitigation:** HTTPS with certificate verification
-- **Residual risk:** Very low (requires compromising GitHub's TLS infrastructure)
+- Non-executable content has lower risk than binaries
+- Users review templates before using (not blind execution)
+- HTTPS + hardcoded repo prevents common attacks
+- Additional signatures provide minimal benefit for text files
+- Complexity costs outweigh marginal security improvements
 
-**2. Post-download tampering:**
-- **Threat:** Local asset files modified after download
-- **Mitigation:** SHA-based caching detects changes on next update
-- **Residual risk:** Low (user would notice broken behavior before next update)
+## Trade-offs
 
-**3. Typosquatting:**
-- **Threat:** User misconfigures repo URL to malicious look-alike
-- **Mitigation:** No user-configurable repo URL (hardcoded in binary)
-- **Residual risk:** None (no configuration option)
+Accept:
 
-### Threats We Accept
+- No defense against compromised maintainer account (maintainer responsibility, same as any open-source project)
+- No cryptographic proof of authenticity beyond HTTPS (HTTPS + hardcoded repo is sufficient for text files)
+- No commit pinning for reproducibility (user controls update timing, can inspect changes)
+- Trust GitHub infrastructure completely (acceptable dependency, standard practice)
+- Accept supply chain risk from bad updates (users control timing, can inspect, no auto-execution)
 
-**1. Compromised GitHub account:**
-- **Threat:** Attacker gains access to grantcarthew/start repository
-- **Mitigation:** Repository maintainer uses 2FA, strong credentials, GitHub's security
-- **Residual risk:** Low (GitHub account security is maintainer's responsibility)
-- **Accepted:** Yes (same risk as any open-source project)
+Gain:
 
-**2. Compromised GitHub infrastructure:**
-- **Threat:** GitHub itself is compromised, serves malicious content
-- **Mitigation:** None (if GitHub is compromised, we have bigger problems)
-- **Residual risk:** Very low (GitHub has strong security)
-- **Accepted:** Yes (acceptable dependency on GitHub)
+- Extremely simple implementation (no key management, signature verification, or pinning logic)
+- Secure enough for content distribution (HTTPS + hardcoded repo prevents common attacks)
+- Transparent to users (all assets inspectable locally)
+- Low risk for non-executable content (text files, user-reviewed templates)
+- Maintainable security model (less code, fewer dependencies, clearer design)
+- Industry-standard approach (similar to Homebrew, npm, cargo for content)
+- No verification failure modes (signatures can fail for many reasons)
 
-**3. Malicious asset content:**
-- **Threat:** Malicious TOML/markdown content in assets
-- **Mitigation:** Users review before using, no auto-execution
-- **Residual risk:** Low (content is inspectable, not auto-executed)
-- **Accepted:** Yes (users responsible for reviewing templates)
+## Alternatives
 
-**4. Supply chain attack via bad update:**
-- **Threat:** Malicious commit pushed to main, users auto-update
-- **Mitigation:** Users control update timing (DR-025), can inspect assets
-- **Residual risk:** Low (user-initiated updates only)
-- **Accepted:** Yes (same risk as any auto-updating software)
+Cryptographic signature verification:
 
-## Implementation
+Example approaches:
+- GPG-signed commits (git verify-commit)
+- Individual file signatures (detached .sig files)
+- Signed release tags
 
-### Hardcoded Repository
+Pros:
+- Cryptographic proof of authenticity
+- Detect compromised repository or man-in-the-middle attacks
+- Industry best practice for security-critical software
 
-**Binary contains:**
-```go
-const (
-    AssetRepository = "github.com/grantcarthew/start"
-    AssetBranch     = "main"
-    AssetPath       = "/assets"
-)
+Cons:
+- Key management complexity (distribution, storage, rotation, revocation)
+- Public key distribution problem (how do users get the trusted key?)
+- Signature verification can fail (expired keys, clock skew, key rotation issues)
+- Users confused when verification fails
+- Minimal security improvement for non-executable text files
+- More code to audit and maintain
+- Additional dependencies and failure modes
+
+Rejected: Complexity and failure modes outweigh benefits for non-executable content. HTTPS provides adequate security for markdown and TOML files.
+
+Commit pinning with SHA references:
+
+Example: Config specifies exact commit SHA to download
+```toml
+[settings]
+asset_commit = "abc123def456..."
 ```
 
-**No configuration options:**
-- No `asset_repository` in config file
-- No `--repo` flag on `start assets update`
-- No environment variable override
-- Repository URL is compile-time constant
+Pros:
+- Reproducible asset versions (same SHA = same content)
+- Users can choose when to update (explicit SHA change)
+- Protection against unexpected changes
 
-### Download Process
+Cons:
+- Users must manually update commit SHAs (friction)
+- Reduces benefit of "always latest" design
+- False sense of security (still trusting GitHub and HTTPS)
+- Complexity in config management
+- Conflicts with main branch strategy
+- Doesn't prevent attacks, just controls timing
 
-**Security checks during download:**
+Rejected: User controls update timing already (user-initiated updates only). SHA pinning adds complexity without meaningful security benefit.
+
+Multiple trusted repositories with fallbacks:
+
+Example: Try official repo, fallback to mirrors
 ```go
-func downloadAssets() error {
-    // 1. HTTPS URL construction (hardcoded repo)
-    url := fmt.Sprintf("https://api.github.com/repos/%s/...", AssetRepository)
-
-    // 2. Standard library HTTP client (respects system cert store)
-    client := &http.Client{
-        Timeout: 30 * time.Second,
-        // Uses system certificate verification automatically
-    }
-
-    // 3. SHA verification on subsequent downloads
-    if existingSHA != downloadedSHA {
-        // Update needed
-    }
-
-    // 4. Atomic install (DR-015)
-    return atomicInstall(downloadedAssets)
+repos := []string{
+    "github.com/grantcarthew/start",
+    "gitlab.com/grantcarthew/start-mirror",
+    "codeberg.org/grantcarthew/start-mirror",
 }
 ```
 
-**What we DON'T do:**
+Pros:
+- Availability if one source is down
+- Reduced dependency on single platform
+- Geographic distribution
+
+Cons:
+- Multiple sources to trust and secure
+- Synchronization complexity (which is canonical?)
+- Authentication complexity (trust all equally?)
+- Attack surface increases (compromise any mirror = success)
+- Maintenance burden (keep mirrors in sync)
+- Overkill for optional content (assets not critical)
+
+Rejected: Single trusted source is simpler and more secure. GitHub availability is sufficient for optional content.
+
+## Structure
+
+Hardcoded repository configuration:
+
+Repository constants (compile-time, not configurable):
+- Repository: github.com/grantcarthew/start
+- Branch: main
+- No environment variable override
+- No config file override
+- No command-line flag override
+
+Threat model:
+
+Threats mitigated:
+
+1. Man-in-the-middle attacks:
+   - Threat: Attacker intercepts network and injects malicious assets
+   - Mitigation: HTTPS with certificate verification
+   - Residual risk: Very low (requires compromising GitHub TLS)
+
+2. Typosquatting:
+   - Threat: User misconfigures repo URL to malicious look-alike
+   - Mitigation: No user-configurable repo URL (hardcoded)
+   - Residual risk: None (no configuration option exists)
+
+Threats accepted:
+
+1. Compromised GitHub account:
+   - Threat: Attacker gains access to grantcarthew/start repository
+   - Mitigation: Maintainer uses 2FA, strong credentials, GitHub's security
+   - Residual risk: Low (GitHub account security is maintainer responsibility)
+   - Accepted: Yes (same risk as any open-source project, standard practice)
+
+2. Compromised GitHub infrastructure:
+   - Threat: GitHub itself compromised, serves malicious content
+   - Mitigation: None (if GitHub is compromised, entire ecosystem affected)
+   - Residual risk: Very low (GitHub has strong security practices)
+   - Accepted: Yes (acceptable dependency, industry standard)
+
+3. Malicious asset content:
+   - Threat: Malicious TOML/markdown content in assets
+   - Mitigation: Users review before using, no auto-execution, inspectable content
+   - Residual risk: Low (content is visible, not auto-executed)
+   - Accepted: Yes (users responsible for reviewing templates)
+
+4. Supply chain attack via bad update:
+   - Threat: Malicious commit pushed to main, users update
+   - Mitigation: Users control update timing, can inspect assets, user-initiated only
+   - Residual risk: Low (no automatic updates, user reviews changes)
+   - Accepted: Yes (same risk as any auto-updating software with user control)
+
+Download process security:
+
+HTTPS download:
+- System certificate store for verification (standard library http.Client)
 - No custom certificate pinning
-- No signature verification
-- No checksum files from separate source
-- No manual verification prompts
+- 30-second timeout for network calls
+- GitHub API over HTTPS
 
-### User Transparency
+Atomic installation:
+- Download to temporary location
+- Verify download completed successfully
+- Move to final location atomically
+- Prevents partial/corrupted installations
 
-**Users can inspect assets:**
+User inspection capabilities:
+
+Asset transparency:
+- All assets visible in local cache directory
+- Users can read any asset file
+- Users can review GitHub commit history
+- Users can compare local vs remote versions
+
+Update control:
+- User-initiated updates only (no automatic downloads)
+- Users decide when to update
+- Users can inspect changes before updating
+- Users can rollback by not updating
+
+## Usage Examples
+
+Inspecting downloaded assets:
+
 ```bash
-# View all downloaded assets
-ls -R ~/.config/start/assets/
+# View asset cache directory
+ls -R ~/.cache/start/
 
 # Inspect specific role
-cat ~/.config/start/assets/roles/code-reviewer.md
+cat ~/.cache/start/roles/code-reviewer.md
 
-# Check asset version
-cat ~/.config/start/asset-version.toml
+# Compare with GitHub version
+start assets diff code-reviewer
 ```
 
-**Users control updates:**
-- Per DR-025: No automatic updates
-- `start assets update` is user-initiated
-- `start doctor` shows asset age
-- Users decide when to update
+Reviewing changes before update:
 
-## Security Best Practices
+```bash
+# Check for available updates
+start doctor
 
-### For Repository Maintainer
+# Review what changed on GitHub
+start assets changes
 
-**Account security:**
-- Enable 2FA on GitHub account
-- Use strong, unique password
-- Review account access regularly
-- Use SSH keys for git operations
+# Update when ready
+start assets update
+```
 
-**Repository security:**
-- Enable branch protection on main
-- Require code review for PRs (if team)
-- Monitor repository access logs
-- Keep dependencies updated
+Comparison with other tools:
 
-**Asset review:**
-- Review all asset changes carefully
-- Test assets before committing to main
-- Document asset changes in commits
-- Consider security implications of templates
+Similar trust model (HTTPS only):
+- Homebrew: Trusts GitHub, HTTPS, no signatures on formulae
+- npm: Trusts registry, HTTPS (optional signatures available)
+- cargo: Trusts crates.io, HTTPS, checksums only
+- pip: Trusts PyPI, HTTPS (optional GPG verification)
 
-### For Users
+More paranoid (signatures required):
+- apt/yum: GPG signatures on packages (system packages, executables)
+- Arch pacman: Package signing required (system binaries)
+- Signal: Binary transparency, reproducible builds (privacy-critical)
+- Tor: Multi-signature releases (security-critical software)
 
-**Asset hygiene:**
-- Run `start doctor` periodically to check for updates
-- Review asset changes after `start assets update` (check git history)
-- Inspect role/task templates before using
-- Report suspicious content to maintainer
-
-**Update timing:**
-- Update when convenient (user-controlled per DR-025)
-- Check release notes/commit history before updating
-- Test after updates to detect issues
-- Keep backups of working configurations
-
-## Comparison with Other Tools
-
-**Similar trust model (HTTPS only):**
-- **Homebrew:** Trusts GitHub, HTTPS, no signatures on formulae
-- **npm:** Trusts registry, HTTPS (supports optional signatures)
-- **pip:** Trusts PyPI, HTTPS (optional GPG verification)
-- **cargo:** Trusts crates.io, HTTPS (checksums only)
-
-**More paranoid (signatures required):**
-- **apt/yum:** GPG signatures on packages
-- **Arch pacman:** Package signing required
-- **Signal:** Binary transparency, reproducible builds
-- **Tor:** Multi-signature releases
-
-**Our position:**
+Our position:
 - More like Homebrew (content packages, not executables)
-- Less like apt (system packages, higher stakes)
+- Less like apt (text templates, not system binaries)
 - Appropriate for markdown/TOML asset distribution
 
-## Benefits
+## Updates
 
-- ✅ **Simple** - No key management, signature verification, or pinning logic
-- ✅ **Secure enough** - HTTPS + hardcoded repo prevents common attacks
-- ✅ **Transparent** - Users can inspect all assets locally
-- ✅ **Low risk** - Non-executable content, user-reviewed templates
-- ✅ **Maintainable** - Less code, fewer dependencies, clearer model
-- ✅ **Industry standard** - Similar to other content distribution tools
-
-## Trade-offs Accepted
-
-- ❌ No defense against compromised maintainer account (acceptable: maintainer responsibility)
-- ❌ No cryptographic proof of authenticity (acceptable: HTTPS + hardcoded repo is sufficient)
-- ❌ No commit pinning for reproducibility (acceptable: user controls update timing)
-- ❌ Trust GitHub infrastructure (acceptable: standard dependency)
-
-## Future Considerations
-
-**If threat model changes, we could add:**
-
-**Option 1: Commit signing verification**
-```bash
-# Verify commits are signed by maintainer
-git verify-commit abc123def456
-```
-
-**Option 2: Asset checksums from separate source**
-```bash
-# Checksums published via DNS TXT record or separate repo
-start assets update --verify-checksums
-```
-
-**Option 3: Reproducible asset builds**
-```bash
-# Assets generated deterministically, users can reproduce
-start assets update --verify-reproducible
-```
-
-**Current stance:** Don't implement unless threat landscape changes or users request it. Current model is appropriate for content distribution.
-
-## Related Decisions
-
-- [DR-011](./dr-011-asset-distribution.md) - GitHub-fetched assets (establishes network dependency)
-- [DR-014](./dr-014-github-tree-api.md) - SHA-based caching (file integrity checking)
-- [DR-022](./dr-022-asset-branch-strategy.md) - Main branch strategy (no release tags)
-- [DR-025](./dr-025-no-automatic-checks.md) - User-initiated updates (user controls timing)
-- [DR-026](./dr-026-offline-behavior.md) - Network-only approach (no manual injection)
-
-## Documentation
-
-### User Documentation
-
-**README security section:**
-```markdown
-## Security
-
-`start` downloads assets from GitHub over HTTPS:
-- Repository: github.com/grantcarthew/start
-- Transport: HTTPS (encrypted, authenticated)
-- Content: Markdown and TOML files (non-executable)
-
-You can inspect downloaded assets:
-- Location: ~/.config/start/assets/
-- View: cat ~/.config/start/assets/roles/code-reviewer.md
-
-Updates are user-initiated only:
-- Run `start assets update` when you want to update
-- Review changes: git log in the repository
-```
-
-### Developer Documentation
-
-**Security guidelines for contributors:**
-```markdown
-## Asset Security
-
-When adding/modifying assets:
-- Assets are trusted content (users will use them)
-- Review all template content carefully
-- Avoid suggesting dangerous commands in templates
-- Document template purpose and usage
-- Test thoroughly before committing to main
-
-Repository security:
-- Enable 2FA on your GitHub account
-- Use strong credentials
-- Review access permissions regularly
-```
+- 2025-01-17: Removed references to superseded DR-011, DR-014, DR-015; updated asset paths to cache directory for catalog system

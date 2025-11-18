@@ -1,97 +1,189 @@
 # DR-025: No Automatic Checks or Caching
 
-**Date:** 2025-01-06
-**Status:** Accepted
-**Category:** CLI Design
+- Date: 2025-01-06
+- Status: Accepted
+- Category: CLI Design
+
+## Problem
+
+The CLI needs to decide when and how to perform health checks (version updates, asset staleness, configuration validation). The strategy must balance:
+
+- Keeping users informed about available updates and issues
+- Respecting user workflow (no unexpected delays or network calls)
+- Command execution performance (fast startup, no overhead)
+- Offline usability (commands work without network access)
+- Implementation complexity (cache management, staleness logic)
+- User control over when checks occur
 
 ## Decision
 
-The CLI does **not** perform automatic background health checks or cache health check results. All checks are user-initiated only.
+The CLI does not perform automatic background health checks or cache health check results. All checks are user-initiated only via explicit commands.
 
-## What This Means
+No automatic checks:
 
-### No Automatic Checks
-
-**No background checking:**
-- No automatic version checks on every command execution
+- No automatic version checks on command execution
 - No periodic background health checks
 - No "you haven't run doctor in 30 days" nag messages
 - No silent network calls during normal operation
 
-**User-initiated only:**
-- `start doctor` - explicitly checks health
-- `start assets update` - explicitly updates assets and checks CLI version
-- All other commands (`start`, `start task`, etc.) - no health checks
+No result caching:
 
-### No Result Caching
-
-**No cached health check results:**
-- `start doctor` always performs fresh checks (network calls)
+- start doctor always performs fresh checks (no cached results)
 - No "last checked 2 hours ago" cached status
 - No "check is still valid for X hours" logic
-- Every execution makes fresh API calls (with rate limit protection)
+- Every execution makes fresh API calls
 
-**Asset download caching only:**
-- DR-014 SHA-based caching still applies (for asset downloads)
-- This prevents re-downloading unchanged files
-- This is file content caching, not health check caching
+User-initiated only:
 
-## Rationale
+- start doctor - explicitly checks health (always fresh, requires network)
+- start assets update - explicitly updates assets (always fresh, requires network)
+- All other commands - no health checks (fast, offline-friendly)
 
-**Respectful of user's workflow:**
-- No unexpected network calls
+## Why
+
+Respectful of user workflow:
+
+- No unexpected network calls during work
 - No performance impact on normal commands
-- No nagging or interruptions
-- User controls when checks happen
+- No interruptions or nagging messages
+- User controls exactly when checks happen
+- Commands work offline (except doctor and update)
 
-**Simpler implementation:**
-- No cache file management for health checks
-- No cache invalidation logic
-- No staleness calculations for cached results
-- No background job scheduling
+Simpler implementation:
 
-**Always fresh data:**
+- No cache file management for health check results
+- No cache invalidation logic or staleness calculations
+- No background job scheduling or goroutines
+- Fewer edge cases to handle
+- Less state to manage
+
+Always fresh data:
+
 - When user runs doctor, they get current information
 - No confusion about "last checked" vs "current status"
-- No stale cached results
+- No stale cached results misleading users
+- Clear expectation: doctor checks now, not from cache
 
-**Consistent with design:**
-- DR-021: CLI version checks have no caching
-- DR-023: Asset staleness checks have no caching
-- This decision makes that pattern explicit
+Fast command execution:
 
-## Comparison with Other Tools
+- start launches agent immediately (no delays)
+- start task executes immediately (no overhead)
+- No network round-trips during normal operation
+- Predictable performance
 
-Many CLI tools do automatic checks. We explicitly choose not to:
+## Trade-offs
 
-**Homebrew:**
-```bash
-# Auto-updates on brew install/upgrade
-# Can disable with HOMEBREW_NO_AUTO_UPDATE
+Accept:
+
+- User might miss available updates (they must remember to run doctor)
+- User might use outdated assets (no notification when updates available)
+- No "last checked" information (always fresh, but no historical context)
+- Repeated doctor calls make repeated API requests (no caching efficiency)
+- Users must develop their own update check cadence
+
+Gain:
+
+- Extremely fast command execution (no check overhead, no network calls)
+- Predictable behavior (checks only when user explicitly requests)
+- Respectful of user workflow (no unexpected network activity or interruptions)
+- Simple implementation (no cache management, invalidation, or staleness logic)
+- Offline-friendly (all commands work without network except doctor/update)
+- No nagging messages during work sessions
+- Clear mental model (doctor = check now, other commands = execute now)
+
+## Alternatives
+
+Automatic checks on every command (like npm, homebrew):
+
+Example approaches:
+- npm checks for updates periodically, shows "update available" message
+- homebrew auto-updates on brew install/upgrade (can disable with HOMEBREW_NO_AUTO_UPDATE)
+- rustup checks for toolchain updates with configurable behavior
+
+Pros:
+- Users stay informed about updates automatically
+- No need to remember to check manually
+- Updates are discovered quickly
+
+Cons:
+- Adds network latency to every command execution
+- Unexpected network calls (privacy and performance concerns)
+- Commands slower and less predictable
+- Requires network for normal operation
+- Interrupts user workflow with messages
+- Requires cache management to avoid excessive API calls
+
+Rejected: Performance and predictability more important than automatic update awareness. Users can develop their own cadence for running doctor.
+
+Cached results with time-to-live:
+
+Example: Cache doctor results for 24 hours, show cached status if fresh
+- start doctor within 24h: "Last checked 2 hours ago (cached), status: healthy"
+- start doctor after 24h: Perform fresh check
+
+Pros:
+- Reduces API calls for repeated doctor checks
+- Could enable "check on first use each day" pattern
+- Provides "last checked" information
+
+Cons:
+- Adds cache file management complexity
+- Requires cache invalidation logic
+- Stale results can mislead users
+- TTL value is arbitrary (too short = ineffective, too long = stale)
+- Users unsure if status is current or cached
+- More state to manage and debug
+
+Rejected: Complexity outweighs benefits. Fresh checks provide clear, unambiguous status.
+
+Optional automatic check setting:
+
+Example config:
+```toml
+[settings]
+auto_check = false  # Default: disabled
+auto_check_frequency = "daily"
 ```
 
-**npm:**
-```bash
-# Checks for npm updates periodically
-# Shows "npm update available" message
-```
+Pros:
+- Users can opt-in if they want automatic checks
+- Flexibility for different workflows
+- Advanced users can configure behavior
 
-**rustup:**
-```bash
-# Checks for toolchain updates
-# Can configure update behavior
-```
+Cons:
+- Adds implementation complexity (scheduling, cache, staleness)
+- Two code paths to maintain and test
+- Makes command behavior less predictable (depends on config)
+- Conflicts with "user-initiated only" principle
+- Most users would leave it disabled anyway
 
-**Our approach (start):**
-```bash
-# No automatic checks
-# User runs 'start doctor' when they want to check
-# User runs 'start assets update' when they want to update
-```
+Rejected: Adds significant complexity for uncertain benefit. Current design is simple and clear.
 
-## User Experience
+## Structure
 
-### Normal Command Execution
+Commands that perform health checks:
+
+- start doctor - Always checks, always fresh, requires network
+- start assets update - Always checks, always fresh, requires network
+
+Commands that do not perform checks:
+
+- start - No checks, fast execution, offline-friendly
+- start prompt - No checks
+- start task - No checks
+- start config (all subcommands) - No checks
+- start init - No checks (creates config only)
+
+Asset file caching (separate concern):
+
+- Asset downloads use catalog-based lazy loading
+- Downloaded assets cached locally to avoid re-downloading
+- This is file content caching (prevents redundant downloads)
+- Not health check result caching (different concern)
+
+## Usage Examples
+
+Normal command execution (no checks):
 
 ```bash
 $ start
@@ -106,128 +198,61 @@ $ start task review
 # Fast execution
 ```
 
-### Explicit Health Check
+Explicit health check:
 
 ```bash
 $ start doctor
 # User explicitly requests check
-# Makes network calls to GitHub
-# Shows comprehensive status
-# Fresh data every time
+# Makes fresh network calls to GitHub
+# Shows comprehensive current status
+# No cached results
 ```
 
-### Explicit Update
+Explicit update:
 
 ```bash
 $ start assets update
 # User explicitly requests update
-# Downloads new assets
-# Checks CLI version
+# Downloads new assets from catalog
 # Shows what changed
+# Always fresh check
 ```
 
-## Benefits
+Comparison with other tools:
 
-- ✅ **Fast** - Normal commands have no check overhead
-- ✅ **Predictable** - Checks only when user requests
-- ✅ **Respectful** - No unexpected network activity
-- ✅ **Simple** - No cache management complexity
-- ✅ **Offline-friendly** - Commands work without network (except doctor/update)
-- ✅ **No nagging** - No "you should update" messages during work
-
-## Trade-offs Accepted
-
-- ❌ User might miss available updates (acceptable: they can run doctor)
-- ❌ User might use outdated assets (acceptable: they control update timing)
-- ❌ No "last checked" information (acceptable: always fresh when checking)
-
-## Implementation Notes
-
-### What NOT to Implement
-
-**Don't add:**
-- Background check threads/goroutines
-- Cache files for health check results (e.g., `~/.config/start/doctor-cache.json`)
-- "Last checked" timestamps
-- Automatic update notifications
-- Periodic check timers
-- "Check on first use each day" logic
-
-### What to Keep
-
-**Do keep:**
-- SHA-based asset download caching (DR-014)
-- Rate limit checking before API calls
-- Network error handling
-
-### Command Behavior
-
-**Commands that check health:**
-- `start doctor` - always checks, always fresh
-- `start assets update` - always checks, always fresh
-
-**Commands that don't check:**
-- `start` - no checks
-- `start prompt` - no checks
-- `start task` - no checks
-- `start config *` - no checks
-- `start init` - no checks (just downloads assets)
-
-## Documentation
-
-### Help Text
-
-Make this clear in `--help`:
-
-```
-start doctor - Check system health and version status
-
-This command always performs fresh checks (no caching).
-It requires network access to check for updates.
-
-Run 'start doctor' periodically to check for updates.
+Homebrew (automatic):
+```bash
+# Auto-updates on brew install/upgrade
+# Can disable with HOMEBREW_NO_AUTO_UPDATE
 ```
 
-### README
+npm (automatic):
+```bash
+# Checks for npm updates periodically
+# Shows "npm update available" message
+```
 
-Document the philosophy:
+Our approach (manual):
+```bash
+# No automatic checks
+# User runs 'start doctor' when they want to check
+# User runs 'start assets update' when they want to update
+```
 
-```markdown
+## Scope
+
+This decision applies to:
+
+- Health check execution (when checks occur)
+- Result caching (whether check results are cached)
+- All commands in the CLI (which commands check, which don't)
+
+This decision does not apply to:
+
+- Asset file caching (downloaded assets are cached to avoid re-downloading)
+- Configuration file loading (configs are read on every execution)
+- Version injection at build time (embedded in binary)
+
 ## Updates
 
-`start` does not automatically check for updates. This keeps
-normal commands fast and respects your workflow.
-
-To check for updates:
-- Run `start doctor` to check health and version status
-- Run `start assets update` to update the asset library
-
-We recommend running `start doctor` occasionally to check
-for CLI and asset updates.
-```
-
-## Related Decisions
-
-- [DR-014](./dr-014-github-tree-api.md) - SHA-based asset caching (file content caching)
-- [DR-021](./dr-021-github-version-check.md) - CLI version checking (no result caching)
-- [DR-023](./dr-023-asset-staleness-check.md) - Asset staleness checking (no result caching)
-- [DR-024](./dr-024-doctor-exit-codes.md) - Doctor exit codes
-
-## Future Considerations
-
-If users request automatic checks, we could add:
-
-**Optional background checks** (not implementing now):
-```toml
-[settings]
-auto_check = false  # Default: disabled
-auto_check_frequency = "daily"  # If enabled
-```
-
-**But this conflicts with our philosophy:**
-- Adds complexity
-- Requires cache management
-- Makes commands less predictable
-- Goes against "user-initiated only" principle
-
-**Current stance:** Don't implement unless users strongly request it.
+- 2025-01-17: Removed references to superseded DR-014 and DR-023, updated asset caching description for catalog system

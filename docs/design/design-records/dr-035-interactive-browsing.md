@@ -1,54 +1,314 @@
 # DR-035: Interactive Asset Browsing
 
-**Date:** 2025-01-10
-**Status:** Accepted
-**Category:** Asset Management
+- Date: 2025-01-10
+- Status: Accepted
+- Category: Asset Management
+
+## Problem
+
+Users need to discover and install assets from the catalog interactively. The browsing strategy must address:
+
+- Discovery mechanism (how users browse available assets)
+- Navigation approach (category-based vs flat list vs search-first)
+- TUI complexity (full framework vs simple prompts vs numbered selection)
+- Terminal compatibility (SSH, containers, CI environments)
+- Non-interactive support (automation and scripts)
+- Dependency footprint (external libraries vs native Go)
+- Error handling (network failures, user cancellation)
+- Command organization (asset-focused vs type-specific commands)
+- Confirmation workflow (prevent accidental installations)
 
 ## Decision
 
-Provide interactive terminal-based catalog browsing via `start assets add` (no arguments) with TUI library support, falling back to numbered selection for non-interactive environments.
+Provide interactive terminal-based catalog browsing via start assets add (no arguments) using native numbered selection with category-first navigation and confirmation prompts.
 
-**Note:** Originally specified as `start config <type> add` commands. Per [DR-041](./dr-041-asset-command-reorganization.md), terminal TUI browsing moved to `start assets add` with no arguments. Separate `start assets browse` command opens web browser to GitHub catalog.
+Key aspects:
 
-## What This Means
+Command: start assets add (no arguments)
+- Interactive TUI browser for all asset types
+- Downloads index.csv for catalog metadata
+- Groups assets by category
+- Numbered selection interface
 
-### Interactive Browsing Commands
+Navigation: Category-first approach
+- Step 1: Select category (with asset counts)
+- Step 2: Select asset within category (with descriptions)
+- Step 3: Confirm download with metadata preview
+- Option to view all assets (skip category filtering)
 
-**Terminal TUI browser (DR-041):**
-```bash
-start assets add                # Interactive TUI browser for all asset types
+Implementation: Native numbered selection
+- No TUI library dependency (no bubbletea, promptui, survey)
+- Standard input/output (print numbered lists, read integers)
+- Works in all terminal environments
+- KISS principle for v1
+
+Confirmation workflow:
+- Show asset metadata before downloading (name, description, tags)
+- Prompt: "Download and add to config? [Y/n]"
+- User can cancel anytime (no changes made)
+- Downloads and adds to config only after confirmation
+
+Non-interactive mode:
+- --yes flag skips confirmation prompts (for automation)
+- --category flag skips category selection
+- --local flag adds to local config instead of global
+- Direct installation: start assets add <path>
+
+## Why
+
+Native numbered selection provides universal compatibility:
+
+- Works in all terminal environments (SSH, containers, CI)
+- No terminal capability detection needed
+- No external dependencies (keeps binary small)
+- Simple implementation (standard input/output)
+- Predictable behavior across platforms
+- Fast build times (no complex dependencies)
+
+Category-first navigation improves organization:
+
+- Easier to scan than flat list (grouped by domain)
+- Scales to hundreds of assets (smaller lists per screen)
+- Clear mental model (type → category → asset)
+- Reduces cognitive load (focus on one category at a time)
+- Better for discovery (browse related assets together)
+
+Confirmation prompts prevent accidents:
+
+- User sees what they're downloading (name, description, tags)
+- Explicit consent required (Y/n prompt)
+- Can review before committing (metadata preview)
+- No surprise downloads (always prompted)
+- Can cancel anytime (no changes made if cancelled)
+
+KISS principle for v1:
+
+- Don't add dependencies speculatively
+- Ship simple version first (numbered selection proven pattern)
+- Add TUI library later if users request (based on real feedback)
+- Keeps binary small and builds fast
+- Avoids over-engineering for initial release
+
+Flexible modes support different workflows:
+
+- Interactive browsing (discovery and exploration)
+- Direct installation (when user knows asset path)
+- Non-interactive mode (automation and scripts)
+- Category filtering (skip navigation if category known)
+
+## Trade-offs
+
+Accept:
+
+- No fancy TUI in v1 (no arrow key navigation, no fuzzy search, no multi-select, but can add in v2 if users request)
+- Category navigation adds step (extra prompt compared to flat list, but better organization for large catalogs)
+- No inline search in TUI (can't filter by keyword while browsing, use start assets search or --category flag instead)
+- Numbered input only (typing numbers instead of arrow keys, but works everywhere)
+- Manual category selection (can't auto-detect user intent, but --category flag available)
+
+Gain:
+
+- Universal compatibility (works in SSH, containers, CI, all terminals without feature detection)
+- Zero dependencies (no external TUI libraries, keeps binary small and builds fast)
+- Simple and predictable (numbered lists, clear prompts, straightforward flow)
+- Flexible modes (interactive browsing or direct installation with --yes for automation)
+- Category organization (easier to scan, better for large catalogs, scales well)
+- Confirmation before changes (user sees metadata before installing, can cancel anytime)
+- Non-interactive support (automation-friendly with --yes, --category, and direct path installation)
+
+## Alternatives
+
+Use TUI library (bubbletea, promptui, survey):
+
+Example: Integrate charmbracelet/bubbletea for enhanced UX
+- Full-featured TUI framework
+- Arrow key navigation instead of numbered selection
+- Fuzzy search, multi-select capabilities
+- Beautiful rendering with colors and boxes
+- Modern terminal UI patterns
+
+Pros:
+- Better UX (arrow keys more intuitive than typing numbers)
+- Richer interactions (fuzzy search, multi-select)
+- Modern appearance (colors, borders, animations)
+- Familiar pattern (like fzf, kubectl)
+
+Cons:
+- External dependency (larger binary, slower builds)
+- Terminal compatibility issues (some terminals don't support features)
+- Complex API (Elm architecture for bubbletea, steeper learning curve)
+- May not work in all environments (SSH, containers, limited terminals)
+- Adds maintenance burden (dependency updates, API changes)
+
+Rejected: KISS principle - ship v1 with numbered selection, add TUI library in v2 if users request. Numbered selection works everywhere and avoids complexity.
+
+Flat list without categories:
+
+Example: Show all assets in one long list
+```
+Available tasks:
+  1. git-workflow/pre-commit-review - Review staged changes
+  2. git-workflow/pr-ready - Complete PR preparation
+  3. code-quality/find-bugs - Find potential bugs
+  4. code-quality/quick-wins - Low-hanging refactoring
+  [... 42 more ...]
+Choice [1-46]: _
 ```
 
-**Web browser (DR-041):**
-```bash
-start assets browse             # Opens GitHub catalog in web browser
+Pros:
+- Simpler (one step instead of two)
+- Faster (no category navigation)
+- Less code (no grouping logic)
+
+Cons:
+- Long list (hard to scan with hundreds of assets)
+- Poor organization (no grouping by domain)
+- Doesn't scale (overwhelming as catalog grows)
+- Cognitive overload (too many choices at once)
+
+Rejected: Category-first navigation better for large catalogs, easier to scan, clearer organization.
+
+Search-first pattern:
+
+Example: Prompt for search query before browsing
+```
+Search for task (or press Enter to browse all): commit
+
+Found 3 tasks:
+  1. pre-commit-review - Review staged changes
+  2. commit-message - Generate conventional commit
+  3. explain-changes - Understand what changed
 ```
 
-**Search and install (DR-040, DR-041):**
-```bash
-start assets add "commit"       # Search by query (substring matching)
-start assets add git-workflow/pre-commit-review  # Direct install by path
+Pros:
+- Fast for users who know what they want
+- Reduces browsing (direct to relevant assets)
+- Good for power users (targeted search)
+
+Cons:
+- Extra step for exploration (must type something)
+- Not good for discovery (browsing to see what exists)
+- Requires search implementation upfront
+- Poor for new users (don't know what to search for)
+
+Rejected: Category browsing better for discovery. Search available via separate start assets search command for targeted queries.
+
+Direct installation without browsing:
+
+Example: Require explicit asset path, no interactive mode
 ```
-
-**Legacy commands (deprecated):**
-```bash
-start assets add           # DEPRECATED - use 'start assets add'
-start config role add           # DEPRECATED - use 'start assets add'
-start config agent add          # DEPRECATED - use 'start assets add'
+start assets add git-workflow/pre-commit-review --yes
 ```
+- No interactive browsing at all
+- User must know asset path upfront
+- Always requires explicit path
 
-### User Experience Flow
+Pros:
+- Very explicit (user knows exactly what they're getting)
+- No interactive navigation needed
+- Simple implementation (no TUI code)
 
-**1. Invoke TUI browser:**
+Cons:
+- Poor discoverability (must know asset path upfront)
+- No exploration (can't browse available assets)
+- Requires external documentation (users look up paths elsewhere)
+- Worse UX for new users (high barrier to discovery)
+
+Rejected: Interactive browsing critical for discovery. Direct installation available as alternative mode, not replacement.
+
+## Structure
+
+Interactive TUI browser:
+
+Command: start assets add (no arguments)
+- Downloads index.csv from GitHub
+- Groups assets by type and category
+- Shows numbered category list
+- User selects category (or "view all")
+- Shows numbered asset list with descriptions
+- User selects asset
+- Shows confirmation prompt with metadata
+- Downloads and adds to config on confirmation
+
+Navigation flow:
+
+1. Fetch catalog
+   - Download index.csv from raw.githubusercontent.com
+   - Parse into in-memory structure
+   - Group by type and category
+
+2. Category selection
+   - Display: "Select category:"
+   - List categories with asset counts (e.g., "1. git-workflow (4 tasks)")
+   - Include option: "[view all tasks]" to skip filtering
+   - Read user input (integer choice)
+
+3. Asset selection
+   - Display: "{category} tasks:"
+   - List assets with name and description
+   - Read user input (integer choice)
+
+4. Confirmation prompt
+   - Display selected asset metadata:
+     - Name
+     - Description
+     - Tags
+   - Prompt: "Download and add to config? [Y/n]"
+   - Read user input (Y/n)
+
+5. Download and install
+   - Download asset files from GitHub (raw URLs)
+   - Cache to ~/.cache/start/{type}/{category}/
+   - Add to config (global or local based on --local flag)
+   - Display success message with usage hint
+
+Non-interactive mode:
+
+Flags:
+- --yes, -y: Skip confirmation prompts (for automation)
+- --category <cat>: Filter by category (skip category selection step)
+- --local: Add to local config instead of global
+
+Direct installation:
+- Syntax: start assets add <path>
+- Example: start assets add git-workflow/pre-commit-review
+- Skips category and asset selection steps
+- Shows confirmation prompt (unless --yes provided)
+- Downloads and adds to config
+
+Error handling:
+
+Network unavailable:
+- Message: "Cannot fetch catalog from GitHub"
+- Show network error details
+- Suggestions:
+  - Check internet connection
+  - Use cached assets: start task <name>
+  - Add custom task manually
+
+No assets found:
+- Message: "No tasks found in category 'X'"
+- Show available categories
+- Suggest: Try different category
+
+User cancels:
+- Message: "Cancelled. No changes made."
+- Exit code 0 (user choice, not error)
+
+Invalid input:
+- Re-prompt for valid choice
+- Show valid range (e.g., "Choice [1-5]:")
+
+## Usage Examples
+
+Interactive browsing:
+
 ```bash
 $ start assets add
 
 Fetching catalog from GitHub...
 ✓ Found 46 assets across 4 types and 12 categories
-```
 
-**2. Select category:**
-```
 Select category:
   1. git-workflow (4 tasks)
   2. code-quality (4 tasks)
@@ -56,171 +316,114 @@ Select category:
   4. debugging (2 tasks)
   5. [view all tasks]
 
-> _
-```
+> 1
 
-**3. Select asset:**
-```
 git-workflow tasks:
   1. pre-commit-review - Review staged changes before commit
   2. pr-ready - Complete PR preparation checklist
   3. commit-message - Generate conventional commit message
   4. explain-changes - Understand what changed in commits
 
-  [b] back  [q] quit
+> 1
 
-> _
-```
-
-**4. Confirm and download:**
-```
 Selected: pre-commit-review
 Description: Review staged changes before commit
 Tags: git, review, quality, pre-commit
 
-Download and add to config? [Y/n] _
-```
+Download and add to config? [Y/n] y
 
-**5. Success:**
-```
 Downloading...
-✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+✓ Cached to ~/.cache/start/tasks/git-workflow/
 ✓ Added to global config as 'pre-commit-review'
 
 Try it: start task pre-commit-review
 ```
 
-### TUI Library Selection
+Category filtering (skip category selection):
 
-**Evaluation criteria:**
-- Ease of use (API simplicity)
-- Dependency footprint
-- Maintenance status
-- Feature completeness
-
-**Options considered:**
-
-**1. bubbletea (charmbracelet/bubbletea)**
-- Full-featured TUI framework
-- Beautiful rendering
-- Complex API (Elm architecture)
-- Large dependency tree
-
-**2. promptui (manifoldco/promptui)**
-- Simple prompts and selects
-- Minimal API
-- Small dependency footprint
-- Good for basic interactions
-
-**3. survey (AlecAivazis/survey)**
-- Rich prompt library
-- Medium complexity
-- Active maintenance
-- Good balance
-
-**4. Native numbered selection (no dependency)**
-- Print numbered list
-- Read user input
-- No external dependencies
-- Works everywhere
-
-**Decision for v1:** Start with **native numbered selection**, evaluate TUI library later based on user feedback.
-
-**Rationale:**
-- KISS principle - don't add dependencies speculatively
-- Numbered selection works everywhere (SSH, containers, CI)
-- Can add TUI library in v2 if users request it
-- Keeps binary small and build fast
-
-### Implementation (Numbered Selection)
-
-```go
-func BrowseTaskCatalog() (*Asset, error) {
-    // Fetch catalog
-    catalog := getCatalog()
-    tasks := catalog.FilterByType("tasks")
-
-    // Group by category
-    categories := tasks.GroupByCategory()
-
-    // Show categories
-    fmt.Println("\nSelect category:")
-    for i, cat := range categories {
-        fmt.Printf("  %d. %s (%d tasks)\n", i+1, cat.Name, len(cat.Assets))
-    }
-    fmt.Printf("  %d. [view all tasks]\n", len(categories)+1)
-
-    // Read category choice
-    choice := readInt(fmt.Sprintf("\nChoice [1-%d]: ", len(categories)+1))
-    if choice == len(categories)+1 {
-        // Show all
-        return showAllTasks(tasks)
-    }
-
-    selectedCategory := categories[choice-1]
-
-    // Show tasks in category
-    fmt.Printf("\n%s tasks:\n", selectedCategory.Name)
-    for i, asset := range selectedCategory.Assets {
-        fmt.Printf("  %d. %s - %s\n", i+1, asset.Name, asset.Description)
-    }
-
-    // Read task choice
-    taskChoice := readInt(fmt.Sprintf("\nChoice [1-%d]: ", len(selectedCategory.Assets)))
-    selectedAsset := selectedCategory.Assets[taskChoice-1]
-
-    // Confirm
-    fmt.Printf("\nSelected: %s\n", selectedAsset.Name)
-    fmt.Printf("Description: %s\n", selectedAsset.Description)
-    fmt.Printf("Tags: %s\n", strings.Join(selectedAsset.Tags, ", "))
-
-    if !confirm("Download and add to config?") {
-        return nil, ErrUserCancelled
-    }
-
-    return selectedAsset, nil
-}
-```
-
-### Filtering and Search
-
-**Category filtering (v1):**
 ```bash
-start assets add --category git-workflow
+$ start assets add --category git-workflow
 
-# Shows only git-workflow tasks, skip category selection
+Fetching catalog from GitHub...
+✓ Found 4 assets in git-workflow
+
+git-workflow tasks:
+  1. pre-commit-review - Review staged changes before commit
+  2. pr-ready - Complete PR preparation checklist
+  3. commit-message - Generate conventional commit message
+  4. explain-changes - Understand what changed in commits
+
+> 1
+
+Selected: pre-commit-review
+Description: Review staged changes before commit
+Tags: git, review, quality, pre-commit
+
+Download and add to config? [Y/n] y
+
+Downloading...
+✓ Cached to ~/.cache/start/tasks/git-workflow/
+✓ Added to global config as 'pre-commit-review'
 ```
 
-**Search by keyword (future):**
+Direct installation:
+
 ```bash
-start assets add --search commit
+$ start assets add git-workflow/pre-commit-review
 
-# Shows all tasks matching "commit" in name, description, or tags
+Found asset: pre-commit-review
+Description: Review staged changes before commit
+Tags: git, review, quality, pre-commit
+
+Download and add to config? [Y/n] y
+
+Downloading...
+✓ Cached to ~/.cache/start/tasks/git-workflow/
+✓ Added to global config as 'pre-commit-review'
 ```
 
-### Non-Interactive Mode
+Non-interactive mode for automation:
 
-**For scripts/automation:**
 ```bash
-# Direct installation (no interaction)
-start assets add git-workflow/pre-commit-review --yes
+$ start assets add git-workflow/pre-commit-review --yes
 
-# Error if not found
-start assets add nonexistent/task --yes
-# Exit code 1
+✓ Downloaded and cached pre-commit-review
+✓ Added to global config
+
+$ echo $?
+0
 ```
 
-**Flags:**
-```
---yes, -y          Skip confirmation prompts
---category <cat>   Filter by category
---search <term>    Search by keyword (future)
+Add to local config:
+
+```bash
+$ start assets add --local
+
+Fetching catalog from GitHub...
+✓ Found 46 assets across 4 types and 12 categories
+
+Select category:
+  1. git-workflow (4 tasks)
+  [...]
+
+> 1
+
+git-workflow tasks:
+  1. pre-commit-review - Review staged changes before commit
+  [...]
+
+> 1
+
+[... confirmation ...]
+
+Downloading...
+✓ Cached to ~/.cache/start/tasks/git-workflow/
+✓ Added to local config as 'pre-commit-review'
 ```
 
-### Error Handling
+Error handling - network unavailable:
 
-**Network unavailable:**
-```
+```bash
 $ start assets add
 
 Error: Cannot fetch catalog from GitHub
@@ -230,11 +433,12 @@ Network error: dial tcp: no route to host
 To resolve:
 - Check internet connection
 - Use cached assets: start task <name>
-- Add custom task: start assets add my-task
+- Add custom task manually
 ```
 
-**No assets found:**
-```
+Error handling - no assets found:
+
+```bash
 $ start assets add --category nonexistent
 
 Error: No tasks found in category 'nonexistent'
@@ -248,158 +452,55 @@ Available categories:
 Try: start assets add --category git-workflow
 ```
 
-**User cancels:**
-```
+Error handling - user cancels:
+
+```bash
 $ start assets add
 
+Fetching catalog from GitHub...
+✓ Found 46 assets across 4 types and 12 categories
+
 [... user navigates and selects task ...]
+
+Selected: pre-commit-review
+Description: Review staged changes before commit
+Tags: git, review, quality, pre-commit
 
 Download and add to config? [Y/n] n
 
 Cancelled. No changes made.
 ```
 
-## Alternative UX Patterns
+View all assets (skip category filtering):
 
-### Pattern 1: Flat List (Simple)
+```bash
+$ start assets add
 
-```
-Available tasks:
-  1. git-workflow/pre-commit-review - Review staged changes
-  2. git-workflow/pr-ready - Complete PR preparation
-  3. code-quality/find-bugs - Find potential bugs
-  4. code-quality/quick-wins - Low-hanging refactoring
-  [... 8 more ...]
+Fetching catalog from GitHub...
+✓ Found 46 assets across 4 types and 12 categories
 
-Choice [1-12]: _
-```
-
-**Pros:** Simplest, no category navigation
-**Cons:** Long list, hard to scan
-
-### Pattern 2: Category First (Chosen)
-
-```
-Categories:
+Select category:
   1. git-workflow (4 tasks)
   2. code-quality (4 tasks)
+  3. security (2 tasks)
+  4. debugging (2 tasks)
+  5. [view all tasks]
 
-Choice: 1
+> 5
 
-Tasks in git-workflow:
-  1. pre-commit-review - Review staged changes
-  2. pr-ready - Complete PR preparation
+All tasks:
+  1. git-workflow/pre-commit-review - Review staged changes before commit
+  2. git-workflow/pr-ready - Complete PR preparation checklist
+  3. git-workflow/commit-message - Generate conventional commit message
+  4. git-workflow/explain-changes - Understand what changed in commits
+  5. code-quality/find-bugs - Find potential bugs in code
+  [... 8 more ...]
 
-Choice: 1
+> 1
+
+[... confirmation and download ...]
 ```
 
-**Pros:** Organized, easier to scan
-**Cons:** Extra step
+## Updates
 
-### Pattern 3: Search First
-
-```
-Search for task (or press Enter to browse all): commit
-
-Found 3 tasks:
-  1. pre-commit-review - Review staged changes
-  2. commit-message - Generate conventional commit
-  3. explain-changes - Understand what changed
-
-Choice: _
-```
-
-**Pros:** Fast for users who know what they want
-**Cons:** Requires implementation of search
-
-**Decision:** Use Pattern 2 (category first) for v1, can add search later.
-
-## Implementation Phases
-
-### Phase 1: Core Browsing (v1)
-- ✅ Numbered category selection
-- ✅ Asset list in category
-- ✅ Confirmation prompt
-- ✅ Download and add to config
-
-### Phase 2: Enhanced Navigation (v2)
-- Category filtering flag
-- Back/quit navigation
-- Asset preview (show content)
-- Diff between local and catalog
-
-### Phase 3: TUI Enhancement (v3)
-- Evaluate user feedback
-- Add TUI library if requested
-- Arrow key navigation
-- Fuzzy search
-
-### Phase 4: Advanced Features (future)
-- Full-text search
-- Tag filtering
-- Bulk installation
-- Asset ratings/popularity
-
-## Benefits
-
-**Discoverable:**
-- ✅ Browse all available assets
-- ✅ Organized by category
-- ✅ See descriptions before downloading
-
-**Accessible:**
-- ✅ Works in all terminals (numbered selection)
-- ✅ Works over SSH
-- ✅ Works in CI/containers (with --yes flag)
-
-**Simple:**
-- ✅ No external dependencies for v1
-- ✅ Straightforward numbered lists
-- ✅ Clear prompts and confirmations
-
-**Flexible:**
-- ✅ Interactive or direct installation
-- ✅ Filter by category
-- ✅ Non-interactive mode for automation
-
-## Trade-offs Accepted
-
-**No fancy TUI in v1:**
-- ❌ No arrow key navigation
-- ❌ No fuzzy search
-- ❌ No multi-select
-- **Mitigation:** Can add later if users request, numbered selection works well
-
-**Category navigation adds a step:**
-- ❌ Extra prompt compared to flat list
-- **Mitigation:** Better organization, easier to scan large catalogs
-
-**No inline search in TUI:**
-- ❌ Can't filter by keyword while browsing the TUI
-- **Mitigation:** Use `start assets search <query>` instead (DR-040), or category filtering
-
-## Related Decisions
-
-- [DR-031](./dr-031-catalog-based-assets.md) - Catalog architecture (browsing context)
-- [DR-034](./dr-034-github-catalog-api.md) - GitHub API (catalog source)
-- [DR-033](./dr-033-asset-resolution-algorithm.md) - Resolution (post-download behavior)
-- [DR-039](./dr-039-catalog-index.md) - Catalog index file (powers search/browse functionality)
-- [DR-040](./dr-040-substring-matching.md) - Substring matching algorithm (search query matching)
-- [DR-041](./dr-041-asset-command-reorganization.md) - Asset command reorganization (TUI browser moved to `start assets add`)
-
-## Future Considerations
-
-**TUI library addition:**
-```go
-// If user feedback requests enhanced UX
-import "github.com/charmbracelet/bubbletea"
-
-func BrowseTasks() {
-    if isInteractive() && config.EnableTUI {
-        return browseTUI()  // Fancy interface
-    }
-    return browseNumbered()  // Fallback
-}
-```
-
-**Current stance:** Ship v1 with numbered selection. Monitor user feedback. Add TUI in v2 if requested.
+- 2025-01-17: Initial version aligned with schema; removed implementation code, Related Decisions, and Future Considerations sections; command changed from start config <type> add to start assets add per command reorganization

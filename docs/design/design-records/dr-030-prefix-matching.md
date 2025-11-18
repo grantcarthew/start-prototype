@@ -1,182 +1,291 @@
 # DR-030: Prefix Matching for Commands
 
-**Date:** 2025-01-10
-**Status:** Accepted
-**Category:** CLI Design
+- Date: 2025-01-10
+- Status: Accepted
+- Category: CLI Design
+
+## Problem
+
+CLI usability can be improved by allowing shorter command input. The design must address:
+
+- Command typing speed (full commands are verbose for frequent use)
+- User experience (balance between brevity and clarity)
+- Ambiguity handling (what happens when prefix matches multiple commands)
+- Script stability (automated scripts should not break)
+- Implementation complexity (build custom vs leverage framework)
+- Command naming constraints (avoiding conflicting prefixes)
+- Breaking changes (adding new commands may conflict with shortcuts)
+- Documentation clarity (examples should be understandable)
 
 ## Decision
 
-Enable Cobra's built-in prefix matching globally via `cobra.EnablePrefixMatching = true`. Users can type unambiguous prefixes of commands at all levels instead of full command names.
+Enable Cobra's built-in prefix matching globally via cobra.EnablePrefixMatching = true. Users can type unambiguous prefixes of commands at all levels instead of full command names.
 
-## What This Means
+How it works:
 
-### User Experience
+- User types partial command (e.g., con)
+- Cobra checks all subcommands for prefix match
+- If exactly one matches: uses that command
+- If zero or multiple match: returns error with suggestions
+- Works at all command levels automatically
 
-Users can type partial commands as long as they're unambiguous:
+Examples:
 
-**Top-level commands:**
+Top-level commands:
+- start d → start doctor
+- start con → start config
+- start t mytask → start task mytask
+
+Nested commands:
+- start con ag l → start config agent list
+- start ass a role1 → start assets add role1
+- start con r e myRole → start config role edit myRole
+
+Ambiguous prefixes fail with helpful error.
+
+## Why
+
+Faster typing for power users:
+
+- Significantly reduces keystrokes for frequent commands
+- Allows natural development of personal shortcuts
+- Less cognitive load during interactive sessions
+- Muscle memory develops for common prefix patterns
+- Better UX for daily usage
+
+Forgiving and discoverable:
+
+- Typos often still match (sta → start, doe → doctor)
+- Progressive disclosure with Tab completion
+- Can explore commands by typing prefixes
+- Reduces friction for learning the CLI
+
+Zero implementation cost:
+
+- Single line of code: cobra.EnablePrefixMatching = true
+- Cobra's findNext() method handles all logic
+- Automatic at all command levels
+- No custom code to maintain
+
+Industry standard pattern:
+
+- kubectl uses this extensively (get po, desc no)
+- Familiar to developer audience
+- Expected feature for modern CLIs
+- Works well with shell completion
+
+Complements shell completion:
+
+- Tab completion for full commands
+- Prefix matching for quick shortcuts
+- Together provide flexible UX
+- Users can choose their preferred style
+
+## Trade-offs
+
+Accept:
+
+- Ambiguity risk when adding new commands (new command may conflict with existing shortcuts)
+- Script fragility (scripts using shortcuts may break if new commands added)
+- Reduced explicitness (start con ag l less readable than full command)
+- Command naming constraints (must avoid similar prefixes where possible)
+- Cobra warns this can be "dangerous" (acknowledge the risk for better UX)
+- Documentation complexity (must explain shortcuts vs full commands)
+
+Gain:
+
+- Significantly faster typing for power users (fewer keystrokes, better flow)
+- Forgiving user experience (typos often still work, less frustration)
+- Zero implementation cost (one line of code, Cobra handles everything)
+- Works with shell completion (complementary features, not redundant)
+- Consistent everywhere (all commands, all levels, no special cases)
+- Familiar pattern (kubectl users expect this, industry standard for complex CLIs)
+- Progressive disclosure (helps users explore command structure)
+
+## Alternatives
+
+No prefix matching:
+
+Example: Require full command names always
 ```bash
-start d          → start doctor
-start u          → start (ambiguous: start-assets-update)
-start con        → start config
-start t mytask   → start task mytask
+start config agent list  # Always required
+start con ag l          # Error: unknown command
 ```
 
-**Nested commands:**
-```bash
-start con ag l           → start config agent list
-start ass a task1        → start assets add task1
-start con r e myRole     → start config role edit myRole
-```
+Pros:
+- No ambiguity possible (commands always explicit)
+- Scripts never break from new commands
+- Documentation always clear
+- No naming constraints
+- Simple and predictable
 
-**Ambiguous prefixes fail:**
-```bash
-start config t   → Error: "t" matches both "task" and nothing else currently
-                   (or suggests "did you mean: task?")
-```
+Cons:
+- Verbose for frequent use (lots of typing)
+- Poor UX for power users (tedious and slow)
+- Less forgiving (typos always fail)
+- Missing industry-standard feature
+- Users will create shell aliases anyway
 
-### How Cobra Handles It
+Rejected: Poor UX for interactive use. Power users expect prefix matching in modern CLIs. Implementation is trivial.
 
-**Matching logic:**
-1. User types partial command (e.g., `con`)
-2. Cobra checks all subcommands for prefix match
-3. If **exactly one** matches → uses that command
-4. If **zero or multiple** match → returns error/suggestion
+Selective prefix matching:
 
-**Works at all levels automatically:**
-- Root level: `start d`
-- First level: `start con ag`
-- Second level: `start config ag l`
-- Everywhere!
-
-### Implementation
-
-**Single line in main.go:**
+Example: Enable only for specific command levels
 ```go
-func init() {
-    cobra.EnablePrefixMatching = true
-}
+// Only top-level commands
+rootCmd.EnablePrefixMatching = true
+// Nested commands require full names
 ```
 
-That's it. Cobra's `findNext()` method in `command.go` handles the rest.
+Pros:
+- Reduces ambiguity scope (fewer places for conflicts)
+- Scripts could use shortcuts at top level safely
+- More predictable which shortcuts work
+- Gradual adoption possible
 
-## Benefits
+Cons:
+- Inconsistent UX (works sometimes, not others)
+- Users confused about where prefixes work
+- More complex implementation (per-command config)
+- Limits benefits to partial use cases
+- Still have same risks at top level
 
-**For power users:**
-- ✅ **Faster typing** - `start con ag l` vs `start config agent list`
-- ✅ **Muscle memory** - Develop personal shortcuts naturally
-- ✅ **Less cognitive load** - Don't need to remember exact spelling mid-flow
+Rejected: Inconsistency is worse than consistent behavior. If we enable prefix matching, enable it everywhere.
 
-**For all users:**
-- ✅ **Forgiving** - Typos often still match (e.g., `sta` → `start`)
-- ✅ **Progressive disclosure** - Can type `start c<Tab>` to see completions
-- ✅ **Familiar pattern** - kubectl, docker, and other CLIs do this
+Custom alias system:
 
-**For the project:**
-- ✅ **Zero implementation cost** - One line of code
-- ✅ **Works with completion** - Tab completion + prefix matching = great UX
-- ✅ **Consistent everywhere** - All commands, all levels
+Example: User-defined command aliases
+```toml
+[aliases]
+d = "doctor"
+ca = "config agent"
+cal = "config agent list"
+```
 
-## Trade-offs Accepted
+Pros:
+- Users define their own shortcuts
+- No ambiguity (explicit mappings)
+- Scripts can use aliases safely (defined in config)
+- Full control over abbreviations
 
-**Ambiguity risk:**
-- ❌ Adding new commands could break existing shortcuts
-- ❌ Example: If we add `start configure`, then `start con` becomes ambiguous
-- **Mitigation:** Careful command naming, avoid similar prefixes
+Cons:
+- Requires configuration (not automatic)
+- Users must set up aliases manually
+- More implementation work
+- Aliases not portable (machine-specific)
+- Doesn't help with typo forgiveness
+- Must maintain alias system
 
-**Script fragility:**
-- ❌ Scripts using shortcuts could break with new commands
-- ❌ Example: CI script uses `start u` → we add `start upgrade` → breaks
-- **Mitigation:** Document recommendation to use full commands in scripts
+Rejected: More work to implement and configure. Cobra's prefix matching provides better UX with zero configuration.
 
-**Reduced explicitness:**
-- ❌ `start con ag l` is less readable than full command
-- ❌ Documentation examples harder to understand
-- **Mitigation:** Always show full commands in docs, mention shortcuts as optional
+## Structure
 
-**"Dangerous" per Cobra:**
-- ❌ Cobra docs warn "Automatic prefix matching can be a dangerous thing"
-- ❌ They know about the ambiguity and breaking change risks
-- **Mitigation:** We accept the trade-off for better UX
+Matching logic:
 
-## Guidelines
+How Cobra handles prefix matching:
 
-### For Users
+1. User types partial command (e.g., con)
+2. Cobra checks all subcommands for prefix match
+3. If exactly one matches: uses that command
+4. If zero or multiple match: returns error with suggestions
+5. Works at all command levels automatically
 
-**Interactive use:**
-- Use shortcuts freely: `start con ag l`
+Ambiguity handling:
+
+Exactly one match:
+- Command executes normally
+- User sees expected behavior
+
+Multiple matches (ambiguous):
+- Error message lists matching commands
+- Suggests full command names
+- Exit with error code
+
+No matches (unknown command):
+- Error message shows similar commands
+- Suggests using --help
+- Exit with error code
+
+Usage guidelines:
+
+For users in interactive sessions:
+- Use shortcuts freely (start con ag l)
 - Experiment to find what works
+- Develop personal muscle memory
 
-**In scripts/CI:**
-- Always use full commands: `start config agent list`
+For scripts and CI:
+- Always use full commands (start config agent list)
 - Prevents breakage when new commands added
+- More explicit and maintainable
 
-**Documentation/sharing:**
+For documentation and sharing:
 - Prefer full commands for clarity
-- Can mention shortcuts: "You can also type `start con ag l`"
+- Can mention shortcuts as optional feature
+- Examples should be understandable
 
-### For Development
+For development and command naming:
 
-**Command naming:**
-- Avoid similar prefixes where possible
-- Example: Don't add both `configure` and `config`
-- Think about common prefixes: `a`, `c`, `d`, `l`, `s`, `t`, `u`
+Avoid similar prefixes:
+- Don't add both configure and config
+- Think about common single-letter prefixes
+- Consider existing shortcuts when naming
 
-**Version stability:**
-- Adding commands is a **minor** change (may break shortcuts)
-- Users should expect new commands → update their shortcuts
+Version stability:
+- Adding commands is a minor change (may break shortcuts)
+- Users should expect new commands to affect shortcuts
 - Document command additions in release notes
 
-**Testing:**
-- Test both full commands and common prefixes
-- Verify ambiguity detection works
-- Check error messages are helpful
+## Usage Examples
 
-## Documentation Updates
+Top-level command shortcuts:
 
-### README Quick Start
-
-```markdown
-**Pro tip:** You can use unambiguous prefixes:
 ```bash
-start d              # start doctor
-start con ag l       # start config agent list
-start t code-review  # start task code-review
+$ start d
+# Executes: start doctor
+
+$ start con
+# Executes: start config
+
+$ start t mytask
+# Executes: start task mytask
+
+$ start ass
+# Executes: start assets
 ```
 
-**For scripts:** Always use full command names to avoid breakage.
+Nested command shortcuts:
+
+```bash
+$ start con ag l
+# Executes: start config agent list
+
+$ start con r e myRole
+# Executes: start config role edit myRole
+
+$ start ass a task1
+# Executes: start assets add task1
 ```
 
-### CLI Documentation
+Ambiguous prefix error:
 
-Add note to command reference pages:
+```bash
+$ start c
 
-```markdown
-## Prefix Matching
-
-You can type unambiguous prefixes instead of full command names:
-- `start con` → `start config`
-- `start config ag` → `start config agent`
-
-If your prefix matches multiple commands, `start` will show suggestions.
-
-**Recommendation:** Use full commands in scripts and documentation.
-```
-
-### Error Messages
-
-When ambiguous:
-```
-Error: command "t" is ambiguous, could be:
-  - task
-  - (if we add more commands starting with 't')
+Error: command "c" is ambiguous, matches:
+  - config
+  - completion
 
 Try:
   start --help   # See all commands
 ```
 
-When no match:
-```
+Exit code: 1
+
+Unknown command with suggestions:
+
+```bash
+$ start xyz
+
 Error: unknown command "xyz"
 
 Did you mean one of these?
@@ -186,45 +295,63 @@ Did you mean one of these?
 Run 'start --help' for usage.
 ```
 
-## Examples in the Wild
+Exit code: 1
 
-**kubectl (extensive use):**
+Script usage (full commands):
+
 ```bash
-kubectl get po       → kubectl get pods
-kubectl desc no      → kubectl describe nodes
-kubectl app version  → kubectl apply version
+#!/bin/bash
+# CI script - always use full commands
+
+start config validate
+start doctor
+start task code-review "check security"
+
+# Don't use shortcuts in scripts:
+# start con val     # Bad - may break if new command added
+# start d           # Bad - ambiguous if "debug" command added
+# start t review    # Bad - could break with new commands
 ```
 
-**git (limited use):**
-```bash
-git st    → Would work if aliased, not built-in
-git co    → Not built-in, requires alias
-git br    → Not built-in, requires alias
-```
-Git chose not to do this by default, requires explicit aliases.
+Interactive usage (shortcuts):
 
-**docker (no prefix matching):**
 ```bash
-docker ps    → docker ps (exact command)
-docker co    → Error
-```
-Docker uses short exact commands, not prefix matching.
+# Power user session - shortcuts are fine
+$ start d
+$ start con ag l
+$ start t cr "check this"
 
-**Our choice:** Follow kubectl's power-user approach, since:
+# These develop naturally with muscle memory
+```
+
+Comparison with other CLIs:
+
+kubectl (extensive prefix matching):
+```bash
+kubectl get po       # kubectl get pods
+kubectl desc no      # kubectl describe nodes
+kubectl apply -f     # kubectl apply -f (exact)
+```
+
+git (manual aliases, no built-in prefix):
+```bash
+git st    # Error (unless aliased)
+git co    # Error (unless aliased)
+git br    # Error (unless aliased)
+```
+
+docker (short exact commands, no prefix):
+```bash
+docker ps    # Exact command
+docker co    # Error (not a prefix match)
+```
+
+Our approach follows kubectl:
 - Similar target audience (developers)
 - Similar command complexity (nested subcommands)
 - Better UX for frequent use
+- Industry standard for developer CLIs
 
-## Related Decisions
+## Updates
 
-- [DR-006](./dr-006-cobra-cli.md) - Cobra CLI framework (provides prefix matching)
-- [DR-028](./dr-028-shell-completion.md) - Shell completion (complements prefix matching)
-
-## Future Considerations
-
-**If ambiguity becomes a problem:**
-- Could disable for specific command levels
-- Could add `--no-prefix` flag to force exact matching
-- Could make it configurable via settings
-
-**Current stance:** Enable everywhere, monitor for issues. One line to add, one line to remove if needed.
+- 2025-01-17: Initial version aligned with schema

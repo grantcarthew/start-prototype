@@ -1,257 +1,246 @@
 # DR-028: Shell Completion Support
 
-**Date:** 2025-01-07
-**Status:** Accepted
-**Category:** CLI Design
+- Date: 2025-01-07
+- Status: Accepted
+- Category: CLI Design
+
+## Problem
+
+Modern CLI tools provide shell completion for improved usability. The CLI needs a completion strategy that addresses:
+
+- Shell support (which shells to support and why?)
+- Installation methods (how do users enable completion?)
+- Completion scope (what gets completed: commands, flags, dynamic values?)
+- Implementation complexity (leverage framework or build custom?)
+- Dynamic completions (complete agent names, task names from config)
+- Cross-platform paths (different completion locations per OS and shell)
+- User experience (manual vs auto-install, system-wide vs user-only)
+- Maintenance burden (supporting multiple shells and completion types)
 
 ## Decision
 
 Support shell completion for bash, zsh, and fish using Cobra's built-in completion system. Provide both manual output and auto-install commands. Complete commands, flags, agent names, task names, and scope arguments.
 
-## What This Means
+Supported shells:
 
-### Supported Shells
-
-**Three shells supported:**
 - bash (most common on Linux)
 - zsh (macOS default since Catalina, popular on Linux)
 - fish (growing popularity, different syntax)
+- Not PowerShell (Windows-focused, not planning Windows support)
 
-**Not supported:**
-- PowerShell (Windows-focused, not planning Windows support)
+Installation patterns:
 
-**Rationale:**
-- Covers >95% of Unix/macOS users
-- All three provided free by Cobra framework
-- PowerShell requires Windows support we're not planning
+Manual output (print to stdout):
+- start completion bash
+- start completion zsh
+- start completion fish
+- User redirects to file and sources in shell config
 
-### Two Installation Patterns
+Auto-install (convenience):
+- start completion install bash
+- start completion install zsh
+- start completion install fish
+- Automatically installs to standard location for shell
+- Detects OS (macOS vs Linux) for path selection
+- User directory by default (no sudo required)
+- Optional --system flag for system-wide install
+- Optional --path flag for custom location
 
-**Pattern 1: Manual output (for piping/redirection)**
-```bash
-start completion bash
-start completion zsh
-start completion fish
-```
+Completion tiers:
 
-Prints completion script to stdout. User can redirect to file:
-```bash
-start completion bash > ~/.bash_completion/start
-```
+Tier 1 - Static (free from Cobra):
+- Commands and subcommands
+- Flags and short flags
+- No custom code required
 
-**Pattern 2: Auto-install (convenience command)**
-```bash
-start completion install bash
-start completion install zsh
-start completion install fish
-```
+Tier 2 - Dynamic (high-value, implement):
+- Agent names for --agent flag (from config)
+- Task names for start task command (from config and catalog)
+- Scope arguments (global, local, merged)
+- Custom ValidArgsFunction implementations
 
-Automatically installs to standard location:
-- Detects OS (macOS vs Linux)
-- Uses user directory by default (no sudo required)
-- Shows confirmation: "Installed to ~/.zsh/completion/_start"
-- Provides reload instructions
-
-**Optional flags for install:**
-```bash
-start completion install bash --system  # System-wide (requires sudo)
-start completion install bash --user    # User only (default)
-start completion install bash --path /custom/path/_start  # Custom location
-```
-
-### What Gets Completed
-
-**Tier 1: Static completion (free from Cobra)**
-
-Commands and subcommands:
-```bash
-start <Tab>
-# Shows: prompt, task, init, config, doctor, update, completion, help
-
-start config <Tab>
-# Shows: show, edit, path, validate, agent, context, task, role
-
-start config agent <Tab>
-# Shows: list, add, new, show, test, edit, remove, default
-```
-
-Flags:
-```bash
-start --<Tab>
-# Shows: --agent, -a, --role, -r, --model, -m, --directory, -d, --verbose, --quiet, -q, --debug, --help, -h, --version, -v
-
-start task --<Tab>
-# Shows: --agent, -a, --role, -r, --model, -m, --directory, -d, --verbose, --quiet, -q, --debug, --help, -h, --version, -v
-```
-
-**Tier 2: Dynamic completion (high-value, worth implementing)**
-
-Agent names for `--agent` flag:
-```bash
-start --agent <Tab>
-# Shows: claude, gemini, aichat
-# Reads from config (global + local merge)
-```
-
-Task names for `start task` command:
-```bash
-start task <Tab>
-# Shows: code-review (cr), git-diff-review (gdr), comment-tidy (ct)
-# Reads from assets + global + local configs
-# Shows alias in parentheses
-```
-
-Scope arguments:
-```bash
-start init <Tab>
-# Shows: global, local
-
-start config edit <Tab>
-# Shows: global, local
-
-start config task list <Tab>
-# Shows: global, local, merged
-```
-
-**Not implemented (Tier 3, skip for v1):**
-- Model names for `--model` flag (requires parsing agent's model table)
+Tier 3 - Skip for v1:
+- Model names for --model flag (requires parsing agent's model table)
 - Context names, role names
 - File path completion (shells handle this already)
 
-## Implementation
+## Why
 
-### Cobra Completion System
+Shell completion improves usability:
 
-**Cobra provides:**
-```go
-// Auto-generated by Cobra
-cmd.CompletionCmd()  // Generates 'completion' subcommand
+- Faster command entry (Tab completion vs typing full names)
+- Discoverability (users discover subcommands and flags via Tab)
+- Fewer typos (completion prevents command and flag mistakes)
+- Professional expectation (users expect modern CLIs to support completion)
+- Learning aid (seeing available options helps users learn the CLI)
 
-// Custom completions via ValidArgsFunction
-&cobra.Command{
-    ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-        // Return completion suggestions
-        return suggestions, cobra.ShellCompDirectiveNoFileComp
-    },
-}
+Cobra provides free implementation:
+
+- Built-in completion generation for bash, zsh, fish
+- ValidArgsFunction hooks for dynamic completions
+- Standard patterns that work across shells
+- Less code to write and maintain
+- Proven, tested completion logic
+
+Dynamic completions add value:
+
+- Agent names from config (users Tab through configured agents)
+- Task names from config (shows all available tasks with aliases)
+- Scope values (global, local, merged for various commands)
+- Context-aware (reads current config state)
+- Practical for daily usage
+
+Auto-install reduces friction:
+
+- One command to enable completion (vs multi-step manual process)
+- Detects correct paths for shell and OS
+- Creates directories if needed
+- Shows reload instructions
+- Lower barrier to adoption
+
+Three shells cover most users:
+
+- bash, zsh, fish cover >95% of Unix/macOS users
+- All three provided free by Cobra
+- PowerShell requires Windows support not planned
+- Sufficient coverage without excessive maintenance
+
+## Trade-offs
+
+Accept:
+
+- Requires one-time setup by user (completion not enabled by default)
+- Different installation steps per shell (auto-install abstracts this)
+- Doesn't complete model names (less frequently used, Tier 3)
+- No PowerShell support (Windows not planned, niche for Unix CLI)
+- Dynamic completions slower than static (config loading overhead acceptable)
+
+Gain:
+
+- Better UX (faster command entry, fewer mistakes, discoverability)
+- Professional polish (expected feature for modern CLI tools)
+- Free implementation (Cobra provides heavy lifting)
+- Dynamic agent and task completion (context-aware from config)
+- Easy installation (auto-install removes complexity)
+- Standard patterns (follows shell completion conventions)
+- Maintainable (Cobra handles cross-shell differences)
+
+## Alternatives
+
+No shell completion:
+
+Pros:
+- No implementation required
+- No maintenance burden
+- No cross-shell compatibility concerns
+
+Cons:
+- Poor UX (users must type full commands and flags)
+- No discoverability (users can't Tab to explore)
+- Unprofessional (users expect completion in modern CLIs)
+- More typos and errors
+- Harder to learn CLI
+
+Rejected: Shell completion is an expected feature. Modern CLIs without completion feel outdated.
+
+Manual installation only (no auto-install):
+
+Example: Only provide start completion bash, user handles installation
+```bash
+start completion bash > ~/.bash_completion.d/start
+echo 'source ~/.bash_completion.d/start' >> ~/.bashrc
 ```
 
-**We implement:**
-1. Add `completion` command (Cobra generates base)
-2. Add `completion install` subcommand (our custom logic)
-3. Add `ValidArgsFunction` for dynamic completions
+Pros:
+- Simpler implementation (no path detection, no OS-specific logic)
+- Maximum flexibility for users
+- Less code to maintain
 
-### Dynamic Completion Functions
+Cons:
+- Higher friction (multi-step process, users must know paths)
+- OS and shell-specific knowledge required
+- Many users won't bother (lower adoption)
+- More support questions about installation
 
-**Agent names completion:**
-```go
-func completeAgentNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-    cfg := loadConfig()  // Load global + local
-    agents := cfg.GetAgentNames()
+Rejected: Auto-install significantly improves adoption and reduces friction. Implementation complexity is manageable.
 
-    return agents, cobra.ShellCompDirectiveNoFileComp
-}
+Support all completion types including Tier 3:
+
+Example: Complete model names, context names, role names, file paths
+```bash
+start --agent claude --model <Tab>
+# Shows: haiku, sonnet, opus
+
+start config context edit <Tab>
+# Shows: environment, index, project, agents
 ```
 
-**Task names completion:**
-```go
-func completeTaskNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-    tasks := loadTasks()  // Assets + global + local
+Pros:
+- Most complete experience
+- Every value completable
+- Maximum polish
 
-    suggestions := []string{}
-    for _, task := range tasks {
-        if task.Alias != "" {
-            suggestions = append(suggestions, fmt.Sprintf("%s\t(%s)", task.Name, task.Alias))
-        } else {
-            suggestions = append(suggestions, task.Name)
-        }
-    }
+Cons:
+- Requires parsing agent model tables (complex, error-prone)
+- File path completion redundant (shells do this)
+- Diminishing returns (model/context names less frequently used)
+- More maintenance burden
+- More code complexity
 
-    return suggestions, cobra.ShellCompDirectiveNoFileComp
-}
-```
+Rejected: Tier 1 + Tier 2 provides sufficient value. Tier 3 adds complexity for marginal benefit.
 
-**Scope values completion:**
-```go
-func completeScopeValues(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-    return []string{"global", "local"}, cobra.ShellCompDirectiveNoFileComp
-}
+## Structure
 
-func completeScopeWithMerged(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-    return []string{"global", "local", "merged"}, cobra.ShellCompDirectiveNoFileComp
-}
-```
+Completion command structure:
 
-### Auto-Install Implementation
+Root command:
+- start completion <shell> - Print completion script to stdout
+- start completion install <shell> [flags] - Auto-install to standard location
 
-**Standard locations by shell:**
+Supported shells:
+- bash
+- zsh
+- fish
 
-```go
-var completionPaths = map[string]map[string]string{
-    "bash": {
-        "user":   "~/.bash_completion",
-        "system": "/etc/bash_completion.d/start",
-    },
-    "zsh": {
-        "user":   "~/.zsh/completion/_start",
-        "system": "/usr/local/share/zsh/site-functions/_start",
-    },
-    "fish": {
-        "user":   "~/.config/fish/completions/start.fish",
-        "system": "/usr/share/fish/vendor_completions.d/start.fish",
-    },
-}
-```
+Install flags:
+- --user (default) - Install to user directory
+- --system - Install system-wide (requires sudo)
+- --path <path> - Install to custom path
 
-**Install logic:**
-```go
-func installCompletion(shell string, scope string) error {
-    // 1. Get path for shell + scope
-    path := getCompletionPath(shell, scope)
+Standard installation paths:
 
-    // 2. Expand ~ if needed
-    path = expandHomePath(path)
+bash:
+- User: ~/.bash_completion
+- System: /etc/bash_completion.d/start
 
-    // 3. Create parent directory
-    if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-        return err
-    }
+zsh:
+- User: ~/.zsh/completion/_start
+- System: /usr/local/share/zsh/site-functions/_start
 
-    // 4. Generate completion script
-    var buf bytes.Buffer
-    rootCmd.GenCompletionScript(shell, &buf)
+fish:
+- User: ~/.config/fish/completions/start.fish
+- System: /usr/share/fish/vendor_completions.d/start.fish
 
-    // 5. Write to file
-    if err := os.WriteFile(path, buf.Bytes(), 0644); err != nil {
-        return err
-    }
+Completion tiers:
 
-    // 6. Show success + reload instructions
-    fmt.Printf("✓ Completion installed to: %s\n", path)
-    fmt.Printf("\nReload your shell:\n")
-    fmt.Printf("  %s\n", getReloadInstruction(shell))
+Tier 1 (static, free from Cobra):
+- All commands and subcommands
+- All flags (long and short forms)
+- Help text for each
 
-    return nil
-}
-```
+Tier 2 (dynamic, custom implementations):
+- Agent names: Read from config (global + local merge)
+- Task names: Read from config and catalog (show alias in parentheses)
+- Scope values: global, local (or global, local, merged for list commands)
 
-**Reload instructions by shell:**
-```go
-func getReloadInstruction(shell string) string {
-    switch shell {
-    case "bash":
-        return "source ~/.bashrc"
-    case "zsh":
-        return "source ~/.zshrc"
-    case "fish":
-        return "source ~/.config/fish/config.fish"
-    }
-}
-```
+Tier 3 (not implemented):
+- Model names (requires parsing agent model tables)
+- Context names, role names
+- Custom file path filtering
 
-## User Experience
+## Usage Examples
 
-### Manual Installation (bash example)
+Manual installation (bash):
 
 ```bash
 $ start completion bash > ~/.bash_completion/start
@@ -264,10 +253,10 @@ $ source ~/.bashrc
 
 # Test
 $ start <Tab>
-prompt  task  init  config  doctor  update  completion  help
+prompt  task  init  config  doctor  assets  completion  help
 ```
 
-### Auto-Install (zsh example)
+Auto-install (zsh):
 
 ```bash
 $ start completion install zsh
@@ -287,7 +276,7 @@ $ start --agent <Tab>
 claude  gemini  aichat
 ```
 
-### System-Wide Install (fish example)
+System-wide install (fish):
 
 ```bash
 $ sudo start completion install fish --system
@@ -300,9 +289,8 @@ Reload your shell:
 Fish completion is now available for all users.
 ```
 
-### Completion in Action
+Command completion:
 
-**Command completion:**
 ```bash
 $ start con<Tab>
 $ start config   # Completed
@@ -314,7 +302,8 @@ $ start config agent li<Tab>
 $ start config agent list   # Completed
 ```
 
-**Flag completion:**
+Flag completion:
+
 ```bash
 $ start --ag<Tab>
 $ start --agent   # Completed
@@ -326,7 +315,8 @@ $ start --agent cl<Tab>
 $ start --agent claude   # Completed
 ```
 
-**Task completion:**
+Task completion with aliases:
+
 ```bash
 $ start task <Tab>
 code-review (cr)     git-diff-review (gdr)     comment-tidy (ct)     doc-review (dr)
@@ -334,12 +324,13 @@ code-review (cr)     git-diff-review (gdr)     comment-tidy (ct)     doc-review 
 $ start task co<Tab>
 $ start task code-review   # Completed
 
-# Also works with aliases
+# Alias matching works too
 $ start task cr<Tab>
 $ start task code-review   # Completed (matched alias)
 ```
 
-**Scope completion:**
+Scope completion:
+
 ```bash
 $ start init <Tab>
 global  local
@@ -351,184 +342,21 @@ $ start config task list <Tab>
 global  local  merged
 ```
 
-## Command Specification
-
-### start completion
-
-**Synopsis:**
-```bash
-start completion <shell>
-start completion install <shell> [flags]
-```
-
-**Arguments:**
-
-`<shell>` - Shell type (required)
-- `bash` - Bash completion script
-- `zsh` - Zsh completion script
-- `fish` - Fish completion script
-
-**Subcommands:**
-
-`install` - Auto-install completion to standard location
-- `--user` - Install to user directory (default)
-- `--system` - Install system-wide (requires sudo)
-- `--path <path>` - Install to custom path
-
-**Examples:**
+Custom path installation:
 
 ```bash
-# Print to stdout
-start completion bash
-start completion zsh
+$ start completion install zsh --path ~/.my-completions/_start
 
-# Auto-install (user directory)
-start completion install bash
-start completion install zsh
+✓ Completion installed to: /Users/grant/.my-completions/_start
 
-# System-wide install
-sudo start completion install bash --system
-
-# Custom path
-start completion install zsh --path ~/.my-completions/_start
-```
-
-**Output (manual):**
-Prints completion script to stdout (suitable for redirection).
-
-**Output (install):**
-```
-Creating directory: /Users/grant/.bash_completion.d
-✓ Completion installed to: /Users/grant/.bash_completion.d/start
-
-Add to your .bashrc:
-  source ~/.bash_completion.d/start
+Add to your .zshrc:
+  fpath=(~/.my-completions $fpath)
+  autoload -Uz compinit && compinit
 
 Reload your shell:
-  source ~/.bashrc
+  source ~/.zshrc
 ```
 
-**Exit codes:**
-- 0 - Success (script printed or installed)
-- 1 - Invalid shell argument
-- 2 - Permission error (install failed)
-- 3 - Invalid flags
+## Updates
 
-## Benefits
-
-- ✅ **Better UX** - Faster command entry via Tab completion
-- ✅ **Discoverability** - Users discover subcommands and flags via Tab
-- ✅ **Fewer typos** - Completion prevents command/flag mistakes
-- ✅ **Dynamic values** - Agent and task names completed from config
-- ✅ **Professional** - Expected feature for modern CLI tools
-- ✅ **Easy install** - Auto-install removes complexity
-- ✅ **Free implementation** - Cobra does heavy lifting
-
-## Trade-offs Accepted
-
-- ❌ Requires one-time setup by user (acceptable: common for CLI tools)
-- ❌ Different per shell (acceptable: auto-install handles this)
-- ❌ Doesn't complete model names (acceptable: less frequently used)
-- ❌ No PowerShell support (acceptable: not planning Windows support)
-
-## Documentation
-
-### README section
-
-```markdown
-## Shell Completion
-
-`start` supports Tab completion for bash, zsh, and fish.
-
-**Quick setup:**
-```bash
-# Bash
-start completion install bash
-source ~/.bashrc
-
-# Zsh
-start completion install zsh
-source ~/.zshrc
-
-# Fish
-start completion install fish
-source ~/.config/fish/config.fish
-```
-
-**What gets completed:**
-- Commands: `start config <Tab>`
-- Flags: `start --<Tab>`
-- Agents: `start --agent <Tab>` → shows configured agents
-- Tasks: `start task <Tab>` → shows available tasks
-- Scopes: `start init <Tab>` → `global`, `local`
-
-**Manual installation:**
-```bash
-# For custom setups
-start completion bash > /path/to/completion
-source /path/to/completion
-```
-```
-
-### Help text
-
-```bash
-$ start completion --help
-
-Generate shell completion scripts
-
-Usage:
-  start completion <shell>
-  start completion install <shell> [flags]
-
-Shells:
-  bash    Bash completion
-  zsh     Zsh completion
-  fish    Fish completion
-
-Examples:
-  # Print to stdout
-  start completion bash > ~/.bash_completion/start
-
-  # Auto-install (recommended)
-  start completion install bash
-  start completion install zsh
-
-  # System-wide install
-  sudo start completion install bash --system
-
-Flags:
-  --user          Install to user directory (default)
-  --system        Install system-wide (requires sudo)
-  --path <path>   Install to custom path
-  -h, --help      Help for completion
-
-After installation, reload your shell or start a new session.
-```
-
-## Related Decisions
-
-- [DR-006](./dr-006-cobra-cli.md) - Cobra framework (provides completion system)
-
-## Future Considerations
-
-**Could add in future:**
-
-**Model name completion:**
-```bash
-start --agent claude --model <Tab>
-# Shows: haiku, sonnet, opus
-# Requires parsing agent's model table
-```
-
-**Context name completion:**
-```bash
-start config context edit <Tab>
-# Shows: environment, index, project, agents
-```
-
-**File path completion:**
-- Shells already do this, but we could enhance for specific file types
-- Example: `start config edit <Tab>` → only show .toml files
-
-**Current stance:** Tier 1 + Tier 2 is sufficient for v1. Add Tier 3 if users request it.
+- 2025-01-17: Initial version aligned with schema
