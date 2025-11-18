@@ -17,20 +17,20 @@ See [vision.md](../../vision.md) for the product vision and goals.
 | [DR-007](./dr-007-placeholders.md) | Command Interpolation & Placeholders | Configuration | 2025-01-03 |
 | [DR-008](./dr-008-file-handling.md) | Context File Detection & Handling | Runtime Behavior | 2025-01-03 |
 | [DR-009](./dr-009-task-structure.md) | Task Structure, Agent Field & Placeholders | Tasks | 2025-01-03 |
-| [DR-010](./dr-010-default-tasks.md) | Default Task Definitions | Tasks | 2025-01-03 |
-| [DR-011](./dr-011-asset-distribution.md) | Asset Distribution & Update System | Distribution | 2025-01-03 |
+| [DR-010](./superseded/DR-010-default-tasks.md) | Default Task Definitions | Tasks | 2025-01-03 |
+| [DR-011](./superseded/DR-011-asset-distribution.md) | Asset Distribution & Update System | Distribution | 2025-01-03 |
 | [DR-012](./dr-012-context-required.md) | Context Document Required Field | Configuration | 2025-01-04 |
 | [DR-013](./dr-013-agent-templates.md) | Agent Templates from GitHub | Distribution | 2025-01-04 |
-| [DR-014](./archive/dr-014-github-tree-api.md) | GitHub Tree API for Assets | Asset Management | 2025-01-06 |
-| [DR-015](./archive/dr-015-atomic-updates.md) | Atomic Update Mechanism | Asset Management | 2025-01-06 |
-| [DR-016](./archive/dr-016-asset-discovery.md) | Asset Discovery Strategy | Asset Management | 2025-01-06 |
+| [DR-014](./superseded/dr-014-github-tree-api.md) | GitHub Tree API for Assets | Asset Management | 2025-01-06 |
+| [DR-015](./superseded/dr-015-atomic-updates.md) | Atomic Update Mechanism | Asset Management | 2025-01-06 |
+| [DR-016](./superseded/dr-016-asset-discovery.md) | Asset Discovery Strategy | Asset Management | 2025-01-06 |
 | [DR-017](./dr-017-cli-reorganization.md) | CLI Command Reorganization | CLI Design | 2025-01-06 |
-| [DR-018](./dr-018-init-update-integration.md) | Init/Update Command Integration | Asset Management | 2025-01-06 |
+| [DR-018](./superseded/DR-018-init-update-integration.md) | Init/Update Command Integration | Asset Management | 2025-01-06 |
 | [DR-019](./dr-019-task-loading.md) | Task Loading & Merging Algorithm | Tasks | 2025-01-06 |
 | [DR-020](./dr-020-version-injection.md) | Binary Version Injection Strategy | Build & Distribution | 2025-01-06 |
 | [DR-021](./dr-021-github-version-check.md) | GitHub Version Checking | Version Management | 2025-01-06 |
 | [DR-022](./dr-022-asset-branch-strategy.md) | Asset Branch Strategy | Asset Management | 2025-01-06 |
-| [DR-023](./archive/dr-023-asset-staleness-check.md) | Asset Staleness Checking | Asset Management | 2025-01-06 |
+| [DR-023](./superseded/dr-023-asset-staleness-check.md) | Asset Staleness Checking | Asset Management | 2025-01-06 |
 | [DR-024](./dr-024-doctor-exit-codes.md) | Doctor Exit Code System | CLI Design | 2025-01-06 |
 | [DR-025](./dr-025-no-automatic-checks.md) | No Automatic Checks or Caching | CLI Design | 2025-01-06 |
 | [DR-026](./dr-026-offline-behavior.md) | Offline Fallback & Network Unavailable | Asset Management | 2025-01-07 |
@@ -45,6 +45,10 @@ See [vision.md](../../vision.md) for the product vision and goals.
 | [DR-035](./dr-035-interactive-browsing.md) | Interactive Asset Browsing | Asset Management | 2025-01-10 |
 | [DR-036](./dr-036-cache-management.md) | Cache Management | Asset Management | 2025-01-10 |
 | [DR-037](./dr-037-asset-updates.md) | Asset Update Mechanism | Asset Management | 2025-01-10 |
+| [DR-038](./dr-038-flag-value-resolution.md) | Flag Value Resolution and Prefix Matching | CLI Design | 2025-01-11 |
+| [DR-039](./dr-039-catalog-index.md) | Catalog Index File | Asset Management | 2025-01-13 |
+| [DR-040](./dr-040-substring-matching.md) | Substring Matching Algorithm for Asset Search | Asset Management | 2025-01-13 |
+| [DR-041](./dr-041-asset-command-reorganization.md) | Asset Command Reorganization | CLI Design | 2025-01-13 |
 
 ## By Category
 
@@ -61,7 +65,7 @@ Core configuration structure and file handling:
 - **[DR-008](./dr-008-file-handling.md)** - Relative paths and missing file handling
 - **[DR-012](./dr-012-context-required.md)** - Required field and document order
 
-### CLI Design (DR-006, DR-017, DR-024, DR-025, DR-028, DR-030)
+### CLI Design (DR-006, DR-017, DR-024, DR-025, DR-028, DR-030, DR-038, DR-041)
 
 Command-line interface structure:
 
@@ -71,28 +75,30 @@ Command-line interface structure:
 - **[DR-025](./dr-025-no-automatic-checks.md)** - No automatic checks or result caching
 - **[DR-028](./dr-028-shell-completion.md)** - Shell completion for bash/zsh/fish
 - **[DR-030](./dr-030-prefix-matching.md)** - Enable prefix matching for all commands
+- **[DR-038](./dr-038-flag-value-resolution.md)** - Flag Value Resolution and Prefix Matching
+- **[DR-041](./dr-041-asset-command-reorganization.md)** - Asset Command Reorganization
 
 ### Tasks (DR-009, DR-010, DR-019, DR-029)
 
 Task configuration and loading:
 
 - **[DR-009](./dr-009-task-structure.md)** - Task structure with role/agent fields and {instructions}/{command} placeholders
-- **[DR-010](./dr-010-default-tasks.md)** - Four interactive review tasks as defaults
+- **[DR-010](./superseded/DR-010-default-tasks.md)** - Four interactive review tasks as defaults (Superseded by DR-031)
 - **[DR-019](./dr-019-task-loading.md)** - Task loading now includes cache resolution
 - **[DR-029](./dr-029-task-agent-field.md)** - Optional agent field for task-specific agent preference
 
-### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023, DR-026, DR-027, DR-031 to DR-037)
+### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023, DR-026, DR-027, DR-031 to DR-040)
 
 Asset distribution and updates:
 
-- **[DR-011](./dr-011-asset-distribution.md)** - GitHub-fetched assets with update system
+- **[DR-011](./superseded/DR-011-asset-distribution.md)** - GitHub-fetched assets with update system (Superseded by DR-031)
 - **[DR-013](./dr-013-agent-templates.md)** - Fetch agent configs from GitHub
-- **[DR-014](./archive/dr-014-github-tree-api.md)** - SHA-based caching for incremental updates (Superseded by DR-031)
-- **[DR-015](./archive/dr-015-atomic-updates.md)** - Atomic install with rollback capability (Superseded by DR-031)
-- **[DR-016](./archive/dr-016-asset-discovery.md)** - Each feature checks its own directory (Superseded by DR-031)
-- **[DR-018](./dr-018-init-update-integration.md)** - Init and update share implementation
+- **[DR-014](./superseded/dr-014-github-tree-api.md)** - SHA-based caching for incremental updates (Superseded by DR-031)
+- **[DR-015](./superseded/dr-015-atomic-updates.md)** - Atomic install with rollback capability (Superseded by DR-031)
+- **[DR-016](./superseded/dr-016-asset-discovery.md)** - Each feature checks its own directory (Superseded by DR-031)
+- **[DR-018](./superseded/DR-018-init-update-integration.md)** - Init and update share implementation (Superseded by DR-031)
 - **[DR-022](./dr-022-asset-branch-strategy.md)** - Assets from main branch (not releases)
-- **[DR-023](./archive/dr-023-asset-staleness-check.md)** - GitHub commit comparison with no caching (Superseded by DR-031)
+- **[DR-023](./superseded/dr-023-asset-staleness-check.md)** - GitHub commit comparison with no caching (Superseded by DR-031)
 - **[DR-026](./dr-026-offline-behavior.md)** - Network-only, no manual installation, graceful degradation
 - **[DR-027](./dr-027-security-trust-model.md)** - Trust GitHub HTTPS, no signatures, no pinning
 - **[DR-031](./dr-031-catalog-based-assets.md)** - Catalog-Based Asset Architecture
@@ -102,12 +108,14 @@ Asset distribution and updates:
 - **[DR-035](./dr-035-interactive-browsing.md)** - Interactive Asset Browsing
 - **[DR-036](./dr-036-cache-management.md)** - Cache Management
 - **[DR-037](./dr-037-asset-updates.md)** - Asset Update Mechanism
+- **[DR-039](./dr-039-catalog-index.md)** - Catalog Index File
+- **[DR-040](./dr-040-substring-matching.md)** - Substring Matching Algorithm for Asset Search
 
 ### Build & Distribution (DR-011, DR-013, DR-020)
 
 How the tool and its content are distributed:
 
-- **[DR-011](./dr-011-asset-distribution.md)** - Assets fetched from GitHub, updateable without releases
+- **[DR-011](./superseded/DR-011-asset-distribution.md)** - Assets fetched from GitHub, updateable without releases (Superseded by DR-031)
 - **[DR-013](./dr-013-agent-templates.md)** - Agent configurations as GitHub content
 - **[DR-020](./dr-020-version-injection.md)** - Binary version via ldflags at build time
 
