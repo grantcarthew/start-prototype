@@ -9,7 +9,7 @@ start assets add - Search and install asset from GitHub catalog
 ```bash
 start assets add               # Interactive mode
 start assets add <query>       # Search mode
-start assets add <query> --local
+start assets add <query> [-l|--local]
 ```
 
 ## Description
@@ -22,7 +22,7 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 **Two operational modes:**
 
 **Interactive mode** (no query or < 3 characters):
-- Browse all asset types and categories
+- Browse all asset types (roles, agents, contexts, tasks) and categories
 - Navigate through tree structure
 - Select asset to install
 
@@ -57,12 +57,13 @@ See [DR-040](../design/design-records/dr-040-substring-matching.md) for matching
 
 ## Flags
 
-**--local**
+**-l, --local**
 : Install to local project configuration (`./.start/`) instead of global (`~/.config/start/`).
 
 **Examples:**
 ```bash
 start assets add "pre-commit" --local    # Install to ./.start/
+start assets add "pre-commit" -l         # Short flag
 start assets add "go-expert"             # Install to ~/.config/start/
 ```
 
@@ -108,45 +109,48 @@ start assets add "go-expert"             # Install to ~/.config/start/
 
 ### Interactive Mode (No Query)
 
-**Planned for future version:**
-- TUI-based catalog browser
-- Tree navigation by type and category
-- Preview pane showing asset details
-- Select and install
+When no query is provided (or query is < 3 chars), `start assets add` launches an interactive terminal UI (TUI) for browsing the catalog.
 
-**Current behavior:**
-```bash
-$ start assets add
+**Features:**
+- **Tree View**: Navigate asset types (roles, agents, contexts, tasks) and categories.
+- **Preview**: See descriptions, tags, and details in a side pane.
+- **Search**: Filter the list dynamically.
+- **Install**: Select an asset and press Enter to install.
 
-Error: Interactive mode not yet implemented
-
-Use search mode with a query:
-  start assets add <query>
-
-Or browse catalog in browser:
-  start assets browse
-```
-
-Exit code: 1
+**Controls:**
+- `↑/↓`: Navigate list
+- `Enter`: Select/Install
+- `/`: Filter/Search
+- `Esc`/`q`: Quit
 
 ### Installation Locations
 
 **Global installation (default):**
 - Cache: `~/.config/start/assets/{type}/{category}/{name}.*`
-- Config: `~/.config/start/{type}s.toml`
+- Config: `~/.config/start/{type}.toml`
 
 **Local installation (--local flag):**
 - Cache: `~/.config/start/assets/{type}/{category}/{name}.*` (shared)
-- Config: `./.start/{type}s.toml`
+- Config: `./.start/{type}.toml`
 
 **Example:**
 ```bash
-# Global
+# Global Role
 start assets add "code-reviewer"
 # → Cache: ~/.config/start/assets/roles/general/code-reviewer.md
 # → Config: ~/.config/start/roles.toml
 
-# Local
+# Global Agent
+start assets add "claude-3-5-sonnet"
+# → Cache: ~/.config/start/assets/agents/anthropic/claude-3-5-sonnet.toml
+# → Config: ~/.config/start/agents.toml
+
+# Global Context
+start assets add "docker-context"
+# → Cache: ~/.config/start/assets/contexts/devops/docker-context.toml
+# → Config: ~/.config/start/contexts.toml
+
+# Local Task
 start assets add "pre-commit" --local
 # → Cache: ~/.config/start/assets/tasks/git-workflow/pre-commit-review.toml
 # → Config: ./.start/tasks.toml
@@ -179,7 +183,7 @@ tasks/git-workflow/pre-commit-review
 
 Downloading...
 ✓ Cached to ~/.config/start/assets/tasks/git-workflow/
-✓ Added to global config
+✓ Added to global config (tasks.toml)
 
 Use 'start task pre-commit-review' to run.
 ```
@@ -211,7 +215,7 @@ Selected: tasks/git-workflow/pre-commit-review
 
 Downloading...
 ✓ Cached to ~/.config/start/assets/tasks/git-workflow/
-✓ Added to global config
+✓ Added to global config (tasks.toml)
 
 Use 'start task pre-commit-review' to run.
 ```
@@ -241,16 +245,8 @@ $ start assets add "ab"
 ⚠ Query too short (minimum 3 characters)
   Falling back to interactive mode...
 
-Error: Interactive mode not yet implemented
-
-Use a longer query (3+ characters):
-  start assets add <query>
-
-Or browse catalog in browser:
-  start assets browse
+[ Launches TUI Browser ]
 ```
-
-Exit code: 1
 
 ### With --local Flag
 
@@ -336,7 +332,7 @@ tasks/git-workflow/pre-commit-review
 
 Downloading...
 ✓ Cached to ~/.config/start/assets/tasks/git-workflow/
-✓ Added to global config
+✓ Added to global config (tasks.toml)
 
 Use 'start task pre-commit-review' to run.
 ```
@@ -457,7 +453,7 @@ tasks/git-workflow/pre-commit-review
 
 Downloading...
 ✓ Cached to ~/.config/start/assets/tasks/git-workflow/
-✓ Added to global config
+✓ Added to global config (tasks.toml)
 
 Use 'start task pre-commit-review' to run.
 ```
@@ -596,7 +592,7 @@ asset_repo = "grantcarthew/start"    # Default
 # asset_repo = "myorg/custom-assets"  # Custom
 ```
 
-**No other configuration needed.**
+**Note:** This setting configures the *source* repository. Downloaded assets are installed into `tasks.toml`, `roles.toml`, `agents.toml`, or `contexts.toml`, not into `config.toml`.
 
 ## Notes
 
