@@ -12,7 +12,6 @@ start assets search <query>    # Search catalog by name/description/tags
 start assets add <query>       # Search and install asset
 start assets info <query>      # Show detailed asset information
 start assets update [query]    # Update cached assets
-start assets clean             # Remove unused cached assets
 start assets index             # Generate catalog index (contributors)
 ```
 
@@ -103,7 +102,7 @@ See [start-assets-info(1)](./start-assets-info.md) for details.
 
 ### start assets update
 
-Update cached assets by comparing SHAs with GitHub catalog. Replaces deprecated `start update` command.
+Update cached assets by comparing SHAs with GitHub catalog.
 
 ```bash
 start assets update            # Update all cached assets
@@ -118,17 +117,6 @@ start assets update git-workflow      # Update category
 ```
 
 See [start-assets-update(1)](./start-assets-update.md) for details.
-
-### start assets clean
-
-Remove unused cached assets with interactive prompts. Scans configs and prompts for each referenced asset.
-
-```bash
-start assets clean             # Interactive cleanup
-start assets clean --force     # Delete all (no prompts)
-```
-
-See [start-assets-clean(1)](./start-assets-clean.md) for details.
 
 ### start assets index
 
@@ -192,28 +180,11 @@ start assets update
 start assets update git-workflow
 ```
 
-**Clean up unused:**
-```bash
-start assets clean
-```
-
 ## Design References
 
 - [DR-039](../design/design-records/dr-039-catalog-index.md) - Catalog index file (CSV schema)
 - [DR-040](../design/design-records/dr-040-substring-matching.md) - Substring matching algorithm
 - [DR-041](../design/design-records/dr-041-asset-command-reorganization.md) - Asset command reorganization
-
-## Migration from Old Commands
-
-| Old Command | New Command | Notes |
-|-------------|-------------|-------|
-| `start config task add` | `start assets add` | Universal installer |
-| `start config role add` | `start assets add` | Universal installer |
-| `start config agent add` | `start assets add` | Universal installer |
-| `start update` | `start assets update` | Clearer naming |
-| `start show assets` | `start assets info` | Preview metadata |
-
-See [DR-041](../design/design-records/dr-041-asset-command-reorganization.md) for migration guide.
 
 ## Examples
 
@@ -357,25 +328,6 @@ Checking for updates to assets matching 'commit'...
 Updated 2 assets, 1 up to date.
 ```
 
-### Clean Unused Assets
-
-```bash
-$ start assets clean
-
-Scanning cache...
-
-Unused assets (not in any config):
-  tasks/experimental/old-task (1.2 KB)
-  roles/deprecated/old-role (850 bytes)
-
-Remove 2 unused assets (2.0 KB)? [y/N]: y
-
-✓ Removed 2 assets
-✓ Freed 2.0 KB
-
-Cache: 46 assets (125 KB)
-```
-
 ## Exit Codes
 
 **0** - Success
@@ -409,7 +361,6 @@ start config role list         # See your configured roles
 Cache is automatically managed:
 - Populated when downloading from GitHub
 - Updated via `start assets update`
-- Cleaned via `start assets clean`
 - No manual inspection needed
 
 Cache location: `~/.config/start/assets/`
@@ -430,6 +381,5 @@ start assets add "task-name" --local   # → ./.start/tasks.toml
 - start-assets-add(1) - Add asset from catalog
 - start-assets-info(1) - Show asset information
 - start-assets-update(1) - Update cached assets
-- start-assets-clean(1) - Clean unused cache
 - start-config(1) - Manage configuration
 - start-task(1) - Run tasks

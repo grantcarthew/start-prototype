@@ -22,9 +22,7 @@ Check for updates to cached assets and download new versions from the GitHub cat
 4. Download and update assets with SHA mismatches
 5. Report update summary
 
-**Important:** Configuration files (`tasks.toml`, `roles.toml`, etc.) are **never automatically modified**. Only the asset cache is updated.
-
-Replaces deprecated `start update` command.
+**Note:** While configuration files (`tasks.toml`) are not modified, assets are typically installed as file references (e.g., `prompt_file = "~/.config/start/assets/..."`). Updating the cached files **automatically updates the behavior** of these tasks without requiring config changes.
 
 ## Arguments
 
@@ -487,20 +485,6 @@ start assets add "new-asset"
 
 Update maintains existing, add acquires new.
 
-### vs deprecated `start update`
-
-**Old (deprecated):**
-```bash
-start update                # Unclear what's being updated
-```
-
-**New (clear):**
-```bash
-start assets update         # Clearly updates assets
-```
-
-Better naming with semantic clarity.
-
 ## Configuration
 
 **Asset repository:**
@@ -647,7 +631,6 @@ Query uses substring matching (DR-040):
 - start-assets(1) - Asset management overview
 - start-assets-add(1) - Install new assets
 - start-assets-info(1) - View asset details
-- start-assets-clean(1) - Remove unused cache
 - DR-037 - Asset update mechanism
 - DR-025 - No automatic checks
 - DR-040 - Substring matching algorithm

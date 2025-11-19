@@ -16,6 +16,9 @@ start assets add <query> --local
 
 Search for assets in the GitHub catalog and install them to your configuration. Supports two modes: interactive browsing (no query) or search-based selection (with query). Downloaded assets are cached locally and added to global or local configuration.
 
+> **Tip: Lazy Loading**
+> You don't always need to run `start assets add` explicitly. If you try to run a task that isn't installed (e.g., `start task pre-commit-review`), the CLI will automatically search the catalog and prompt you to download it. Use `start assets add` when you want to browse options or install to a specific scope (local/global) ahead of time.
+
 **Two operational modes:**
 
 **Interactive mode** (no query or < 3 characters):
@@ -34,8 +37,6 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 2. Download asset files to cache (`~/.config/start/assets/`)
 3. Add configuration entry to `~/.config/start/` or `./.start/`
 4. Report installation location and usage instructions
-
-Replaces deprecated commands: `start config task add`, `start config role add`, `start config agent add`.
 
 ## Arguments
 
@@ -584,24 +585,6 @@ start assets add "commit"
 
 Search is read-only, add performs installation.
 
-### vs deprecated `start config task add`
-
-**Old (deprecated):**
-```bash
-start config task add "pre-commit-review"    # Tasks only
-start config role add "code-reviewer"        # Roles only
-start config agent add "claude"              # Agents only
-```
-
-**New (unified):**
-```bash
-start assets add "pre-commit-review"    # Any asset type
-start assets add "code-reviewer"        # Any asset type
-start assets add "claude"               # Any asset type
-```
-
-Single command handles all asset types.
-
 ## Configuration
 
 **Asset repository:**
@@ -718,24 +701,6 @@ If asset already exists in target config:
 3. Cancel
 
 **Reinstall use case:** Update cached files without changing config.
-
-### Migration from Deprecated Commands
-
-**Old commands (deprecated):**
-```bash
-start config task add "foo"
-start config role add "bar"
-start config agent add "baz"
-```
-
-**New unified command:**
-```bash
-start assets add "foo"
-start assets add "bar"
-start assets add "baz"
-```
-
-See [DR-041](../design/design-records/dr-041-asset-command-reorganization.md) for migration guide.
 
 ## See Also
 

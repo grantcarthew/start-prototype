@@ -28,12 +28,13 @@ Issues:
 - Inconsistent UX (each asset type uses different command pattern)
 - No asset information (can't preview before installing)
 - Update is unclear (start update name conflicts with "update CLI binary")
-- No cache management (can't clean old/unused assets)
 - Type coupling (must know asset type before discovering)
 
 ## Decision
 
 Create unified start assets command suite for all asset discovery, installation, and management operations.
+
+**Note:** `start assets clean` was considered but rejected. Assets cached for local projects cannot be safely identified from a global context, creating a risk of breaking local configurations by deleting their dependencies.
 
 Command structure:
 
@@ -49,7 +50,6 @@ start assets add                 # Interactive terminal browser (no args)
 
 # Management
 start assets update [query]      # Update cached assets (all or matching query)
-start assets clean               # Remove unused cached assets
 
 # Maintenance (for catalog contributors)
 start assets index               # Generate catalog index.csv
@@ -91,13 +91,6 @@ Clearer discoverability for users:
 - Less cognitive load (one command to remember, not four)
 - Natural grouping (related operations together)
 
-Better cache management:
-
-- Explicit cleanup command (start assets clean)
-- See what's unused (shows list before removing)
-- Control cache growth (prevent indefinite growth)
-- Clear ownership (assets command owns cache)
-
 Clearer update semantics:
 
 - Explicit scope (start assets update clearly updates assets)
@@ -112,13 +105,13 @@ Accept:
 - Breaking change (requires migration for existing scripts/workflows, but clear replacement mapping provided)
 - Command is longer (start assets add vs start config task add, but supports search shortcuts with prefix matching)
 - Learning curve for existing users (must learn new command structure, but clearer long-term)
+- Indefinite cache growth (no clean command, but assets are small text files)
 
 Gain:
 
 - Unified discovery (one place for all asset operations, searchable, preview before install, type-agnostic, clear organization)
 - Consistent implementation (same code paths for all asset types, easier to extend, better testing, shared functionality)
 - Clearer discoverability (help is clearer, intuitive naming, less cognitive load, natural grouping)
-- Better cache management (explicit cleanup, see unused, control growth, clear ownership)
 - Clearer update semantics (explicit scope, no ambiguity, selective updates, predictable behavior)
 
 ## Alternatives
@@ -147,7 +140,6 @@ Cons:
 - Inconsistent UX (different patterns per type)
 - Harder to extend (new asset type needs new command)
 - Confusing update (start update ambiguous)
-- No cache management (can't clean unused)
 - Poor discoverability (commands scattered across CLI)
 
 Rejected: Unified command suite provides much better UX. Breaking change is acceptable with clear migration mapping.
@@ -280,15 +272,6 @@ start assets update [query]:
 - Report updated count and unchanged count
 - See DR-037 for complete algorithm
 
-start assets clean:
-- Scan asset cache (~/.config/start/assets/)
-- Find assets not referenced in global or local config
-- Display list of unused assets with sizes
-- Prompt for confirmation (default: no removal)
-- Remove confirmed assets
-- Report freed space
-- Support --force flag to skip confirmation prompt
-
 start assets index:
 - Validate git repository structure
 - Scan assets/ directory for .meta.toml files
@@ -315,17 +298,7 @@ Cached assets used immediately without prompting:
 
 ## Usage Examples
 
-Discovery workflow (before):
-
-```bash
-# Can't search, must know exact name
-start config task add "pre-commit-review"  # Hope it exists
-
-# Can't browse, must check GitHub web
-# No way to see what's available
-```
-
-Discovery workflow (after):
+Discovery workflow:
 
 ```bash
 # Browse in web browser
@@ -346,31 +319,11 @@ start assets info "pre-commit-review"
 start assets add "pre-commit-review"
 ```
 
-Update workflow (before):
-
-```bash
-start update              # Updates what? CLI? Assets? Both?
-```
-
-Update workflow (after):
+Update workflow:
 
 ```bash
 start assets update       # Clear: updates cached assets
 start assets update "git" # Update only git-related assets
-```
-
-Cache management (before):
-
-```bash
-# No way to clean unused assets
-# Cache grows indefinitely
-```
-
-Cache management (after):
-
-```bash
-start assets clean        # Remove unused assets (with confirmation)
-start assets clean --force  # Remove without confirmation
 ```
 
 Open web browser to catalog (success):
@@ -555,42 +508,6 @@ Checking for updates to assets matching 'commit'...
 Updated 2 assets, 1 up to date.
 ```
 
-Clean unused cache (with confirmation):
-
-```bash
-$ start assets clean
-
-Scanning cache...
-
-Unused assets (not in any config):
-  tasks/experimental/old-task (1.2 KB)
-  roles/deprecated/old-role (850 bytes)
-
-Remove 2 unused assets (2.0 KB)? [y/N]: y
-
-✓ Removed 2 assets
-✓ Freed 2.0 KB
-
-Cache: 46 assets (125 KB)
-```
-
-Clean unused cache (force without confirmation):
-
-```bash
-$ start assets clean --force
-
-Scanning cache...
-
-Unused assets (not in any config):
-  tasks/experimental/old-task (1.2 KB)
-  roles/deprecated/old-role (850 bytes)
-
-✓ Removed 2 assets
-✓ Freed 2.0 KB
-
-Cache: 46 assets (125 KB)
-```
-
 Generate catalog index:
 
 ```bash
@@ -617,4 +534,4 @@ Ready to commit:
 
 ## Updates
 
-- 2025-01-17: Initial version aligned with schema; removed implementation code and detailed migration/deprecation phases; corrected start assets browse to open web browser (not terminal TUI); added URL fallback when browser fails to open; corrected start assets clean to use --force flag instead of --dry-run
+- 2025-01-17: Initial version aligned with schema; removed implementation code; corrected start assets browse to open web browser (not terminal TUI); added URL fallback when browser fails to open; removed 'start assets clean' to prevent accidental deletion of assets used by local configurations
