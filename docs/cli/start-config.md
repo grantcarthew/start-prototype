@@ -981,7 +981,11 @@ Validation checks if context files exist but:
 ## See Also
 
 - start(1) - Launch with context
+- start-assets(1) - Manage catalog assets
 - start-config-agent(1) - Manage agents
+- start-config-task(1) - Manage tasks
+- start-config-role(1) - Manage roles
+- start-config-context(1) - Manage contexts
 - start-init(1) - Initialize configuration
 - DR-004 - Agent configuration scope
 - DR-001 - Configuration format (TOML)

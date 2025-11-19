@@ -539,7 +539,7 @@ Exit code: 3
 
 **No context documents configured:**
 
-If the `[context]` section is empty or missing:
+If the `[contexts]` section is empty or missing:
 
 ```
 Context documents: (none configured)
