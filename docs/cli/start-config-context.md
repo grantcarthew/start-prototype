@@ -36,7 +36,7 @@ Manages context document configurations in config files. Context documents provi
 Contexts are defined using the **[Unified Template Design (UTD)](../design/unified-template-design.md)** pattern:
 
 ```toml
-[context.environment]
+[contexts.environment]
 description = "User environment and tool configuration"
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
@@ -383,7 +383,7 @@ Use 'start config context list local' to see all contexts.
 **Resulting config (file-based):**
 
 ```toml
-[context.environment]
+[contexts.environment]
 description = "User environment and tool configuration"
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
@@ -393,7 +393,7 @@ required = true
 **Resulting config (command-based):**
 
 ```toml
-[context.git-status]
+[contexts.git-status]
 description = "Current git working tree status"
 command = "git status --short"
 prompt = "Working tree status:\n{command}"
@@ -405,7 +405,7 @@ command_timeout = 5
 **Resulting config (inline prompt):**
 
 ```toml
-[context.project-note]
+[contexts.project-note]
 description = "Project-specific guidance"
 prompt = "Important: This project uses Go 1.21 and follows standard Go conventions."
 required = true
@@ -824,7 +824,7 @@ Testing context: environment
 
 Loading configuration...
   Config file: ~/.config/start/contexts.toml
-  Context section: [context.environment]
+  Context section: [contexts.environment]
 
 Configuration details:
   Name: environment
@@ -1334,7 +1334,7 @@ Shows list of all contexts to choose from.
 **./.start/contexts.toml**
 : Local project configuration file containing project-specific contexts.
 
-Both files can contain `[context.<name>]` sections. Contexts are combined when both configs exist (global + local).
+Both files can contain `[contexts.<name>]` sections. Contexts are combined when both configs exist (global + local).
 
 ## Error Handling
 
@@ -1409,27 +1409,27 @@ Contexts use the UTD pattern for flexible content sourcing:
 
 **File-based:**
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 ```
 
 **Command-based:**
 ```toml
-[context.git-status]
+[contexts.git-status]
 command = "git status --short"
 prompt = "Working tree status:\n{command}"
 ```
 
 **Inline prompt:**
 ```toml
-[context.note]
+[contexts.note]
 prompt = "Important: This project uses Go 1.21"
 ```
 
 **Combined:**
 ```toml
-[context.project-state]
+[contexts.project-state]
 file = "./PROJECT.md"
 command = "git log -5 --oneline"
 prompt = "{file}\n\nRecent commits:\n{command}"
@@ -1448,7 +1448,7 @@ Context prompt templates support these placeholders:
 
 **Example:**
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 command = "date"
 prompt = """
@@ -1463,7 +1463,7 @@ Current timestamp: {command_output}
 Contexts can override the global shell setting:
 
 ```toml
-[context.git-status]
+[contexts.git-status]
 command = "git status --short"
 prompt = "Working tree status:\n{command_output}"
 shell = "bash"

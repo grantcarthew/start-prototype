@@ -176,9 +176,7 @@ Version
 
 Assets
   Location: ~/.config/start/assets/
-  Version file: ~/.config/start/asset-version.toml
   Last updated: 2024-11-22T14:23:10Z (45 days ago)
-  Commit: abc123def456
 
   Asset inventory:
     agents/ - 8 files
@@ -300,8 +298,8 @@ Compares local version against latest GitHub release.
 Verifies age and completeness of asset library.
 
 **What it checks:**
-- `asset-version.toml` exists and is readable
-- Asset age (warns if > 30 days)
+- Asset directory exists and is readable
+- Age of cached assets (warns if > 30 days)
 - Asset directory structure intact
 - All expected subdirectories present
 
@@ -411,7 +409,7 @@ Verifies runtime environment.
 
 **3** - Asset issues
 - Asset library missing
-- Asset version file corrupted
+- Asset directory empty or corrupted
 - Asset directory not writable
 
 **4** - Multiple issues (combination of above)

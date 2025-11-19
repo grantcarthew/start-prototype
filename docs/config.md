@@ -112,17 +112,17 @@ default_model = "gpt4-mini"
 **contexts.toml** (`~/.config/start/contexts.toml`)
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true
 
-[context.index]
+[contexts.index]
 file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 required = true
 
-[context.readme]
+[contexts.readme]
 file = "README.md"
 prompt = "Project overview from {file}"
 required = false
@@ -150,17 +150,17 @@ description = "Project-specific code reviewer"
 **contexts.toml** (`./.start/contexts.toml`)
 
 ```toml
-[context.agents]
+[contexts.agents]
 file = "./AGENTS.md"
 prompt = "Read {file} for repository instructions and agent guidance."
 required = true
 
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "Read {file}. Respond with the project title and shortest possible summary of work required."
 required = false
 
-[context.design]
+[contexts.design]
 file = "./docs/design-record.md"
 prompt = "Read {file} for design decisions."
 required = false
@@ -629,7 +629,7 @@ See [UTD Examples](./unified-template-design.md#examples) for more patterns.
 
 ---
 
-### [context.\<name\>]
+### [contexts.\<name\>]
 
 Context documents to include in prompts. Named sections allow targeted overrides.
 
@@ -651,7 +651,7 @@ At least one UTD field must be present. See [UTD documentation](./design/unified
 : Human-readable description of this context. Displayed in `start config show` and validation output.
 
 ```toml
-[context.environment]
+[contexts.environment]
 description = "User environment and tool configuration"
 ```
 
@@ -667,10 +667,10 @@ description = "User environment and tool configuration"
 - `required = false`: Optional context for full sessions only (PROJECT.md, README.md)
 
 ```toml
-[context.environment]
+[contexts.environment]
 required = true  # Always included
 
-[context.project]
+[contexts.project]
 required = false  # Only in 'start' command
 ```
 
@@ -704,27 +704,27 @@ Rearrange config definitions to change prompt order.
 
 ```toml
 # Simple file
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 description = "User environment and tools"
 required = true
 
 # Inline text
-[context.note]
+[contexts.note]
 prompt = "Important: This project uses Go 1.21"
 description = "Project-specific note"
 required = true
 
 # Dynamic content from command
-[context.git-status]
+[contexts.git-status]
 command = "git status --short"
 prompt = "Working tree status:\n{command_output}"
 description = "Current git status"
 required = false
 
 # Combined: file + command
-[context.project-state]
+[contexts.project-state]
 file = "./PROJECT.md"
 command = "git log -5 --oneline"
 prompt = """
@@ -839,7 +839,7 @@ Review the following changes:
 
 Tasks automatically include **all contexts where `required = true`**.
 
-This ensures critical context (like AGENTS.md, ENVIRONMENT.md) is always present while excluding optional contexts. See the `required` field documentation in the **[context.\<name\>]** section above for complete behavior across all commands.
+This ensures critical context (like AGENTS.md, ENVIRONMENT.md) is always present while excluding optional contexts. See the `required` field documentation in the **[contexts.\<name\>]** section above for complete behavior across all commands.
 
 **Example task (full):**
 
@@ -931,7 +931,7 @@ Example: `2025-01-04T14:30:00+10:00`
 
 ### UTD Pattern Placeholders
 
-Used in `prompt` field of `[context.<name>]`, `[roles.<name>]`, and `[tasks.<name>]`:
+Used in `prompt` field of `[contexts.<name>]`, `[roles.<name>]`, and `[tasks.<name>]`:
 
 **{file}**
 : File path from the `file` field (absolute, with ~ expanded).
@@ -943,7 +943,7 @@ Example: `file = "~/reference/ENVIRONMENT.md"` → `{file}` = `"/Users/username/
 
 Example for injecting contents:
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = """
 Environment Context:
@@ -953,7 +953,7 @@ Environment Context:
 
 Example for instructing AI to read (for agents with file access):
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 ```
@@ -1025,7 +1025,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 - `command` should contain `{prompt}` placeholder (warns if missing)
 - `[agents.<name>.models]` table must exist with at least one model
 
-**[context.\<name\>]:**
+**[contexts.\<name\>]:**
 - At least one of `file`, `command`, or `prompt` must be present (UTD pattern)
 - UTD validation rules apply (see [Unified Template Design](./unified-template-design.md#validation-rules))
 
@@ -1063,7 +1063,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 - `[settings]` - Local overrides global
 - `[roles.<name>]` - Combined (global + local), local overrides global for same name
 - `[agents.<name>]` - Combined (global + local), local overrides global for same name
-- `[context.<name>]` - Combined (global + local)
+- `[contexts.<name>]` - Combined (global + local)
 - `[tasks.<name>]` - Combined (global + local), local overrides global for same name
 
 ---
@@ -1134,13 +1134,13 @@ models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
 
 ```toml
 # Always needed for context
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true
 
 # Nice to have, but not essential
-[context.changelog]
+[contexts.changelog]
 file = "CHANGELOG.md"
 prompt = "Recent changes in {file}"
 required = false
@@ -1152,19 +1152,19 @@ Define most important documents first - they appear first in the prompt:
 
 ```toml
 # First - critical context
-[context.environment]
+[contexts.environment]
 # ...
 
 # Second - project overview
-[context.agents]
+[contexts.agents]
 # ...
 
 # Third - current work
-[context.project]
+[contexts.project]
 # ...
 
 # Last - supplementary
-[context.design]
+[contexts.design]
 # ...
 ```
 
@@ -1215,7 +1215,7 @@ log_level = "verbose"  # This project needs detailed output
 # ...
 
 # 4. Shared contexts
-[context.environment]
+[contexts.environment]
 # ...
 ```
 
@@ -1231,7 +1231,7 @@ log_level = "verbose"  # This project needs detailed output
 # ...
 
 # 3. Project contexts
-[context.agents]
+[contexts.agents]
 # ...
 ```
 

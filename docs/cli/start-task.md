@@ -242,7 +242,7 @@ command_timeout = 30
 
 **Note:** Tasks automatically include all contexts where `required = true`.
 
-See [task.md](../task.md) for complete configuration documentation.
+See [tasks.md](../tasks.md) for complete configuration documentation.
 
 ## Examples
 
@@ -642,7 +642,7 @@ Tasks automatically include all contexts where `required = true`.
 
 **Context resolution:**
 
-1. Task loads all `[context.<name>]` sections where `required = true`
+1. Task loads all `[contexts.<name>]` sections where `required = true`
 2. Contexts resolved from merged global + local config
 3. If context file doesn't exist → skip with status display (same as `start` command)
 
@@ -790,4 +790,4 @@ The `--quiet` flag is accepted but silently ignored for tasks. Tasks always disp
 - start(1) - Launch with context
 - start-prompt(1) - Launch with custom prompt
 - start-config(1) - Manage configuration
-- task.md - Task configuration reference
+- tasks.md - Task configuration reference

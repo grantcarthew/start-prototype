@@ -20,7 +20,7 @@ Launches an AI agent with automatically detected project context. Reads ALL conf
 - Missing files generate warnings and are skipped
 - Use `start prompt` for required documents only
 
-This is the primary command for launching an AI session with full context. For custom prompts with minimal context, use `start prompt` subcommand. For predefined workflows, use `start task` subcommand.
+This is the primary command for launching an AI session with full context. For custom prompts with minimal context, use `start prompt` subcommand. For predefined workflows, use `start task` subcommand. To discover and install new agents, roles, tasks, and contexts from the catalog, use `start assets` subcommand.
 
 Note: _You can always launch your agent directly for full custom controls if the role and context documents are not needed for one-off use._
 
@@ -129,19 +129,19 @@ Context documents appear in the prompt in the **order they are defined in the co
 **Example config:**
 
 ```toml
-[context.environment]  # First
+[contexts.environment]  # First
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 
-[context.index]        # Second
+[contexts.index]        # Second
 file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 
-[context.agents]       # Third
+[contexts.agents]       # Third
 file = "./AGENTS.md"
 prompt = "Read {file} for repository overview."
 
-[context.project]      # Fourth
+[contexts.project]      # Fourth
 file = "./PROJECT.md"
 prompt = "Read {file} for current project status."
 ```
@@ -592,22 +592,22 @@ The agent launches with no context. This is valid - useful for general AI sessio
 Documents can be marked as `required` to control which commands include them:
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true    # Always included
 
-[context.index]
+[contexts.index]
 file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 required = true    # Always included
 
-[context.agents]
+[contexts.agents]
 file = "./AGENTS.md"
 prompt = "Read {file} for repository context."
 required = true    # Always included
 
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 required = false   # Optional - included by start, excluded by start prompt
@@ -672,6 +672,7 @@ Absolute paths and `~` paths resolve independently of working directory.
 
 ## See Also
 
+- start-assets(1) - Manage catalog assets
 - start-prompt(1) - Launch with custom prompt
 - start-task(1) - Run predefined tasks
 - start-init(1) - Initialize configuration

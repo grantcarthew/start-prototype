@@ -168,7 +168,7 @@ Tasks automatically include **all contexts where `required = true`**.
 
 Context inclusion behavior:
 
-1. All contexts with `[context.<name>] required = true` are automatically included
+1. All contexts with `[contexts.<name>] required = true` are automatically included
 2. Tasks cannot exclude required contexts or include optional contexts
 3. This ensures critical context (like AGENTS.md) is always present
 
@@ -176,12 +176,12 @@ Context inclusion behavior:
 
 ```toml
 # Global config
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true  # Always included in tasks
 
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "Read {file} for project status."
 required = false  # Never included in tasks

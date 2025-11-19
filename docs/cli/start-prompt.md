@@ -114,22 +114,22 @@ Read /Users/gcarthew/Projects/my-app/AGENTS.md for repository overview.
 Example config:
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true    # Included
 
-[context.index]
+[contexts.index]
 file = "~/reference/INDEX.csv"
 prompt = "Read {file} for documentation index."
 required = true    # Included
 
-[context.agents]
+[contexts.agents]
 file = "./AGENTS.md"
 prompt = "Read {file} for repository overview."
 required = true    # Included
 
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 # required = false (default) - NOT included with start prompt

@@ -51,11 +51,11 @@ Gain:
 ## Structure
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 ```
@@ -64,7 +64,7 @@ Example merge behavior:
 
 Global config:
 ```toml
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 ```
@@ -72,12 +72,12 @@ prompt = "Read {file}. Respond with summary."
 Local config:
 ```toml
 # Override: Replace global "project" context
-[context.project]
+[contexts.project]
 file = "~/multi-repo/BIG-PROJECT.md"
 prompt = "Read {file} for project context."
 
 # Add: New context not in global
-[context.vision]
+[contexts.vision]
 file = "./docs/vision.md"
 prompt = "Read {file} for product vision."
 ```

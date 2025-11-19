@@ -1486,7 +1486,7 @@ Tasks automatically include **all contexts where `required = true`**.
 **Example:**
 ```toml
 # In config
-[context.agents]
+[contexts.agents]
 file = "./AGENTS.md"
 required = true
 

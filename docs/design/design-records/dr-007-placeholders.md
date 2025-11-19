@@ -363,7 +363,7 @@ When this role is used:
 Context with placeholders:
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 ```

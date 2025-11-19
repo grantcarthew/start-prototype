@@ -248,7 +248,7 @@ The start project is an AI agent CLI orchestrator. Key concepts:
 ### Key Design Patterns
 
 1. UTD (Unified Template Design): Pattern with file, command, prompt fields for dynamic content
-2. Named sections: `[agents.<name>]`, `[roles.<name>]`, `[tasks.<name>]`, `[context.<name>]`
+2. Named sections: `[agents.<name>]`, `[roles.<name>]`, `[tasks.<name>]`, `[contexts.<name>]`
 3. Merge behavior: Local completely replaces global for same name (no per-field merge)
 4. Asset resolution: local → global → cache → GitHub
 5. Precedence rules: CLI flags → task fields → settings → defaults
@@ -257,7 +257,7 @@ The start project is an AI agent CLI orchestrator. Key concepts:
 
 - "Model name" not "model alias" (user-defined friendly names)
 - "Full model identifier" not "full model name" (provider's actual model ID)
-- `contexts.toml` file contains `[context.<name>]` sections (file plural, section singular)
+- `contexts.toml` file contains `[contexts.<name>]` sections (file plural, section singular)
 - Multi-file config, not single-file
 
 ## Success Criteria

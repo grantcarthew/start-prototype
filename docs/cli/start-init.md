@@ -758,7 +758,7 @@ file = "./ROLE.md"
 **contexts.toml** (context documents):
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 required = true
 # ...

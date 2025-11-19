@@ -334,11 +334,11 @@ func UpdateAssets() error {
 - ✅ `[settings]` - default_agent, default_role, log_level, shell, command_timeout
 - ✅ `[agents.<name>]` - Full design with models, env, validation (global + local)
 - ✅ `[roles.<name>]` - Named roles using UTD pattern (file, command, prompt)
-- ✅ `[context.<name>]` - Uses UTD pattern with required/description fields
+- ✅ `[contexts.<name>]` - Uses UTD pattern with required/description fields
 - ✅ `[tasks.<name>]` - Role and agent fields, UTD for task prompt, auto-includes required contexts
 
 **Config Section Naming:**
-- Changed `[context.documents.<name>]` → `[context.<name>]`
+- Changed `[contexts.documents.<name>]` → `[contexts.<name>]`
 - Renamed `path` attribute → `file` (UTD standard)
 - Renamed `verbosity` → `log_level`
 

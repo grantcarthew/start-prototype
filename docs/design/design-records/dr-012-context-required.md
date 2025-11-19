@@ -91,7 +91,7 @@ Single inclusion rule (all contexts always included):
 Per-command context selection:
 
 ```toml
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "..."
 include_in = ["start", "task"]  # Not in "prompt"
@@ -134,12 +134,12 @@ Alphabetical ordering:
 Context configuration with required field:
 
 ```toml
-[context.environment]  # First in prompt
+[contexts.environment]  # First in prompt
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true    # Always included
 
-[context.project]      # Second in prompt
+[contexts.project]      # Second in prompt
 file = "./PROJECT.md"
 prompt = "Read {file}. Respond with summary."
 required = false   # Optional (default)
@@ -168,17 +168,17 @@ Document order:
 Essential context (always included):
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 required = true  # Included in: start, start prompt, start task
 
-[context.index]
+[contexts.index]
 file = "~/reference/INDEX.csv"
 prompt = "Documentation index: {file}"
 required = true  # Included in: start, start prompt, start task
 
-[context.agents]
+[contexts.agents]
 file = "./AGENTS.md"
 prompt = "Read {file} for repository context."
 required = true  # Included in: start, start prompt, start task
@@ -187,7 +187,7 @@ required = true  # Included in: start, start prompt, start task
 Optional context (interactive sessions only):
 
 ```toml
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 prompt = "Read {file} for project context."
 required = false  # Included in: start only (not start prompt, not start task)

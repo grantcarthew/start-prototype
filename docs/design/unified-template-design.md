@@ -7,7 +7,7 @@ A consistent pattern for defining content across `start` configuration sections.
 The Unified Template Design (UTD) provides a flexible way to combine static files, dynamic command output, and template text. It's used throughout the configuration for:
 
 - `[roles.<name>]` - Role (system prompt) definitions
-- `[context.<name>]` - Context documents for sessions
+- `[contexts.<name>]` - Context documents for sessions
 - `[tasks.<name>]` - Task prompt fields
 
 ## Core Concept
@@ -112,7 +112,7 @@ command_timeout = 30  # seconds
 Override shell for specific contexts/tasks:
 
 ```toml
-[context.node-version]
+[contexts.node-version]
 command = "console.log(process.version)"
 shell = "node"
 command_timeout = 5
@@ -157,11 +157,11 @@ Commands are subject to timeout limits:
 [settings]
 command_timeout = 30  # Global default: 30 seconds
 
-[context.quick-check]
+[contexts.quick-check]
 command = "git status"
 command_timeout = 5   # Override: 5 seconds
 
-[context.slow-analysis]
+[contexts.slow-analysis]
 command = "npm run analyze"
 command_timeout = 120  # Override: 2 minutes
 ```
@@ -191,7 +191,7 @@ file = "./ROLE.md"
 ### 2. Only `command`
 
 ```toml
-[context.git-status]
+[contexts.git-status]
 command = "git status --short"
 ```
 
@@ -204,7 +204,7 @@ command = "git status --short"
 ### 3. Only `prompt`
 
 ```toml
-[context.note]
+[contexts.note]
 prompt = "Important: This project uses Go 1.21"
 ```
 
@@ -217,7 +217,7 @@ prompt = "Important: This project uses Go 1.21"
 ### 4. `file` + `command` (no `prompt`)
 
 ```toml
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 command = "git log -5 --oneline"
 ```
@@ -251,7 +251,7 @@ def5678 Add feature
 ### 5. `file` + `prompt`
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 ```
@@ -264,7 +264,7 @@ prompt = "Read {file} for environment context."
 ### 6. `command` + `prompt`
 
 ```toml
-[context.status]
+[contexts.status]
 command = "git status --short"
 prompt = "Current status:\n{command_output}"
 ```
@@ -277,7 +277,7 @@ prompt = "Current status:\n{command_output}"
 ### 7. All three (`file` + `command` + `prompt`)
 
 ```toml
-[context.full-state]
+[contexts.full-state]
 file = "./PROJECT.md"
 command = "git status --short"
 prompt = """
@@ -298,7 +298,7 @@ Current Status:
 ### 8. Empty section (no fields)
 
 ```toml
-[context.broken]
+[contexts.broken]
 # No fields defined
 ```
 
@@ -320,7 +320,7 @@ Uses file contents directly.
 ### Simple Command
 
 ```toml
-[context.git-status]
+[contexts.git-status]
 command = "git status --short"
 description = "Working tree status"
 ```
@@ -330,7 +330,7 @@ Uses command output directly.
 ### Inline Prompt
 
 ```toml
-[context.note]
+[contexts.note]
 prompt = "Important: This project uses Go 1.21"
 description = "Go version requirement"
 ```
@@ -340,7 +340,7 @@ Uses prompt text directly.
 ### File with Template
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for environment context."
 ```
@@ -350,7 +350,7 @@ Injects file contents into prompt template.
 ### Command with Template
 
 ```toml
-[context.recent-changes]
+[contexts.recent-changes]
 command = "git log -5 --oneline"
 prompt = """
 Recent commits:
@@ -381,7 +381,7 @@ Work in progress.
 Config:
 
 ```toml
-[context.project]
+[contexts.project]
 file = "./PROJECT.md"
 command = "git log -3 --oneline"
 ```
@@ -391,7 +391,7 @@ Result includes git log output where `{command_output}` appears in the file.
 ### Combined: File + Command + Prompt
 
 ```toml
-[context.complete-status]
+[contexts.complete-status]
 file = "./PROJECT.md"
 command = "git status --short"
 prompt = """
@@ -412,7 +412,7 @@ Both file contents and command output injected into prompt template.
 ### Multi-line Script with Node.js
 
 ```toml
-[context.package-info]
+[contexts.package-info]
 shell = "node"
 command = """
 const pkg = require('./package.json');
@@ -425,7 +425,7 @@ prompt = "Package details:\n{command_output}"
 ### Python Analysis
 
 ```toml
-[context.python-files]
+[contexts.python-files]
 shell = "python3"
 command_timeout = 10
 command = """
@@ -440,7 +440,7 @@ prompt = "Python project files:\n{command_output}"
 ### Bun Runtime
 
 ```toml
-[context.bun-version]
+[contexts.bun-version]
 shell = "bun"
 command = "console.log(Bun.version)"
 prompt = "Using Bun {command_output}"
@@ -449,7 +449,7 @@ prompt = "Using Bun {command_output}"
 ### Deno Example
 
 ```toml
-[context.deno-check]
+[contexts.deno-check]
 shell = "deno"
 command = "console.log(Deno.version.deno)"
 prompt = "Deno runtime: {command_output}"
@@ -470,15 +470,15 @@ Current task: {command_output}
 """
 ```
 
-### [context.\<name\>]
+### [contexts.\<name\>]
 
 ```toml
-[context.environment]
+[contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
 prompt = "Read {file} for context."
 required = true
 
-[context.git-status]
+[contexts.git-status]
 command = "git status --short"
 prompt = "Repository state:\n{command_output}"
 ```

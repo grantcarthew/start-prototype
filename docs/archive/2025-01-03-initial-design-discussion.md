@@ -47,10 +47,10 @@ Created `docs/vision.md` to establish:
 **Clever insight:** Named document sections solve the override problem
 
 ```toml
-[context.documents.project]  # Global defines this
+[contexts.documents.project]  # Global defines this
 path = "./PROJECT.md"
 
-[context.documents.project]  # Local can override same name
+[contexts.documents.project]  # Local can override same name
 path = "~/multi-repo/BIG-PROJECT.md"
 ```
 
