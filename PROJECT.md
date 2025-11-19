@@ -1,6 +1,6 @@
 # Project: CLI Documentation Review and Correction
 
-**Status:** Active - Documentation Review
+**Status:** Restarting Review
 **Date Started:** 2025-01-11
 **Previous Phase:** Catalog Design (completed, see PROJECT-backlog.md)
 
@@ -40,20 +40,20 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/cli/start-assets.md`
+Active document: `docs/config.md`
 
 ### Root Documentation
 
-- [x] `docs/config.md` - Configuration reference
-- [x] `docs/tasks.md` - Task-specific documentation
-- [x] `docs/vision.md` - Product vision and goals
+- [ ] `docs/config.md` - Configuration reference
+- [ ] `docs/tasks.md` - Task-specific documentation
+- [ ] `docs/vision.md` - Product vision and goals
 
 ### Main Commands
 
-- [x] `docs/cli/start.md` - Main entry point, interactive sessions
-- [x] `docs/cli/start-prompt.md` - Prompt composition and execution
-- [x] `docs/cli/start-task.md` - Task execution
-- [x] `docs/cli/start-init.md` - Configuration initialization
+- [ ] `docs/cli/start.md` - Main entry point, interactive sessions
+- [ ] `docs/cli/start-prompt.md` - Prompt composition and execution
+- [ ] `docs/cli/start-task.md` - Task execution
+- [ ] `docs/cli/start-init.md` - Configuration initialization
 - [ ] `docs/cli/start-doctor.md` - System diagnostics
 
 ### Asset Commands

@@ -7,7 +7,7 @@ start init - Initialize start configuration
 ## Synopsis
 
 ```bash
-start init [flags]
+start init [-l|--local] [-f|--force]
 ```
 
 ## Description

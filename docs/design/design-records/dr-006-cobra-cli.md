@@ -32,6 +32,8 @@ Global flags available on all commands:
 --role <name>, -r <name>        # Which role to use
 --model <name>, -m <name>       # Model name or full identifier
 --directory <path>, -d <path>   # Working directory
+--asset-download[=bool]         # Enable/disable asset download (default true)
+--local, -l                     # Install assets to local config
 --quiet, -q                     # Quiet mode
 --verbose                       # Verbose output
 --debug                         # Debug mode

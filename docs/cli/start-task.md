@@ -77,7 +77,7 @@ All global flags from `start` command are supported. See `start --help` for a fu
 **--quiet**, **-q**
 : Silently ignored for tasks. Unlike other commands, `start task` always shows a summary before execution to ensure the user sees what context is being used.
 
-**--local**
+**-l, --local**
 : When lazy-loading a new task from the catalog, this flag adds the task to the local config (`./.start/tasks.toml`) instead of the global config.
 
 **--help**, **-h**

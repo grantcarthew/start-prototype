@@ -22,17 +22,20 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 **Two operational modes:**
 
 **Interactive mode** (no query or < 3 characters):
+
 - Browse all asset types (roles, agents, contexts, tasks) and categories
 - Navigate through tree structure
 - Select asset to install
 
 **Search mode** (3+ character query):
+
 - Substring search across name, path, description, and tags
 - Auto-select if single match found
 - Interactive selection if multiple matches
 - Download and install selected asset
 
 **Installation process:**
+
 1. Search GitHub catalog for matching assets
 2. Download asset files to cache (`~/.config/start/assets/`)
 3. Add configuration entry to `~/.config/start/` or `./.start/`
@@ -44,10 +47,12 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 : Search query for finding assets. Minimum 3 characters for search mode.
 
 **Query behavior:**
+
 - **Omitted or < 3 chars** - Interactive mode (browse all assets)
 - **3+ characters** - Search mode (substring matching)
 
 **Query matching:** Case-insensitive substring match against:
+
 - Asset name (highest priority)
 - Full path (type/category/name)
 - Description
@@ -61,6 +66,7 @@ See [DR-040](../design/design-records/dr-040-substring-matching.md) for matching
 : Install to local project configuration (`./.start/`) instead of global (`~/.config/start/`).
 
 **Examples:**
+
 ```bash
 start assets add "pre-commit" --local    # Install to ./.start/
 start assets add "pre-commit" -l         # Short flag
@@ -72,6 +78,7 @@ start assets add "go-expert"             # Install to ~/.config/start/
 ### Search Mode (Query Provided)
 
 **Single match (exact):**
+
 ```
 1. Search catalog
 2. Find single exact match
@@ -82,6 +89,7 @@ start assets add "go-expert"             # Install to ~/.config/start/
 ```
 
 **Multiple matches:**
+
 ```
 1. Search catalog
 2. Display matches grouped by type/category
@@ -92,6 +100,7 @@ start assets add "go-expert"             # Install to ~/.config/start/
 ```
 
 **No matches:**
+
 ```
 1. Search catalog
 2. No results found
@@ -100,6 +109,7 @@ start assets add "go-expert"             # Install to ~/.config/start/
 ```
 
 **Query too short (<3 chars):**
+
 ```
 1. Detect short query
 2. Fall back to interactive mode
@@ -112,12 +122,14 @@ start assets add "go-expert"             # Install to ~/.config/start/
 When no query is provided (or query is < 3 chars), `start assets add` launches an interactive terminal UI (TUI) for browsing the catalog.
 
 **Features:**
+
 - **Tree View**: Navigate asset types (roles, agents, contexts, tasks) and categories.
 - **Preview**: See descriptions, tags, and details in a side pane.
 - **Search**: Filter the list dynamically.
 - **Install**: Select an asset and press Enter to install.
 
 **Controls:**
+
 - `↑/↓`: Navigate list
 - `Enter`: Select/Install
 - `/`: Filter/Search
@@ -126,14 +138,17 @@ When no query is provided (or query is < 3 chars), `start assets add` launches a
 ### Installation Locations
 
 **Global installation (default):**
+
 - Cache: `~/.config/start/assets/{type}/{category}/{name}.*`
 - Config: `~/.config/start/{type}.toml`
 
 **Local installation (--local flag):**
+
 - Cache: `~/.config/start/assets/{type}/{category}/{name}.*` (shared)
 - Config: `./.start/{type}.toml`
 
 **Example:**
+
 ```bash
 # Global Role
 start assets add "code-reviewer"
@@ -159,9 +174,10 @@ start assets add "pre-commit" --local
 ### Multi-File Assets
 
 Assets may consist of multiple files:
+
 ```
 tasks/git-workflow/pre-commit-review.toml       # Task definition
-tasks/git-workflow/pre-commit-review.md         # Documentation
+tasks/git-workflow/pre-commit-review.md         # Prompt or instructions
 tasks/git-workflow/pre-commit-review.meta.toml  # Metadata
 ```
 
@@ -552,12 +568,14 @@ Matches all assets in git-workflow category.
 ### vs `start assets browse`
 
 **`start assets browse`** - Visual catalog exploration (browser)
+
 ```bash
 start assets browse
 # Opens GitHub in browser, no installation
 ```
 
 **`start assets add`** - Search and install (terminal)
+
 ```bash
 start assets add "commit"
 # Finds, selects, downloads, and installs
@@ -568,12 +586,14 @@ Workflow: Browse visually, then return to terminal to install.
 ### vs `start assets search`
 
 **`start assets search`** - Find assets, display only
+
 ```bash
 start assets search "commit"
 # Lists matches, exits
 ```
 
 **`start assets add`** - Find and install
+
 ```bash
 start assets add "commit"
 # Lists matches, prompts for selection, installs
@@ -586,19 +606,21 @@ Search is read-only, add performs installation.
 **Asset repository:**
 
 In `~/.config/start/config.toml`:
+
 ```toml
 [settings]
 asset_repo = "grantcarthew/start"    # Default
 # asset_repo = "myorg/custom-assets"  # Custom
 ```
 
-**Note:** This setting configures the *source* repository. Downloaded assets are installed into `tasks.toml`, `roles.toml`, `agents.toml`, or `contexts.toml`, not into `config.toml`.
+**Note:** This setting configures the _source_ repository. Downloaded assets are installed into `tasks.toml`, `roles.toml`, `agents.toml`, or `contexts.toml`, not into `config.toml`.
 
 ## Notes
 
 ### GitHub-Only Source
 
 `start assets add` searches **only the GitHub catalog**:
+
 - Does NOT search local configuration
 - Does NOT search global configuration
 - Does NOT search cache
@@ -606,6 +628,7 @@ asset_repo = "grantcarthew/start"    # Default
 **Rationale:** This is for discovering and adding new assets from the catalog.
 
 **For local assets:**
+
 ```bash
 start config task list         # See installed tasks
 start config role list         # See installed roles
@@ -614,17 +637,20 @@ start config role list         # See installed roles
 ### Cache Location
 
 All downloaded assets cached to:
+
 ```
 ~/.config/start/assets/{type}/{category}/{name}.*
 ```
 
 **Cache is shared** between global and local configs:
+
 - Download once, reference from multiple configs
 - `--local` flag affects config location, not cache
 
 ### Network Required
 
 This command requires network access to:
+
 - Download catalog index (`assets/index.csv`)
 - Download asset files
 
@@ -637,6 +663,7 @@ This command requires network access to:
 **Minimum length:** 3 characters
 
 **Match priority:**
+
 1. Exact name match (auto-select if single)
 2. Name substring
 3. Path substring (category matching)
@@ -650,17 +677,20 @@ See [DR-040](../design/design-records/dr-040-substring-matching.md) for complete
 ### Installation Scope Best Practices
 
 **Global (`~/.config/start/`):**
+
 - Personal preferences
 - Commonly used across projects
 - Not committed to version control
 
 **Local (`./.start/`):**
+
 - Project-specific assets
 - Team standardization
 - Committed to version control
 - Shared with collaborators
 
 **Example workflow:**
+
 ```bash
 # Personal preferences (global)
 start assets add "code-reviewer"
@@ -677,6 +707,7 @@ git commit -m "Add project-specific assets"
 ### Multi-File Asset Handling
 
 Assets may have multiple files:
+
 ```
 pre-commit-review.toml       # Required (task definition)
 pre-commit-review.md         # Optional (documentation)
@@ -692,6 +723,7 @@ pre-commit-review.meta.toml  # Metadata (not downloaded)
 If asset already exists in target config:
 
 **Options presented:**
+
 1. Reinstall (update cache, keep config)
 2. Add to other scope (global → local or vice versa)
 3. Cancel
