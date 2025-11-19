@@ -40,21 +40,19 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/config.md`
+Active document: `docs/cli/start-task.md`
 
 ### Root Documentation
 
-- [ ] `docs/config.md` - Configuration reference
-- [ ] `docs/tasks.md` - Task-specific documentation
-- [ ] `docs/vision.md` - Product vision and goals
+- [x] `docs/config.md` - Configuration reference
+- [x] `docs/tasks.md` - Task-specific documentation
+- [x] `docs/vision.md` - Product vision and goals
 
 ### Main Commands
 
-- [ ] `docs/cli/start.md` - Main entry point, interactive sessions
-- [ ] `docs/cli/start-prompt.md` - Prompt composition and execution
+- [x] `docs/cli/start.md` - Main entry point, interactive sessions
+- [x] `docs/cli/start-prompt.md` - Prompt composition and execution
 - [ ] `docs/cli/start-task.md` - Task execution
-- [ ] `docs/cli/start-init.md` - Configuration initialization
-- [ ] `docs/cli/start-doctor.md` - System diagnostics
 
 ### Asset Commands
 
@@ -348,3 +346,9 @@ Documentation review is complete when:
 - Living (non-archived) design records updated: dr-010, dr-011, dr-018, dr-021, dr-022, dr-024, dr-025, dr-026, dr-027, dr-030, dr-031, dr-034, dr-036, dr-037
 - CLI docs updated: start-config-task.md, start-doctor.md, start-config-role.md
 - Preserved historical references in archive files, DR-017 (deprecation record), and DR-041 (migration record)
+- **Asset resolution clarification**: Updated `docs/config.md` to clarify that assets are lazy-loaded to the global cache (`~/.config/start/assets/{type}/`) and added to global config by default, or local config with `-l`/`--local`.
+- **Path resolution simplification**: Updated `docs/config.md` to align with DR-008 - relative paths always resolve to working directory, regardless of config scope.
+- **Task context inclusion**: Updated `docs/tasks.md` to generalize "required context" description.
+- **Task lazy-loading details**: Updated `docs/tasks.md` to explicitly state tasks download to global cache and add to global/local config based on flags.
+- **Lazy-loading clarification**: Updated `docs/cli/start.md` to include contexts in asset types, simplify cache path, and clarify global vs local configuration targeting with `--local`.
+- **Local flag clarification**: Updated `docs/cli/start-prompt.md` to explicitly state that assets download to global cache but config entry goes to local scope when `--local` is used.

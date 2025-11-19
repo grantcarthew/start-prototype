@@ -170,7 +170,7 @@ Context inclusion behavior:
 
 1. All contexts with `[contexts.<name>] required = true` are automatically included
 2. Tasks cannot exclude required contexts or include optional contexts
-3. This ensures critical context (like AGENTS.md) is always present
+3. This ensures context configured as required (e.g., environment details, project index) is always present
 
 **Example:**
 
@@ -437,11 +437,13 @@ Tasks are available from the GitHub asset catalog and automatically download on 
 
 **How it works:**
 - Run `start task <name>` for any catalog task
-- Task downloads from GitHub and adds to your config automatically
+- Task is downloaded to the **global asset cache** (`~/.config/start/assets/tasks/`)
+- Task configuration is added to your **global config** (`~/.config/start/tasks.toml`) by default
 - Subsequent uses run from your config (no network required)
 - Browse available tasks: `start assets add` or `start assets browse`
 
 **Customization:**
+- Use `start task <name> --local` to add the task to your **local config** (`./.start/tasks.toml`) instead
 - Override catalog tasks by defining the same name in your config
 - Create custom tasks (global or local)
 - Disable auto-download: `asset_download = false` setting

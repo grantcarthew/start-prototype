@@ -313,9 +313,12 @@ Executing command...
 
 ### Lazy-Loading of Assets
 
-If an asset (like an agent, role, or task) is requested but not found in the local or global configuration, the CLI will attempt to find it in the GitHub asset catalog. If found, it will be downloaded, cached, and added to your global configuration for future use. This allows for seamless, on-demand use of the entire asset library.
+If an asset (like an agent, role, context, or task) is requested but not found in the local or global configuration, the CLI will attempt to find it in the GitHub asset catalog. If found, it will be downloaded to the global asset cache (`~/.config/start/assets/`) and added to your **global configuration** (`~/.config/start/`) by default for future use.
 
-This behavior can be controlled with the `--asset-download` flag.
+**Local Configuration:**
+You can direct the configuration entry to your **local configuration** (`./.start/`) by using the `--local` flag (e.g., `start task <name> --local`). The asset content always remains in the global cache.
+
+This behavior can be controlled with the `--asset-download` flag (enable/disable) and the `--local` flag (target scope).
 
 ## Examples
 
