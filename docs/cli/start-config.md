@@ -824,22 +824,25 @@ Show detailed validation results including all checks performed.
 
 **~/.config/start/**
 : Global configuration directory containing:
-  - `config.toml` - Settings only
-  - `agents.toml` - Agent configurations
-  - `roles.toml` - Role definitions
-  - `contexts.toml` - Context document references
-  - `tasks.toml` - Task definitions
+
+- `config.toml` - Settings only
+- `agents.toml` - Agent configurations
+- `roles.toml` - Role definitions
+- `contexts.toml` - Context document references
+- `tasks.toml` - Task definitions
 
 **./.start/**
 : Local project configuration directory (same file structure as global)
-  - Local values override global for matching items
-  - Collections are combined (e.g., contexts from both are merged)
+
+- Local values override global for matching items
+- Collections are combined (e.g., contexts from both are merged)
 
 **~/.config/start/\*.YYYY-MM-DD-HHMMSS.toml**
 : Backup files created before modifications. Examples:
-  - `config.2025-01-04-103045.toml`
-  - `agents.2025-01-04-103045.toml`
-  - `roles.2025-01-04-103045.toml`
+
+- `config.2025-01-04-103045.toml`
+- `agents.2025-01-04-103045.toml`
+- `roles.2025-01-04-103045.toml`
 
 ## Editor Configuration
 

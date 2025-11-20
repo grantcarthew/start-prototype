@@ -24,6 +24,7 @@ start show task [name] [flags]
 The `start show` command has two distinct modes:
 
 **1. Execution Preview Mode** - Preview what commands would execute without running them:
+
 - `start show` - Preview `start` interactive session
 - `start show task <name>` - Preview `start task <name>` execution
 - `start show prompt <text>` - Preview `start prompt <text>` execution
@@ -31,6 +32,7 @@ The `start show` command has two distinct modes:
 Shows normal terminal output plus extra metadata (contexts loaded, file sizes, command to execute), with content truncated to 10 lines unless `--verbose` is used.
 
 **2. Content Viewer Mode** - Display resolved content after UTD processing and config merging:
+
 - `start show role [name]` - Show role content (after UTD processing)
 - `start show context [name]` - Show context content (after UTD processing)
 - `start show agent [name]` - Show agent effective configuration
@@ -39,6 +41,7 @@ Shows normal terminal output plus extra metadata (contexts loaded, file sizes, c
 Shows the final processed content that would be used by commands.
 
 **For asset management**, see `start assets` commands:
+
 - `start assets browse` - Open catalog in browser
 - `start assets search` - Search catalog
 - `start assets info` - Show asset details
@@ -46,6 +49,7 @@ Shows the final processed content that would be used by commands.
 - `start assets clean` - Remove unused cache
 
 **Key difference from `start config <type> show`:**
+
 - `start config <type> show` - Shows raw TOML configuration structure
 - `start show <type>` - Shows resolved/processed content (after UTD, placeholders, merging)
 
@@ -64,6 +68,7 @@ start show [flags]
 **Behavior:**
 
 Displays:
+
 - Which agent would be used
 - Which role would be used
 - Which contexts would be loaded (all: required + optional)
@@ -178,6 +183,7 @@ start show task <name> [instructions] [flags]
 **Behavior:**
 
 Displays:
+
 - Which task would be used
 - Task's configured role (if specified)
 - Which agent would be used
@@ -223,6 +229,7 @@ focus on security
   ```diff
   {command_output}
   ```
+
   ... (45 more lines) - Use --verbose to see full content─────────────────────────────────────────────────
 
 Final composed prompt (first 10 lines):
@@ -239,11 +246,13 @@ Command that would execute:
 ❯ claude --model claude-3-7-sonnet-20250219 --append-system-prompt '...' 'Read...'
 
 PREVIEW ONLY: Task not executed
+
 ```
 
 **Error cases shown in preview:**
 
 ```
+
 Starting Task: broken-task (PREVIEW - NOT EXECUTING)
 ===============================================================================================
 
@@ -258,6 +267,7 @@ Executing task command...
   Error: nonexistent-command: command not found
 
 ⚠ This task will fail when executed due to command errors
+
 ```
 
 ### start show prompt
@@ -278,6 +288,7 @@ start show prompt <text> [flags]
 **Behavior:**
 
 Displays:
+
 - Which agent would be used
 - Which role would be used
 - Which contexts would be loaded (required only)
@@ -346,6 +357,7 @@ start show role --scope local
 **Behavior:**
 
 Shows the fully resolved role content after:
+
 - UTD processing (file contents loaded, commands executed, placeholders replaced)
 - Config merging (global + local)
 
@@ -455,6 +467,7 @@ start show context --scope local
 **Behavior:**
 
 Shows the fully resolved context content after:
+
 - UTD processing (file contents loaded, commands executed, placeholders replaced)
 - Config merging (global + local)
 
@@ -669,9 +682,11 @@ Prompt template:
   ```diff
   {command_output}
   ```
+
 ─────────────────────────────────────────────────
 
 Context inclusion: All required contexts
+
 ```
 
 ## Flags
@@ -911,23 +926,27 @@ start show role
 ### Truncation in Preview Mode
 
 **Default behavior (without --verbose):**
+
 - Role content: First 10 lines + line count
 - Prompt content: First 10 lines + line count
 - Command output: First 10 lines + line count
 
 **With --verbose flag:**
+
 - Shows full content (no truncation)
 - Use when debugging or inspecting full prompts
 
 ### Content Viewer Mode vs Config Viewer
 
 **Content viewer (`start show <type>`):**
+
 - Shows resolved/processed content
 - After UTD processing (files read, commands executed, placeholders replaced)
 - After config merging (effective configuration)
 - What the agent would actually receive
 
 **Config viewer (`start config <type> show`):**
+
 - Shows raw TOML configuration
 - File paths, prompt templates, settings
 - Configuration structure, not content
@@ -935,6 +954,7 @@ start show role
 ### Execution Preview Accuracy
 
 Preview shows exactly what would execute, including:
+
 - ✓ All context documents that would be loaded
 - ✓ File existence checks and sizes
 - ✓ Command execution (for tasks and UTD)
@@ -942,18 +962,21 @@ Preview shows exactly what would execute, including:
 - ✓ Exact agent command that would run
 
 The only difference from actual execution:
+
 - ✗ Agent is NOT invoked
 - ✗ Agent binary is NOT executed
 
 ### Performance Considerations
 
 **Execution preview mode:**
+
 - Executes task commands (if task has `command` field)
 - Reads all context files
 - Processes UTD (executes commands in roles/contexts)
 - Nearly identical cost to actual execution (minus agent invocation)
 
 **Content viewer mode:**
+
 - Faster - only resolves requested content
 - Use when you just want to see specific role/context/task
 

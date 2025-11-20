@@ -37,21 +37,25 @@ No central asset discovery system; each feature checks its own directory with gr
 ## Usage Pattern Per Asset Type
 
 **Agents (`assets/agents/`):**
+
 - Accessed by: `start config agent add`
 - Usage: Load as templates, show selection menu
 - Fallback: Manual agent entry if directory empty/missing
 
 **Roles (`assets/roles/`):**
+
 - Accessed by: User config references: `file = "~/.config/start/assets/roles/code-reviewer.md"`
 - Usage: Read file contents when loading system prompt
 - Fallback: Standard file-not-found error
 
 **Tasks (`assets/tasks/`):**
+
 - Accessed by: `start config task list`
 - Usage: Show as templates (not auto-loaded)
 - Fallback: Empty list if directory missing
 
 **Examples (`assets/examples/`):**
+
 - Accessed by: Never automatically (reference only)
 - Usage: Users manually view/copy sections
 - Fallback: N/A (optional resource)

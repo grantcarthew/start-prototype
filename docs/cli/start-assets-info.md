@@ -17,6 +17,7 @@ Display detailed information about a specific asset from the GitHub catalog with
 Use this command to preview asset details before installation, or to inspect already-installed assets.
 
 **Information displayed:**
+
 - Asset name, type, and category
 - Full description
 - Tags (keywords)
@@ -27,6 +28,7 @@ Use this command to preview asset details before installation, or to inspect alr
 - Usage instructions
 
 **Search behavior:**
+
 - Uses substring matching (same as `start assets search`)
 - Auto-displays if single match
 - Interactive selection if multiple matches
@@ -37,6 +39,7 @@ Use this command to preview asset details before installation, or to inspect alr
 : Search query to find asset. Minimum 3 characters.
 
 **Query matching:**
+
 - Case-insensitive substring match
 - Searches: name, path, description, tags
 - Single match → auto-display
@@ -498,12 +501,14 @@ JSON output for parsing in scripts.
 ### vs `start assets search`
 
 **`start assets search`** - List multiple matches briefly
+
 ```bash
 start assets search "commit"
 # Shows list with short descriptions
 ```
 
 **`start assets info`** - Detailed single asset view
+
 ```bash
 start assets info "commit"
 # Shows complete metadata for selected asset
@@ -514,12 +519,14 @@ Search for discovery, info for inspection.
 ### vs `start assets add`
 
 **`start assets info`** - View details only (read-only)
+
 ```bash
 start assets info "pre-commit"
 # Displays information, no installation
 ```
 
 **`start assets add`** - View and install
+
 ```bash
 start assets add "pre-commit"
 # Displays info, prompts for installation
@@ -530,12 +537,14 @@ Info is non-invasive inspection.
 ### vs `start show task`
 
 **`start assets info`** - Catalog asset metadata
+
 ```bash
 start assets info "pre-commit-review"
 # Shows catalog metadata (GitHub)
 ```
 
 **`start show task`** - Resolved configuration
+
 ```bash
 start show task pre-commit-review
 # Shows effective configuration after UTD processing
@@ -548,6 +557,7 @@ Info shows catalog source, show displays runtime config.
 **Asset repository:**
 
 In `~/.config/start/config.toml`:
+
 ```toml
 [settings]
 asset_repo = "grantcarthew/start"    # Default
@@ -561,11 +571,13 @@ asset_repo = "grantcarthew/start"    # Default
 ### Installation Status Detection
 
 **Status checks:**
+
 1. **Cached** - File exists in `~/.config/start/assets/{type}/{category}/`
 2. **Global config** - Entry exists in `~/.config/start/{type}.toml`
 3. **Local config** - Entry exists in `./.start/{type}.toml`
 
 **Independent checks:**
+
 - Asset can be cached but not configured
 - Asset can be in global but not local (or vice versa)
 - Asset can be in both global and local
@@ -573,6 +585,7 @@ asset_repo = "grantcarthew/start"    # Default
 ### Update Detection
 
 **SHA comparison:**
+
 - Cached asset SHA (from `.meta.toml`)
 - Catalog asset SHA (from `index.csv`)
 - Different → update available
@@ -599,11 +612,13 @@ Uses same algorithm as `start assets search` and `start assets add`.
 ### File Content Preview
 
 **With --show-content flag:**
+
 - Downloads file contents from GitHub
 - Displays inline in terminal
 - Useful for previewing small files
 
 **Without flag (default):**
+
 - Only shows metadata
 - No file downloads
 - Faster and lighter
@@ -611,16 +626,19 @@ Uses same algorithm as `start assets search` and `start assets add`.
 ### Output Formats
 
 **text (default):**
+
 - Human-readable
 - Formatted for terminal display
 - Uses box-drawing characters
 
 **json:**
+
 - Machine-parsable
 - Complete metadata structure
 - Suitable for scripting
 
 **yaml:**
+
 - Human and machine readable
 - Structured but readable
 - Alternative to JSON

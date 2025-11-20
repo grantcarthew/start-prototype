@@ -13,12 +13,14 @@
 ## Check Strategy
 
 **GitHub Comparison (Commit SHA):**
+
 - Read local commit SHA from `~/.config/start/asset-version.toml`
 - Fetch latest commit SHA from main branch via GitHub API
 - Compare: if different, updates are available
 - No caching - fresh check every time
 
 **Not timestamp-based:**
+
 - Don't use age alone (e.g., "assets > 30 days old")
 - Timestamp shown for context, but not used for status determination
 - Only warn if actual updates exist on GitHub
@@ -32,6 +34,7 @@ GET /repos/grantcarthew/start/commits/main
 ```
 
 **Response (relevant fields):**
+
 ```json
 {
   "sha": "def5678abc1234...",
@@ -45,11 +48,13 @@ GET /repos/grantcarthew/start/commits/main
 ```
 
 **Efficient alternative (lighter response):**
+
 ```
 GET /repos/grantcarthew/start/git/refs/heads/main
 ```
 
 **Response:**
+
 ```json
 {
   "ref": "refs/heads/main",
@@ -128,11 +133,13 @@ Same approach as DR-021 (CLI version checking):
 ```
 
 **Authentication:**
+
 - Respect `GH_TOKEN` environment variable
 - Anonymous: 60 requests/hour
 - Authenticated: 5000 requests/hour
 
 **No Caching:**
+
 - Every `start doctor` execution makes fresh API call
 - Consistent with DR-021 (CLI version checking)
 - Always shows current data
@@ -167,6 +174,7 @@ showAssetInfo(localCommit, localTime, latestCommit, latestTime, status)
 ### Commit SHA Display
 
 Show short SHA (7 characters) for readability:
+
 - Full SHA: `def5678abc1234567890abcdef123456`
 - Display: `def5678`
 
@@ -175,6 +183,7 @@ This matches git's default short SHA format.
 ### Timestamp Display
 
 Show relative time for user-friendliness:
+
 - `2 hours ago`
 - `3 days ago`
 - `45 days ago`

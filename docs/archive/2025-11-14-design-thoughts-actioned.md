@@ -50,6 +50,7 @@ Implement new `start assets` top-level command to consolidate all GitHub catalog
 ### Final Command Set
 
 **Approved commands:**
+
 1. `start assets browse` - Open GitHub catalog in browser
 2. `start assets add <query>` - Download and install asset with substring matching
 3. `start assets search <term>` - Search catalog, terminal output only
@@ -58,6 +59,7 @@ Implement new `start assets` top-level command to consolidate all GitHub catalog
 6. `start assets clean [--force]` - Selective cache cleanup with prompts
 
 **Rejected commands:**
+
 - ~~`start assets catalog`~~ - Folded into list, then list dropped
 - ~~`start assets list`~~ - Use browse/search instead; config commands show installed assets
 - ~~`start assets show`~~ - Dropped; info command is sufficient
@@ -74,15 +76,18 @@ Implement new `start assets` top-level command to consolidate all GitHub catalog
 **Purpose:** Open GitHub catalog in default browser for visual exploration
 
 **Behavior:**
+
 - Opens browser to `https://github.com/{asset_repo}/tree/main/assets`
 - Uses `[settings] asset_repo` value (default: `grantcarthew/start`)
 - Expected regular use case for discovery
 
 **Error Handling:**
+
 - If browser fails to open: print URL with warning, exit 0
 - No "continue" needed - command completes after attempt
 
 **Exit Codes:**
+
 - 0 - Success (browser opened or URL printed)
 
 ---
@@ -94,6 +99,7 @@ Implement new `start assets` top-level command to consolidate all GitHub catalog
 **Replaces:** `start config task add`, `start config role add`, etc.
 
 **Matching Strategy:**
+
 - Substring match against: name, full path, description, tags
 - Minimum 3 characters required
 - < 3 chars → fall back to interactive browse with warning message
@@ -102,14 +108,17 @@ Implement new `start assets` top-level command to consolidate all GitHub catalog
 **Modes:**
 
 **A) Interactive mode** (no args or < 3 chars):
+
 ```bash
 start assets add
 ```
+
 - Browse all types and categories
 - Tree-based navigation
 - Full interactive flow
 
 **B) Search mode** (3+ chars):
+
 ```bash
 start assets add git-workflow    # Matches directory
 start assets add commit-review   # Matches leaf items
@@ -117,6 +126,7 @@ start assets add pre             # Partial match
 ```
 
 **Results Display:**
+
 ```
 Found 2 matches for 'git':
 
@@ -131,6 +141,7 @@ Select [1-2]: _
 ```
 
 **Directory Selection Flow:**
+
 ```
 Selected: assets/tasks/git-workflow/ (4 assets)
 
@@ -143,21 +154,25 @@ Choice [1-3]: _
 ```
 
 **Flags:**
+
 - `--local` - Sets default to local config but doesn't skip interactive prompts
 
 **Direct Install:**
+
 ```bash
 start assets add tasks/git-workflow/pre-commit-review
 start assets add git-workflow/pre-commit-review  # Type can be inferred
 ```
 
 **Behavior:**
+
 - Downloads from GitHub catalog
 - Caches to `~/.config/start/assets/`
 - Adds configuration entry to global or local config
 - Never searches local/global/cache - only GitHub catalog
 
 **Exit Codes:**
+
 - 0 - Success (asset added)
 - 1 - Network error (catalog unavailable)
 - 2 - Asset not found
@@ -170,16 +185,19 @@ start assets add git-workflow/pre-commit-review  # Type can be inferred
 **Purpose:** Non-interactive terminal search of GitHub catalog
 
 **Behavior:**
+
 - Substring match (same as `add`)
 - Terminal output only - no interactive prompts
 - Just lists results and exits
 - Tree structure output
 
 **Minimum Query Length:**
+
 - 3 characters required
 - < 3 chars → error/warning message
 
 **Output Format:**
+
 ```
 Found 3 matches for 'commit':
 
@@ -190,6 +208,7 @@ Found 3 matches for 'commit':
 ```
 
 **Exit Codes:**
+
 - 0 - Matches found
 - 1 - No matches or error (< 3 chars, network error)
 
@@ -200,11 +219,13 @@ Found 3 matches for 'commit':
 **Purpose:** Show detailed metadata for specific asset
 
 **Matching:**
+
 - Substring matching (same as search/add)
 - Multiple matches → interactive selection
 - Single match → show info directly
 
 **Display:**
+
 ```
 Asset: pre-commit-review
 Type: task
@@ -223,12 +244,14 @@ Installation Status:
 ```
 
 **Status Display:**
+
 - "Installed in global config"
 - "Installed in local config"
 - "Cached but not configured"
 - "Not installed"
 
 **Exit Codes:**
+
 - 0 - Success (info displayed)
 - 1 - Asset not found
 - 2 - Network error
@@ -242,6 +265,7 @@ Installation Status:
 **Replaces:** `start update` (top-level command completely removed)
 
 **Behavior:**
+
 - No arguments → update all cached assets
 - With query → substring match (categories, names, paths, etc.)
 - Multiple matches → interactive selection
@@ -249,6 +273,7 @@ Installation Status:
 - Updates cache only, never modifies user config files
 
 **Examples:**
+
 ```bash
 start assets update                    # Update all
 start assets update pre-commit-review  # Update specific asset
@@ -258,6 +283,7 @@ start assets update git-workflow       # Update all in category
 **Uses:** Substring matching algorithm (see DR-040)
 
 **Exit Codes:**
+
 - 0 - Success (updates applied)
 - 1 - Network error
 - 2 - File system error
@@ -277,6 +303,7 @@ start assets update git-workflow       # Update all in category
 4. Auto-delete cached assets not in any config
 
 **Flow:**
+
 ```
 Found 5 asset references in configs:
 
@@ -310,21 +337,25 @@ Kept in cache:
 ```
 
 **Logic:**
+
 - User says YES → remove from config + delete from cache
 - User says NO → keep in config + keep in cache
 - Not in config → auto-delete from cache (no prompt)
 
 **Flag - `--force`:**
+
 - Skip all prompts
 - Delete EVERYTHING (cache + all asset configs)
 - Nuclear option for complete cleanup
 
 **Order of Operations:**
+
 1. Prompt for config removals first
 2. Then delete from cache based on decisions
 3. Configs are backed up before removal
 
 **Exit Codes:**
+
 - 0 - Success (cleaned or user cancelled)
 - 3 - File system error (backup failed, etc.)
 
@@ -366,6 +397,7 @@ Kept in cache:
 ### Documentation Updates Needed
 
 **CLI docs to create:**
+
 - ✅ `docs/cli/start-assets.md` - Main command documentation (COMPLETED)
 - ✅ `docs/cli/start-assets-browse.md` (COMPLETED)
 - ✅ `docs/cli/start-assets-add.md` (COMPLETED)
@@ -375,6 +407,7 @@ Kept in cache:
 - ✅ `docs/cli/start-assets-clean.md` (COMPLETED)
 
 **CLI docs to update:**
+
 - ✅ `docs/cli/start-config-task.md` - Removed `add` subcommand, updated references (COMPLETED)
 - ✅ `docs/cli/start-config-role.md` - Removed `add` subcommand, updated references (COMPLETED)
 - ✅ `docs/cli/start-config-agent.md` - Removed `add` subcommand, updated references (COMPLETED)
@@ -382,21 +415,25 @@ Kept in cache:
 - ✅ `docs/cli/start-show.md` - Removed Asset Catalog Viewer Mode section (COMPLETED)
 
 **Config docs to update:**
+
 - ✅ `docs/config.md` - Updated asset catalog references (COMPLETED)
 
 ### Implementation Notes
 
 **Core Principles:**
+
 - `start assets` ONLY interacts with GitHub catalog
 - Never searches local config, global config, or cache
 - Asset resolution algorithm (DR-033) remains separate for runtime resolution
 - Cache remains invisible (DR-036) - no manual cache inspection commands
 
 **Semantic Separation:**
+
 - `start config` = Manage YOUR configuration (edit, test, remove custom assets)
 - `start assets` = Shop THE catalog (browse, add, update from GitHub)
 
 **User Mental Model:**
+
 - "I want to see what's available" → `start assets browse` or `start assets search`
 - "I want to see what I have installed" → `start config task list`, `start config role list`, etc.
 - "I want to add something" → `start assets add <query>`
@@ -407,6 +444,7 @@ Kept in cache:
 ### Breaking Changes
 
 **Commands removed:**
+
 - `start update` (replaced by `start assets update`)
 - `start config task add` (replaced by `start assets add`)
 - `start config role add` (replaced by `start assets add`)
@@ -414,6 +452,7 @@ Kept in cache:
 - `start show assets` (use `start assets info` instead)
 
 **Migration path:**
+
 - Document changes in release notes
 - Add deprecation warnings in v1 (if we implement deprecation period)
 - Or just hard cutover since project is in design phase
@@ -421,6 +460,7 @@ Kept in cache:
 ### Success Criteria
 
 **Design Phase (Documentation):**
+
 - [x] Catalog index DR written (DR-039)
 - [x] Substring matching DR written (DR-040)
 - [x] Asset command reorganization DR written (DR-041)
@@ -440,6 +480,7 @@ Kept in cache:
 -->
 
 **Documentation Phase Progress:**
+
 - ✅ Main command doc (start-assets.md)
 - ✅ Browse command doc (start-assets-browse.md)
 - ✅ Add command doc (start-assets-add.md)
@@ -449,12 +490,14 @@ Kept in cache:
 - ✅ Clean command doc (start-assets-clean.md)
 
 **Documentation Phase: COMPLETE** (2025-01-13)
+
 - All 7 new CLI documentation files created
 - All 6 existing CLI documentation files updated to remove deprecated commands
 - All deprecated command references cleaned up from user-facing docs
 - All verification checks passed (ripgrep searches confirmed cleanup complete)
 
 **Project Status: ARCHIVED** (2025-01-14)
+
 - Design and documentation phase completed successfully
 - Implementation phase not pursued (Document Driven Development exercise)
 - All design records and CLI documentation ready for future implementation if needed

@@ -44,21 +44,25 @@ The bulk download model (download entire library upfront) is incompatible with t
 ## Asset Usage Patterns
 
 **Agent templates:**
+
 - Located in `~/.config/start/assets/agents/`
 - Used during `start assets add` to pre-fill configurations
 - User selects template, values are copied to `config.toml`
 
 **Role files:**
+
 - Located in `~/.config/start/assets/roles/`
 - Referenced in config: `file = "~/.config/start/assets/roles/code-reviewer.md"`
 - Updates flow automatically when `start assets update` is run
 
 **Task definitions:**
+
 - Located in `~/.config/start/assets/tasks/`
 - Shown as templates in `start config task list`
 - Users explicitly add them to config to activate
 
 **Example configs:**
+
 - Located in `~/.config/start/assets/examples/`
 - Reference only, not automatically loaded
 - Users manually copy sections to their config

@@ -25,30 +25,35 @@ Provide interactive terminal-based catalog browsing via start assets add (no arg
 Key aspects:
 
 Command: start assets add (no arguments)
+
 - Interactive TUI browser for all asset types
 - Downloads index.csv for catalog metadata
 - Groups assets by category
 - Numbered selection interface
 
 Navigation: Category-first approach
+
 - Step 1: Select category (with asset counts)
 - Step 2: Select asset within category (with descriptions)
 - Step 3: Confirm download with metadata preview
 - Option to view all assets (skip category filtering)
 
 Implementation: Native numbered selection
+
 - No TUI library dependency (no bubbletea, promptui, survey)
 - Standard input/output (print numbered lists, read integers)
 - Works in all terminal environments
 - KISS principle for v1
 
 Confirmation workflow:
+
 - Show asset metadata before downloading (name, description, tags)
 - Prompt: "Download and add to config? [Y/n]"
 - User can cancel anytime (no changes made)
 - Downloads and adds to config only after confirmation
 
 Non-interactive mode:
+
 - --yes flag skips confirmation prompts (for automation)
 - --category flag skips category selection
 - --local flag adds to local config instead of global
@@ -121,6 +126,7 @@ Gain:
 Use TUI library (bubbletea, promptui, survey):
 
 Example: Integrate charmbracelet/bubbletea for enhanced UX
+
 - Full-featured TUI framework
 - Arrow key navigation instead of numbered selection
 - Fuzzy search, multi-select capabilities
@@ -128,12 +134,14 @@ Example: Integrate charmbracelet/bubbletea for enhanced UX
 - Modern terminal UI patterns
 
 Pros:
+
 - Better UX (arrow keys more intuitive than typing numbers)
 - Richer interactions (fuzzy search, multi-select)
 - Modern appearance (colors, borders, animations)
 - Familiar pattern (like fzf, kubectl)
 
 Cons:
+
 - External dependency (larger binary, slower builds)
 - Terminal compatibility issues (some terminals don't support features)
 - Complex API (Elm architecture for bubbletea, steeper learning curve)
@@ -145,6 +153,7 @@ Rejected: KISS principle - ship v1 with numbered selection, add TUI library in v
 Flat list without categories:
 
 Example: Show all assets in one long list
+
 ```
 Available tasks:
   1. git-workflow/pre-commit-review - Review staged changes
@@ -156,11 +165,13 @@ Choice [1-46]: _
 ```
 
 Pros:
+
 - Simpler (one step instead of two)
 - Faster (no category navigation)
 - Less code (no grouping logic)
 
 Cons:
+
 - Long list (hard to scan with hundreds of assets)
 - Poor organization (no grouping by domain)
 - Doesn't scale (overwhelming as catalog grows)
@@ -171,6 +182,7 @@ Rejected: Category-first navigation better for large catalogs, easier to scan, c
 Search-first pattern:
 
 Example: Prompt for search query before browsing
+
 ```
 Search for task (or press Enter to browse all): commit
 
@@ -181,11 +193,13 @@ Found 3 tasks:
 ```
 
 Pros:
+
 - Fast for users who know what they want
 - Reduces browsing (direct to relevant assets)
 - Good for power users (targeted search)
 
 Cons:
+
 - Extra step for exploration (must type something)
 - Not good for discovery (browsing to see what exists)
 - Requires search implementation upfront
@@ -196,19 +210,23 @@ Rejected: Category browsing better for discovery. Search available via separate 
 Direct installation without browsing:
 
 Example: Require explicit asset path, no interactive mode
+
 ```
 start assets add git-workflow/pre-commit-review --yes
 ```
+
 - No interactive browsing at all
 - User must know asset path upfront
 - Always requires explicit path
 
 Pros:
+
 - Very explicit (user knows exactly what they're getting)
 - No interactive navigation needed
 - Simple implementation (no TUI code)
 
 Cons:
+
 - Poor discoverability (must know asset path upfront)
 - No exploration (can't browse available assets)
 - Requires external documentation (users look up paths elsewhere)
@@ -221,6 +239,7 @@ Rejected: Interactive browsing critical for discovery. Direct installation avail
 Interactive TUI browser:
 
 Command: start assets add (no arguments)
+
 - Downloads index.csv from GitHub
 - Groups assets by type and category
 - Shows numbered category list
@@ -265,11 +284,13 @@ Navigation flow:
 Non-interactive mode:
 
 Flags:
+
 - --yes, -y: Skip confirmation prompts (for automation)
 - --category <cat>: Filter by category (skip category selection step)
 - --local: Add to local config instead of global
 
 Direct installation:
+
 - Syntax: start assets add <path>
 - Example: start assets add git-workflow/pre-commit-review
 - Skips category and asset selection steps
@@ -279,6 +300,7 @@ Direct installation:
 Error handling:
 
 Network unavailable:
+
 - Message: "Cannot fetch catalog from GitHub"
 - Show network error details
 - Suggestions:
@@ -287,15 +309,18 @@ Network unavailable:
   - Add custom task manually
 
 No assets found:
+
 - Message: "No tasks found in category 'X'"
 - Show available categories
 - Suggest: Try different category
 
 User cancels:
+
 - Message: "Cancelled. No changes made."
 - Exit code 0 (user choice, not error)
 
 Invalid input:
+
 - Re-prompt for valid choice
 - Show valid range (e.g., "Choice [1-5]:")
 

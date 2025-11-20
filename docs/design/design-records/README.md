@@ -137,6 +137,7 @@ Version tracking and update checking:
 ### Unified Template Design (UTD)
 
 The `file`, `command`, `prompt` pattern is used consistently across:
+
 - Context documents
 - Roles
 - Task configurations
@@ -151,6 +152,7 @@ See individual DRs for details.
 ### Local Precedence
 
 When both global and local configs define the same item, local wins:
+
 - Contexts: Combined (global + local), local overrides by name
 - Agents: Combined (global + local), local overrides by name
 - Roles: Local completely replaces global (for same role name)

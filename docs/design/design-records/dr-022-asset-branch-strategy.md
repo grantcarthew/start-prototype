@@ -24,12 +24,14 @@ Asset catalog needs to know which GitHub branch to fetch assets from. The system
 Asset catalog always fetched from **main branch**, not GitHub Releases.
 
 Catalog operations using main branch:
+
 - `start assets search` - downloads `assets/index.csv` from main
 - `start assets add` - downloads catalog index and assets from main
 - `start assets update` - checks for updates on main branch
 - Lazy loading - downloads individual assets from main on first use
 
 CLI binary versioning (separate concern):
+
 - CLI releases use GitHub Releases (semantic versioning)
 - Users update CLI via `brew upgrade` or `go install`
 - Version checks compare against latest release (DR-021)
@@ -225,19 +227,22 @@ func FetchAsset(path string) ([]byte, error) {
 To prevent broken assets reaching users:
 
 Keep main branch stable:
+
 - Test assets before merging to main
-- Don't commit broken TOML or malformed markdown
+- Don't commit broken TOML or malformed Markdown
 - Review asset changes like code
 - Use PRs for asset contributions
 - Validate metadata in PR reviews
 
 Validation on catalog index generation:
+
 - `start assets index` validates TOML syntax
 - Checks required metadata fields
 - Errors on missing/invalid data
 - Catches issues before merge
 
 Per-asset validation (future consideration):
+
 - Could validate TOML syntax before caching
 - Could check for required fields
 - Could rollback individual asset on failure

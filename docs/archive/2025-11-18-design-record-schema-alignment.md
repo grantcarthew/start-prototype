@@ -56,7 +56,7 @@ MUST READ before starting work:
    - DR-009 (Task Structure) - Comprehensive example showing all sections well
 
    **Catalog system (major architectural change):**
-   - DR-031 (Catalog-Based Assets) - Core architectural shift, superseded DR-010, DR-011, DR-018
+   - DR-031 (Catalog-Based Assets) - Core architectural Shift, superseded DR-010, DR-011, DR-018
    - DR-033 (Asset Resolution Algorithm) - How catalog works: local → global → cache → GitHub
    - DR-039 (Catalog Index) - index.csv from main branch, catalog metadata
 

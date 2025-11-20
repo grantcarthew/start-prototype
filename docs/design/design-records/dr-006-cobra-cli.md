@@ -140,11 +140,13 @@ start init                         # Initialize configuration
 Cobra automatically adds help support to all commands:
 
 Help flags (automatic):
+
 ```bash
 -h, --help            # Show help for any command
 ```
 
 Help command (automatic):
+
 ```bash
 start help                    # Show root command help
 start help config             # Show help for config subcommand
@@ -152,6 +154,7 @@ start help config agent       # Show help for nested subcommand
 ```
 
 Works at all levels:
+
 ```bash
 start --help
 start config --help

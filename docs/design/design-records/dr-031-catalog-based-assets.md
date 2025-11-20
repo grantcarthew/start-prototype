@@ -47,6 +47,7 @@ Key principles:
 Catalog index system:
 
 Index file structure:
+
 - Location: assets/index.csv in catalog repository
 - Format: CSV with columns (type, category, name, description, tags, bin, sha, size, created, updated)
 - Downloaded fresh on every search/browse operation (no local caching)
@@ -54,6 +55,7 @@ Index file structure:
 - Enables fast metadata-rich searching without downloading individual .meta.toml files
 
 Fallback mechanism:
+
 - If index.csv unavailable: Fall back to GitHub Tree API for directory listing
 - Tree API provides name/path only (no descriptions/tags)
 - Degraded but functional search capability
@@ -69,6 +71,7 @@ Asset resolution order (when user runs start task <name>):
 Cache behavior:
 
 Cache is invisible to users:
+
 - Automatically populated when downloading from GitHub
 - Updated via start assets update (SHA-based detection)
 - Never auto-cleaned (files are tiny text files)
@@ -76,11 +79,13 @@ Cache is invisible to users:
 - User can manually delete cache directory if desired
 
 Cache contains:
+
 - Asset content files (.toml, .md)
 - Sidecar metadata files (.meta.toml)
 - SHA tracking for update detection
 
 Cache does NOT contain:
+
 - User modifications (those go in config files)
 - State tracking files (filesystem IS the state)
 - Catalog index (downloaded fresh each time)
@@ -180,17 +185,20 @@ Gain:
 Bundled assets in binary:
 
 Example: Include all assets in CLI binary at build time
+
 - Assets compiled into executable
 - No network dependency ever
 - Simple deployment
 
 Pros:
+
 - Zero network dependency (100% offline)
 - Guaranteed availability (assets always present)
 - Fast access (no download or cache lookup)
 - Simple distribution (single binary)
 
 Cons:
+
 - Large binary size (grows with asset count)
 - Can't update assets without CLI release
 - No community contributions between releases
@@ -203,6 +211,7 @@ Rejected: Couples content to code releases. Can't update assets independently. B
 Plugin system with separate asset repositories:
 
 Example: Users add asset repos like apt sources
+
 ```toml
 [asset_sources]
 official = "github.com/grantcarthew/start"
@@ -211,12 +220,14 @@ personal = "github.com/myuser/my-assets"
 ```
 
 Pros:
+
 - Multiple asset sources (community ecosystems)
 - Decentralized asset hosting
 - Users can create private asset repos
 - Flexible and extensible
 
 Cons:
+
 - Complex configuration (users must manage sources)
 - Trust and security issues (which sources are safe?)
 - Discovery fragmentation (assets spread across repos)
@@ -229,16 +240,19 @@ Rejected: Over-engineered for v1. Single trusted source is simpler and sufficien
 Download all .meta.toml files for search:
 
 Example: Fetch all metadata files individually for search
+
 - Query GitHub Tree API for asset list
 - Download each .meta.toml file (200+ HTTP requests)
 - Parse and search in memory
 
 Pros:
+
 - No index file needed (one less thing to maintain)
 - Always absolutely fresh (no derived file)
 - Source of truth directly accessed
 
 Cons:
+
 - Extremely slow (200+ HTTP requests for large catalog)
 - API rate limits (GitHub API has limits)
 - Poor user experience (long wait for searches)
@@ -251,6 +265,7 @@ Rejected: Performance unacceptable. Index.csv pattern is proven (npm, cargo, hom
 Configuration structure:
 
 Directory layout:
+
 ```
 ~/.config/start/
 ├── config.toml      # Settings only
@@ -271,6 +286,7 @@ Directory layout:
 ```
 
 Settings configuration (config.toml):
+
 ```toml
 [settings]
 default_agent = "claude"
@@ -284,6 +300,7 @@ asset_repo = "grantcarthew/start"
 ```
 
 Task configuration (tasks.toml):
+
 ```toml
 # Downloaded from catalog - inlined completely
 [tasks.pre-commit-review]
@@ -303,6 +320,7 @@ prompt = "Check for issues"
 Catalog index system:
 
 Index file (assets/index.csv):
+
 - Location: assets/index.csv in catalog repository
 - Format: CSV with header row
 - Columns: type, category, name, description, tags, bin, sha, size, created, updated
@@ -312,6 +330,7 @@ Index file (assets/index.csv):
 - Size: ~10-50KB for hundreds of assets
 
 Search workflow:
+
 1. Download index.csv from raw.githubusercontent.com
 2. Parse CSV into in-memory structure
 3. Search by substring matching (name, description, tags)
@@ -347,22 +366,26 @@ When user runs start task <name>:
 Cache behavior:
 
 Automatic population:
+
 - Assets downloaded from GitHub cached automatically
 - Cache location: ~/.config/start/assets/
 - Organized by asset type (tasks/, roles/, agents/, contexts/)
 
 Update detection:
+
 - start assets update downloads index.csv
 - Compares SHA from index with SHA of cached files
 - Downloads updated assets to cache
 - Shows what changed (version, description)
 
 Preservation of user config:
+
 - Cache updates never overwrite user config files
 - User must manually apply updates to tasks.toml if desired
 - Preserves customizations and prevents breaking changes
 
 No cleanup:
+
 - Cache never auto-cleaned
 - Files are tiny text files (storage not a concern)
 - User can manually delete cache directory if needed
@@ -370,25 +393,32 @@ No cleanup:
 Command flags and options:
 
 start task <name> [flags]:
+
 - --local: Add downloaded asset to local config (default: global)
 - --asset-download[=bool]: Download from GitHub if not found (default: from settings)
 
 start assets browse:
+
 - Open GitHub catalog in web browser
 
 start assets add <query>:
+
 - Search catalog and install matching asset (uses index.csv)
 
 start assets update [query]:
+
 - Update cached assets (all or matching query, uses index.csv for SHA comparison)
 
 start assets search <query>:
+
 - Search catalog by description/tags (uses index.csv)
 
 start assets info <name>:
+
 - Preview asset before installing (uses index.csv)
 
 start assets index:
+
 - Generate index.csv from .meta.toml files (maintainer command)
 
 ## Usage Examples

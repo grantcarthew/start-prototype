@@ -6,7 +6,7 @@ You are performing a comprehensive documentation reconciliation review to identi
 
 **Include:**
 
-- All markdown files in docs/
+- All Markdown files in docs/
 - AGENTS.md
 - README.md
 

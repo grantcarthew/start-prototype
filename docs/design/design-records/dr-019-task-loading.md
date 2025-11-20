@@ -28,12 +28,14 @@ Tasks load from multiple sources with clear precedence: local config → global 
 Task sources:
 
 Runtime execution (`start task <name>`):
+
 - Local config: `./.start/tasks.toml`
 - Global config: `~/.config/start/tasks.toml`
 - Asset cache: `~/.config/start/assets/tasks/`
 - GitHub catalog: Query and download if `asset_download = true`
 
 Management commands (`start config task list/add/edit`):
+
 - Shows all configured tasks (local + global merged)
 - Asset tasks visible via `start assets search` or `start assets add`
 
@@ -312,6 +314,7 @@ Local tasks (1):
 ```
 
 Asset catalog tasks shown via:
+
 ```bash
 start assets search "review"
 start assets add  # Interactive TUI
@@ -322,6 +325,7 @@ start assets add  # Interactive TUI
 Aliases are treated as short names for tasks. Local always wins.
 
 Resolution:
+
 - `start task cr` → Local alias wins over global alias
 - Warning displayed at runtime about shadowed global alias
 

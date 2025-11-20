@@ -89,6 +89,7 @@ Model name behavior:
 Example merge:
 
 Global `~/.config/start/agents.toml`:
+
 ```toml
 [agents.claude]
 bin = "claude"
@@ -101,6 +102,7 @@ default_model = "haiku"  # Personal preference: use cheap model
 ```
 
 Local `./.start/agents.toml`:
+
 ```toml
 [agents.claude]
 bin = "claude"

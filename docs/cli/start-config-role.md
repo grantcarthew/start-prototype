@@ -147,7 +147,6 @@ This command launches an interactive wizard to help you create a new role from s
 
 (See `start config agent new` for a detailed example of the interactive wizard flow).
 
-
 ### start config role show
 
 Display current role configuration.
@@ -1278,14 +1277,17 @@ Exit code: 1
 The `[roles.<name>]` sections have combine-and-override merge behavior:
 
 **Global roles:** `~/.config/start/roles.toml`
+
 - Personal default role definitions
 - Used across all projects
 
 **Local roles:** `./.start/roles.toml`
+
 - Project-specific role definitions
 - Added to global roles
 
 **Merge behavior:**
+
 - Global and local roles are **combined**
 - If a role with the same name exists in both: local overrides global for that role
 - All other roles from both configs remain available
@@ -1308,6 +1310,7 @@ Roles are completely optional:
 Roles use UTD pattern for flexible content sourcing:
 
 **File-based:**
+
 ```toml
 [roles.code-reviewer]
 file = "~/.config/start/roles/code-reviewer.md"
@@ -1322,6 +1325,7 @@ prompt = "You are a code reviewer. Current commit: {command_output}"
 ```
 
 **Inline prompt:**
+
 ```toml
 [roles.security-reviewer]
 prompt = """
@@ -1331,6 +1335,7 @@ Focus on security and performance.
 ```
 
 **File with template framing:**
+
 ```toml
 [roles.project-role]
 file = "./ROLE.md"
@@ -1343,6 +1348,7 @@ Follow these instructions carefully.
 ```
 
 **Combination (file + command):**
+
 ```toml
 [roles.time-aware-role]
 file = "./ROLE.md"
@@ -1366,6 +1372,7 @@ Role templates support these placeholders:
 - `{command_output}` - Output from `command` execution (empty if command fails)
 
 **Example:**
+
 ```toml
 [roles.branch-aware-reviewer]
 file = "~/.config/start/roles/reviewer.md"
@@ -1396,15 +1403,18 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 By convention, role definition files are stored in:
 
 **Global:** `~/.config/start/roles/*.md`
+
 - Personal role definitions
 - Managed via `start assets update` (asset roles)
 - Can also be user-created
 
 **Local (per-project):** `./.start/roles/*.md` or `./roles/*.md`
+
 - Project-specific role definitions
 - Manually created
 
 **Asset roles:** `~/.config/start/assets/roles/*.md`
+
 - Provided by `start` as defaults
 - Updated via `start assets update`
 

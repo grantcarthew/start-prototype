@@ -12,6 +12,7 @@ Tasks allow you to define reusable AI-assisted workflows. Each task can:
 - Optionally provide a short alias for quick access
 
 **Key difference from contexts:**
+
 - **Context** = Passive background information included in sessions
 - **Task** = Active workflow with specific role and structured prompt
 
@@ -75,12 +76,14 @@ description = "Review Go code with specialized agent"
 If omitted, uses the `default_agent` from settings (resolved via asset resolution algorithm), or the first agent in local/global config (TOML order) if no default is set.
 
 **Use cases:**
+
 - Specialized agents for specific languages or domains
 - Different model perspectives for alternative reviews
 - Performance optimization (fast agents for quick checks)
 - Tool-specific features (vision, artifacts, etc.)
 
 **Validation:**
+
 - Agent name resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog)
 - Resolved at task execution time (may download from catalog if `asset_download = true`)
 - Configured agents checked by `start doctor` and `start config validate`
@@ -91,6 +94,7 @@ If omitted, uses the `default_agent` from settings (resolved via asset resolutio
 : Preferred role for this task. Resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog).
 
 **Role Selection Precedence:**
+
 1. CLI `--role` flag (highest priority)
 2. Task `role` field
 3. `default_role` setting
@@ -104,11 +108,13 @@ description = "Security-focused code audit"
 ```
 
 **Validation:**
+
 - Role name resolved using asset resolution algorithm (local config → global config → cache → GitHub catalog)
 - Resolved at task execution time (may download from catalog if `asset_download = true`)
 - Configured roles checked by `start doctor` and `start config validate`
 
 **Use cases:**
+
 - Task-specific AI personas (security auditor, code reviewer, documentation writer)
 - Different perspectives for same codebase
 - Specialized domain knowledge (Go expert, API validator, etc.)
@@ -157,6 +163,7 @@ Available in `file` content and `prompt` templates:
 - `{date}` - Current timestamp (global)
 
 **{instructions} behavior:**
+
 - Value: User's arguments after task name
 - If no arguments provided: `"None"`
 - Example: `start task gdr "focus on security"` → `{instructions}` = `"focus on security"`
@@ -196,13 +203,16 @@ prompt = "Review the code. {instructions}"
 Tasks can be defined in **both global and local** configs:
 
 **Global tasks:** `~/.config/start/tasks.toml`
+
 - Shared across all projects
 
 **Local tasks:** `./.start/tasks.toml`
+
 - Project-specific workflows
 - Override global tasks by using same name
 
 **Merge behavior:**
+
 - Global + local tasks are combined
 - Same task name: **local overrides global**
 - Task list alphabetically sorted
@@ -217,11 +227,13 @@ At least one of `file`, `command`, or `prompt` must be present for the task prom
 ### Naming Constraints
 
 **Task names:**
+
 - Lowercase alphanumeric with hyphens
 - Pattern: `/^[a-z0-9]+(-[a-z0-9]+)*$/`
 - Examples: `code-review`, `git-diff-review`, `doc-review`
 
 **Task aliases:**
+
 - Same constraints as task names
 - Must be unique across all tasks (global + local merged)
 - Conflict resolution: First in TOML order wins
@@ -430,12 +442,14 @@ The local task completely replaces the global task with the same name.
 Tasks are available from the GitHub asset catalog and automatically download on first use (if `asset_download = true`).
 
 **Example tasks available:**
+
 - **code-review** (alias: `cr`) - General code review for quality and best practices
 - **git-diff-review** (alias: `gdr`) - Review staged git changes
 - **comment-tidy** (alias: `ct`) - Review and improve code comments
 - **doc-review** (alias: `dr`) - Review and improve documentation
 
 **How it works:**
+
 - Run `start task <name>` for any catalog task
 - Task is downloaded to the **global asset cache** (`~/.config/start/assets/tasks/`)
 - Task configuration is added to your **global config** (`~/.config/start/tasks.toml`) by default
@@ -443,6 +457,7 @@ Tasks are available from the GitHub asset catalog and automatically download on 
 - Browse available tasks: `start assets add` or `start assets browse`
 
 **Customization:**
+
 - Use `start task <name> --local` to add the task to your **local config** (`./.start/tasks.toml`) instead
 - Override catalog tasks by defining the same name in your config
 - Create custom tasks (global or local)

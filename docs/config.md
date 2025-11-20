@@ -20,18 +20,20 @@ Complete reference for `start` configuration files.
   - `contexts.toml` - Project contexts
 
 **Merge behavior:**
+
 - Settings: Merged per-field, local overrides global for same field
 - Agents: Combined (global + local), local overrides global for same name
 - Contexts: Combined (global + local), local overrides global for same name
 - Roles: Combined (global + local), local overrides global for same name
+
 ## Asset Resolution & Lazy-Loading
 
 `start` treats configurations for agents, roles, tasks, and contexts as "assets". When you ask for an asset (e.g., by running `start task <name>`, `start --role <name>`, or `start assets add <query>`), the CLI resolves it using the following order of precedence:
 
-1.  **Local Config:** (`./.start/`) - Highest priority. Allows project-specific overrides.
-2.  **Global Config:** (`~/.config/start/`) - Your personal, user-wide configurations.
-3.  **Asset Cache:** (`~/.config/start/assets/`) - Assets you have previously downloaded.
-4.  **GitHub Catalog:** If an asset is not found in any of the above locations, the CLI will search the official GitHub asset catalog.
+1. **Local Config:** (`./.start/`) - Highest priority. Allows project-specific overrides.
+2. **Global Config:** (`~/.config/start/`) - Your personal, user-wide configurations.
+3. **Asset Cache:** (`~/.config/start/assets/`) - Assets you have previously downloaded.
+4. **GitHub Catalog:** If an asset is not found in any of the above locations, the CLI will search the official GitHub asset catalog.
 
 If the asset is found in the GitHub catalog, it will be "lazy-loaded": downloaded to the global asset cache, and added to your **global configuration** (`~/.config/start/`) by default for immediate and future offline use.
 
@@ -173,17 +175,21 @@ required = false
 When both configs exist, the effective configuration combines them:
 
 **Settings:**
+
 - `default_agent = "claude"` (from global)
 - `log_level = "debug"` (from local, overrides global "normal")
 
 **Agents:**
+
 - claude, gemini, aichat (from global; local can override or add agents)
 
 **Roles:**
+
 - code-reviewer: `./ROLE.md` (from local, overrides global)
 - go-expert: `~/.config/start/roles/go-base.md` (from global)
 
 **Context documents (in definition order):**
+
 1. environment - `~/reference/ENVIRONMENT.md` (global, required)
 2. index - `~/reference/INDEX.csv` (global, required)
 3. readme - `README.md` (global, optional)
@@ -206,6 +212,7 @@ When both configs exist, the effective configuration combines them:
 ```
 
 **Purpose:**
+
 - User-wide defaults and configurations
 - Shared across all projects
 - Personal preferences and common workflows
@@ -224,6 +231,7 @@ When both configs exist, the effective configuration combines them:
 ```
 
 **Purpose:**
+
 - Project-specific overrides and customizations
 - Team-shareable configurations (can be committed)
 - Project-specific workflows
@@ -455,6 +463,7 @@ Model name mappings for the agent. User-defined names map to full model identifi
 ```
 
 **Names:**
+
 - User-defined (not hardcoded)
 - lowercase, alphanumeric, hyphens
 - Each agent defines its own names
@@ -493,6 +502,7 @@ command = "VAR1='{role}' VAR2='{date}' custom-ai --model {model} '{prompt}'"
 ```
 
 **Benefits:**
+
 - Standard and familiar syntax
 - No separate env section needed
 - Supports multiple variables easily
@@ -534,6 +544,7 @@ description = "Expert code reviewer focusing on security"
 **Role Selection:**
 
 Roles are selected using precedence rules:
+
 1. CLI `--role` flag (highest priority)
 2. Task `role` field (if executing a task)
 3. `default_role` setting
@@ -549,6 +560,7 @@ default_role = "code-reviewer"
 **Placeholders:**
 
 Roles are passed to agents via two placeholders:
+
 - `{role}` - Inline content (fully resolved, for Claude, aichat)
 - `{role_file}` - File path (for Gemini and file-based agents)
 
@@ -661,10 +673,12 @@ description = "User environment and tool configuration"
 : Whether this document is required context.
 
 **Behavior by command:**
+
 - `required = true`: Included in `start`, `start prompt`, and `start task`
 - `required = false`: Included in `start` only, excluded from `start prompt` and `start task`
 
 **Use cases:**
+
 - `required = true`: Critical context needed for all interactions (ENVIRONMENT.md, AGENTS.md, INDEX.csv)
 - `required = false`: Optional context for full sessions only (PROJECT.md, README.md)
 
@@ -691,6 +705,7 @@ required = false  # Only in 'start' command
 **Document order:**
 
 Documents appear in the prompt in **definition order**:
+
 1. Global contexts (in TOML order)
 2. Local contexts (in TOML order)
 
@@ -883,6 +898,7 @@ prompt = "Help me with: {instructions}"
 **Placeholder behavior:**
 
 In task prompt templates:
+
 - `{file}` - File path from task `file`
 - `{file_contents}` - Content from task `file`
 - `{command}` - Command string from task `command`
@@ -920,8 +936,9 @@ Example: `claude-3-7-sonnet-20250219`
 
 **{role_file}**
 : File path to role content. Use for agents that require file-based system prompts (Gemini).
-  - **Simple roles (file only):** Points to original file path
-  - **UTD roles (with command/prompt):** Role is evaluated, saved to temp file (`/tmp/start-role-*.md`), path points to temp file. Temp file cleaned up after agent execution.
+
+- **Simple roles (file only):** Points to original file path
+- **UTD roles (with command/prompt):** Role is evaluated, saved to temp file (`/tmp/start-role-*.md`), path points to temp file. Temp file cleaned up after agent execution.
 
 **{prompt}**
 : Assembled prompt text from context documents and custom prompts.
@@ -944,6 +961,7 @@ Example: `file = "~/reference/ENVIRONMENT.md"` → `{file}` = `"/Users/username/
 : Content from the `file` field. The file is read and its contents replace the placeholder.
 
 Example for injecting contents:
+
 ```toml
 [contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
@@ -954,6 +972,7 @@ Environment Context:
 ```
 
 Example for instructing AI to read (for agents with file access):
+
 ```toml
 [contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
@@ -1019,6 +1038,7 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 ### Required Fields
 
 **[agents.\<name\>]:**
+
 - `bin` must be present (required for auto-detection)
 - `command` must be present
 - `command` must contain `{bin}` placeholder (required)
@@ -1027,10 +1047,12 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 - `[agents.<name>.models]` table must exist with at least one model
 
 **[contexts.\<name\>]:**
+
 - At least one of `file`, `command`, or `prompt` must be present (UTD pattern)
 - UTD validation rules apply (see [Unified Template Design](./unified-template-design.md#validation-rules))
 
 **[tasks.\<name\>]:**
+
 - At least one of `file`, `command`, or `prompt` must be present (task prompt)
 - UTD validation rules apply (see [Unified Template Design](./unified-template-design.md#validation-rules))
 - `agent` field (if present) must reference an existing `[agents.<name>]` section
@@ -1038,29 +1060,35 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 ### Field Constraints
 
 **Agent names:**
+
 - Lowercase alphanumeric with hyphens
 - Pattern: `/^[a-z0-9]+(-[a-z0-9]+)*$/`
 - Examples: `claude`, `gemini`, `my-agent`
 
 **Model names:**
+
 - Same constraints as agent names
 - Examples: `haiku`, `sonnet`, `gpt4-mini`
 
 **Task names:**
+
 - Same constraints as agent names
 - Examples: `code-review`, `gdr`, `ct`
 
 **Task aliases:**
+
 - Same constraints as agent names
 - Must be unique across all tasks
 
 **Context document names:**
+
 - Same constraints as agent names
 - Must be unique across global + local configs
 
 ### Scope Constraints
 
 **Allowed in both global and local:**
+
 - `[settings]` - Local overrides global
 - `[roles.<name>]` - Combined (global + local), local overrides global for same name
 - `[agents.<name>]` - Combined (global + local), local overrides global for same name
@@ -1078,18 +1106,22 @@ file = "~/reference/file.md"   # Home-relative (tilde expansion)
 When both configs exist, the effective configuration is:
 
 **Settings:**
+
 - `default_agent = "claude"` (from global)
 - `log_level = "verbose"` (from local, overrides global)
 
 **Agents:**
+
 - claude, gemini, aichat (from global; local can override or add agents)
 
 **Roles:**
+
 - code-reviewer: `./ROLE.md` (from local, overrides global)
 - coder: `~/.config/start/roles/coder.md` (from global)
 - reviewer: `~/.config/start/roles/reviewer.md` (from global)
 
 **Context documents (in order):**
+
 1. environment (global, required)
 2. index (global, required)
 3. readme (global, optional)

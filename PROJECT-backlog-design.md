@@ -98,56 +98,56 @@ $ start update
 
 ### Medium Priority (Resolved for v1, Future Enhancement)
 
-6. **TUI library choice** - ✅ RESOLVED (DR-035)
+1. **TUI library choice** - ✅ RESOLVED (DR-035)
    - v1: Numbered selection (no dependencies)
    - Future: TUI library if users request it
    - Works everywhere (SSH, containers, CI)
 
-7. **Asset validation** - ✅ RESOLVED (DR-032)
+2. **Asset validation** - ✅ RESOLVED (DR-032)
    - TOML parsing validates structure
    - Required field checks in Go code
    - SHA format validation (40-char hex)
    - No schema file (keep simple)
 
-8. **Update notification** - ✅ RESOLVED (DR-037)
+3. **Update notification** - ✅ RESOLVED (DR-037)
    - Manual `start update` only (DR-025 compliant)
    - No automatic checks
    - No background processes
    - User explicitly opts in
 
-9. **Error recovery** - ✅ RESOLVED (DR-037)
+4. **Error recovery** - ✅ RESOLVED (DR-037)
    - Partial failures reported clearly
    - User can retry `start update`
    - Cache is disposable (can delete and re-download)
 
-10. **Asset dependencies** - DEFERRED (not in v1)
+5. **Asset dependencies** - DEFERRED (not in v1)
     - Add if users request it
     - Would use `dependencies` field in metadata
     - Auto-install would require dependency resolution
 
 ### Low Priority (Nice to Have)
 
-11. **Community assets** - How can users contribute?
+1. **Community assets** - How can users contribute?
     - PR process to main repo?
     - User-hosted repos?
     - Namespacing: `user/repo/path`
 
-12. **Search functionality** - Full-text search across assets?
+2. **Search functionality** - Full-text search across assets?
     - Search by description, tags, name
     - Fuzzy matching
     - Integration with TUI
 
-13. **Analytics** - Track popular assets (privacy-respecting)?
+3. **Analytics** - Track popular assets (privacy-respecting)?
     - Opt-in telemetry
     - Help prioritize development
     - No PII collection
 
-14. **Asset preview** - Preview asset before downloading?
+4. **Asset preview** - Preview asset before downloading?
     - Show metadata (description, tags)
     - Show actual content
     - Diff between versions
 
-15. **Bulk operations** - Install multiple assets at once?
+5. **Bulk operations** - Install multiple assets at once?
     - Install entire category
     - Install from list/file
     - Workspace templates
@@ -200,17 +200,18 @@ $ start update
 
 ### Updates to Existing DRs (All Completed)
 
-8. ✅ **DR-014: GitHub Tree API** → Status: Superseded by DR-031
-9. ✅ **DR-015: Atomic Updates** → Status: Superseded by DR-031
-10. ✅ **DR-016: Asset Discovery** → Status: Superseded by DR-031
-11. ✅ **DR-019: Task Loading** → Status: Updated by DR-031
-12. ✅ **DR-023: Staleness Checking** → Status: Superseded by DR-031
+1. ✅ **DR-014: GitHub Tree API** → Status: Superseded by DR-031
+2. ✅ **DR-015: Atomic Updates** → Status: Superseded by DR-031
+3. ✅ **DR-016: Asset Discovery** → Status: Superseded by DR-031
+4. ✅ **DR-019: Task Loading** → Status: Updated by DR-031
+5. ✅ **DR-023: Staleness Checking** → Status: Superseded by DR-031
 
 ## Command Updates Required
 
 ### New Behavior
 
 **`start config task add`** - Interactive catalog browsing
+
 ```bash
 start config task add                              # Browse catalog
 start config task add git-workflow/pre-commit-review  # Direct install
@@ -222,6 +223,7 @@ start config task add --search "commit"            # Search catalog
 **`start config agent add`** - Same pattern as tasks
 
 **`start task <name>`** - Lazy loading
+
 ```bash
 # If task not in config or cache, query GitHub
 # Prompt to download and cache
@@ -229,6 +231,7 @@ start config task add --search "commit"            # Search catalog
 ```
 
 **`start update`** - Update cached assets
+
 ```bash
 start update            # Interactive (default)
 start update --auto     # Automatic mode
@@ -289,25 +292,30 @@ asset_repo = "grantcarthew/start"               # GitHub repository
 ## Minimal Viable Asset Set (v1)
 
 ### Roles (8)
+
 - **general/** (4): default, code-reviewer, pair-programmer, explainer
 - **languages/** (2): go-expert, python-expert
 - **specialized/** (2): security-focused, rubber-duck
 
 ### Tasks (12)
+
 - **git-workflow/** (4): pre-commit-review, pr-ready, commit-message, explain-changes
 - **code-quality/** (4): find-bugs, quick-wins, naming-review, test-suggestions
 - **security/** (2): security-scan, dependency-audit
 - **debugging/** (2): debug-help, git-story
 
 ### Agents (6)
+
 - **claude/** (3): sonnet, opus, haiku
 - **openai/** (2): gpt-4, gpt-4-turbo
 - **google/** (1): gemini-pro
 
 ### Templates (2)
+
 - **projects/** (2): solo-developer, team-project
 
 ### Contexts (2)
+
 - **dev/** (2): go, python
 
 **Total: 30 assets** - Enough to impress, not overwhelming
@@ -373,7 +381,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 
 **Goal:** Ship with 30 high-quality assets
 
-- [ ] Write 8 role prompts (markdown)
+- [ ] Write 8 role prompts (Markdown)
 - [ ] Write 12 task definitions (toml)
 - [ ] Write 6 agent configs (toml)
 - [ ] Write 2 project templates (toml)
@@ -426,6 +434,7 @@ Implementation is complete when:
 ## Future Enhancements
 
 **Beyond v1:**
+
 - Community asset contributions
 - User-hosted asset repositories
 - Asset search and filtering
@@ -441,12 +450,14 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 ## Reference
 
 **Key Documents:**
+
 - [docs/ideas/catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) - Complete brainstorming and vision
 - [docs/archive/2025-01-10-cli-configuration-design-phase.md](./docs/archive/2025-01-10-cli-configuration-design-phase.md) - Completed CLI design phase
 - [docs/config.md](./docs/config.md) - Configuration reference (needs updates)
 - [docs/design/design-record.md](./docs/design/design-record.md) - All design decisions
 
 **Related DRs (to update):**
+
 - DR-014: GitHub Tree API
 - DR-015: Atomic Updates
 - DR-016: Asset Discovery
@@ -459,6 +470,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 ### Catalog Design Phase Complete (2025-01-10)
 
 **Session 1: Catalog Architecture Brainstorming**
+
 - Working on Task 22 (out-of-box assets) from CLI design phase
 - Realized bulk download model was wrong
 - Brainstormed catalog-driven architecture
@@ -466,6 +478,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 - Made initial architectural decisions
 
 **Session 2: Design Resolution and Documentation**
+
 - ✅ Resolved all 5 high-priority questions interactively
 - ✅ Wrote 7 new Design Records (DR-031 through DR-037)
 - ✅ Updated 5 existing DRs with catalog notes
@@ -473,6 +486,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 - ✅ Documented all decisions in detail
 
 **Key Final Decisions:**
+
 1. ✅ Metadata: 6 required fields, category from filesystem
 2. ✅ Config: Multi-file (config, tasks, agents, contexts)
 3. ✅ API: Tree API + raw.githubusercontent.com (no rate limit)
@@ -484,6 +498,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 9. ✅ Browsing: Numbered selection (v1), TUI future
 
 **Documents Created:**
+
 - `docs/ideas/catalog-based-assets.md` - Complete vision
 - `docs/design/decisions/dr-031-catalog-based-assets.md` - Overall architecture
 - `docs/design/decisions/dr-032-asset-metadata-schema.md` - Metadata format
@@ -494,6 +509,7 @@ See [catalog-based-assets.md](./docs/ideas/catalog-based-assets.md) for complete
 - `docs/design/decisions/dr-037-asset-updates.md` - Update mechanism
 
 **Next Steps:**
+
 1. Update command specs for new behavior
 2. Begin Phase 1 implementation (Core Catalog Infrastructure)
 3. Create minimal viable asset set (28 assets)

@@ -24,12 +24,14 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 ### Configuration Management
 
 **File Operations:**
+
 - ✅ `start config show` - [docs/cli/start-config.md](./docs/cli/start-config.md) - View merged config
 - ✅ `start config edit [scope]` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Edit config file
 - ✅ `start config path` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Show config paths
 - ✅ `start config validate` - [docs/cli/start-config.md](./docs/cli/start-config.md) - Validate config
 
 **Configuration Sections:**
+
 - ✅ `start config agent` - [docs/cli/start-config-agent.md](./docs/cli/start-config-agent.md) - Manage agents (MOVED from `start agent`)
 - ✅ `start config context` - [docs/cli/start-config-context.md](./docs/cli/start-config-context.md) - Manage contexts
 - ✅ `start config task` - [docs/cli/start-config-task.md](./docs/cli/start-config-task.md) - Manage tasks
@@ -46,6 +48,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 ### Completed (30 Design Records)
 
 **Core Configuration (DR-001 to DR-008):**
+
 - DR-001: TOML for configuration format
 - DR-002: Global + local config file structure with merge
 - DR-003: Named context documents (not arrays)
@@ -56,6 +59,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-008: Context file detection and handling
 
 **Tasks & Commands (DR-009 to DR-013):**
+
 - DR-009: Task structure and placeholders
 - DR-010: Four default interactive review tasks
 - DR-011: Asset distribution and update system (GitHub-fetched)
@@ -63,6 +67,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-013: Agent configuration distribution via GitHub
 
 **Asset Management & CLI (DR-014 to DR-028):**
+
 - DR-014: GitHub Tree API with SHA-based caching for incremental updates
 - DR-015: Atomic update mechanism with rollback capability
 - DR-016: Asset discovery - each feature checks its own directory
@@ -82,6 +87,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 - DR-030: Prefix matching for commands - enable Cobra's prefix matching globally
 
 **Implementation:**
+
 - Unified Template Design (UTD): `file`, `command`, `prompt` pattern across all sections
 - Document order: Config definition order (TOML preserves order)
 - Command pattern: Positional scope arguments (`start init [scope]`, `start config edit [scope]`)
@@ -99,6 +105,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 ## Open Questions
 
 ### Resolved
+
 1. ✅ **Task listing:** `start task` with no args + `--help`
 2. ✅ **Agent testing:** Binary availability, config validation, dry-run display
 3. ✅ **Config editing:** Soft warnings (non-blocking)
@@ -116,7 +123,7 @@ Context-aware AI agent launcher that detects project context, builds intelligent
 
 ### Deferred to Catalog Redesign
 
-15. **Default assets:** Redesigned as catalog-based system → See PROJECT-catalog-redesign.md
+1. **Default assets:** Redesigned as catalog-based system → See PROJECT-catalog-redesign.md
 
 ## Success Criteria
 
@@ -151,11 +158,13 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 ### Universal --help Support - Task 24 (2025-01-10)
 
 **Task 24 Completed:**
+
 - ✅ Verified Cobra's automatic help support in source code
 - ✅ Updated DR-006 with help documentation
 - ✅ Confirmed zero implementation required
 
 **Key Findings:**
+
 - Cobra automatically adds `-h, --help` flag to every command
 - Also provides `help` subcommand automatically (`start help config agent`)
 - No `DisableHelpFlag` option exists - it's always enabled
@@ -163,21 +172,25 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 - Works at all nesting levels
 
 **Implementation Required:**
+
 - Zero lines of code
 - Built-in Cobra behavior
 
 **Documentation Updated:**
+
 - `docs/design/decisions/dr-006-cobra-cli.md` - Added automatic help support section
 - `PROJECT.md` - Marked question 14 and Task 24 as resolved
 
 ### Prefix Matching for Commands - DR-030 (2025-01-10)
 
 **Task 23 Completed:**
+
 - ✅ Explored Cobra source code to understand prefix matching support
 - ✅ Created DR-030: Prefix matching for commands
 - ✅ Updated all documentation
 
 **Key Decisions:**
+
 - Enable Cobra's built-in prefix matching via `cobra.EnablePrefixMatching = true`
 - Works at all command levels automatically
 - One line of code implementation
@@ -185,6 +198,7 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 - Accept trade-offs: ambiguity risk, script fragility, reduced explicitness
 
 **Benefits:**
+
 - Faster typing for power users (`start con ag l` vs `start config agent list`)
 - Muscle memory development for common workflows
 - Forgiving of typos and partial memory
@@ -192,12 +206,14 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 - Zero implementation cost (built into Cobra)
 
 **Guidelines:**
+
 - Interactive use: shortcuts encouraged
 - Scripts/CI: always use full commands
 - Documentation: show full commands, mention shortcuts optionally
 - Command naming: avoid similar prefixes
 
 **Documentation Updated:**
+
 - `docs/design/decisions/dr-030-prefix-matching.md` - Complete design record
 - `docs/design/design-record.md` - Added DR-030 to index
 - `PROJECT.md` - Updated task list, design record count, resolved questions
@@ -205,11 +221,13 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 ### Task Agent Field - DR-029 (2025-01-07)
 
 **Task 25 Completed:**
+
 - ✅ Designed task agent field configuration
 - ✅ Created DR-029: Task agent field
 - ✅ Updated all documentation
 
 **Key Decisions:**
+
 - Optional `agent` field in task configuration
 - Agent selection precedence: CLI flag > task agent > default_agent
 - Validation at execution time (not load time)
@@ -217,12 +235,14 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 - Simple string field referencing agent name
 
 **Use Cases:**
+
 - Specialized agents for specific languages/domains
 - Different model perspectives for alternative reviews
 - Performance optimization (fast agents for quick checks)
 - Tool-specific features (vision, artifacts, etc.)
 
 **Documentation Updated:**
+
 - `docs/design/decisions/dr-029-task-agent-field.md` - Complete design record
 - `docs/design/design-record.md` - Added DR-029 to index
 - `docs/tasks.md` - Added agent field documentation and examples
@@ -233,11 +253,13 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 ### Task Loading Algorithm Design - DR-019 (2025-01-06)
 
 **Task 16a-c Completed:**
+
 - ✅ Designed complete task loading and merging algorithm
 - ✅ Created DR-019: Task loading and merging
 - ✅ Clarified asset tasks as templates (not runtime loaded)
 
 **Key Decisions:**
+
 - Runtime tasks load from global + local configs only (assets NOT auto-loaded)
 - Asset tasks serve as templates for `start config task add` workflow
 - Local completely replaces global for same task name (no field merging)
@@ -246,22 +268,26 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 - `start config task list` shows all three: global, local, and available assets
 
 **Task Adding Workflow:**
+
 - Interactive: "Start from template or create new?"
 - If template: prompts show asset values as defaults (easy to accept)
 - Conflict warnings for name/alias shadowing
 
 **Alias Handling:**
+
 - Local alias wins over global alias (silent override with warning)
 - Conflict warning during add: "Your task will shadow the global alias"
 - Runtime warning: "Global alias 'cr' shadowed by local task"
 
 **Benefits:**
+
 - Clear mental model: assets are templates, not active tasks
 - Predictable: local always wins
 - Secure: source shown at runtime (detect malicious local configs)
 - Discoverable: asset templates visible in list
 
 **Implementation Ready:**
+
 - `internal/config/TaskRegistry` with Load/Resolve/CheckConflicts
 - Clear algorithm for name/alias resolution
 - Metadata tracking structure defined
@@ -269,11 +295,13 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 ### Init/Update Integration Design - DR-018 (2025-01-06)
 
 **Task 15a Completed:**
+
 - ✅ Defined relationship between `start init` and `start update` commands
 - ✅ Created DR-018: Init and update command integration
 - ✅ Simplified approach: No conditional logic, no special flags
 
 **Key Decisions:**
+
 - `start init` **always** invokes asset update logic (no staleness checks)
 - Both commands share identical SHA-based update implementation from DR-014
 - No flags: `--skip-assets`, `--force`, etc. (KISS principle)
@@ -281,6 +309,7 @@ All CLI design criteria met. Asset system redesigned as catalog-based architectu
 - Network failure during update: fails (its explicit purpose)
 
 **Implementation Strategy:**
+
 ```go
 // Package: internal/assets
 func UpdateAssets() error {
@@ -290,24 +319,28 @@ func UpdateAssets() error {
 ```
 
 **Benefits:**
+
 - Self-optimizing: SHA comparison prevents redundant downloads
 - Predictable: init always tries to update, update requires network
 - Offline-friendly: init can proceed without assets
 - Simple: removed all conditional logic and staleness checks
 
 **Next Steps:**
+
 - Task 15b: Design offline fallback strategy
 - Task 15c: Define behavior when network unavailable
 
 ### Documentation Updates - config.md (2025-01-06)
 
 **Agent Section Updates:**
+
 - Updated to reflect DR-004 change allowing agents in both global and local configs
 - Documented merge behavior: local overrides global for same agent name
 - Added use case: teams can commit `.start/` with standard configs
 - Updated all scope references and validation rules
 
 **Task Section Updates:**
+
 - Completely rewrote to use Unified Template Design (UTD) pattern
 - Added `role` field to reference named roles (replaced `system_prompt_*` fields)
 - Added `agent` field for task-specific agent preference
@@ -317,6 +350,7 @@ func UpdateAssets() error {
 - Removed old field references: `documents`, `content_command`, `system_prompt_*` fields
 
 **Consistency Fixes:**
+
 - Fixed placeholder documentation (`{command}` not `{content}` for tasks)
 - Updated path examples (consistent use of `file` field)
 - Updated validation rules for contexts (UTD pattern)
@@ -325,12 +359,14 @@ func UpdateAssets() error {
 ### Configuration Design (2025-01-05)
 
 **Unified Template Design (UTD):**
+
 - Created `docs/unified-template-design.md` - Consistent pattern for file/command/prompt across all sections
 - Fields: `file`, `command`, `prompt` with `{file}` and `{command}` placeholders
 - Shell configuration: Global `shell` setting, per-section override, supports bash/node/python/bun/deno/etc
 - Command timeout: Global `command_timeout`, per-section override
 
 **Config Sections Completed:**
+
 - ✅ `[settings]` - default_agent, default_role, log_level, shell, command_timeout
 - ✅ `[agents.<name>]` - Full design with models, env, validation (global + local)
 - ✅ `[roles.<name>]` - Named roles using UTD pattern (file, command, prompt)
@@ -338,17 +374,20 @@ func UpdateAssets() error {
 - ✅ `[tasks.<name>]` - Role and agent fields, UTD for task prompt, auto-includes required contexts
 
 **Config Section Naming:**
+
 - Changed `[contexts.documents.<name>]` → `[contexts.<name>]`
 - Renamed `path` attribute → `file` (UTD standard)
 - Renamed `verbosity` → `log_level`
 
 **Updated Documentation:**
+
 - `docs/config.md` now references UTD, removed duplication
 - All examples updated to use new field names
 
 ### Tasks Design & Documentation Updates (2025-01-05)
 
 **Tasks Configuration Finalized:**
+
 - ✅ Full UTD pattern for `system_prompt_*` fields (file, command, prompt)
 - ✅ Full UTD pattern for task prompt fields (file, command, prompt)
 - ✅ Auto-includes contexts where `required = true` (no `documents` array)
@@ -358,6 +397,7 @@ func UpdateAssets() error {
 - ✅ Updated `docs/tasks.md` with complete specification
 
 **Agent Scope Updated (DR-004):**
+
 - ✅ Changed from global-only to global + local support
 - ✅ Enables team standardization via committed `.start/` directory
 - ✅ Local agents override global for same name (merge behavior)
@@ -365,12 +405,14 @@ func UpdateAssets() error {
 - ✅ Updated `docs/design/design-record.md` DR-004
 
 **Command Pattern Finalized:**
+
 - ✅ Positional scope arguments: `start init [scope]` and `start config edit [scope]`
 - ✅ Scopes: `global` (default) or `local`
 - ✅ Smart behavior when no scope: Interactive prompts with recommendations
 - ✅ Explicit scope skips prompts for scripting/automation
 
 **Smart Init Behavior:**
+
 - ✅ Scenario 1: No configs → Ask, default to global
 - ✅ Scenario 2: Global exists → Ask to replace global or create local
 - ✅ Scenario 3: Both exist → Ask which to replace
@@ -380,6 +422,7 @@ func UpdateAssets() error {
 ### Asset Management System & CLI Reorganization (2025-01-06)
 
 **CLI Command Reorganization (DR-017):**
+
 - ✅ Identified inconsistency: `start agent` (config) vs `start task` (execution)
 - ✅ Decided: Configuration management under `start config`, execution at top level
 - ✅ New structure: `start config agent|context|task|role` for all config management
@@ -387,6 +430,7 @@ func UpdateAssets() error {
 - ✅ Breaking change acceptable (design phase, no existing users)
 
 **Asset Library Design:**
+
 - ✅ Assets fetched from GitHub repository (not embedded in binary)
 - ✅ Stored in `~/.config/start/assets/` directory
 - ✅ Version tracked in `asset-version.toml` file (commit SHA + file SHAs)
@@ -395,12 +439,14 @@ func UpdateAssets() error {
 - ✅ `start doctor` checks asset age and reports if stale (> 30 days)
 
 **Asset Types:**
+
 - ✅ **Agents** (`assets/agents/*.toml`) - Templates used during `start agent add`
 - ✅ **Roles** (`assets/roles/*.md`) - Referenced in config, updates flow automatically
 - ✅ **Tasks** (`assets/tasks/*.toml`) - Merged with user tasks, user tasks take precedence
 - ✅ **Examples** (`assets/examples/*.toml`) - Reference configs, not auto-loaded
 
 **Update Flow:**
+
 - ✅ User runs `start doctor` → Sees "Assets 45 days old"
 - ✅ User runs `start update` → Downloads latest from GitHub
 - ✅ Role file references automatically use updated content
@@ -408,6 +454,7 @@ func UpdateAssets() error {
 - ✅ User config never modified automatically
 
 **Design Decisions:**
+
 - ✅ Updated DR-011 to reflect GitHub-fetched assets
 - ✅ Separation of binary (code) vs content (assets)
 - ✅ Users control update timing (not forced)
@@ -415,6 +462,7 @@ func UpdateAssets() error {
 - ✅ Network dependency acceptable for updates
 
 **Documentation Updates (Complete - 6/6):**
+
 - ✅ `docs/cli/start-init.md` - Added scope argument, smart behavior, local support
 - ✅ `docs/cli/start-config.md` - Changed flags to positional args, updated agent scope info
 - ✅ `docs/config.md` - Updated agent section (local scope support), task section (UTD fields), merge behaviors, validation rules
@@ -424,49 +472,58 @@ func UpdateAssets() error {
 - ✅ `docs/design/design-record.md` DR-011 - Updated to reflect GitHub-fetched assets (not embedded)
 
 **High-Level Design Complete:**
+
 - ✅ Review/update `docs/cli/start-task.md` for task UTD fields
 - ✅ Design `start doctor` and `start update` commands (user-facing behavior)
 
 **Implementation Details to Design:**
 
-*Asset Update Mechanism:*
+_Asset Update Mechanism:_
+
 - [x] **Task 12a:** Decide GitHub download strategy → DR-014: GitHub Tree API with SHA caching
 - [x] **Task 12b:** Design atomic update mechanism → DR-015: SHA-filtered incremental + batch atomic install
 - [x] **Task 12c:** Define asset discovery system → DR-016: No discovery system, each feature checks its directory
 
-*Command Reorganization:*
+_Command Reorganization:_
+
 - [x] **Task 12d:** CLI command reorganization → DR-017: `start config` for all configuration management
 - [x] **Task 12e:** Update `start-config-agent.md` to reflect `start config agent` (path change only)
 - [x] **Task 12f:** Create `start-config-context.md` spec (NEW command)
 - [x] **Task 12g:** Create `start-config-task.md` spec (NEW command)
 - [x] **Task 12h:** Create `start-config-role.md` spec (NEW command)
 
-*Version Tracking & Checking:*
+_Version Tracking & Checking:_
+
 - [x] **Task 13a:** Define binary version source (build-time injection strategy) → DR-020: ldflags with git tags
 - [x] **Task 13b:** Design GitHub version checking (API endpoint, rate limiting, caching) → DR-021: Releases API, no caching
 - [x] **Task 13c:** Define commit SHA retrieval strategy (releases vs commits) → DR-022: Main branch for assets
 
-*Doctor Implementation:*
+_Doctor Implementation:_
+
 - [x] **Task 14a:** Design asset staleness checking (local-only vs GitHub comparison) → DR-023: GitHub commit comparison
 - [x] **Task 14b:** Define exit code priority system (multiple simultaneous issues) → DR-024: Simple binary exit codes
 - [x] **Task 14c:** Design automatic check frequency and caching strategy → DR-025: No automatic checks or caching
 
-*Integration & Offline Support:*
+_Integration & Offline Support:_
+
 - [x] **Task 15a:** Define start init + start update relationship → DR-018: Shared implementation, no conditional logic
 - [x] **Task 15b:** Design offline fallback strategy (manual asset installation) → DR-026: Network-only, no manual installation
 - [x] **Task 15c:** Define behavior when network unavailable → DR-026: Graceful degradation, clear error messages
 
-*Task Merging Implementation:*
+_Task Merging Implementation:_
+
 - [x] **Task 16a:** Design task loading and merging algorithm (assets + user config) → DR-019: Global + local only, assets as templates
 - [x] **Task 16b:** Define source metadata tracking ([default] vs [user] labels) → DR-019: Source and SourcePath metadata
 - [x] **Task 16c:** Specify precedence rules implementation details → DR-019: Local > global, name/alias resolution priority
 
-*Security & Trust:*
+_Security & Trust:_
+
 - [x] **Task 17a:** Define trust model for downloaded assets → DR-027: Trust GitHub HTTPS + hardcoded repo
 - [x] **Task 17b:** Decide on signature verification (if any) → DR-027: No signatures, HTTPS sufficient
 - [x] **Task 17c:** Design commit/tag pinning strategy → DR-027: No pinning, always latest from main
 
-*Remaining High-Level Design:*
+_Remaining High-Level Design:_
+
 - [x] **Task 18:** Evaluate `start context` command necessity → Resolved: `start config context` created (Task 12f)
 - [x] **Task 19:** Evaluate `start role` command necessity → Resolved: `start config role` created (Task 12h)
 - [x] **Task 20:** Determine shell completion requirements (bash/zsh/fish) → DR-028: bash/zsh/fish support, Tier 1+2 completions

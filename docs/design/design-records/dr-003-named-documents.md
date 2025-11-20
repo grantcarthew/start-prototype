@@ -63,6 +63,7 @@ prompt = "Read {file}. Respond with summary."
 Example merge behavior:
 
 Global config:
+
 ```toml
 [contexts.project]
 file = "./PROJECT.md"
@@ -70,6 +71,7 @@ prompt = "Read {file}. Respond with summary."
 ```
 
 Local config:
+
 ```toml
 # Override: Replace global "project" context
 [contexts.project]
@@ -83,6 +85,7 @@ prompt = "Read {file} for product vision."
 ```
 
 Result after merge:
+
 - `context.project` uses local definition (overridden)
 - `context.vision` added from local (new)
 

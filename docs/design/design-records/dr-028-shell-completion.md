@@ -31,12 +31,14 @@ Supported shells:
 Installation patterns:
 
 Manual output (print to stdout):
+
 - start completion bash
 - start completion zsh
 - start completion fish
 - User redirects to file and sources in shell config
 
 Auto-install (convenience):
+
 - start completion install bash
 - start completion install zsh
 - start completion install fish
@@ -49,17 +51,20 @@ Auto-install (convenience):
 Completion tiers:
 
 Tier 1 - Static (free from Cobra):
+
 - Commands and subcommands
 - Flags and short flags
 - No custom code required
 
 Tier 2 - Dynamic (high-value, implement):
+
 - Agent names for --agent flag (from config)
 - Task names for start task command (from config and catalog)
 - Scope arguments (global, local, merged)
 - Custom ValidArgsFunction implementations
 
 Tier 3 - Skip for v1:
+
 - Model names for --model flag (requires parsing agent's model table)
 - Context names, role names
 - File path completion (shells handle this already)
@@ -130,11 +135,13 @@ Gain:
 No shell completion:
 
 Pros:
+
 - No implementation required
 - No maintenance burden
 - No cross-shell compatibility concerns
 
 Cons:
+
 - Poor UX (users must type full commands and flags)
 - No discoverability (users can't Tab to explore)
 - Unprofessional (users expect completion in modern CLIs)
@@ -146,17 +153,20 @@ Rejected: Shell completion is an expected feature. Modern CLIs without completio
 Manual installation only (no auto-install):
 
 Example: Only provide start completion bash, user handles installation
+
 ```bash
 start completion bash > ~/.bash_completion.d/start
 echo 'source ~/.bash_completion.d/start' >> ~/.bashrc
 ```
 
 Pros:
+
 - Simpler implementation (no path detection, no OS-specific logic)
 - Maximum flexibility for users
 - Less code to maintain
 
 Cons:
+
 - Higher friction (multi-step process, users must know paths)
 - OS and shell-specific knowledge required
 - Many users won't bother (lower adoption)
@@ -167,6 +177,7 @@ Rejected: Auto-install significantly improves adoption and reduces friction. Imp
 Support all completion types including Tier 3:
 
 Example: Complete model names, context names, role names, file paths
+
 ```bash
 start --agent claude --model <Tab>
 # Shows: haiku, sonnet, opus
@@ -176,11 +187,13 @@ start config context edit <Tab>
 ```
 
 Pros:
+
 - Most complete experience
 - Every value completable
 - Maximum polish
 
 Cons:
+
 - Requires parsing agent model tables (complex, error-prone)
 - File path completion redundant (shells do this)
 - Diminishing returns (model/context names less frequently used)
@@ -194,15 +207,18 @@ Rejected: Tier 1 + Tier 2 provides sufficient value. Tier 3 adds complexity for 
 Completion command structure:
 
 Root command:
+
 - start completion <shell> - Print completion script to stdout
 - start completion install <shell> [flags] - Auto-install to standard location
 
 Supported shells:
+
 - bash
 - zsh
 - fish
 
 Install flags:
+
 - --user (default) - Install to user directory
 - --system - Install system-wide (requires sudo)
 - --path <path> - Install to custom path
@@ -210,30 +226,36 @@ Install flags:
 Standard installation paths:
 
 bash:
+
 - User: ~/.bash_completion
 - System: /etc/bash_completion.d/start
 
 zsh:
+
 - User: ~/.zsh/completion/_start
 - System: /usr/local/share/zsh/site-functions/_start
 
 fish:
+
 - User: ~/.config/fish/completions/start.fish
 - System: /usr/share/fish/vendor_completions.d/start.fish
 
 Completion tiers:
 
 Tier 1 (static, free from Cobra):
+
 - All commands and subcommands
 - All flags (long and short forms)
 - Help text for each
 
 Tier 2 (dynamic, custom implementations):
+
 - Agent names: Read from config (global + local merge)
 - Task names: Read from config and catalog (show alias in parentheses)
 - Scope values: global, local (or global, local, merged for list commands)
 
 Tier 3 (not implemented):
+
 - Model names (requires parsing agent model tables)
 - Context names, role names
 - Custom file path filtering
@@ -292,14 +314,14 @@ Fish completion is now available for all users.
 Command completion:
 
 ```bash
-$ start con<Tab>
-$ start config   # Completed
+start con<Tab>
+start config   # Completed
 
-$ start config ag<Tab>
-$ start config agent   # Completed
+start config ag<Tab>
+start config agent   # Completed
 
-$ start config agent li<Tab>
-$ start config agent list   # Completed
+start config agent li<Tab>
+start config agent list   # Completed
 ```
 
 Flag completion:

@@ -175,6 +175,7 @@ Provide specific, actionable feedback on:
 ```
 
 Usage:
+
 ```bash
 start task code-review "focus on error handling"
 start task cr "check security"
@@ -211,6 +212,7 @@ Provide specific feedback on:
 `````
 
 Usage:
+
 ```bash
 start task git-diff-review "focus on security"
 start task gdr "ignore formatting changes"
@@ -240,6 +242,7 @@ Provide specific suggestions for improvement.
 ```
 
 Usage:
+
 ```bash
 start task comment-tidy "check function documentation"
 start task ct "verify accuracy"
@@ -270,6 +273,7 @@ Focus on:
 ```
 
 Usage:
+
 ```bash
 start task doc-review "add installation instructions"
 start task dr "improve examples"
@@ -280,6 +284,7 @@ start task dr "improve examples"
 These tasks reference two roles that should be defined in the default asset library:
 
 code-reviewer:
+
 ```toml
 [roles.code-reviewer]
 description = "Expert code reviewer focused on quality and best practices"
@@ -287,6 +292,7 @@ file = "~/.config/start/assets/roles/code-reviewer.md"
 ```
 
 documentation-writer:
+
 ```toml
 [roles.documentation-writer]
 description = "Technical documentation specialist"

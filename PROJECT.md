@@ -167,7 +167,7 @@ Documentation review is complete when:
 - `docs/cli/start-config.md`: Changed `start-agent(1)` to `start-config-agent(1)`
 - `docs/cli/start.md`: Changed `start-agent(1)` to `start-config-agent(1)`
 - `docs/cli/start-prompt.md`: Changed `start-agent(1)` to `start-config-agent(1)`
-- **TOML link added**: Added link to https://toml.io/ in Overview section of docs/config.md
+- **TOML link added**: Added link to <https://toml.io/> in Overview section of docs/config.md
 - **Settings merge clarification**: Changed "Settings: Local values override global values" to "Settings: Merged per-field, local overrides global for same field" to clarify it's per-field merge, not whole-section replacement
 - `docs/config.md`: Updated Merge behavior section (line 23)
 - `docs/cli/start-config.md`: Updated Configuration Merge Behavior section (line 889)
@@ -249,7 +249,7 @@ Documentation review is complete when:
 - **{role_file} placeholder clarity**: Enhanced documentation to clearly explain temp file behavior for UTD roles
 - `docs/config.md`: Expanded {role_file} description to explain simple vs UTD role behavior and temp file creation/cleanup (lines 904-907)
 - `docs/cli/start-config-agent.md`: Clarified {role_file} description to mention temp file for UTD roles (line 1297)
-- **Markdown rendering fix**: Fixed broken GitHub markdown rendering caused by incorrect backtick nesting in toml blocks containing nested code blocks
+- **Markdown rendering fix**: Fixed broken GitHub Markdown rendering caused by incorrect backtick nesting in toml blocks containing nested code blocks
 - `docs/config.md`: Changed outer code fence to 5 backticks for two toml blocks with nested diff blocks (lines 799-813, 831-853)
 - `docs/cli/start-task.md`: Fixed line 224 from 4 to 3 backticks (closing diff block) and upgraded outer fence to 5 backticks (lines 206-232)
 - `docs/cli/start-task.md`: Fixed line 254 from 4 to 3 backticks (closing bash block)
@@ -297,7 +297,7 @@ Documentation review is complete when:
 - `docs/cli/start-doctor.md`: Updated verbose output to show multi-file config validation with all 5 files (lines 192-207)
 - `docs/design/design-records/dr-019-task-loading.md`: Changed task source paths from config.toml to tasks.toml (lines 16-17)
 - `docs/ideas/catalog-based-assets.md`: Changed resolution order from config.toml to tasks.toml for task resolution (lines 339-340)
-- **Fixed nested code fence in tasks.md**: Upgraded outer fence to 5 backticks for toml block containing nested diff block (broke GitHub markdown rendering)
+- **Fixed nested code fence in tasks.md**: Upgraded outer fence to 5 backticks for toml block containing nested diff block (broke GitHub Markdown rendering)
 - `docs/tasks.md`: Changed outer fence from 3 to 5 backticks for "Task with Role Reference" example (lines 255-273)
 - **Corrected "Default Tasks" section**: Changed terminology and explanation to reflect catalog-based lazy-loading architecture
 - `docs/tasks.md`: Renamed "Default Tasks" to "Available Tasks"; removed incorrect "embedded in binary" statement; explained GitHub catalog auto-download mechanism (lines 429-450)

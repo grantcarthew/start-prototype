@@ -1360,16 +1360,19 @@ Exit code: 1
 Agents can be defined in both global and local configs with merge behavior:
 
 **Global agents:** `~/.config/start/agents.toml`
+
 - Personal agent configurations
 - Managed by `start config agent` commands
 - Individual preferences (model names, default models)
 
 **Local agents:** `./.start/agents.toml`
+
 - Team-standardized configurations (can be committed to git)
 - Manually edited (not managed by `start config agent` commands)
 - Project-specific agent wrappers or custom tools
 
 **Merge behavior:**
+
 - Global + local agents are combined
 - Same agent name: local overrides global
 - Enables team standardization while allowing personal overrides

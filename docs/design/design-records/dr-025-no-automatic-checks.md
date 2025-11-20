@@ -96,16 +96,19 @@ Gain:
 Automatic checks on every command (like npm, homebrew):
 
 Example approaches:
+
 - npm checks for updates periodically, shows "update available" message
 - homebrew auto-updates on brew install/upgrade (can disable with HOMEBREW_NO_AUTO_UPDATE)
 - rustup checks for toolchain updates with configurable behavior
 
 Pros:
+
 - Users stay informed about updates automatically
 - No need to remember to check manually
 - Updates are discovered quickly
 
 Cons:
+
 - Adds network latency to every command execution
 - Unexpected network calls (privacy and performance concerns)
 - Commands slower and less predictable
@@ -118,15 +121,18 @@ Rejected: Performance and predictability more important than automatic update aw
 Cached results with time-to-live:
 
 Example: Cache doctor results for 24 hours, show cached status if fresh
+
 - start doctor within 24h: "Last checked 2 hours ago (cached), status: healthy"
 - start doctor after 24h: Perform fresh check
 
 Pros:
+
 - Reduces API calls for repeated doctor checks
 - Could enable "check on first use each day" pattern
 - Provides "last checked" information
 
 Cons:
+
 - Adds cache file management complexity
 - Requires cache invalidation logic
 - Stale results can mislead users
@@ -139,6 +145,7 @@ Rejected: Complexity outweighs benefits. Fresh checks provide clear, unambiguous
 Optional automatic check setting:
 
 Example config:
+
 ```toml
 [settings]
 auto_check = false  # Default: disabled
@@ -146,11 +153,13 @@ auto_check_frequency = "daily"
 ```
 
 Pros:
+
 - Users can opt-in if they want automatic checks
 - Flexibility for different workflows
 - Advanced users can configure behavior
 
 Cons:
+
 - Adds implementation complexity (scheduling, cache, staleness)
 - Two code paths to maintain and test
 - Makes command behavior less predictable (depends on config)
@@ -221,18 +230,21 @@ $ start assets update
 Comparison with other tools:
 
 Homebrew (automatic):
+
 ```bash
 # Auto-updates on brew install/upgrade
 # Can disable with HOMEBREW_NO_AUTO_UPDATE
 ```
 
 npm (automatic):
+
 ```bash
 # Checks for npm updates periodically
 # Shows "npm update available" message
 ```
 
 Our approach (manual):
+
 ```bash
 # No automatic checks
 # User runs 'start doctor' when they want to check

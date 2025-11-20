@@ -546,6 +546,7 @@ Prompt template:
   ```diff
   {command_output}
   ```
+
 ```
 
 **Output (local task):**
@@ -1420,6 +1421,7 @@ Tasks are discovered from three sources:
 3. **Local config:** `./.start/tasks.toml` (managed by `start config task`)
 
 **Precedence:**
+
 1. Local tasks override global tasks (same name)
 2. Global tasks override asset tasks (same name)
 3. Local tasks override asset tasks (same name)
@@ -1440,6 +1442,7 @@ In task lists, tasks are labeled by source:
 Tasks use UTD pattern for task prompts and reference roles by name:
 
 **Role selection (optional):**
+
 ```toml
 [tasks.code-review]
 role = "code-reviewer"  # References [roles.code-reviewer] section
@@ -1447,6 +1450,7 @@ agent = "claude"         # Optional: preferred agent
 ```
 
 **Task prompt (at least one required):**
+
 ```toml
 [tasks.git-diff]
 file = "./prompts/diff-template.md"
@@ -1467,6 +1471,7 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 ### Placeholders
 
 **Task prompt templates:**
+
 - `{file}` - File path from task `file` (absolute, ~ expanded)
 - `{file_contents}` - Content from task `file`
 - `{command}` - Command string from task `command`
@@ -1479,11 +1484,13 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 Tasks automatically include **all contexts where `required = true`**.
 
 **Rationale:**
+
 - Ensures critical context (like AGENTS.md) is always present
 - Simplifies task configuration
 - Users control what's "required" via context configuration
 
 **Example:**
+
 ```toml
 # In config
 [contexts.agents]
@@ -1513,6 +1520,7 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 ### Asset vs User Tasks
 
 **Asset tasks:**
+
 - Provided by `start` as defaults
 - Located in `~/.config/start/assets/tasks/`
 - Updated via `start assets update`
@@ -1520,12 +1528,14 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 - Can be overridden by creating user task with same name
 
 **User tasks:**
+
 - Created via `start config task new` or `start assets add`
 - Located in global or local config
 - Fully customizable
 - Take precedence over asset tasks
 
 **To customize asset task:**
+
 1. Run `start config task new global` (or local)
 2. Use same name as asset task
 3. Configure as desired

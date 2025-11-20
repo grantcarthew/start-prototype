@@ -23,7 +23,7 @@ Created `docs/vision.md` to establish:
 
 - The problem: Context setup friction for AI development
 - The solution: Context-aware launcher
-- The pattern: Optional markdown files (ROLE.md, AGENTS.md, PROJECT.md)
+- The pattern: Optional Markdown files (ROLE.md, AGENTS.md, PROJECT.md)
 - Non-goals: Not replacing agents, not making API calls, not orchestrating workflows
 - Success criteria: Easy install, configure, launch
 

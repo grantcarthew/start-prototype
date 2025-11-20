@@ -29,6 +29,7 @@ Format: CSV with header row
 Columns: type, category, name, description, tags, bin, sha, size, created, updated
 
 Field definitions:
+
 - type: Asset type (tasks, roles, agents, contexts)
 - category: Category subdirectory (git-workflow, general, etc.)
 - name: Asset name (filename without extension)
@@ -47,6 +48,7 @@ Generation process:
 Command: start assets index
 Validation: Must be git repository with assets/ directory
 Algorithm:
+
 1. Scan assets/ directory recursively
 2. Find all .meta.toml files
 3. Parse each .meta.toml, extract metadata
@@ -58,19 +60,21 @@ Algorithm:
 Usage pattern:
 
 When to fetch: Every CLI execution needing catalog search
-How to fetch: GET https://raw.githubusercontent.com/{org}/{repo}/{branch}/assets/index.csv
+How to fetch: GET <https://raw.githubusercontent.com/{org}/{repo}/{branch}/assets/index.csv>
 No local caching: File is small (10-50KB), always fresh data
 Zero rate limits: Uses raw.githubusercontent.com (not API)
 
 Fallback behavior:
 
 If index.csv missing/corrupted:
+
 1. Attempt to download index.csv
 2. If fail: Log warning, fall back to Tree API
 3. Tree API provides name/path only (no descriptions/tags)
 4. Return degraded results with note
 
 Source of truth:
+
 - .meta.toml files are canonical (each asset has complete metadata)
 - index.csv is derived file (for performance)
 - If conflict: .meta.toml wins
@@ -155,16 +159,19 @@ Gain:
 Download all .meta.toml files individually:
 
 Example: Fetch each .meta.toml on search
+
 - Query Tree API for file list
 - Download each .meta.toml (200+ HTTP requests)
 - Parse and search in memory
 
 Pros:
+
 - No index file to maintain (one less thing)
 - Always absolutely fresh (no derived file)
 - Source of truth directly accessed
 
 Cons:
+
 - Extremely slow (200+ HTTP requests for large catalog)
 - Poor user experience (long wait for searches)
 - Doesn't scale (worse as catalog grows)
@@ -175,16 +182,19 @@ Rejected: Performance unacceptable. Index.csv pattern proven by npm, cargo, home
 Use GitHub Search API:
 
 Example: Use GitHub's built-in code search
+
 - Search API for file contents
 - Filter results by repository/path
 - Parse search results
 
 Pros:
+
 - No index file needed (GitHub maintains index)
 - Powerful search (regex, code search)
 - Always fresh (GitHub indexes automatically)
 
 Cons:
+
 - Rate limited (10-30 requests/min authenticated, 60/hour)
 - Indexing delays (new files not immediately searchable)
 - Requires authentication for reasonable limits
@@ -196,6 +206,7 @@ Rejected: Rate limits too restrictive. Index.csv provides better control and per
 JSON index instead of CSV:
 
 Example: Use assets/index.json with structured data
+
 ```json
 [
   {
@@ -211,11 +222,13 @@ Example: Use assets/index.json with structured data
 ```
 
 Pros:
+
 - Native array support (tags not semicolon-separated)
 - More structured (nested objects possible)
 - Familiar format (widely used)
 
 Cons:
+
 - Larger file size (JSON more verbose than CSV)
 - Harder to inspect visually (no tabular view)
 - Git diffs less readable (closing braces, commas)
@@ -226,16 +239,19 @@ Rejected: CSV simpler, smaller, easier to diff. Tags as semicolon-separated acce
 Cache index.csv locally with TTL:
 
 Example: Save index.csv with 5-minute expiry
+
 - Download once, reuse for 5 minutes
 - Refresh after TTL expires
 - Faster repeated operations
 
 Pros:
+
 - Fewer downloads (reuse cached index)
 - Faster for repeated searches
 - Could work partially offline (within TTL)
 
 Cons:
+
 - Stale data possible (user sees old asset list)
 - Cache invalidation complexity (when to refresh?)
 - Confusing (new assets added, not visible until cache expires)
@@ -246,16 +262,19 @@ Rejected: Always-fresh data preferred. Index small (~10-50KB), download fast. St
 Auto-generate index via GitHub Actions:
 
 Example: GitHub workflow regenerates index on every PR
+
 - PR submitted with .meta.toml changes
 - Action runs start assets index
 - Commits index.csv automatically
 
 Pros:
+
 - Contributors can't forget (automated)
 - Always up to date (regenerated on every change)
 - No manual step (workflow handles it)
 
 Cons:
+
 - Bot commits add noise (extra commit per PR)
 - Workflow complexity (setup and maintenance)
 - Can fail silently (workflow breaks, PRs still merge)
@@ -268,11 +287,13 @@ Rejected: Manual generation acceptable. Clear documentation guides contributors.
 Index file format:
 
 CSV structure:
+
 ```csv
 type,category,name,description,tags,bin,sha,size,created,updated
 ```
 
 Example entries:
+
 ```csv
 agents,anthropic,claude,Anthropic Claude AI via Claude Code CLI,claude;anthropic;ai,claude,a1b2c3d4,1024,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
 roles,general,code-reviewer,Expert code reviewer focusing on security,review;security;quality,,b2c3d4e5,2048,2025-01-10T00:00:00Z,2025-01-12T00:00:00Z
@@ -283,11 +304,13 @@ tasks,git-workflow,pre-commit-review,Review staged changes before committing,git
 CSV escaping (RFC 4180):
 
 Fields with commas (quoted):
+
 ```csv
 tasks,workflow,my-task,"Review code, check tests, verify docs",testing,,abc123,1024,2025-01-13T00:00:00Z,2025-01-13T00:00:00Z
 ```
 
 Fields with quotes (doubled quotes):
+
 ```csv
 tasks,workflow,my-task,"Review ""special"" cases",testing,,abc123,1024,2025-01-13T00:00:00Z,2025-01-13T00:00:00Z
 ```
@@ -295,6 +318,7 @@ tasks,workflow,my-task,"Review ""special"" cases",testing,,abc123,1024,2025-01-1
 Multi-file assets:
 
 One index entry per asset (not per file):
+
 ```
 assets/tasks/git-workflow/pre-commit-review.toml
 assets/tasks/git-workflow/pre-commit-review.md
@@ -302,6 +326,7 @@ assets/tasks/git-workflow/pre-commit-review.meta.toml
 ```
 
 Index contains single entry:
+
 ```csv
 tasks,git-workflow,pre-commit-review,Review staged changes,git;review,,abc123,2048,2025-01-10T00:00:00Z,2025-01-10T00:00:00Z
 ```
@@ -309,11 +334,13 @@ tasks,git-workflow,pre-commit-review,Review staged changes,git;review,,abc123,20
 Fetching and parsing:
 
 Download:
+
 ```
 GET https://raw.githubusercontent.com/{org}/{repo}/{branch}/assets/index.csv
 ```
 
 Parse CSV:
+
 - Read CSV with header row
 - Skip header, parse entries
 - Split tags by semicolon
@@ -321,19 +348,21 @@ Parse CSV:
 - Build in-memory asset list
 
 Search:
+
 - Substring match on name, description, tags (case-insensitive)
 - Return all matching assets with full metadata
 
 Fallback behavior:
 
 Progressive degradation:
+
 1. Attempt to download index.csv
    - Success: Use index for rich search
    - Fail: Log warning, fall back to Tree API
 
 2. Fall back to Tree API directory listing
    - GET /repos/{org}/{repo}/git/trees/{branch}?recursive=1
-   - Filter paths: assets/{type}/*/*.toml (exclude .meta.toml)
+   - Filter paths: assets/{type}/_/_.toml (exclude .meta.toml)
    - Extract names from paths only
    - No descriptions/tags (limited search)
 
@@ -343,6 +372,7 @@ Progressive degradation:
    - Tags: empty
 
 New assets not in index:
+
 1. Search index.csv: not found
 2. Search Tree API: found
 3. Return with note: "(Not in index - metadata unavailable)"
@@ -351,11 +381,13 @@ New assets not in index:
 Generation command:
 
 Validation:
+
 - Check for .git/ directory (must be git repo)
 - Check for assets/ directory (must be catalog structure)
 - Error if missing: "Must be run in catalog repository"
 
 Algorithm:
+
 1. Scan assets/ recursively for .meta.toml files
 2. Parse each .meta.toml (extract metadata)
 3. Derive type and category from path
@@ -366,6 +398,7 @@ Algorithm:
 8. Report: "Generated index with N assets"
 
 Error handling:
+
 - Missing .meta.toml: Warning, skip asset
 - Invalid TOML: Error with filename and line number
 - Missing required fields: Error with which fields and file
@@ -374,14 +407,17 @@ Error handling:
 Size estimates:
 
 Minimal catalog (28 assets):
+
 - 28 rows × ~120 bytes/row = ~3.4 KB
 - With header and CSV overhead = ~4 KB
 
 Large catalog (200 assets):
+
 - 200 rows × ~120 bytes/row = ~24 KB
 - With header and CSV overhead = ~30 KB
 
 Very large catalog (500 assets):
+
 - 500 rows × ~120 bytes/row = ~60 KB
 - With header and CSV overhead = ~70 KB
 

@@ -95,18 +95,22 @@ start task pre-commit-review --asset-download=false  # Fail if not found
 When you run `start task <name>`, the CLI follows this resolution order:
 
 **1. Local config** (`./.start/tasks.toml`)
+
 - Project-specific tasks
 - Highest priority
 
 **2. Global config** (`~/.config/start/tasks.toml`)
+
 - Your personal tasks
 - Available across all projects
 
 **3. Asset cache** (`~/.config/start/assets/tasks/`)
+
 - Previously downloaded catalog tasks
 - Used immediately without prompting
 
 **4. GitHub catalog** (if `asset_download = true`)
+
 - Query GitHub for task
 - Prompt to download (or auto-download if configured)
 - Cache locally and add to config
@@ -158,27 +162,27 @@ start task <name> [instructions]
 1. Resolve task using resolution algorithm (see above)
 2. Load and merge configuration (global + local)
 3. Find task by name or alias
-3. Determine agent using precedence rules:
+4. Determine agent using precedence rules:
    - CLI `--agent` flag (highest priority)
    - Task `agent` field (if configured)
    - `default_agent` setting
    - First agent in config (TOML order)
-4. Determine role using precedence rules:
+5. Determine role using precedence rules:
    - CLI `--role` flag (highest priority)
    - Task `role` field (if configured)
    - `default_role` setting
    - First role in config (TOML order)
-5. Validate agent and role exist in configuration
+6. Validate agent and role exist in configuration
    - UTD supports: file, command, prompt with placeholders
-6. Load required contexts:
+7. Load required contexts:
    - Auto-includes all contexts where `required = true`
    - Missing files generate warnings and are skipped (same as `start` command behavior)
    - Order: Config definition order
-7. Run task `command` if configured (UTD):
+8. Run task `command` if configured (UTD):
    - Execute in working directory
    - Capture stdout and stderr
    - Error and exit if command fails (non-zero exit code)
-8. Build prompt from task's prompt template using UTD:
+9. Build prompt from task's prompt template using UTD:
    - Load from `file` if specified
    - Execute `command` if specified
    - Process `prompt` template with placeholders
@@ -187,8 +191,8 @@ start task <name> [instructions]
    - Replace `{command}` with command string, `{command_output}` with command output
    - Replace global placeholders ({date})
    - Insert required context document prompts first
-9. Display task summary (unless verbose/debug)
-10. Execute agent command
+10. Display task summary (unless verbose/debug)
+11. Execute agent command
 
 ### Task-Specific Help
 
@@ -231,11 +235,13 @@ command_timeout = 30
 `````
 
 **Agent Selection:**
+
 - Tasks can specify preferred agent with `agent` field
 - Precedence: `--agent` flag > task `agent` field > `default_agent` setting > first agent in config
 - Agent must exist in `[agents.<name>]` configuration
 
 **Role Selection:**
+
 - Tasks can specify preferred role with `role` field
 - Precedence: `--role` flag > task `role` field > `default_role` setting > first role in config
 - Role must exist in `[roles.<name>]` configuration

@@ -80,11 +80,13 @@ Severity-based exit codes (0, 1, 2):
 - Exit 2: Errors (config broken, agent missing, critical issues)
 
 Pros:
+
 - Scripts could differentiate warnings from errors
 - Could auto-proceed on warnings, stop on errors
 - More nuanced status reporting
 
 Cons:
+
 - More complex for users to understand
 - Scripts must handle three cases instead of two
 - Boundary between "warning" and "error" can be fuzzy
@@ -104,11 +106,13 @@ Category-based exit codes (0-7):
 - Exit 6+: Reserved
 
 Pros:
+
 - Scripts could react differently to each issue type
 - Specific automation based on category
 - Very detailed status encoding
 
 Cons:
+
 - Complex to document and remember
 - Scripts rarely need category-specific handling
 - Users must check multiple exit codes
@@ -120,10 +124,12 @@ Rejected: Far too complex for user-facing diagnostic command. Category informati
 Always exit 0 (never fail):
 
 Pros:
+
 - Never breaks scripts or automation
 - Doctor always runs successfully
 
 Cons:
+
 - Cannot use in CI/CD health checks
 - Scripts cannot detect issues programmatically
 - Must parse output text (fragile)
@@ -163,11 +169,13 @@ Priority rules when multiple issues found:
 Check definitions:
 
 Version Information:
+
 - Source: Version injection from build process
 - Always succeeds (informational only)
 - Displays: CLI version, commit hash, build date, Go version
 
 Configuration:
+
 - Check: TOML syntax validation for each file (settings.toml, agents.toml, tasks.toml, roles.toml, contexts.toml)
 - Check: File references exist
 - Check: Required fields present
@@ -175,6 +183,7 @@ Configuration:
 - Warning if: Deprecated fields used, optional issues found
 
 Asset Information:
+
 - Check: Asset cache directory exists and accessible
 - Check: Catalog connectivity (GitHub API reachable)
 - Check: Compare local cache with latest catalog index
@@ -182,17 +191,20 @@ Asset Information:
 - Warning if: Updates available in catalog
 
 CLI Version Check:
+
 - Check: Latest release from GitHub
 - Warning if: Update available
 - Never errors (informational only)
 
 Agents:
+
 - Check: Each configured agent binary is discoverable in PATH
 - Check: Binary is executable
 - Error if: Binary not found or not executable
 - Never warns (binary either works or doesn't)
 
 Environment:
+
 - Check: Required environment variables (if specified in config)
 - Check: Optional environment variables (EDITOR, GH_TOKEN)
 - Error if: Required env var missing

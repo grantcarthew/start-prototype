@@ -100,17 +100,20 @@ Gain:
 Manual asset installation with --asset-path flag:
 
 Example:
+
 ```bash
 start assets update --from-directory /path/to/assets
 start assets update --from-bundle assets-v1.2.3.tar.gz
 ```
 
 Pros:
+
 - Supports air-gapped environments
 - Users can install assets without network
 - Useful for corporate environments with restricted internet access
 
 Cons:
+
 - Adds complexity (bundle extraction, validation, directory structure checking)
 - Security concerns (must validate manually-provided assets, prevent code injection)
 - Two installation methods to maintain and test
@@ -125,11 +128,13 @@ Fail init when network unavailable:
 Example: start init fails with "Network required" error
 
 Pros:
+
 - Ensures complete setup (config and assets both succeed or both fail)
 - No partial setup states
 - Clear all-or-nothing contract
 
 Cons:
+
 - Frustrating for users who just want to create config
 - Config creation is more important than asset download
 - Users can't proceed with manual config creation
@@ -142,11 +147,13 @@ Cache assets for offline use with full mirroring:
 Example: Download all catalog assets during init, use cached versions when offline
 
 Pros:
+
 - Completely offline-capable after initial setup
 - All catalog assets available without network
 - No partial functionality degradation
 
 Cons:
+
 - Large download on init (entire asset catalog)
 - Storage overhead (cache all assets even if unused)
 - Conflicts with lazy loading design (download only what's needed)
@@ -160,9 +167,11 @@ Rejected: Conflicts with catalog-based lazy loading architecture. Downloads shou
 Network requirements by command:
 
 Require network (fail if unavailable):
+
 - start assets update - Explicit download operation, fails with clear error (exit 1)
 
 Optional network (work without):
+
 - start init - Creates config, warns on asset download failure (exit 0)
 - start doctor - Shows partial results, skips network checks (exit based on local checks)
 - start - Launches agent, works without assets
@@ -179,10 +188,12 @@ Network failure exit codes:
 Missing assets behavior:
 
 Pattern 1: Warn and continue (core commands)
+
 - start / start prompt / start task work without assets
 - Role references fail at runtime with clear error (expected behavior)
 
 Pattern 2: Reduced functionality (asset commands)
+
 - start assets add can't browse catalog but manual creation works
 - Interactive prompts skip template selection
 

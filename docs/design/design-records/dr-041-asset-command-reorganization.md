@@ -9,6 +9,7 @@
 Asset management functionality is scattered across multiple commands with inconsistent interfaces:
 
 Old structure:
+
 ```bash
 # Adding assets - different paths per type
 start config task add [query]    # Add task from catalog
@@ -119,6 +120,7 @@ Gain:
 Keep scattered commands:
 
 Example: Maintain current structure with separate commands per type
+
 ```bash
 start config task add "foo"
 start config role add "bar"
@@ -128,12 +130,14 @@ start show assets
 ```
 
 Pros:
+
 - No breaking changes (existing users unaffected)
 - No migration needed (current scripts work)
 - Shorter commands (config task add vs assets add)
 - Familiar pattern (users already know it)
 
 Cons:
+
 - No unified discovery (must know asset type first)
 - No search functionality (can't find by description/tags)
 - No preview capability (can't see details before installing)
@@ -147,6 +151,7 @@ Rejected: Unified command suite provides much better UX. Breaking change is acce
 Use subcommands under config instead of new assets command:
 
 Example: Keep under config but unify pattern
+
 ```bash
 start config assets browse
 start config assets search <query>
@@ -155,11 +160,13 @@ start config assets update
 ```
 
 Pros:
+
 - Less top-level command pollution (nested under config)
 - Still unifies asset operations
 - Familiar location (near existing config commands)
 
 Cons:
+
 - Confusing semantics (assets command modifies cache, not config)
 - Longer commands (start config assets add vs start assets add)
 - Misleading grouping (config is about user settings, assets about catalog)
@@ -171,6 +178,7 @@ Rejected: start assets is clearer - assets are distinct from user config. Cache 
 Add browse/search without deprecating old commands:
 
 Example: Add new discovery commands but keep old add commands
+
 ```bash
 start assets browse              # New
 start assets search <query>      # New
@@ -181,11 +189,13 @@ start update                     # Keep
 ```
 
 Pros:
+
 - No breaking changes (old commands still work)
 - Adds discovery features (browse, search, info)
 - Gradual migration (users can switch over time)
 
 Cons:
+
 - Duplicated functionality (two ways to add assets)
 - Inconsistent UX (new way vs old way coexist)
 - Confusing for new users (which command to use?)
@@ -198,6 +208,7 @@ Rejected: Clean break better. Duplicated functionality creates confusion.
 Use single command with type flag:
 
 Example: Single add command with --type flag
+
 ```bash
 start assets add "foo" --type task
 start assets add "bar" --type role
@@ -205,11 +216,13 @@ start assets add "baz" --type agent
 ```
 
 Pros:
+
 - Single command (one add instead of multiple)
 - Explicit type (clear what's being added)
 - Consistent pattern (same command for all types)
 
 Cons:
+
 - Requires knowing type (defeats type-agnostic discovery)
 - Extra typing (--type flag every time)
 - Less ergonomic (more verbose)
@@ -223,13 +236,15 @@ Rejected: Type-agnostic discovery is key feature. Asset type is metadata, not us
 Command structure:
 
 start assets browse:
+
 - Open GitHub catalog in web browser
-- URL: https://github.com/{org}/{repo}/tree/main/assets
+- URL: <https://github.com/{org}/{repo}/tree/main/assets>
 - Uses system default browser
 - Fallback: If browser fails to open, print URL to terminal for manual click
 - No terminal interaction (pure web browsing)
 
 start assets search <query>:
+
 - Search catalog using substring matching (DR-040)
 - Match against name, path, description, tags
 - Display results grouped by type/category
@@ -238,6 +253,7 @@ start assets search <query>:
 - Minimum 3 characters required
 
 start assets add <query>:
+
 - Search catalog using substring matching
 - Single match: auto-select and proceed
 - Multiple matches: interactive selection
@@ -247,6 +263,7 @@ start assets add <query>:
 - Display usage instructions after installation
 
 start assets add (no arguments):
+
 - Interactive terminal browser with numbered selection (DR-035)
 - Download catalog index
 - Category-first navigation
@@ -255,6 +272,7 @@ start assets add (no arguments):
 - Download and add to config
 
 start assets info <query>:
+
 - Search for asset (same matching as add)
 - Display full metadata from .meta.toml
 - Show description and tags
@@ -263,6 +281,7 @@ start assets info <query>:
 - Optional full file contents preview
 
 start assets update [query]:
+
 - Download catalog index.csv
 - Find cached .meta.toml files
 - Filter by query if provided (substring matching)
@@ -273,6 +292,7 @@ start assets update [query]:
 - See DR-037 for complete algorithm
 
 start assets index:
+
 - Validate git repository structure
 - Scan assets/ directory for .meta.toml files
 - Parse metadata from each file
@@ -285,6 +305,7 @@ start assets index:
 Scope control:
 
 Downloaded assets added to config based on --local flag:
+
 - Default: global config (~/.config/start/tasks.toml)
 - With --local flag: local config (.start/tasks.toml)
 - Local creates or updates the .start/ directory
@@ -292,6 +313,7 @@ Downloaded assets added to config based on --local flag:
 Cache behavior:
 
 Cached assets used immediately without prompting:
+
 - Cache is transparent implementation detail
 - No user interaction needed for cached assets
 - Reduces network calls automatically

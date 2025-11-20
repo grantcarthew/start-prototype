@@ -24,6 +24,7 @@ Binary versioning needs a mechanism to embed version information at build time. 
 Use Go's `-ldflags` at build time to inject version information into a dedicated `internal/version` package variable.
 
 Version sources:
+
 - Git tags for production releases (semantic versioning)
 - Git describe for post-release commits
 - Default "dev" for development builds without ldflags
@@ -222,10 +223,10 @@ LDFLAGS := -X 'github.com/grantcarthew/start/internal/version.Version=$(VERSION)
            -X 'github.com/grantcarthew/start/internal/version.GoVersion=$(GO_VERSION)'
 
 build:
-	go build -ldflags "$(LDFLAGS)" -o start ./cmd/start
+ go build -ldflags "$(LDFLAGS)" -o start ./cmd/start
 
 install:
-	go install -ldflags "$(LDFLAGS)" ./cmd/start
+ go install -ldflags "$(LDFLAGS)" ./cmd/start
 ```
 
 GoReleaser integration:
@@ -258,12 +259,14 @@ Git tags (production releases):
 Development builds:
 
 Default values when built without ldflags:
+
 - `Version = "dev"`
 - `Commit = "unknown"`
 - `BuildDate = "unknown"`
 - `GoVersion = "unknown"`
 
 This allows:
+
 ```bash
 go run ./cmd/start --version
 # Output: start dev (commit: unknown, built: unknown, go: unknown)
@@ -318,6 +321,7 @@ var versionCmd = &cobra.Command{
 Package design:
 
 The `internal/version` package should be minimal:
+
 - No external dependencies
 - Pure data plus simple formatters
 - Used by `cmd/start/main.go` for `--version` flag

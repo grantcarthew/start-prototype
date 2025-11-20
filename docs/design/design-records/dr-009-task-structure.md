@@ -303,6 +303,7 @@ prompt = "Help me with: {instructions}"
 ```
 
 Usage:
+
 ```bash
 start task help "how to structure this code"
 start task h "explain error handling"
@@ -319,6 +320,7 @@ prompt = "Review the code. Focus: {instructions}"
 ```
 
 Usage:
+
 ```bash
 start task code-review "security issues"
 start task cr "performance"
@@ -343,6 +345,7 @@ Focus: {instructions}
 ```
 
 Usage:
+
 ```bash
 start task go-review "check for goroutine leaks"
 start task gor "verify error handling"
@@ -370,6 +373,7 @@ Review these changes:
 `````
 
 Usage:
+
 ```bash
 start task gdr "focus on security"
 start task git-diff-review "check for bugs"
@@ -393,6 +397,7 @@ Improvements needed: {instructions}
 ```
 
 Usage:
+
 ```bash
 start task doc-review "check clarity"
 start task dr "add examples"
@@ -423,6 +428,7 @@ Focus: {instructions}
 ```
 
 Usage:
+
 ```bash
 start task api-check "verify REST compliance"
 ```

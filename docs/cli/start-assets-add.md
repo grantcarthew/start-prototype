@@ -153,7 +153,7 @@ When no query is provided (or query is < 3 chars), `start assets add` launches a
 **Agent Assets Note:**
 Installing an agent configuration (e.g., `claude-3-5-sonnet`) downloads the configuration file but **does not install the AI tool binary** (e.g., `claude` CLI). You must ensure the required binary is installed and discoverable on your system.
 
-**Note:** Asset content files (markdown, templates) are **always downloaded to the global cache**, even for local installations. This prevents duplication and saves disk space. Only the configuration definition is added to the local project scope.
+**Note:** Asset content files (Markdown, templates) are **always downloaded to the global cache**, even for local installations. This prevents duplication and saves disk space. Only the configuration definition is added to the local project scope.
 
 **Example:**
 

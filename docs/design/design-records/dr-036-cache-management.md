@@ -25,34 +25,40 @@ Asset cache is invisible implementation detail with no user-facing management co
 Key aspects:
 
 Location: ~/.config/start/assets/
+
 - Separate subdirectory under config directory
 - Configurable via asset_path setting
 - Standard directory structure
 
 No management commands:
+
 - No start cache list
 - No start cache clean
 - No start cache info
 - No start cache prune
 
 Manual deletion:
+
 - rm -rf ~/.config/start/assets/ to clear cache
 - Assets re-download automatically on next use
 - start assets update to bulk re-download
 
 No cleanup policies:
+
 - Cache persists until manually deleted
 - No age-based cleanup
 - No size-based cleanup
 - Consistent with no automatic operations principle
 
 Filesystem as state:
+
 - No tracking files
 - File existence IS the cache state
 - Standard directory structure
 - Human-readable text files
 
 Configurable location:
+
 - Default: ~/.config/start/assets/
 - Customizable: asset_path setting in config.toml
 - Useful for network drives, shared caches, testing
@@ -127,6 +133,7 @@ Gain:
 Add cache management commands:
 
 Example: Implement start cache list, start cache clean, start cache info
+
 ```bash
 start cache list       # List cached assets
 start cache clean      # Remove unused assets
@@ -135,12 +142,14 @@ start cache prune --older-than 30d  # Remove old assets
 ```
 
 Pros:
+
 - User visibility (can see what's cached via CLI)
 - Selective cleanup (remove specific assets)
 - Statistics available (cache size, asset count)
 - Familiar pattern (like npm cache, yarn cache)
 
 Cons:
+
 - Added complexity (implement multiple commands, maintain cache metadata)
 - Minimal benefit (files are tiny < 1MB, cleanup not needed)
 - Over-engineering (cache management for negligible disk space)
@@ -152,20 +161,24 @@ Rejected: Files are tiny (< 1MB even for large catalogs). Cache management adds 
 Automatic cleanup policies:
 
 Example: Age-based or size-based automatic cleanup
+
 ```toml
 [settings]
 cache_max_size = "10MB"
 cache_max_age_days = 90
 ```
+
 - Automatically delete assets older than 90 days
 - Automatically delete oldest assets when size exceeds 10MB
 
 Pros:
+
 - Automatic maintenance (no user intervention)
 - Bounded growth (cache won't grow indefinitely)
 - Familiar pattern (like browser cache)
 
 Cons:
+
 - Violates no automatic operations principle
 - Added complexity (implement cleanup logic, track timestamps)
 - Unnecessary (files tiny, growth negligible)
@@ -177,6 +190,7 @@ Rejected: Violates no automatic operations principle. Unnecessary for tiny files
 SQLite database for cache metadata:
 
 Example: Track cache in database instead of filesystem
+
 ```
 ~/.config/start/cache.db (SQLite database)
 - Table: cached_assets (name, type, category, sha, size, downloaded_at)
@@ -184,11 +198,13 @@ Example: Track cache in database instead of filesystem
 ```
 
 Pros:
+
 - Fast queries (can query cache by various fields)
 - Statistics built-in (count, size, dates)
 - Easy to add features (cache commands, cleanup policies)
 
 Cons:
+
 - Over-engineering (database for tiny text files)
 - Added complexity (database schema, migrations)
 - Another thing to corrupt (database can break)
@@ -200,19 +216,23 @@ Rejected: Filesystem IS the state. Database overkill for tiny files. KISS princi
 Synchronized cache across machines:
 
 Example: Cloud-synced cache directory
+
 ```toml
 [settings]
 asset_path = "~/Dropbox/start-cache"  # Synced via Dropbox
 ```
+
 - Cache synced across all machines
 - One download, available everywhere
 
 Pros:
+
 - Convenience (download once, available everywhere)
 - Faster setup (new machine has cache immediately)
 - Bandwidth savings (no re-downloads)
 
 Cons:
+
 - Sync conflicts possible (multiple machines downloading simultaneously)
 - Dependency on sync service (Dropbox, iCloud, etc.)
 - More complex setup (user must configure)
@@ -225,11 +245,13 @@ Rejected: Re-download is fast (no rate limits, tiny files). Sync adds complexity
 Cache location:
 
 Default: ~/.config/start/assets/
+
 - Subdirectory under config directory
 - Configurable via asset_path setting
 - Standard directory structure
 
 Configuration:
+
 ```toml
 # config.toml
 [settings]
@@ -237,6 +259,7 @@ asset_path = "~/.config/start/assets"  # Default location
 ```
 
 Custom location:
+
 ```toml
 # config.toml
 [settings]
@@ -277,6 +300,7 @@ Directory structure:
 ```
 
 Structure pattern: {cache}/{type}/{category}/{name}.{ext}
+
 - {cache}: ~/.config/start/assets/ (or custom via asset_path)
 - {type}: tasks, roles, agents, contexts
 - {category}: git-workflow, general, anthropic, reference, etc.
@@ -286,6 +310,7 @@ Structure pattern: {cache}/{type}/{category}/{name}.{ext}
 Cache operations:
 
 Automatic population:
+
 - User runs: start task pre-commit-review
 - Asset not in config/cache
 - Downloads from GitHub
@@ -294,6 +319,7 @@ Automatic population:
 - Uses cached version on subsequent runs
 
 Automatic updates:
+
 - User runs: start assets update
 - Checks GitHub for newer SHAs (via index.csv)
 - Downloads updated assets to cache
@@ -301,6 +327,7 @@ Automatic updates:
 - User must manually apply updates to config
 
 Manual deletion:
+
 - User runs: rm -rf ~/.config/start/assets/
 - Cache cleared completely
 - Assets re-download automatically on next use
@@ -309,17 +336,20 @@ Manual deletion:
 Cache persistence:
 
 Per-machine only:
+
 - Not synchronized across machines
 - Not backed up automatically
 - Each machine has independent cache
 
 Re-download is fast:
+
 - Raw.githubusercontent.com (no rate limits)
 - Assets small (< 5KB typically)
 - Network cost minimal
 - Cache is disposable
 
 User config portable:
+
 ```toml
 # tasks.toml references cached assets
 [tasks.pre-commit-review]
@@ -455,6 +485,7 @@ $ start task pre-commit-review
 Cache size estimates:
 
 Minimal viable set (28 assets):
+
 ```
 Tasks (12): 12 × 3KB = 36KB
 Roles (8): 8 × 2KB = 16KB
@@ -464,6 +495,7 @@ Total: ~62KB (tiny!)
 ```
 
 Large catalog (200 assets):
+
 ```
 200 × 3KB = 600KB
 Still trivial for modern systems

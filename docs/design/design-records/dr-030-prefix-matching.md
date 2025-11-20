@@ -32,11 +32,13 @@ How it works:
 Examples:
 
 Top-level commands:
+
 - start d → start doctor
 - start con → start config
 - start t mytask → start task mytask
 
 Nested commands:
+
 - start con ag l → start config agent list
 - start ass a role1 → start assets add role1
 - start con r e myRole → start config role edit myRole
@@ -107,12 +109,14 @@ Gain:
 No prefix matching:
 
 Example: Require full command names always
+
 ```bash
 start config agent list  # Always required
 start con ag l          # Error: unknown command
 ```
 
 Pros:
+
 - No ambiguity possible (commands always explicit)
 - Scripts never break from new commands
 - Documentation always clear
@@ -120,6 +124,7 @@ Pros:
 - Simple and predictable
 
 Cons:
+
 - Verbose for frequent use (lots of typing)
 - Poor UX for power users (tedious and slow)
 - Less forgiving (typos always fail)
@@ -131,6 +136,7 @@ Rejected: Poor UX for interactive use. Power users expect prefix matching in mod
 Selective prefix matching:
 
 Example: Enable only for specific command levels
+
 ```go
 // Only top-level commands
 rootCmd.EnablePrefixMatching = true
@@ -138,12 +144,14 @@ rootCmd.EnablePrefixMatching = true
 ```
 
 Pros:
+
 - Reduces ambiguity scope (fewer places for conflicts)
 - Scripts could use shortcuts at top level safely
 - More predictable which shortcuts work
 - Gradual adoption possible
 
 Cons:
+
 - Inconsistent UX (works sometimes, not others)
 - Users confused about where prefixes work
 - More complex implementation (per-command config)
@@ -155,6 +163,7 @@ Rejected: Inconsistency is worse than consistent behavior. If we enable prefix m
 Custom alias system:
 
 Example: User-defined command aliases
+
 ```toml
 [aliases]
 d = "doctor"
@@ -163,12 +172,14 @@ cal = "config agent list"
 ```
 
 Pros:
+
 - Users define their own shortcuts
 - No ambiguity (explicit mappings)
 - Scripts can use aliases safely (defined in config)
 - Full control over abbreviations
 
 Cons:
+
 - Requires configuration (not automatic)
 - Users must set up aliases manually
 - More implementation work
@@ -193,15 +204,18 @@ How Cobra handles prefix matching:
 Ambiguity handling:
 
 Exactly one match:
+
 - Command executes normally
 - User sees expected behavior
 
 Multiple matches (ambiguous):
+
 - Error message lists matching commands
 - Suggests full command names
 - Exit with error code
 
 No matches (unknown command):
+
 - Error message shows similar commands
 - Suggests using --help
 - Exit with error code
@@ -209,16 +223,19 @@ No matches (unknown command):
 Usage guidelines:
 
 For users in interactive sessions:
+
 - Use shortcuts freely (start con ag l)
 - Experiment to find what works
 - Develop personal muscle memory
 
 For scripts and CI:
+
 - Always use full commands (start config agent list)
 - Prevents breakage when new commands added
 - More explicit and maintainable
 
 For documentation and sharing:
+
 - Prefer full commands for clarity
 - Can mention shortcuts as optional feature
 - Examples should be understandable
@@ -226,11 +243,13 @@ For documentation and sharing:
 For development and command naming:
 
 Avoid similar prefixes:
+
 - Don't add both configure and config
 - Think about common single-letter prefixes
 - Consider existing shortcuts when naming
 
 Version stability:
+
 - Adding commands is a minor change (may break shortcuts)
 - Users should expect new commands to affect shortcuts
 - Document command additions in release notes
@@ -327,6 +346,7 @@ $ start t cr "check this"
 Comparison with other CLIs:
 
 kubectl (extensive prefix matching):
+
 ```bash
 kubectl get po       # kubectl get pods
 kubectl desc no      # kubectl describe nodes
@@ -334,6 +354,7 @@ kubectl apply -f     # kubectl apply -f (exact)
 ```
 
 git (manual aliases, no built-in prefix):
+
 ```bash
 git st    # Error (unless aliased)
 git co    # Error (unless aliased)
@@ -341,12 +362,14 @@ git br    # Error (unless aliased)
 ```
 
 docker (short exact commands, no prefix):
+
 ```bash
 docker ps    # Exact command
 docker co    # Error (not a prefix match)
 ```
 
 Our approach follows kubectl:
+
 - Similar target audience (developers)
 - Similar command complexity (nested subcommands)
 - Better UX for frequent use

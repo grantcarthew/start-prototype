@@ -15,6 +15,7 @@ start assets search <query>
 Search the GitHub asset catalog by keyword and display matching assets without installing them. Terminal-based, non-interactive command that lists matching assets and exits.
 
 Uses substring matching across multiple fields:
+
 - Asset name
 - Full path (type/category/name)
 - Description
@@ -23,6 +24,7 @@ Uses substring matching across multiple fields:
 Results are displayed grouped by type and category, sorted by relevance. This is a read-only discovery tool - use `start assets add` to install assets.
 
 **Key differences from `start assets add`:**
+
 - **Read-only** - Lists matches without installation
 - **Non-interactive** - Prints results and exits
 - **Discovery-focused** - For exploration before installation
@@ -33,11 +35,13 @@ Results are displayed grouped by type and category, sorted by relevance. This is
 : Search query string. Minimum 3 characters.
 
 **Query matching:**
+
 - Case-insensitive
 - Substring match (not prefix)
 - Searches: name, path, description, tags
 
 **Examples:**
+
 ```bash
 start assets search commit       # Finds "pre-commit-review", "commit-message"
 start assets search workflow     # Finds assets in "*-workflow" categories
@@ -69,6 +73,7 @@ roles/
 ```
 
 **Format:**
+
 - Grouped by type and category (hierarchical)
 - Asset name + description (if available)
 - Sorted by relevance (exact name > name substring > path > description > tags)
@@ -387,12 +392,14 @@ Shows all assets matching "pre" substring.
 ### vs `start assets add`
 
 **`start assets search`** - Read-only discovery
+
 ```bash
 start assets search "commit"
 # Lists matches, exits (no installation)
 ```
 
 **`start assets add`** - Search and install
+
 ```bash
 start assets add "commit"
 # Lists matches, prompts for selection, installs
@@ -403,12 +410,14 @@ Use search for exploration, add for installation.
 ### vs `start assets browse`
 
 **`start assets search`** - Keyword-based terminal search
+
 ```bash
 start assets search "commit"
 # Terminal output, filtered by keyword
 ```
 
 **`start assets browse`** - Visual catalog browsing
+
 ```bash
 start assets browse
 # Opens browser, graphical navigation
@@ -419,12 +428,14 @@ Search is faster for targeted queries, browse is better for exploration.
 ### vs `start assets info`
 
 **`start assets search`** - List multiple matches
+
 ```bash
 start assets search "commit"
 # Shows brief list of all matches
 ```
 
 **`start assets info`** - Detailed single asset view
+
 ```bash
 start assets info "pre-commit-review"
 # Shows complete metadata for one asset
@@ -437,6 +448,7 @@ Search is for finding, info is for detailed inspection.
 **Asset repository:**
 
 In `~/.config/start/config.toml`:
+
 ```toml
 [settings]
 asset_repo = "grantcarthew/start"    # Default
@@ -450,11 +462,13 @@ asset_repo = "grantcarthew/start"    # Default
 ### GitHub-Only Search
 
 Searches **only the GitHub catalog**:
+
 - Does NOT search local configuration
 - Does NOT search global configuration
 - Does NOT search cache
 
 **For local assets:**
+
 ```bash
 start config task list         # List installed tasks
 start config role list         # List installed roles
@@ -463,11 +477,13 @@ start config role list         # List installed roles
 ### Substring Matching Details
 
 **Algorithm:**
+
 - Case-insensitive
 - Minimum 3 characters
 - Matches anywhere in field (not just beginning)
 
 **Search fields (priority order):**
+
 1. Exact name match (highest)
 2. Name substring
 3. Path substring
@@ -477,12 +493,14 @@ start config role list         # List installed roles
 ### Performance
 
 **Typical search time:**
+
 - Download index.csv: ~50-100ms
 - Parse CSV: ~5-10ms
 - In-memory search: <1ms
 - **Total: ~60-110ms**
 
 **Index unavailable (fallback):**
+
 - Tree API call: ~100-200ms
 - Parse and search: ~10-20ms
 - **Total: ~110-220ms**
@@ -490,11 +508,13 @@ start config role list         # List installed roles
 ### Output Format
 
 **Human-readable by default:**
+
 - Grouped by type/category
 - Indented tree structure
 - Descriptive text
 
 **Machine-parsable with care:**
+
 - Consistent indentation (2 spaces per level)
 - Predictable format
 - Consider using `--verbose` for structured output
@@ -512,10 +532,12 @@ Requires network access to download catalog index.
 ### Catalog Index Dependency
 
 **With index.csv (preferred):**
+
 - Rich search: name, path, description, tags
 - Fast and complete results
 
 **Without index.csv (fallback):**
+
 - Limited search: name and path only
 - No description or tag matching
 - Degraded but functional

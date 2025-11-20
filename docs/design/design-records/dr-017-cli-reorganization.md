@@ -18,6 +18,7 @@ CLI command structure needs clear organization as the tool grows. The system mus
 - Work well with shell completion
 
 Original inconsistent structure:
+
 - `start agent add` - configuration management
 - `start task code-review` - execution
 
@@ -28,11 +29,13 @@ Different purposes with similar command structure creates confusion.
 Reorganize commands by purpose: execution at top level, configuration management under `start config`, asset management under `start assets`.
 
 Execution commands (top-level):
+
 - `start` - launch agent with all context
 - `start prompt [text]` - launch with required context + custom prompt
 - `start task <name> [inst]` - run predefined task
 
 Configuration management (under `start config`):
+
 - `start config show` - view merged configuration
 - `start config edit [scope]` - edit config file
 - `start config path` - show config file paths
@@ -43,6 +46,7 @@ Configuration management (under `start config`):
 - `start config role <sub>` - manage roles
 
 Asset management (under `start assets`):
+
 - `start assets browse` - open GitHub catalog in browser
 - `start assets search <query>` - search by name/description/tags
 - `start assets add [query]` - interactive TUI or direct install
@@ -51,6 +55,7 @@ Asset management (under `start assets`):
 - `start assets clean` - remove unused cache
 
 Utility commands (top-level):
+
 - `start init [--local]` - initialize configuration
 - `start doctor` - diagnose installation
 

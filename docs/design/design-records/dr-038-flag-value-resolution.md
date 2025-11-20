@@ -23,6 +23,7 @@ CLI flags (--agent, --role, --task, --model) need a resolution strategy. The app
 Implement two-phase resolution (exact → prefix) with short-circuit evaluation across sources, ambiguity detection, and interactive selection in TTY environments.
 
 Phase 1: Exact match across all sources
+
 - Check local config (.start/)
 - Check global config (~/.config/start/)
 - Check cache (~/.config/start/assets/)
@@ -31,6 +32,7 @@ Phase 1: Exact match across all sources
 - If not found: proceed to Phase 2
 
 Phase 2: Prefix match with short-circuit
+
 - Check local config for prefix matches
   - Single match: use it
   - Multiple matches: handle ambiguity
@@ -53,11 +55,13 @@ Short-circuit: Stop at first source with matches (single or multiple), only proc
 Ambiguity handling:
 
 Interactive (TTY detected):
+
 - Show numbered selection menu
 - User selects by number
 - Asset loaded
 
 Non-interactive (piped, scripted, or --non-interactive flag):
+
 - Error with list of matches
 - Require exact name or longer prefix
 - Exit with error code
@@ -65,11 +69,13 @@ Non-interactive (piped, scripted, or --non-interactive flag):
 Flag-specific behaviors:
 
 --model: Resolution exact → prefix → passthrough
+
 - Sources: Agent configuration file only (in-memory)
 - Passthrough: If no match, pass literal value to underlying CLI
 - Allows using brand-new models before updating config
 
 --agent, --role, --task: Resolution exact → prefix (no passthrough)
+
 - Sources: local → global → cache → GitHub catalog
 - No passthrough: Must be valid asset file
 - Invalid name = error
@@ -146,18 +152,21 @@ Gain:
 Exact match only (no prefix matching):
 
 Example: Require full asset names always
+
 ```bash
 start --agent anthropic  # Works
 start --agent anth       # Error: not found
 ```
 
 Pros:
+
 - Simple implementation (just string comparison)
 - No ambiguity (exact match or error)
 - Predictable (always know what you'll get)
 - Fast (no prefix search needed)
 
 Cons:
+
 - More typing (full names required)
 - Less usable (common shortcuts impossible)
 - Unfamiliar pattern (most CLIs support prefixes)
@@ -168,17 +177,20 @@ Rejected: Prefix matching significantly improves usability. Ambiguity detection 
 Prefix match with no exact-first phase:
 
 Example: Always do prefix matching, skip exact matching phase
+
 ```bash
 start --agent anthropic  # Matches as prefix (still works)
 start --agent anth       # Matches as prefix
 ```
 
 Pros:
+
 - Simpler (one-phase instead of two)
 - Still supports shortcuts
 - Less code (no exact phase)
 
 Cons:
+
 - Ambiguity more common (exact matches become ambiguous if prefix of another)
 - Slower (always search all items even if exact match exists)
 - Counterintuitive (exact match should be instant)
@@ -189,17 +201,20 @@ Rejected: Two-phase is better. Exact match should be instant and unambiguous. Pr
 Always error on ambiguity (no interactive selection):
 
 Example: Ambiguous prefix always errors, even in TTY
+
 ```bash
 start --agent a  # Error (even in interactive terminal)
 Error: Ambiguous prefix 'a' matches multiple agents
 ```
 
 Pros:
+
 - Consistent behavior (same in TTY and scripts)
 - Forces explicit names (users learn full names)
 - Simpler implementation (no TTY detection, no selection UI)
 
 Cons:
+
 - Poor UX in interactive use (forces re-typing instead of selecting)
 - Frustrating (user knows what they want, can't choose)
 - Less discoverable (doesn't show what's available)
@@ -210,16 +225,19 @@ Rejected: Interactive selection better UX. TTY detection standard practice. Wort
 No model passthrough:
 
 Example: --model must match configured model, no passthrough
+
 ```bash
 start --model gpt-5-new  # Error: not found (even if valid for underlying CLI)
 ```
 
 Pros:
+
 - Catches typos (all model names validated)
 - Consistent (same behavior as --agent)
 - Simple (no special case)
 
 Cons:
+
 - Prevents using new models (must update config first)
 - Breaks experimentation (can't try temporary model names)
 - Forward compatibility issues (new models released, can't use immediately)
@@ -230,17 +248,20 @@ Rejected: Model passthrough important for flexibility. Warning message prevents 
 Cache GitHub catalog listings:
 
 Example: Cache Tree API results for N minutes
+
 ```go
 // Cache catalog listing in memory
 catalogCache = fetchGitHubCatalog()  // Cache for 5 minutes
 ```
 
 Pros:
+
 - Fewer network calls (reuse catalog across invocations)
 - Faster repeated operations (no refetch)
 - Works offline after first fetch (within TTL)
 
 Cons:
+
 - Stale catalog possible (user sees old asset list)
 - Cache invalidation complexity (when to refresh?)
 - Confusing (new assets added, not visible until cache expires)
@@ -253,14 +274,16 @@ Rejected: Always-fresh catalog preferred. Network call acceptable (<200ms). Stal
 Resolution algorithm:
 
 Phase 1: Exact match
+
 1. Check local config (.start/{type}.toml) for exact name match
 2. Check global config (~/.config/start/{type}.toml) for exact name match
-3. Check cache (~/.config/start/assets/{type}/*/*.toml) for exact name match
+3. Check cache (~/.config/start/assets/{type}/_/_.toml) for exact name match
 4. Check GitHub catalog (query index.csv) for exact name match
 5. If found anywhere: use immediately (lazy fetch from GitHub if needed)
 6. If not found: proceed to Phase 2
 
 Phase 2: Prefix match (short-circuit)
+
 1. Search local config for prefix matches
    - If single match: use it
    - If multiple matches: handle ambiguity (see below)
@@ -286,17 +309,20 @@ Phase 2: Prefix match (short-circuit)
 Ambiguity handling:
 
 Interactive mode (TTY detected and --non-interactive NOT set):
+
 1. Show numbered list of matches with source locations
 2. Prompt user for selection
 3. Load selected asset
 4. Continue execution
 
 Non-interactive mode (piped, scripted, or --non-interactive flag):
+
 1. Show error message with list of matches
 2. Suggest using exact name or longer prefix
 3. Exit with error code 1
 
 TTY detection:
+
 - Check if stdout is terminal: os.Stdout.Stat() & os.ModeCharDevice
 - Check --non-interactive flag is NOT set
 - Both must be true for interactive mode
@@ -304,6 +330,7 @@ TTY detection:
 Flag-specific resolution:
 
 --model (from agent config):
+
 - Resolution: exact → prefix → passthrough
 - Sources: Agent configuration [models] section only
 - Passthrough behavior:
@@ -312,6 +339,7 @@ Flag-specific resolution:
   - Allows new models without config update
 
 --agent, --role, --task (asset files):
+
 - Resolution: exact → prefix (no passthrough)
 - Sources: local → global → cache → GitHub (priority order)
 - No passthrough: Must be valid asset
@@ -320,6 +348,7 @@ Flag-specific resolution:
 Lazy fetch behavior:
 
 When match found in GitHub catalog:
+
 1. Download asset via raw.githubusercontent.com
 2. Save to cache (~/.config/start/assets/{type}/{category}/)
 3. Save metadata (.meta.toml)
@@ -329,6 +358,7 @@ When match found in GitHub catalog:
 GitHub catalog query:
 
 For prefix matching against GitHub:
+
 - Download index.csv from raw.githubusercontent.com
 - Parse CSV into memory
 - Filter by prefix match on name field

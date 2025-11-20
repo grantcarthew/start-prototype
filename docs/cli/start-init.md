@@ -216,6 +216,7 @@ Files don't need to exist - runtime gracefully handles missing files.
 Init uses the catalog index to detect installed agents:
 
 **Step 1: Fetch index**
+
 ```
 GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv
 ```
@@ -223,6 +224,7 @@ GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv
 Parses CSV to extract all agent entries with their `bin` field.
 
 **Step 2: Auto-detect**
+
 ```
 Check if 'claude' is executable  → Detected
 Check if 'gemini' is executable  → Detected
@@ -232,6 +234,7 @@ Check if 'aichat' is executable  → Not found
 **Step 3: Lazy download**
 
 Only downloads asset files for detected/selected agents:
+
 ```
 GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.toml
 GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.meta.toml
@@ -240,6 +243,7 @@ GET https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{cat
 Each agent asset consists of 2 files: configuration (`.toml`) and metadata (`.meta.toml`).
 
 **Benefits:**
+
 - Efficient: 1 index download + N agent downloads (only what's needed)
 - Fast: No rate limits on raw.githubusercontent.com
 - Lazy: Only downloads agents you actually use
@@ -252,12 +256,14 @@ Each agent asset consists of 2 files: configuration (`.toml`) and metadata (`.me
 **Unknown agents:**
 
 If a binary is installed but not in the catalog index:
+
 - Not auto-detected (index is source of truth for available agents)
 - User can manually add later with `start assets add`
 
 ### GitHub Catalog Details
 
 **Index file:**
+
 ```
 URL: https://raw.githubusercontent.com/grantcarthew/start/main/assets/index.csv
 Format: CSV with columns: type,category,name,description,tags,bin,sha,size,created,updated
@@ -266,6 +272,7 @@ Extract: bin column for detection
 ```
 
 **Agent asset files:**
+
 ```
 URL patterns:
   https://raw.githubusercontent.com/grantcarthew/start/main/assets/agents/{category}/{name}.toml
@@ -276,10 +283,12 @@ Meta contains: SHA, size, timestamps for cache management
 ```
 
 **Rate limits:**
+
 - raw.githubusercontent.com has no rate limits
 - Fast and reliable for init workflow
 
 **Timeout:**
+
 - 10 seconds for index fetch
 - 5 seconds per agent TOML download
 - Error and exit if timeout reached
@@ -704,6 +713,7 @@ Init continues with other agents. Does not exit.
 | `start init --local --force` | No (→ local) | No (auto-backup) | No (auto-config) |
 
 **Backup prompt:**
+
 - Shown in interactive mode if config exists at target location
 - Skipped with `--force` flag (auto-backs up instead)
 - Answer 'N' exits gracefully (exit code 0)
@@ -795,6 +805,7 @@ After running init:
    ```
 
 3. **Test configuration**:
+
    ```bash
    start config show     # View config
    start --agent claude  # Test launch
@@ -812,7 +823,7 @@ $EDITOR ~/.config/start/roles.toml
 $EDITOR ~/.config/start/contexts.toml
 ```
 
-See: https://github.com/grantcarthew/start#configuration
+See: <https://github.com/grantcarthew/start#configuration>
 
 ### Re-running Init
 

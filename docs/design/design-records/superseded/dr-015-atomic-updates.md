@@ -84,6 +84,7 @@ Result: 4 total API calls, minimal disk usage
 ## Rationale
 
 Combining SHA filtering (DR-014) with batch atomic install provides:
+
 - Best API efficiency (only changed files)
 - Best safety (rollback on failure)
 - Simplest implementation (no complex state tracking)

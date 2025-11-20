@@ -25,12 +25,14 @@ Use SHA-based update detection via catalog index to check for asset updates. Upd
 Key aspects:
 
 Command: start assets update [query]
+
 - Manual-only (user explicitly runs command)
 - No automatic checks (consistent with no automatic operations principle)
 - Optional query parameter for selective updates
 - Updates cache only (never modifies user config)
 
 Update process:
+
 1. Download index.csv from GitHub (contains current SHAs)
 2. For each cached .meta.toml file:
    - Read local SHA
@@ -42,6 +44,7 @@ Update process:
 5. Never touch user config files
 
 SHA-based versioning:
+
 - No semantic versioning (v1.2.3)
 - Git blob SHA IS the version
 - SHA comparison for update detection
@@ -49,6 +52,7 @@ SHA-based versioning:
 - Simple and reliable
 
 Cache-only updates:
+
 - Cache gets new versions
 - User config remains unchanged
 - Tasks referencing cached files (via prompt_file) automatically use new content
@@ -56,6 +60,7 @@ Cache-only updates:
 - Clear separation (cache vs config)
 
 Selective updates:
+
 - No query: Update all cached assets
 - With query: Update matching assets only (substring matching)
 - Examples: start assets update "commit", start assets update git-workflow
@@ -126,21 +131,25 @@ Gain:
 Semantic versioning with version field:
 
 Example: Use semver in .meta.toml instead of SHA
+
 ```toml
 [metadata]
 version = "1.2.3"
 ```
+
 - Compare version numbers instead of SHAs
 - Check if remote version > local version
 - Download if newer version available
 
 Pros:
+
 - Human-readable versions (v1.2.3 easier to understand)
 - Semantic meaning (major/minor/patch conveys change type)
 - Familiar pattern (developers understand semver)
 - Can detect breaking changes (major version bump)
 
 Cons:
+
 - Manual maintenance required (must remember to bump version)
 - Can be wrong (version bumped but content unchanged, or vice versa)
 - No automatic detection (can't tell if version should change)
@@ -152,16 +161,19 @@ Rejected: SHA is more reliable - automatic, always accurate, no manual maintenan
 Use Tree API for update checking:
 
 Example: Fetch GitHub Tree API instead of index.csv
+
 - Call Tree API to get all file SHAs
 - Compare with cached SHAs
 - Download updates
 
 Pros:
+
 - No index file needed (one less thing to maintain)
 - Always absolutely fresh (direct from GitHub API)
 - Source of truth directly accessed
 
 Cons:
+
 - Counts against rate limit (60/hour anonymous, 5,000/hour authenticated)
 - Slower than raw URL (API overhead)
 - Can hit rate limit with frequent checks
@@ -172,16 +184,19 @@ Rejected: Index.csv via raw URL is more efficient - zero API calls, no rate limi
 Automatic updates to cache:
 
 Example: Auto-update cache on CLI startup or task execution
+
 - Check for updates automatically
 - Download silently in background
 - Keep cache fresh without user action
 
 Pros:
+
 - Always up to date (cache automatically refreshed)
 - No user action needed (convenient)
 - Fresh content always available
 
 Cons:
+
 - Violates no automatic operations principle
 - Surprise network usage (privacy/security concern)
 - Startup delays (checking for updates adds latency)
@@ -193,17 +208,20 @@ Rejected: Violates no automatic operations principle. User control more importan
 Update both cache and config:
 
 Example: Update cache and automatically update user config
+
 - Download new asset version
 - Update cache
 - Update tasks.toml with new content
 - User config always matches cache
 
 Pros:
+
 - Consistent (config always matches latest assets)
 - No manual config updates (automatic sync)
 - Simpler mental model (one source of truth)
 
 Cons:
+
 - Overwrites user customizations (modifications lost)
 - Breaking changes forced (no user control)
 - Surprising behavior (config changes unexpectedly)
@@ -217,6 +235,7 @@ Rejected: Preserving user customizations critical. Cache-only updates keep confi
 Update command:
 
 Syntax: start assets update [query]
+
 - No query: Update all cached assets
 - With query: Update assets matching query (substring matching)
 
@@ -260,29 +279,34 @@ Update algorithm:
 Cache update behavior:
 
 Update cache files:
+
 - Overwrite existing .toml, .md, .meta.toml files
 - Preserve directory structure
 - Update SHA in .meta.toml
 - Update timestamp in .meta.toml
 
 Never modify config:
+
 - ~/.config/start/tasks.toml unchanged
 - ~/.config/start/roles.toml unchanged
 - User customizations preserved
 - User must manually review and apply changes
 
 Effect on config:
+
 - Tasks with prompt_file: Automatically use new content (references cache file)
 - Tasks with inlined prompt: Require manual update (user must copy new content)
 
 Selective updates:
 
 Update all cached assets:
+
 ```bash
 start assets update
 ```
 
 Update assets matching query:
+
 ```bash
 start assets update "commit"             # Match "commit" in name/category/path
 start assets update git-workflow         # Match category
@@ -290,6 +314,7 @@ start assets update pre-commit-review    # Match specific asset name
 ```
 
 Matching algorithm: Substring matching (case-insensitive)
+
 - Search name, category, path
 - Match anywhere in string
 - Returns all matching assets from cache
@@ -297,21 +322,25 @@ Matching algorithm: Substring matching (case-insensitive)
 Error handling:
 
 Network unavailable:
+
 - Message: "Cannot connect to GitHub"
 - Show network error
 - Exit with error code
 
 Asset removed from catalog:
+
 - Warning: "Asset not found in catalog: {name}"
 - Keep cached version (don't delete)
 - Continue with other assets
 
 Invalid SHA in metadata:
+
 - Error: "Invalid SHA in {name}.meta.toml"
 - Skip this asset
 - Suggest: Delete cache and re-download
 
 Partial update failure:
+
 - Update what succeeded
 - Report failures separately
 - Suggest retry

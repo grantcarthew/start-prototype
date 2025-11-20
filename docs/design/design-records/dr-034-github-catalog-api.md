@@ -26,13 +26,15 @@ Use GitHub Tree API for catalog browsing with in-memory caching, raw.githubuserc
 API strategy by operation:
 
 Catalog index download (fast metadata searching):
+
 - Use raw.githubusercontent.com to download assets/index.csv
-- Endpoint: GET https://raw.githubusercontent.com/{owner}/{repo}/main/assets/index.csv
+- Endpoint: GET <https://raw.githubusercontent.com/{owner}/{repo}/main/assets/index.csv>
 - Downloaded fresh on every search/browse operation (no local caching)
 - Not subject to API rate limits
 - Enables fast substring matching across asset metadata
 
 Browsing catalog structure (directory tree, file SHAs):
+
 - Use GitHub Tree API (single call gets entire repository tree)
 - Endpoint: GET /repos/{owner}/{repo}/git/trees/{branch}?recursive=1
 - Returns complete file structure with SHAs and sizes
@@ -41,13 +43,15 @@ Browsing catalog structure (directory tree, file SHAs):
 - Used for resolution and as fallback when index unavailable
 
 Downloading assets (file content):
+
 - Use raw.githubusercontent.com URLs (not subject to API rate limits)
-- Endpoint: GET https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}
+- Endpoint: GET <https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}>
 - Direct HTTP GET, no authentication needed
 - Fallback to Contents API if raw URL fails
 - No rate limit on raw URLs
 
 Update checking (SHA comparison):
+
 - Download index.csv via raw.githubusercontent.com (contains SHAs)
 - Compare index SHAs with cached .meta.toml SHA values
 - No Tree API call needed (index has all SHAs)
@@ -56,12 +60,14 @@ Update checking (SHA comparison):
 In-memory tree cache:
 
 Cache structure:
+
 - Stores GitHub Tree API response
 - Persists for duration of CLI invocation only
 - Cleared when CLI exits
 - Never written to disk
 
 Cache lifecycle:
+
 - Created: First time Tree API accessed (if needed)
 - Used: Fallback when index.csv unavailable, resolution operations
 - Cleared: When CLI exits
@@ -71,6 +77,7 @@ Note: Most operations use index.csv instead of Tree API cache.
 Authentication:
 
 Environment variable: GITHUB_TOKEN
+
 - Optional but recommended
 - Increases rate limit from 60 to 5,000 requests/hour for Tree/Contents APIs
 - Uses standard GitHub authentication header
@@ -80,16 +87,19 @@ Environment variable: GITHUB_TOKEN
 Rate limiting:
 
 Anonymous access:
+
 - Limit: 60 requests/hour for API calls
 - Applies to: Tree API, Contents API
 - Does NOT apply to: raw.githubusercontent.com (index.csv, asset downloads)
 
 Authenticated access (with GITHUB_TOKEN):
+
 - Limit: 5,000 requests/hour for API calls
 - Applies to: Tree API, Contents API
 - Does NOT apply to: raw.githubusercontent.com (index.csv, asset downloads)
 
 Rate limit headers:
+
 - X-RateLimit-Limit: Total limit
 - X-RateLimit-Remaining: Requests remaining
 - X-RateLimit-Reset: Unix timestamp when resets
@@ -169,16 +179,19 @@ Gain:
 Use Tree API for all operations:
 
 Example: Always use Tree API, never use index.csv
+
 - Download tree for every operation
 - Parse tree for metadata
 - No index.csv needed
 
 Pros:
+
 - Single API approach
 - Always has latest data
 - No index maintenance
 
 Cons:
+
 - Counts against rate limit (60/hour anonymous)
 - No description/tags in tree (just file paths and SHAs)
 - Must download .meta.toml files individually for search
@@ -190,16 +203,19 @@ Rejected: Index.csv via raw URL is much more efficient. Zero API calls for searc
 Use Contents API for everything:
 
 Example: Use /repos/{owner}/{repo}/contents/{path} for all operations
+
 - Browse catalog: Recursive calls to get directory structure
 - Download assets: Get base64-encoded content from API
 - Update checking: Get file metadata for SHAs
 
 Pros:
+
 - Single API to learn and use
 - Consistent approach
 - All operations authenticated same way
 
 Cons:
+
 - Multiple API calls to browse (one per directory level)
 - Downloads count against rate limit (60/hour anonymous)
 - Base64 decoding overhead (extra processing)
@@ -212,16 +228,19 @@ Rejected: Raw URLs + index.csv is much more efficient. Zero API calls for most o
 Clone repository with git:
 
 Example: Use git clone or git archive to get catalog
+
 - Clone full repository
 - Read files from disk
 - Use git for updates
 
 Pros:
+
 - Complete offline catalog (all files local)
 - No API calls after initial clone
 - Can use git for version control
 
 Cons:
+
 - Requires git binary (external dependency)
 - Large initial download (entire repository)
 - Disk space overhead (full git history)
@@ -233,15 +252,18 @@ Rejected: Too heavy for simple asset catalog. Raw URLs + index.csv is lighter an
 Cache index.csv locally:
 
 Example: Save index.csv to ~/.cache/start/index.csv with TTL
+
 - Download once, reuse for period
 - Refresh after TTL expires
 
 Pros:
+
 - Fewer downloads (reuse cached index)
 - Faster for repeated operations
 - Could work partially offline
 
 Cons:
+
 - Stale data possible (cache may be outdated)
 - Cache invalidation complexity (when to refresh?)
 - Index shows old assets (confusing)
@@ -254,25 +276,29 @@ Rejected: Always-fresh data preferred. Index is small (~10-50KB) and downloads f
 GitHub API endpoints:
 
 Index download (primary for search/browse):
-- Endpoint: GET https://raw.githubusercontent.com/{owner}/{repo}/main/assets/index.csv
+
+- Endpoint: GET <https://raw.githubusercontent.com/{owner}/{repo}/main/assets/index.csv>
 - Returns: CSV with asset metadata (type, category, name, description, tags, sha, etc.)
 - Rate limit: None (not subject to API limits)
 - Use: Catalog searching, browsing, update checking
 
 Raw content (asset downloads):
-- Endpoint: GET https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}
+
+- Endpoint: GET <https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}>
 - Returns: Plain text file content (no encoding)
 - Rate limit: None (not subject to API limits)
 - Use: Primary method for downloading assets
 
 Tree API (fallback for structure):
-- Endpoint: GET https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1
+
+- Endpoint: GET <https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1>
 - Returns: Complete file tree with paths, SHAs, sizes, types
 - Rate limit: 60/hour anonymous, 5,000/hour authenticated
 - Use: Fallback when index.csv unavailable, in-memory cache for session
 
 Contents API (fallback for downloads):
-- Endpoint: GET https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch}
+
+- Endpoint: GET <https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch}>
 - Returns: File metadata plus base64-encoded content
 - Rate limit: 60/hour anonymous, 5,000/hour authenticated
 - Use: Fallback when raw URL fails
@@ -280,17 +306,20 @@ Contents API (fallback for downloads):
 In-memory tree cache:
 
 Lifecycle:
+
 - Created if Tree API accessed (rare - most operations use index)
 - Persists for duration of process only
 - Cleared when CLI exits
 - Never saved to disk
 
 Usage:
+
 - Fallback when index.csv unavailable
 - Resolution operations if tree already fetched
 - All operations prefer index.csv first
 
 Benefits:
+
 - Rarely needed (index.csv handles most cases)
 - Zero disk I/O
 - Simple lifecycle management
@@ -298,6 +327,7 @@ Benefits:
 Authentication:
 
 Environment variable: GITHUB_TOKEN
+
 - Hardcoded (not configurable)
 - Optional but recommended for power users
 - Standard across GitHub tooling
@@ -305,11 +335,13 @@ Environment variable: GITHUB_TOKEN
 - Not needed for raw URLs (index.csv, asset downloads)
 
 Rate limits:
+
 - Anonymous: 60 requests/hour (Tree/Contents API only)
 - Authenticated: 5,000 requests/hour (Tree/Contents API only)
 - Raw URLs: Unlimited (index.csv, asset downloads)
 
 Configuration (config.toml):
+
 ```toml
 [settings]
 asset_repo = "grantcarthew/start"  # GitHub repository
@@ -318,24 +350,29 @@ asset_repo = "grantcarthew/start"  # GitHub repository
 Download strategy:
 
 For index.csv:
+
 1. Always use raw.githubusercontent.com
 2. No fallback needed (if unavailable, use Tree API for structure)
 
 For assets:
+
 1. Primary: raw.githubusercontent.com (no rate limit, direct content)
 2. Fallback: Contents API (if raw fails, base64 decode)
 
 For catalog structure:
+
 1. Primary: index.csv via raw URL (contains all metadata)
 2. Fallback: Tree API (if index unavailable)
 
 Rate limit handling:
 
 Check headers in API responses:
+
 - X-RateLimit-Remaining: Requests left
 - X-RateLimit-Reset: When limit resets
 
 Error on limit exceeded:
+
 - Show requests used (e.g., 60/60)
 - Show reset time (e.g., "in 45 minutes")
 - Suggest GITHUB_TOKEN for higher limits
@@ -344,23 +381,27 @@ Error on limit exceeded:
 Error handling:
 
 Rate limit exceeded (rare - most operations use raw URLs):
+
 - Message: "GitHub rate limit exceeded"
 - Show: Requests used, reset time
 - Solutions: Set GITHUB_TOKEN, wait, use cached assets
 - Note: Search/browse/download don't count against limits
 
 Network error:
+
 - Message: "Cannot connect to GitHub"
 - Show: Network error details
 - Solution: Check internet connection
 
 Authentication error:
+
 - Warning: "GITHUB_TOKEN authentication failed"
 - Fallback: Use anonymous access (60 requests/hour)
-- Solution: Check token format (should start with ghp_ or github_pat_)
+- Solution: Check token format (should start with ghp_or github_pat_)
 - Note: Raw URLs work without authentication
 
 Index unavailable:
+
 - Fallback to Tree API automatically
 - Warning: "Index unavailable, using directory listing (limited metadata)"
 - Continue with degraded search (name/path only, no descriptions/tags)
@@ -459,6 +500,7 @@ Found 3 matches:
 API call comparison:
 
 Without index.csv:
+
 ```bash
 # Search catalog: 1 Tree API call + N .meta.toml downloads
 # Browse catalog: 1 Tree API call + N .meta.toml downloads
@@ -468,6 +510,7 @@ Without index.csv:
 ```
 
 With index.csv (current design):
+
 ```bash
 # Search catalog: 0 API calls (index via raw URL)
 # Browse catalog: 0 API calls (index via raw URL)

@@ -8,10 +8,10 @@
 
 When a configuration file (global or local) references assets in the asset cache (`~/.config/start/assets/...`), the referenced content files may be missing. This happens when:
 
-1.  **Cloning a project**: Local config (`./.start/`) exists, but cache is empty.
-2.  **Restoring backups**: Global config (`~/.config/start/`) restored, but cache excluded.
-3.  **Sharing configs**: Copying a `tasks.toml` to another machine.
-4.  **Cache clearing**: Accidental deletion of the `assets/` directory.
+1. **Cloning a project**: Local config (`./.start/`) exists, but cache is empty.
+2. **Restoring backups**: Global config (`~/.config/start/`) restored, but cache excluded.
+3. **Sharing configs**: Copying a `tasks.toml` to another machine.
+4. **Cache clearing**: Accidental deletion of the `assets/` directory.
 
 This issue affects any referenced asset file, including:
 
@@ -91,16 +91,20 @@ Gain:
 **Scenario:**
 
 1. `tasks.toml` has:
+
    ```toml
    [tasks.code-review]
    prompt_file = "~/.config/start/assets/tasks/git/review.md"
    role = "reviewer"
    ```
+
 2. `roles.toml` (referenced by "reviewer") has:
+
    ```toml
    [roles.reviewer]
    file = "~/.config/start/assets/roles/general/reviewer.md"
    ```
+
 3. Both `.md` files are missing from disk.
 
 **Behavior:**

@@ -37,21 +37,25 @@ First match wins - no merging, no fallback to next level once found.
 Download control:
 
 Configuration setting (config.toml):
+
 ```toml
 [settings]
 asset_download = true  # Default: auto-download from GitHub
 ```
 
 Behavior:
+
 - asset_download = true: Auto-download if asset not found in config/cache
 - asset_download = false: Fail if asset not found in config/cache
 
 Command-line flag override:
+
 ```bash
 start task <name> --asset-download[=bool] --local
 ```
 
 Flag precedence:
+
 - Flag explicitly set: use flag value
 - Flag not set: use asset_download setting
 - Setting not set: default to true
@@ -59,12 +63,14 @@ Flag precedence:
 Scope control:
 
 Downloaded assets added to config:
+
 - Default: global config (~/.config/start/tasks.toml)
 - With --local flag: local config (.start/tasks.toml)
 
 Cache behavior:
 
 Cached assets:
+
 - Used immediately without prompting
 - Cache is transparent implementation detail
 - No user interaction needed
@@ -74,6 +80,7 @@ Resolution vs discovery:
 This resolution applies to command execution (running tasks, roles, agents, contexts).
 
 Asset discovery commands (start assets search/browse/info) work differently:
+
 - Purpose: Find assets in catalog (explore what's available)
 - Search sources: GitHub catalog only (not local/global/cache)
 - Match algorithm: Substring matching (name, description, tags)
@@ -169,16 +176,19 @@ Gain:
 Merge config sources instead of first-match-wins:
 
 Example: Combine local + global configs
+
 - Local config provides overrides (command, prompt)
 - Global config provides defaults (agent, role)
 - Merge fields from both sources
 
 Pros:
+
 - More flexible (partial overrides possible)
 - Could reuse global defaults with local tweaks
 - Finer-grained control
 
 Cons:
+
 - Complex merging logic (which fields merge, which override?)
 - Unclear precedence (is local command used with global agent?)
 - Harder to reason about (where did this value come from?)
@@ -190,16 +200,19 @@ Rejected: First-match-wins is simpler and more predictable. Users can copy entir
 Always auto-download without control:
 
 Example: No asset_download setting, always download
+
 - Asset not found in config/cache: download automatically
 - No user control over downloads
 - Always fetch from GitHub when needed
 
 Pros:
+
 - Simpler (no setting to configure)
 - Always works (users get assets automatically)
 - No "download disabled" errors
 
 Cons:
+
 - Unexpected network calls (privacy/security concern)
 - No control for restricted environments (corporate firewalls)
 - Can't disable for offline work
@@ -210,16 +223,19 @@ Rejected: User control over network important. Some environments require explici
 Never auto-download:
 
 Example: Always require explicit start assets add
+
 - No automatic downloads ever
 - Users must browse catalog and explicitly add
 - More manual workflow
 
 Pros:
+
 - Very explicit (user controls everything)
 - No surprise downloads
 - Clear when network used
 
 Cons:
+
 - Friction for common workflows (must add before use)
 - Worse UX (extra steps for common tasks)
 - Can't discover assets during execution
@@ -230,15 +246,18 @@ Rejected: Lazy loading with download control provides better UX while maintainin
 Search all sources for discovery:
 
 Example: start assets search queries local + global + cache + GitHub
+
 - Shows assets from all locations
 - Comprehensive search results
 
 Pros:
+
 - See everything in one search
 - Discover what's already configured
 - Comprehensive results
 
 Cons:
+
 - Confusing (user already knows what's configured)
 - Mixing exploration with status check
 - Different mental models (discovering vs reviewing)
@@ -287,6 +306,7 @@ Priority order (first match wins):
 Download behavior:
 
 When asset found in GitHub:
+
 - Download all asset files (.toml, .md, .meta.toml)
 - Cache to ~/.config/start/assets/{type}/{category}/
 - Add to config (global or local based on --local flag)
@@ -296,6 +316,7 @@ When asset found in GitHub:
 Cache lookup:
 
 Pattern: ~/.config/start/assets/{type}/*/{name}.toml
+
 - Type is known (tasks, roles, agents, contexts)
 - Category is unknown (user doesn't specify it)
 - Glob all categories to find match
@@ -304,11 +325,13 @@ Pattern: ~/.config/start/assets/{type}/*/{name}.toml
 Config addition:
 
 Scope determination:
+
 - Default: global (~/.config/start/tasks.toml)
 - With --local flag: local (.start/tasks.toml)
 - Local requires existing .start/ directory
 
 Add to config:
+
 - Load existing config TOML
 - Add asset entry (inline all content)
 - Write back to file
@@ -317,11 +340,13 @@ Add to config:
 Flag precedence:
 
 asset_download determination:
+
 1. If --asset-download flag provided: use flag value
 2. Else if config.toml [settings] asset_download set: use setting value
 3. Else: default to true
 
 Examples:
+
 - No setting, no flag: true (default)
 - Setting false, no flag: false
 - Setting false, flag true: true (flag wins)
@@ -330,6 +355,7 @@ Examples:
 Resolution vs discovery distinction:
 
 Resolution (this DR):
+
 - Purpose: Execute configured asset
 - Commands: start task <name>, start --role <name>
 - Search sources: Local → Global → Cache → GitHub
@@ -338,6 +364,7 @@ Resolution (this DR):
 - Uses index.csv: No
 
 Discovery (DR-039, DR-040, DR-041):
+
 - Purpose: Find assets in catalog
 - Commands: start assets search, start assets browse
 - Search sources: GitHub catalog only
@@ -476,6 +503,7 @@ Note: Local config checked first, no cache or GitHub lookup needed.
 Behavior matrix examples:
 
 Setting true, no flag:
+
 ```bash
 # asset_download = true in config.toml [settings]
 $ start task new-task
@@ -483,6 +511,7 @@ $ start task new-task
 ```
 
 Setting false, no flag:
+
 ```bash
 # asset_download = false in config.toml [settings]
 $ start task new-task
@@ -490,6 +519,7 @@ $ start task new-task
 ```
 
 Setting false, flag true:
+
 ```bash
 # asset_download = false in config.toml [settings]
 $ start task new-task --asset-download
@@ -497,6 +527,7 @@ $ start task new-task --asset-download
 ```
 
 Setting true, flag false:
+
 ```bash
 # asset_download = true in config.toml [settings]
 $ start task new-task --asset-download=false
@@ -504,6 +535,7 @@ $ start task new-task --asset-download=false
 ```
 
 Add to local with flag:
+
 ```bash
 $ start task new-task --asset-download --local
 # Downloads and adds to .start/tasks.toml

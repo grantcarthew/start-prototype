@@ -16,6 +16,7 @@ start assets update <query>    # Update matching assets
 Check for updates to cached assets and download new versions from the GitHub catalog. Compares local asset SHAs with catalog SHAs to detect changes. Updates only the asset cache, never modifies user configuration files.
 
 **Update process:**
+
 1. Fetch catalog tree from GitHub (contains SHAs for all files)
 2. Find all cached assets (`.meta.toml` files in cache)
 3. Compare local SHA with catalog SHA for each asset
@@ -34,6 +35,7 @@ Check for updates to cached assets and download new versions from the GitHub cat
 **With query** - Update only assets matching the query (name, path, category)
 
 **Query matching:**
+
 - Case-insensitive substring match
 - Searches: asset name, path, category
 - Same matching algorithm as `start assets search`
@@ -67,10 +69,12 @@ Check for updates to cached assets and download new versions from the GitHub cat
 ### What Gets Updated
 
 **Updated:**
+
 - Asset files in `~/.config/start/assets/`
 - `.meta.toml` files (SHA, updated timestamp)
 
 **Not Updated:**
+
 - `~/.config/start/*.toml` (configuration files)
 - `./.start/*.toml` (local configuration)
 - User-created custom assets
@@ -78,11 +82,13 @@ Check for updates to cached assets and download new versions from the GitHub cat
 ### SHA-Based Version Detection
 
 **Git blob SHA as version:**
+
 - No semantic versioning (no v1.0.0, etc.)
 - Git blob SHA uniquely identifies file content
 - SHA mismatch = content changed = update available
 
 **Metadata tracking:**
+
 ```toml
 # .meta.toml file
 sha = "a1b2c3d4e5f6..."  # Git blob SHA
@@ -470,12 +476,14 @@ start assets update "problematic-asset" --force
 ### vs `start assets add`
 
 **`start assets update`** - Updates existing cached assets
+
 ```bash
 start assets update
 # Only updates assets already in cache
 ```
 
 **`start assets add`** - Adds new assets from catalog
+
 ```bash
 start assets add "new-asset"
 # Downloads and installs new asset
@@ -488,6 +496,7 @@ Update maintains existing, add acquires new.
 **Asset repository:**
 
 In `~/.config/start/config.toml`:
+
 ```toml
 [settings]
 asset_repo = "grantcarthew/start"    # Default
@@ -497,6 +506,7 @@ asset_repo = "grantcarthew/start"    # Default
 **No automatic update checks:**
 
 Updates are **manual only**:
+
 - No automatic checks on CLI startup
 - No background update checking
 - User must explicitly run `start assets update`
@@ -508,10 +518,12 @@ Updates are **manual only**:
 **Critical behavior:** Config files (`*.toml`) are **never automatically changed**.
 
 **What updates:**
+
 - Asset files in cache: `~/.config/start/assets/**/*`
 - Metadata files: `*.meta.toml`
 
 **What doesn't update:**
+
 - `~/.config/start/tasks.toml`
 - `~/.config/start/roles.toml`
 - `./.start/*.toml`
@@ -521,6 +533,7 @@ Updates are **manual only**:
 ### Referenced vs Inlined Content
 
 **File-referenced assets (automatic update):**
+
 ```toml
 [tasks.my-task]
 file = "~/.config/start/assets/tasks/my-category/my-task.toml"
@@ -528,6 +541,7 @@ file = "~/.config/start/assets/tasks/my-category/my-task.toml"
 ```
 
 **Inlined content (manual update required):**
+
 ```toml
 [tasks.my-task]
 prompt = """
@@ -541,11 +555,13 @@ Content copied from asset...
 ### SHA-Based Versioning
 
 **No semantic versions:**
+
 - No v1.0.0, v2.0.0
 - Git blob SHA is the version
 - SHA change = content changed
 
 **Why SHAs:**
+
 - Uniquely identifies content
 - No version number maintenance
 - Git-native approach
@@ -553,11 +569,13 @@ Content copied from asset...
 ### Custom Assets Skipped
 
 **User-created assets** (not from catalog):
+
 - Stored in cache but not in catalog
 - Skipped during update (no catalog entry)
 - Warning displayed
 
 **Example:**
+
 ```
 ⚠ tasks/custom/my-task not found in catalog (skipped)
 ```
@@ -565,6 +583,7 @@ Content copied from asset...
 ### Network Required
 
 Requires network access to:
+
 - Fetch catalog tree from GitHub
 - Download updated asset files
 
@@ -575,6 +594,7 @@ Requires network access to:
 **No automatic checks** - User decides when to update.
 
 **Recommended frequency:**
+
 - Weekly for active users
 - Monthly for occasional users
 - Before important work
@@ -583,11 +603,13 @@ Requires network access to:
 ### Performance
 
 **Typical update check:**
+
 - Fetch Tree API: ~100-200ms
 - Compare SHAs: <10ms per asset
 - Download (if needed): ~50-100ms per file
 
 **Example (12 cached assets, 2 updates):**
+
 - Fetch tree: 150ms
 - Compare 12 SHAs: 10ms
 - Download 2 assets: 200ms
@@ -613,11 +635,13 @@ grep updated ~/.config/start/assets/tasks/**/*.meta.toml
 ### Substring Matching for Selective Updates
 
 Query uses substring matching:
+
 - Minimum 3 characters
 - Case-insensitive
 - Matches name, path, category
 
 **Examples:**
+
 - `"commit"` - Matches all commit-related assets
 - `"git-workflow"` - Matches all in category
 - `"pre-commit-review"` - Matches specific asset

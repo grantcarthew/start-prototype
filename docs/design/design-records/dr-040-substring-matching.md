@@ -29,12 +29,14 @@ Case sensitivity: Case-insensitive matching (normalize to lowercase)
 Minimum length: 3 characters minimum (prevents overly broad matches)
 
 Search fields (in order):
+
 1. Name: Asset filename without extension
 2. Full path: Complete path including type and category
 3. Description: Human-readable summary
 4. Tags: Metadata keywords (semicolon-separated in index.csv)
 
 Match priority: All matches returned, sorted by relevance
+
 - Exact name matches (highest)
 - Name substring matches
 - Path matches
@@ -45,23 +47,28 @@ Match priority: All matches returned, sorted by relevance
 Multiple match handling:
 
 Interactive (TTY):
+
 - Display tree-structured selection menu with numbers
 - User selects by number or quits
 - Shows type/category grouping for clarity
 
 Non-interactive (piped or --non-interactive flag):
+
 - List all matches and exit with code 0
 - No interactive prompt
 - Machine-readable output
 
 Single match:
+
 - Auto-select in interactive mode
 - Proceed to action (add/info/etc)
 
 No matches:
+
 - Error with suggestions (check spelling, try shorter query, use browse)
 
 Query too short (< 3 chars):
+
 - Error: "Query too short (minimum 3 characters)"
 - Suggest using start assets browse for exploration
 
@@ -151,17 +158,20 @@ Gain:
 Prefix matching for search:
 
 Example: Only match beginning of strings
+
 ```bash
 start assets search "commit"   # Matches commit-message, NOT pre-commit-review
 start assets search "pre"       # Matches pre-commit-review
 ```
 
 Pros:
+
 - Faster (can short-circuit on first character mismatch)
 - More predictable (only matches beginning)
 - Simpler algorithm
 
 Cons:
+
 - Less discoverable (must know how names start)
 - Poor for category search (workflow doesn't find git-workflow)
 - Poor for description search (can't search content)
@@ -172,17 +182,20 @@ Rejected: Substring matching much better for discovery. Prefix matching availabl
 Fuzzy matching with typo tolerance:
 
 Example: Use Levenshtein distance for "did you mean?"
+
 ```bash
 start assets search "comit"     # Did you mean "commit"?
 start assets search "reviw"     # Did you mean "review"?
 ```
 
 Pros:
+
 - Typo-tolerant (helps with spelling mistakes)
 - Better UX (users don't need perfect spelling)
 - Discoverable (suggests corrections)
 
 Cons:
+
 - More complex (Levenshtein distance calculation)
 - False positives possible (wrong suggestions)
 - Performance impact (more computation)
@@ -193,16 +206,19 @@ Rejected: Keep v1 simple. Substring matching with clear error messages sufficien
 No minimum query length:
 
 Example: Allow 1 or 2 character queries
+
 ```bash
 start assets search "a"   # Returns 50% of catalog
 start assets search "ab"  # Still very broad
 ```
 
 Pros:
+
 - More flexible (no artificial restriction)
 - Users can try any query
 
 Cons:
+
 - Overly broad matches (too many results)
 - Poor UX (overwhelming result lists)
 - Performance impact (searching for short strings)
@@ -213,16 +229,19 @@ Rejected: 3-character minimum better UX. Prevents garbage matches. Users can use
 Advanced ranking (TF-IDF, popularity):
 
 Example: Score results by frequency, usage stats
+
 - Boost frequently used assets
 - Weight by how unique terms are
 - Consider user's past usage
 
 Pros:
+
 - Better relevance (most useful results first)
 - Learns from usage patterns
 - More sophisticated
 
 Cons:
+
 - Complex implementation (TF-IDF calculation, usage tracking)
 - Requires usage analytics (privacy concerns)
 - More state to manage (statistics)
@@ -233,6 +252,7 @@ Rejected: Simple field-based priority sufficient for v1. Alphabetical within lev
 Query language with filters:
 
 Example: Support structured queries
+
 ```bash
 start assets search "type:tasks tag:git"
 start assets search "commit AND review"
@@ -240,11 +260,13 @@ start assets search "category:git-workflow"
 ```
 
 Pros:
+
 - More powerful (precise queries)
 - Advanced users can be specific
 - Boolean operators (AND, OR, NOT)
 
 Cons:
+
 - Complex to implement (query parser)
 - Harder to use (learning curve)
 - Over-engineering for v1 (most users just want simple search)
@@ -257,11 +279,13 @@ Rejected: Simple substring search better for v1. Keep it simple. Add query langu
 Substring matching algorithm:
 
 Match criteria:
+
 - Query found anywhere in search field (not just beginning)
 - Case-insensitive comparison (normalize to lowercase)
 - Minimum 3 characters (error if < 3)
 
 Search fields in priority order:
+
 1. Name (exact match): Highest priority, exact string equality
 2. Name (substring): High priority, query anywhere in name
 3. Full path: Medium priority, includes type/category/name
@@ -269,6 +293,7 @@ Search fields in priority order:
 5. Tags: Lowest priority, metadata keywords
 
 Result sorting:
+
 - Group by match field (name > path > description > tag)
 - Within group: alphabetical by asset name
 - Exact name matches always first
@@ -276,11 +301,13 @@ Result sorting:
 Data sources:
 
 Primary: assets/index.csv (via raw.githubusercontent.com)
+
 - Contains name, path, description, tags
 - Enables rich multi-field search
 - Fast in-memory search after download
 
 Fallback: GitHub Tree API
+
 - Contains name, path only (no description/tags)
 - Limited search capability
 - Degraded but functional
@@ -288,6 +315,7 @@ Fallback: GitHub Tree API
 Interactive display:
 
 Tree structure (TTY):
+
 ```
 Found N matches:
 
@@ -306,6 +334,7 @@ Select asset [1-N] (or 'q' to quit): _
 ```
 
 List format (non-interactive):
+
 ```
 Found N matches:
 
@@ -318,11 +347,13 @@ type2/category3/asset-name4
 Error handling:
 
 Query too short (<3 chars):
+
 - Message: "Query too short (minimum 3 characters)"
 - Suggestion: "Use 'start assets browse' for interactive browsing"
 - Exit code: 1
 
 No matches found:
+
 - Message: "No matches found for '{query}'"
 - Suggestions:
   - Check spelling
@@ -332,11 +363,13 @@ No matches found:
 - Exit code: 1
 
 Single match (auto-select in TTY):
+
 - Message: "Found 1 match (exact): {path}"
 - Message: "✓ Auto-selected"
 - Proceed to action
 
 Multiple matches (interactive):
+
 - Display tree structure
 - Prompt for selection
 - Validate input
@@ -345,21 +378,25 @@ Multiple matches (interactive):
 Commands using substring matching:
 
 start assets search <query>:
+
 - Search and display results
 - Returns all matches with metadata
 - Exit after display
 
 start assets add <query>:
+
 - Search for asset
 - Interactive selection if multiple matches
 - Download and install selected
 
 start assets info <query>:
+
 - Search for asset
 - Display detailed information
 - Show .meta.toml contents
 
 start assets update <query>:
+
 - Search installed assets
 - Check for updates
 - Download new versions
@@ -370,6 +407,7 @@ Full path format: {type}/{category}/{name}
 Example: tasks/git-workflow/pre-commit-review
 
 Matches:
+
 - git-workflow (category name)
 - tasks/git (type + category prefix)
 - workflow/pre (category + name prefix)
@@ -384,12 +422,14 @@ Return true if any tag contains query substring
 Performance:
 
 Best case (with index):
+
 - Download index.csv: ~50-100ms
 - Parse CSV: ~5-10ms
 - In-memory search: <1ms
 - Total: ~60-110ms
 
 Worst case (fallback to Tree API):
+
 - Tree API call: ~100-200ms
 - Parse response: ~10-20ms
 - Path-only search: <1ms

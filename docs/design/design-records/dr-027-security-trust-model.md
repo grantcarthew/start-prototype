@@ -126,16 +126,19 @@ Gain:
 Cryptographic signature verification:
 
 Example approaches:
+
 - GPG-signed commits (git verify-commit)
 - Individual file signatures (detached .sig files)
 - Signed release tags
 
 Pros:
+
 - Cryptographic proof of authenticity
 - Detect compromised repository or man-in-the-middle attacks
 - Industry best practice for security-critical software
 
 Cons:
+
 - Key management complexity (distribution, storage, rotation, revocation)
 - Public key distribution problem (how do users get the trusted key?)
 - Signature verification can fail (expired keys, clock skew, key rotation issues)
@@ -144,22 +147,25 @@ Cons:
 - More code to audit and maintain
 - Additional dependencies and failure modes
 
-Rejected: Complexity and failure modes outweigh benefits for non-executable content. HTTPS provides adequate security for markdown and TOML files.
+Rejected: Complexity and failure modes outweigh benefits for non-executable content. HTTPS provides adequate security for Markdown and TOML files.
 
 Commit pinning with SHA references:
 
 Example: Config specifies exact commit SHA to download
+
 ```toml
 [settings]
 asset_commit = "abc123def456..."
 ```
 
 Pros:
+
 - Reproducible asset versions (same SHA = same content)
 - Users can choose when to update (explicit SHA change)
 - Protection against unexpected changes
 
 Cons:
+
 - Users must manually update commit SHAs (friction)
 - Reduces benefit of "always latest" design
 - False sense of security (still trusting GitHub and HTTPS)
@@ -172,6 +178,7 @@ Rejected: User controls update timing already (user-initiated updates only). SHA
 Multiple trusted repositories with fallbacks:
 
 Example: Try official repo, fallback to mirrors
+
 ```go
 repos := []string{
     "github.com/grantcarthew/start",
@@ -181,11 +188,13 @@ repos := []string{
 ```
 
 Pros:
+
 - Availability if one source is down
 - Reduced dependency on single platform
 - Geographic distribution
 
 Cons:
+
 - Multiple sources to trust and secure
 - Synchronization complexity (which is canonical?)
 - Authentication complexity (trust all equally?)
@@ -200,6 +209,7 @@ Rejected: Single trusted source is simpler and more secure. GitHub availability 
 Hardcoded repository configuration:
 
 Repository constants (compile-time, not configurable):
+
 - Repository: github.com/grantcarthew/start
 - Branch: main
 - No environment variable override
@@ -235,7 +245,7 @@ Threats accepted:
    - Accepted: Yes (acceptable dependency, industry standard)
 
 3. Malicious asset content:
-   - Threat: Malicious TOML/markdown content in assets
+   - Threat: Malicious TOML/Markdown content in assets
    - Mitigation: Users review before using, no auto-execution, inspectable content
    - Residual risk: Low (content is visible, not auto-executed)
    - Accepted: Yes (users responsible for reviewing templates)
@@ -249,12 +259,14 @@ Threats accepted:
 Download process security:
 
 HTTPS download:
+
 - System certificate store for verification (standard library http.Client)
 - No custom certificate pinning
 - 30-second timeout for network calls
 - GitHub API over HTTPS
 
 Atomic installation:
+
 - Download to temporary location
 - Verify download completed successfully
 - Move to final location atomically
@@ -263,12 +275,14 @@ Atomic installation:
 User inspection capabilities:
 
 Asset transparency:
+
 - All assets visible in local cache directory
 - Users can read any asset file
 - Users can review GitHub commit history
 - Users can compare local vs remote versions
 
 Update control:
+
 - User-initiated updates only (no automatic downloads)
 - Users decide when to update
 - Users can inspect changes before updating
@@ -305,21 +319,24 @@ start assets update
 Comparison with other tools:
 
 Similar trust model (HTTPS only):
+
 - Homebrew: Trusts GitHub, HTTPS, no signatures on formulae
 - npm: Trusts registry, HTTPS (optional signatures available)
 - cargo: Trusts crates.io, HTTPS, checksums only
 - pip: Trusts PyPI, HTTPS (optional GPG verification)
 
 More paranoid (signatures required):
+
 - apt/yum: GPG signatures on packages (system packages, executables)
 - Arch pacman: Package signing required (system binaries)
 - Signal: Binary transparency, reproducible builds (privacy-critical)
 - Tor: Multi-signature releases (security-critical software)
 
 Our position:
+
 - More like Homebrew (content packages, not executables)
 - Less like apt (text templates, not system binaries)
-- Appropriate for markdown/TOML asset distribution
+- Appropriate for Markdown/TOML asset distribution
 
 ## Updates
 

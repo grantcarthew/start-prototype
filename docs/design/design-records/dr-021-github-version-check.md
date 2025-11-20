@@ -26,6 +26,7 @@ Check GitHub Releases API for latest CLI version on every execution of `start do
 API endpoint: `GET /repos/grantcarthew/start/releases/latest`
 
 Version checks occur:
+
 - `start doctor` - as part of health check
 - `start assets update` - after updating cached assets
 
@@ -186,6 +187,7 @@ GET /repos/grantcarthew/start/releases/latest
 ```
 
 Response:
+
 ```json
 {
   "tag_name": "v1.3.0",
@@ -212,6 +214,7 @@ Rate limiting strategy:
 ```
 
 Authentication:
+
 - Respects `GH_TOKEN` environment variable
 - Anonymous: 60 requests/hour
 - Authenticated: 5000 requests/hour
@@ -297,24 +300,28 @@ CLI Version Check:
 Build type handling:
 
 Release build:
+
 ```
 Current: v1.2.3
 Status: ✓ Up to date
 ```
 
 Development build:
+
 ```
 Current: v1.2.3-5-gabc1234 (development build)
 Status: ✓ Base version up to date
 ```
 
 Dirty build:
+
 ```
 Current: v1.2.3-dirty (uncommitted changes)
 Status: ✓ Up to date
 ```
 
 Ahead of release:
+
 ```
 Current: v1.4.0-dirty
 Latest:  v1.3.0

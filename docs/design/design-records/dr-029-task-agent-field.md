@@ -113,17 +113,20 @@ Gain:
 Agent field in settings section only:
 
 Example: Only default_agent in settings, no per-task agent
+
 ```toml
 [settings]
 default_agent = "claude"
 ```
 
 Pros:
+
 - Simpler configuration (one place to set agent)
 - Consistent agent usage across all tasks
 - No per-task complexity
 
 Cons:
+
 - No per-task customization or optimization
 - Can't use specialized agents for specific workflows
 - Must use --agent flag for every specialized task
@@ -134,14 +137,17 @@ Rejected: Per-task optimization is valuable. Some tasks genuinely work better wi
 Load-time validation:
 
 Example: Validate agent exists when loading task config
+
 - Fail to load tasks.toml if agent reference invalid
 - Error message immediately on start
 
 Pros:
+
 - Immediate feedback about configuration problems
 - Clear error before attempting to use task
 
 Cons:
+
 - Prevents sharing task configs across machines
 - Breaks if agent not yet installed (even if not using that task)
 - Must install all referenced agents before config loads
@@ -152,6 +158,7 @@ Rejected: Execution-time validation enables sharing. Better to fail at use with 
 Complex agent configuration in task:
 
 Example: Embed agent details directly in task
+
 ```toml
 [tasks.go-review]
 agent.bin = "claude"
@@ -160,11 +167,13 @@ agent.models.sonnet = "claude-3-7-sonnet-20250219"
 ```
 
 Pros:
+
 - Self-contained task definition
 - No dependency on agent configuration
 - Explicit about what agent is used
 
 Cons:
+
 - Duplicates agent config in multiple places
 - Hard to maintain (change agent = update all tasks)
 - Verbose and complex task definitions
@@ -175,17 +184,20 @@ Rejected: Keep agent details in [agents.<name>] section. Tasks just reference by
 Multiple agents with fallback chain:
 
 Example: Specify primary and fallback agents
+
 ```toml
 [tasks.go-review]
 agents = ["go-expert", "claude", "gemini"]  # Try in order
 ```
 
 Pros:
+
 - Automatic fallback if preferred agent not available
 - More resilient to missing agents
 - Tasks can work across different machine configs
 
 Cons:
+
 - Over-engineered for current needs
 - Adds complexity to precedence rules
 - Unclear which agent actually ran
@@ -198,6 +210,7 @@ Rejected: Single agent + CLI override is sufficient. Can add later if users requ
 Agent field in task configuration:
 
 Field specification:
+
 - Field name: agent
 - Type: string (optional)
 - Value: Name reference to [agents.<name>] section
@@ -206,6 +219,7 @@ Field specification:
 - When validated: Execution time, doctor, config validate
 
 Complete task example:
+
 ```toml
 [tasks.go-review]
 agent = "go-expert"              # Optional: Preferred agent
@@ -243,11 +257,13 @@ Priority order (highest to lowest):
 Scope and merge behavior:
 
 Task agent field follows standard task merge:
+
 - Local task completely overrides global task (same name)
 - Entire task replaced, including agent field
 - No field-level merging between global and local
 
 Example:
+
 ```toml
 # Global: ~/.config/start/tasks.toml
 [tasks.code-review]
@@ -265,16 +281,19 @@ Result: Local task completely replaces global (agent is "go-expert")
 Validation behavior:
 
 Execution time (start task go-review):
+
 - Check if agent exists when task runs
 - Error if agent not found
 - Exit code: 2 (agent error)
 
 Doctor check (start doctor):
+
 - Validates all tasks with agent field
 - Reports undefined agents with fix suggestions
 - Exit code: 1 if validation errors
 
 Config validate (start config validate):
+
 - Reports all tasks with undefined agents
 - Shows which agents are missing
 - Exit code: 1 if validation errors

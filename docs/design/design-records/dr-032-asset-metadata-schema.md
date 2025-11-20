@@ -25,6 +25,7 @@ Use sidecar .meta.toml files for asset metadata with 6 required fields, deriving
 Sidecar metadata approach:
 
 Each catalog asset has a separate metadata file:
+
 ```
 assets/tasks/git-workflow/
 ├── pre-commit-review.toml        # Asset content
@@ -56,6 +57,7 @@ Field definitions:
 Category derived from filesystem:
 
 No category field in metadata - derive from directory structure:
+
 ```
 assets/tasks/git-workflow/pre-commit-review.toml
        ^     ^
@@ -141,6 +143,7 @@ Gain:
 Frontmatter in content files:
 
 Example: Embed metadata in content files
+
 ```toml
 # pre-commit-review.toml
 [metadata]
@@ -153,14 +156,16 @@ tags = ["git", "review"]
 ```
 
 Pros:
+
 - Single file per asset (simpler file management)
 - Metadata and content together (no separate file to maintain)
 - Fewer files in repository
 
 Cons:
+
 - Content files cluttered with metadata (AI processes metadata too)
 - Risk of corrupting content when updating metadata
-- Inconsistent across asset types (markdown can't embed TOML frontmatter easily)
+- Inconsistent across asset types (Markdown can't embed TOML frontmatter easily)
 - Harder to parse independently (must parse entire file)
 - Metadata mixed with what agent sees (not clean separation)
 
@@ -169,6 +174,7 @@ Rejected: Content cleanliness more important than file count. Sidecar files prov
 Category field in metadata:
 
 Example: Explicit category field instead of deriving from path
+
 ```toml
 [metadata]
 category = "git-workflow"
@@ -176,11 +182,13 @@ category = "git-workflow"
 ```
 
 Pros:
+
 - Explicit category declaration (clear in metadata file)
 - Could move files without changing category (flexible organization)
 - Self-documenting (category visible in metadata)
 
 Cons:
+
 - Potential drift (category field doesn't match actual path)
 - Extra validation needed (must check field matches path)
 - More complex (one more field to maintain and validate)
@@ -191,6 +199,7 @@ Rejected: Deriving from filesystem prevents drift. Single source of truth is sim
 Semantic versioning with version field:
 
 Example: Use semver instead of SHA
+
 ```toml
 [metadata]
 version = "1.2.3"
@@ -198,11 +207,13 @@ version = "1.2.3"
 ```
 
 Pros:
+
 - Human-readable versions (v1.2.3 easier to understand than SHA)
 - Semantic meaning (major/minor/patch conveys change type)
 - Familiar pattern (developers understand semver)
 
 Cons:
+
 - Manual maintenance (must remember to bump version)
 - Can be wrong (version updated but content unchanged, or vice versa)
 - No automatic detection (can't tell if version should change)
@@ -213,6 +224,7 @@ Rejected: SHA is more reliable (automatic, always accurate, no manual maintenanc
 Optional metadata fields:
 
 Example: Make some fields optional
+
 ```toml
 [metadata]
 name = "my-task"
@@ -222,11 +234,13 @@ created = "..." # optional - might be missing
 ```
 
 Pros:
+
 - Flexibility (easier to add assets with partial metadata)
 - Less strict (don't need to fill out everything)
 - Gradual completion (can add fields later)
 
 Cons:
+
 - Incomplete catalog data (missing tags means unsearchable)
 - More complex validation (must handle missing field cases)
 - Inconsistent experience (some assets have rich data, others don't)
@@ -241,24 +255,28 @@ Metadata schema:
 Required fields (all must be present):
 
 name (string):
+
 - Asset identifier
 - Must match filename without extensions
 - Example: "pre-commit-review" for pre-commit-review.toml
 - Validated: name must equal filename base
 
 description (string):
+
 - One-line summary of what the asset does
 - Shown in catalog browsing and search results
 - Example: "Review staged changes before committing"
 - No length limit but should be concise
 
 tags (array of strings):
+
 - Keywords for searching and filtering
 - At least 1 tag required
 - Example: ["git", "review", "quality", "pre-commit"]
 - Used for substring matching in search
 
 sha (string):
+
 - Git blob SHA of content files
 - 40-character hexadecimal string
 - Excludes .meta.toml file itself
@@ -268,11 +286,13 @@ sha (string):
 - Used for update detection
 
 created (ISO 8601 timestamp):
+
 - When asset was first created
 - Format: "2025-01-10T00:00:00Z"
 - Never changes after initial creation
 
 updated (ISO 8601 timestamp):
+
 - When asset was last modified
 - Format: "2025-01-10T12:30:00Z"
 - Updated whenever content changes
@@ -281,11 +301,13 @@ updated (ISO 8601 timestamp):
 Derived fields (not in TOML, computed from filesystem):
 
 Category:
+
 - Derived from directory structure
 - Example: assets/tasks/git-workflow/ → category = "git-workflow"
 - Prevents drift between metadata and actual location
 
 AssetType:
+
 - Derived from directory structure
 - Example: assets/tasks/ → type = "tasks"
 - One of: tasks, roles, agents, contexts
@@ -293,22 +315,26 @@ AssetType:
 Validation rules:
 
 Required field checks:
+
 - All 6 fields must be present
 - tags array must have at least 1 element
 - No empty strings for name, description, sha
 
 SHA format validation:
+
 - Must be exactly 40 characters
 - Must be hexadecimal [a-f0-9]
 - Example valid: "a1b2c3d4..."
 - Example invalid: "xyz123..." (non-hex)
 
 Name match validation:
+
 - name field must match filename base
 - Example: pre-commit-review.meta.toml → name must be "pre-commit-review"
 - Prevents naming mismatches
 
 Timestamp validation:
+
 - Must be valid ISO 8601 format
 - updated must be >= created
 - No future timestamps (should be <= now, but not enforced)
@@ -316,6 +342,7 @@ Timestamp validation:
 File structure:
 
 Each asset has matching files:
+
 ```
 assets/{type}/{category}/{name}.toml       # Required: asset content
 assets/{type}/{category}/{name}.md         # Optional: prompt file for tasks/roles
@@ -323,6 +350,7 @@ assets/{type}/{category}/{name}.meta.toml  # Required: metadata
 ```
 
 Metadata location:
+
 - Same directory as asset content
 - Same base filename with .meta.toml extension
 - One metadata file per asset (not per file)
@@ -343,6 +371,7 @@ updated = "2025-01-10T12:30:00Z"
 ```
 
 Corresponding files:
+
 ```
 assets/tasks/git-workflow/
 ├── pre-commit-review.toml        # Task definition
@@ -414,6 +443,7 @@ assets/tasks/documentation/review-docs.meta.toml
 ```
 
 SHA generated from:
+
 ```bash
 # Concatenate all files except .meta.toml in sorted order
 cat review-docs.md review-docs.toml | git hash-object --stdin
@@ -427,6 +457,7 @@ assets/agents/openai/gpt4.meta.toml
 ```
 
 SHA generated from:
+
 ```bash
 # Just hash the single content file
 git hash-object gpt4.toml

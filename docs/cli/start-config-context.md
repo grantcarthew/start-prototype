@@ -61,8 +61,9 @@ required = true
 
 **required** (optional, default: false)
 : Whether this document is required context.
-  - `true` - Included by both `start` and `start prompt`
-  - `false` - Included by `start`, excluded by `start prompt`
+
+- `true` - Included by both `start` and `start prompt`
+- `false` - Included by `start`, excluded by `start prompt`
 
 **shell** (optional)
 : Override global shell for command execution.
@@ -1368,22 +1369,26 @@ Exit code: 1
 Contexts from global and local configs are combined:
 
 **Global contexts:** `~/.config/start/contexts.toml`
+
 - User-wide context documents
 - Managed by `start config context` commands
 - Shared across all projects
 
 **Local contexts:** `./.start/contexts.toml`
+
 - Project-specific context documents
 - Managed by `start config context` commands with `local` scope
 - Can override global contexts (same name)
 
 **Merge behavior:**
+
 - Global + local contexts are combined
 - Order: Global contexts first, then local contexts
 - If name conflict: Local overrides global (intentional, not an error)
 
 **Document order:**
 Documents appear in the prompt in definition order:
+
 1. Global contexts (in TOML order)
 2. Local contexts (in TOML order)
 
@@ -1392,11 +1397,13 @@ Rearrange config definitions to change prompt order.
 ### Required vs Optional Contexts
 
 **Required contexts** (`required = true`):
+
 - Included by both `start` and `start prompt`
 - Auto-included in all tasks
 - Essential background information
 
 **Optional contexts** (`required = false`):
+
 - Included by `start` only
 - Excluded from `start prompt` (for focused queries)
 - Nice-to-have information
@@ -1406,6 +1413,7 @@ Rearrange config definitions to change prompt order.
 Contexts use the UTD pattern for flexible content sourcing:
 
 **File-based:**
+
 ```toml
 [contexts.environment]
 file = "~/reference/ENVIRONMENT.md"
@@ -1413,6 +1421,7 @@ prompt = "Read {file} for environment context."
 ```
 
 **Command-based:**
+
 ```toml
 [contexts.git-status]
 command = "git status --short"
@@ -1420,12 +1429,14 @@ prompt = "Working tree status:\n{command}"
 ```
 
 **Inline prompt:**
+
 ```toml
 [contexts.note]
 prompt = "Important: This project uses Go 1.21"
 ```
 
 **Combined:**
+
 ```toml
 [contexts.project-state]
 file = "./PROJECT.md"
@@ -1445,6 +1456,7 @@ Context prompt templates support these placeholders:
 - `{command_output}` - Output from `command` execution (empty if command fails)
 
 **Example:**
+
 ```toml
 [contexts.environment]
 file = "~/reference/ENVIRONMENT.md"

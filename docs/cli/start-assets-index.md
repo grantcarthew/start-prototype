@@ -15,6 +15,7 @@ start assets index [flags]
 Scans the current directory structure for asset metadata files (`.meta.toml`) and generates a unified `assets/index.csv` file. This command is intended for maintainers of the asset catalog repository.
 
 It performs the following operations:
+
 1. Validates the repository structure (must be a git repo with an `assets/` directory).
 2. Recursively scans `assets/` for `.meta.toml` files.
 3. Parses metadata (description, tags, creation date).
@@ -32,6 +33,7 @@ This index file is used by the `start assets search` and `start assets update` c
 ## Output
 
 The command generates or overwrites `assets/index.csv` with the following columns:
+
 - **type**: Asset type (tasks, roles, agents, contexts)
 - **category**: Directory name (e.g., git-workflow, general)
 - **name**: Asset directory name

@@ -11,6 +11,7 @@ Transform `start` from a tool with bundled assets to a **catalog-driven system**
 ## Core Concept
 
 **GitHub as Database**
+
 - Asset catalog lives in GitHub repository
 - Users browse/search via CLI
 - Download on first use (lazy loading)
@@ -18,6 +19,7 @@ Transform `start` from a tool with bundled assets to a **catalog-driven system**
 - Update check compares SHAs
 
 **State Management**
+
 - Filesystem IS the state
 - No tracking files needed
 - If file exists in cache → it's available
@@ -45,19 +47,19 @@ Transform `start` from a tool with bundled assets to a **catalog-driven system**
 
 ### Future Possibilities
 
-5. **Contexts** - Document templates (`.md` files)
+1. **Contexts** - Document templates (`.md` files)
    - Standard documentation to include
    - Examples: api-guidelines, security-checklist
 
-6. **Metaprompts** - Reusable prompt components (`.toml` files)
+2. **Metaprompts** - Reusable prompt components (`.toml` files)
    - Mix-and-match behaviors
    - Examples: output-as-checklist, minimal-changes
 
-7. **Snippets** - Common command patterns (`.toml` files)
+3. **Snippets** - Common command patterns (`.toml` files)
    - Reusable shell commands
    - Examples: git-workflows, test-runners
 
-8. **Workflows** - Multi-step task chains (`.toml` files)
+4. **Workflows** - Multi-step task chains (`.toml` files)
    - Sequential task execution
    - Examples: full-pr-review = pre-commit + tests + docs + security
 
@@ -202,6 +204,7 @@ updated = "2025-01-10T00:00:00Z"
 ```
 
 **Why sidecar?**
+
 - ✅ Content files stay clean (no frontmatter clutter for AI)
 - ✅ Metadata separate from what agent sees
 - ✅ Easy to parse independently
@@ -361,6 +364,7 @@ asset_repo = "start-project/start-assets"       # GitHub repo
 ```
 
 **GitHub Token:**
+
 - Uses `GITHUB_TOKEN` environment variable (hardcoded, not configurable)
 - Recommended for all users (prevents rate limiting)
 - Anonymous: 60 requests/hour
@@ -372,56 +376,71 @@ asset_repo = "start-project/start-assets"       # GitHub repo
 Ship lean, prove value, iterate:
 
 ### Roles (8 total)
+
 **general/** (4)
+
 - default.md - Balanced, helpful, coding-focused
 - code-reviewer.md - Strict quality/security review
 - pair-programmer.md - Collaborative thinking
 - explainer.md - Teaching mode, simplifies concepts
 
 **languages/** (2)
+
 - go-expert.md - Deep Go knowledge, idioms
 - python-expert.md - Pythonic patterns
 
 **specialized/** (2)
+
 - security-focused.md - OWASP, paranoid mode
 - rubber-duck.md - Only asks questions, helps YOU think 🦆
 
 ### Tasks (12 total)
+
 **git-workflow/** (4)
+
 - pre-commit-review.toml - Review staged changes
 - pr-ready.toml - Complete PR preparation
 - commit-message.toml - Generate conventional commit
 - explain-changes.toml - Understand what changed
 
 **code-quality/** (4)
+
 - find-bugs.toml - Potential bugs and edge cases
 - quick-wins.toml - Low-hanging refactoring fruit
 - naming-review.toml - Better variable/function names
 - test-suggestions.toml - What tests are missing
 
 **security/** (2)
+
 - security-scan.toml - Security-focused review
 - dependency-audit.toml - Check dependencies
 
 **debugging/** (2)
+
 - debug-help.toml - Interactive debugging assistance
 - git-story.toml - Code archaeology, why was it written this way
 
 ### Agents (6 total)
+
 **claude/**
+
 - sonnet.toml - Balanced (recommended default)
 - opus.toml - Deep thinking
 - haiku.toml - Fast iteration
 
 **openai/**
+
 - gpt-4.toml - Alternative provider
 - gpt-4-turbo.toml - Faster GPT-4
 
 **google/**
+
 - gemini-pro.toml - Google's offering
 
 ### Templates (2 total)
+
 **projects/**
+
 - solo-developer.toml - Minimal config example
 - team-project.toml - Full-featured config example
 
@@ -432,10 +451,12 @@ Ship lean, prove value, iterate:
 ### Roles (Beyond v1)
 
 **Languages:**
-- javascript-expert, typescript-expert, rust-expert
+
+- JavaScript-expert, typescript-expert, rust-expert
 - java-expert, csharp-expert, kotlin-expert
 
 **Specialized:**
+
 - architect - Design patterns, SOLID, high-level
 - performance-optimizer - Speed and efficiency
 - accessibility-advocate - WCAG, inclusive design
@@ -444,6 +465,7 @@ Ship lean, prove value, iterate:
 - api-designer - REST, GraphQL, API best practices
 
 **Creative:**
+
 - socratic-teacher - Teaches through questions
 - devil's-advocate - Challenges assumptions
 - minimalist - Simplest solution always
@@ -451,21 +473,25 @@ Ship lean, prove value, iterate:
 ### Tasks (Beyond v1)
 
 **Performance:**
+
 - performance-check - Find bottlenecks
 - profiling-analysis - Analyze profiling data
 - optimization-suggestions - Algorithm improvements
 
 **Architecture:**
+
 - api-review - API design patterns
 - breaking-changes - Detect breaking changes
 - architectural-review - High-level design
 
 **Documentation:**
+
 - doc-review - Documentation quality
 - onboarding-guide - Generate project onboarding
 - api-docs-gen - Auto-generate API docs
 
 **Advanced:**
+
 - threat-modeling - Security threat analysis
 - root-cause-analysis - Deep problem investigation
 - migration-plan - Plan code migrations
@@ -474,17 +500,20 @@ Ship lean, prove value, iterate:
 ### Contexts (Future)
 
 **Standards:**
+
 - api-design-guidelines
 - testing-standards
 - security-checklist
 - code-review-checklist
 
 **Team:**
+
 - code-style-guide
 - pr-template
 - incident-response
 
 **Frameworks:**
+
 - react-patterns
 - go-idioms
 - rust-ownership-rules
@@ -492,18 +521,21 @@ Ship lean, prove value, iterate:
 ### Metaprompts (Future)
 
 **Output Formats:**
+
 - checklist - Markdown checklist with [ ] items
 - diff - Git-style diff format
 - table - Markdown table
 - json - Structured JSON for parsing
 
 **Behavioral Constraints:**
+
 - no-execution - Explain only, don't run code
 - minimal-changes - Smallest possible edits
 - ask-first - Ask permission before changes
 - test-driven - Write tests first
 
 **Lenses:**
+
 - security - OWASP mindset
 - performance - Speed and efficiency focus
 - accessibility - WCAG compliance
@@ -514,11 +546,13 @@ Ship lean, prove value, iterate:
 ### GitHub API Usage
 
 **Required endpoints:**
+
 - `GET /repos/{owner}/{repo}/git/trees/{sha}?recursive=1` - Get directory tree
 - `GET /repos/{owner}/{repo}/contents/{path}` - Get file content
 - `GET /repos/{owner}/{repo}/commits?path={path}` - Get file SHA/history
 
 **Rate limiting:**
+
 - Use `GITHUB_TOKEN` environment variable
 - Check `X-RateLimit-Remaining` header
 - Cache responses where possible
@@ -526,12 +560,14 @@ Ship lean, prove value, iterate:
 ### Versioning Strategy
 
 **Hash-based versioning:**
+
 - Use Git blob SHA or content hash
 - Store in `.meta.toml` when downloaded
 - Update check: compare local SHA with remote SHA
 - No need for semver (content hash is version)
 
 **Update detection:**
+
 ```go
 // Check if update available
 localSHA := readMetadata("pre-commit-review.meta.toml").SHA
@@ -544,11 +580,13 @@ if localSHA != remoteSHA {
 ### Interactive Selection
 
 **Go libraries:**
+
 - `github.com/charmbracelet/bubbletea` - Beautiful TUIs
 - `github.com/manifoldco/promptui` - Simple prompts
 - Fallback: Numbered list selection (no dependencies)
 
 **Selection flow:**
+
 1. Fetch directory tree from GitHub
 2. Group by category (parse directory structure)
 3. Present categories for selection
@@ -576,6 +614,7 @@ if localSHA != remoteSHA {
 ```
 
 **State management:**
+
 - Filesystem IS the state
 - No tracking files needed
 - If `.meta.toml` exists → we can check for updates
@@ -586,11 +625,13 @@ if localSHA != remoteSHA {
 Consistent with DR-026 (offline fallback):
 
 **If online:**
+
 - Browse catalog
 - Download on-demand
 - Check for updates
 
 **If offline:**
+
 - Use cached assets
 - Use configured assets
 - Cannot browse catalog
@@ -599,6 +640,7 @@ Consistent with DR-026 (offline fallback):
 ## Benefits
 
 ### For Users
+
 - 🚀 **Immediate value** - Ship with 28 curated assets
 - 🔍 **Discoverable** - Browse catalog interactively
 - 📦 **On-demand** - Only download what you use
@@ -607,6 +649,7 @@ Consistent with DR-026 (offline fallback):
 - 💾 **Offline-friendly** - Cached assets work offline
 
 ### For Project
+
 - 🧩 **Extensible** - Add asset types easily
 - 📈 **Scalable** - Can grow to hundreds of assets
 - 🔧 **Maintainable** - Update assets without releases
@@ -626,6 +669,7 @@ Consistent with DR-026 (offline fallback):
 ## Related Design Decisions
 
 This architecture impacts several existing DRs:
+
 - DR-014: GitHub Tree API (now for browsing, not bulk download)
 - DR-015: Atomic updates (now per-asset, not bulk)
 - DR-016: Asset discovery (now interactive browsing)

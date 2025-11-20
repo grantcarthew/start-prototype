@@ -357,6 +357,7 @@ Focus on security and performance.
 ```
 
 When this role is used:
+
 - `{role}` = fully resolved content (file contents + date + framing)
 - `{role_file}` = temp file path (because it uses `command`)
 

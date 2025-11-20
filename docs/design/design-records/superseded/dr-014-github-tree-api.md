@@ -32,6 +32,7 @@ Use GitHub Tree API with SHA-based caching for incremental asset updates
 Location: `~/.config/start/asset-version.toml`
 
 Format:
+
 ```toml
 # Asset version tracking - managed by 'start update'
 # Last updated: 2025-01-06T10:30:00Z
@@ -70,6 +71,7 @@ branch = "main"
 ## Incremental Update Example
 
 First update (cold cache):
+
 ```
 - Tree API: 1 call
 - 28 asset files: 28 calls
@@ -77,6 +79,7 @@ First update (cold cache):
 ```
 
 Subsequent update (3 files changed):
+
 ```
 - Tree API: 1 call
 - 3 changed files: 3 calls
@@ -102,6 +105,7 @@ Subsequent update (3 files changed):
 ## Rationale
 
 SHA-based caching provides best balance of:
+
 - Developer ergonomics (no manifest to maintain)
 - User experience (fast incremental updates)
 - Resource efficiency (minimal API calls after first download)

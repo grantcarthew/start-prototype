@@ -280,6 +280,7 @@ Everything looks good!
 Compares local version against latest GitHub release.
 
 **What it checks:**
+
 - Binary version from build metadata
 - Latest release from GitHub API (with caching)
 - Update recommendation if behind
@@ -298,6 +299,7 @@ Compares local version against latest GitHub release.
 Verifies age and completeness of asset library.
 
 **What it checks:**
+
 - Asset directory exists and is readable
 - Age of cached assets (warns if > 30 days)
 - Asset directory structure intact
@@ -318,6 +320,7 @@ Verifies age and completeness of asset library.
 Comprehensive config validation.
 
 **What it checks:**
+
 - TOML syntax (parse errors)
 - Required fields present
 - Field types correct
@@ -332,6 +335,7 @@ Reuses validation from `start config validate`.
 Tests all configured agents.
 
 **What it checks:**
+
 - Binary availability (`exec.LookPath`)
 - Command template syntax
 - Model configuration
@@ -357,6 +361,7 @@ Similar to `start config agent test` but for all agents.
 Checks context document files exist.
 
 **What it checks:**
+
 - Required contexts exist (error if missing)
 - Optional contexts exist (warning if missing)
 - File permissions readable
@@ -379,6 +384,7 @@ Optional:
 Verifies runtime environment.
 
 **What it checks:**
+
 - Shell availability (from config or auto-detect)
 - Config directory writable
 - Asset directory exists and writable
@@ -398,16 +404,19 @@ Verifies runtime environment.
 **0** - Healthy (all checks passed, warnings OK)
 
 **1** - Configuration errors
+
 - TOML syntax errors
 - Missing required fields
 - Invalid configuration values
 
 **2** - Missing dependencies
+
 - Agent binaries not found
 - Required contexts missing
 - Shell not available
 
 **3** - Asset issues
+
 - Asset library missing
 - Asset directory empty or corrupted
 - Asset directory not writable
@@ -473,12 +482,14 @@ Only run task if environment is healthy.
 - **> 90 days** - Strong warning
 
 Assets don't expire, but recommendations:
+
 - Update every 30 days for new features
 - Critical fixes announced in release notes
 
 ### GitHub API Rate Limiting
 
 Version check uses GitHub API:
+
 - Anonymous: 60 requests/hour
 - Cached for 24 hours per machine
 - Cache location: `~/.config/start/.version-check-cache`
@@ -487,6 +498,7 @@ Version check uses GitHub API:
 ### Privacy
 
 `start doctor` makes these network requests:
+
 - GitHub API: Check latest release version
 - No telemetry, no tracking, no data sent
 
@@ -495,6 +507,7 @@ Can run offline (skips version check).
 ### Performance
 
 Doctor runs in < 1 second typically:
+
 - Version check: 50-200ms (cached) or 200-500ms (fresh)
 - Config validation: 10-50ms
 - Agent checks: 10ms per agent
