@@ -32,7 +32,7 @@ Manages AI agent configurations in both global (`~/.config/start/agents.toml`) a
 
 To install agents from the catalog, use `start assets add`.
 
-**Note:** Per DR-004, agents can be defined in both global and local configs. These commands can manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
+**Note:** Agents can be defined in both global and local configs. These commands can manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
 
 ## Agent Configuration Structure
 
@@ -1357,7 +1357,7 @@ Exit code: 1
 
 ### Agent Configuration Scope
 
-Per DR-004, agents can be defined in both global and local configs with merge behavior:
+Agents can be defined in both global and local configs with merge behavior:
 
 **Global agents:** `~/.config/start/agents.toml`
 - Personal agent configurations
@@ -1405,8 +1405,6 @@ Model names are agent-specific and user-defined:
 - Names can be any meaningful identifier (haiku, sonnet, opus, flash, quick, best, etc.)
 - Full model identifiers can always be used with `--model` flag
 
-See DR-004 for full rationale.
-
 ### Command Template Placeholders
 
 Agent commands support these placeholders:
@@ -1428,8 +1426,6 @@ command = "{bin} --model {model} '{prompt}'"
 command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
 ```
 
-See DR-007 for placeholder details.
-
 ### Metadata URLs
 
 **url** - Agent tool documentation
@@ -1448,6 +1444,3 @@ Both URLs are optional but recommended for discoverability and self-documentatio
 - start-config-context(1) - Manage context documents
 - start-config-task(1) - Manage task configurations
 - start-config-role(1) - Manage system prompts
-- DR-004 - Agent configuration scope design decision
-- DR-007 - Command interpolation and placeholders
-- DR-017 - CLI command reorganization

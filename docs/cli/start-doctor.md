@@ -460,7 +460,7 @@ Only run task if environment is healthy.
 
 **No automatic checks:**
 
-Per DR-025, `start` does **not** run diagnostics, version checks, or asset age checks on startup. This ensures fast startup times and predictable behavior.
+`start` does **not** run diagnostics, version checks, or asset age checks on startup. This ensures fast startup times and predictable behavior.
 
 - No background network calls
 - No startup latency

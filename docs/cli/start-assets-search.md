@@ -27,8 +27,6 @@ Results are displayed grouped by type and category, sorted by relevance. This is
 - **Non-interactive** - Prints results and exits
 - **Discovery-focused** - For exploration before installation
 
-See [DR-040](../design/design-records/dr-040-substring-matching.md) for substring matching algorithm.
-
 ## Arguments
 
 **\<query\>** (required)
@@ -194,9 +192,6 @@ Use 'start assets browse' for full catalog exploration.
 
 **--verbose**, **-v**
 : Show detailed metadata for each match (tags, size, dates).
-
-**--non-interactive**
-: Suppress any interactive prompts (if future versions add them).
 
 ## Examples
 
@@ -479,8 +474,6 @@ start config role list         # List installed roles
 4. Description substring
 5. Tag substring (lowest)
 
-See [DR-040](../design/design-records/dr-040-substring-matching.md) for complete algorithm.
-
 ### Performance
 
 **Typical search time:**
@@ -527,8 +520,6 @@ Requires network access to download catalog index.
 - No description or tag matching
 - Degraded but functional
 
-See [DR-039](../design/design-records/dr-039-catalog-index.md) for index details.
-
 ## See Also
 
 - start-assets(1) - Asset management overview
@@ -536,5 +527,3 @@ See [DR-039](../design/design-records/dr-039-catalog-index.md) for index details
 - start-assets-browse(1) - Visual catalog browsing
 - start-assets-info(1) - Detailed asset information
 - start-config-task(1) - Manage local tasks
-- DR-040 - Substring matching algorithm
-- DR-039 - Catalog index file

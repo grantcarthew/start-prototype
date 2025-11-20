@@ -18,7 +18,7 @@ Executes predefined AI workflow tasks configured in `tasks.toml`. Tasks are reus
 
 Like all assets (including roles and agents), tasks can be lazy-loaded from the GitHub catalog on first use.
 
-**Task resolution** (per DR-038):
+**Task resolution**:
 
 1. Exact match: local → global → cache → GitHub (lazy fetch)
 2. Prefix match: local → global → cache → GitHub (short-circuit at first source with matches)
@@ -31,7 +31,7 @@ start task pre                # Prefix match (if unambiguous)
 start task code               # Ambiguous: interactive picker or error
 ```
 
-Tasks can be downloaded from the GitHub catalog on first use, cached locally for offline use, and added to your configuration automatically. See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
+Tasks can be downloaded from the GitHub catalog on first use, cached locally for offline use, and added to your configuration automatically.
 
 **Task components:**
 
@@ -49,7 +49,7 @@ Tasks can be downloaded from the GitHub catalog on first use, cached locally for
 - Comment cleanup
 - Any repeatable AI-assisted workflow
 
-Tasks are defined in `tasks.toml` and can be customized per user or per project. See [DR-031](../design/design-records/dr-031-catalog-based-assets.md) for catalog architecture and [DR-033](../design/design-records/dr-033-asset-resolution-algorithm.md) for resolution details.
+Tasks are defined in `tasks.toml` and can be customized per user or per project. See [start-config-task(1)](start-config-task.md) for configuration details and [start-assets(1)](start-assets.md) for catalog information.
 
 ## Arguments
 

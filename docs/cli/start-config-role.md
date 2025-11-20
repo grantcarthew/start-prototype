@@ -1275,7 +1275,7 @@ Exit code: 1
 
 ### Role Merge Behavior
 
-Per DR-002 and DR-005, `[roles.<name>]` sections have combine-and-override merge behavior:
+The `[roles.<name>]` sections have combine-and-override merge behavior:
 
 **Global roles:** `~/.config/start/roles.toml`
 - Personal default role definitions
@@ -1426,6 +1426,3 @@ Not all AI agents support roles (system prompts):
 - start-config-context(1) - Manage context documents
 - start-config-task(1) - Manage task configurations
 - start-assets-update(1) - Update asset library
-- DR-002 - Configuration file structure and merge behavior
-- DR-005 - Role configuration & selection
-- DR-017 - CLI command reorganization

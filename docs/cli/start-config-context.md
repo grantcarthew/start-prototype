@@ -29,7 +29,7 @@ Manages context document configurations in config files. Context documents provi
 - **edit** - Modify existing context configuration
 - **remove** - Delete context from configuration
 
-**Note:** Per DR-017, context documents can be defined in both global and local configs. These commands can manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
+**Note:** Context documents can be defined in both global and local configs. These commands manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
 
 ## Context Configuration Structure
 
@@ -1365,7 +1365,7 @@ Exit code: 1
 
 ### Context Merge Behavior
 
-Per DR-002, contexts from global and local configs are combined:
+Contexts from global and local configs are combined:
 
 **Global contexts:** `~/.config/start/contexts.toml`
 - User-wide context documents
@@ -1400,8 +1400,6 @@ Rearrange config definitions to change prompt order.
 - Included by `start` only
 - Excluded from `start prompt` (for focused queries)
 - Nice-to-have information
-
-See DR-012 for full rationale.
 
 ### Unified Template Design (UTD)
 
@@ -1481,8 +1479,3 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 - start-config-agent(1) - Manage AI agents
 - start-config-task(1) - Manage task configurations
 - start-config-role(1) - Manage system prompts
-- DR-002 - Configuration file structure and merge behavior
-- DR-003 - Named documents for context
-- DR-008 - Context file detection and handling
-- DR-012 - Context document required field and order
-- DR-017 - CLI command reorganization

@@ -372,4 +372,3 @@ gh browse grantcarthew/start:assets
 - start-assets-search(1) - Terminal-based catalog search
 - start-assets-add(1) - Install asset from catalog
 - start-assets-info(1) - Show asset details
-- DR-041 - Asset command reorganization

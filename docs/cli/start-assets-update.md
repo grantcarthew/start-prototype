@@ -38,8 +38,6 @@ Check for updates to cached assets and download new versions from the GitHub cat
 - Searches: asset name, path, category
 - Same matching algorithm as `start assets search`
 
-See [DR-040](../design/design-records/dr-040-substring-matching.md) for matching algorithm.
-
 ## Behavior
 
 ### Update All Assets (No Query)
@@ -498,7 +496,7 @@ asset_repo = "grantcarthew/start"    # Default
 
 **No automatic update checks:**
 
-Per [DR-025](../design/design-records/dr-025-no-automatic-checks.md), updates are **manual only**:
+Updates are **manual only**:
 - No automatic checks on CLI startup
 - No background update checking
 - User must explicitly run `start assets update`
@@ -551,8 +549,6 @@ Content copied from asset...
 - Uniquely identifies content
 - No version number maintenance
 - Git-native approach
-
-See [DR-037](../design/design-records/dr-037-asset-updates.md).
 
 ### Custom Assets Skipped
 
@@ -616,7 +612,7 @@ grep updated ~/.config/start/assets/tasks/**/*.meta.toml
 
 ### Substring Matching for Selective Updates
 
-Query uses substring matching (DR-040):
+Query uses substring matching:
 - Minimum 3 characters
 - Case-insensitive
 - Matches name, path, category
@@ -631,6 +627,3 @@ Query uses substring matching (DR-040):
 - start-assets(1) - Asset management overview
 - start-assets-add(1) - Install new assets
 - start-assets-info(1) - View asset details
-- DR-037 - Asset update mechanism
-- DR-025 - No automatic checks
-- DR-040 - Substring matching algorithm

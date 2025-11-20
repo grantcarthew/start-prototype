@@ -42,8 +42,6 @@ start -a anth            # Prefix match (if unambiguous)
 start --agent a          # Ambiguous: interactive picker or error
 ```
 
-See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
-
 **--role** _name_, **-r** _name_
 : Which role to use for the system prompt. Overrides default role from config. Resolution order:
 
@@ -57,8 +55,6 @@ start --role go-expert       # Exact match
 start -r go                  # Prefix match (if unambiguous)
 start --role code            # Ambiguous: interactive picker or error
 ```
-
-See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
 
 **--model** _name_, **-m** _name_
 : Model to use (from agent configuration). Resolution order:
@@ -74,8 +70,6 @@ start --model claude-sonnet-4           # Exact match
 start -m claude                         # Prefix match (if unambiguous)
 start --model gpt-5-experimental        # No match, passthrough to agent
 ```
-
-See [DR-038](../design/design-records/dr-038-flag-value-resolution.md) for full resolution algorithm.
 
 **--directory** _path_, **-d** _path_
 : Working directory for context detection. Relative paths in config resolve to this directory. Default: current directory (pwd).
@@ -572,7 +566,7 @@ Run 'start init' to create initial configuration.
 
 **Local config only:**
 
-If local `./.start/` exists but no global config, this is **valid** and the tool works normally. No error is shown. Per DR-004, agents can be defined in both global and local configs.
+If local `./.start/` exists but no global config, this is **valid** and the tool works normally. No error is shown. Agents can be defined in both global and local configs.
 
 Use case: Team configurations where `./.start/` contains all necessary config (agents, roles, tasks, contexts) and is committed to version control. No global config required.
 

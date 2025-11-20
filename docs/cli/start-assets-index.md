@@ -89,4 +89,3 @@ Ready to commit:
 ## See Also
 
 - start-assets(1) - Asset management overview
-- DR-039 - Catalog Index Design

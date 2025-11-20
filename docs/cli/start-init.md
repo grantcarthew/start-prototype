@@ -21,7 +21,7 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 - **global** - Personal config at `~/.config/start/` (default)
 - **local** - Project config at `./.start/` (use `--local` flag)
 
-**Configuration files created** (per DR-031):
+**Configuration files created**:
 
 - `config.toml` - Settings only
 - `agents.toml` - Agent configurations
@@ -46,7 +46,7 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 - Create local project configuration
 
 **Network requirement:**
-Init attempts to download asset catalog from GitHub. If offline, creates config files without downloading assets (per DR-026).
+Init attempts to download asset catalog from GitHub. If offline, creates config files without downloading assets.
 
 ## Flags
 
@@ -209,7 +209,7 @@ These documents are always added to the config:
 **Default role:**
 A `code-reviewer` role referencing `./ROLE.md` is always added to config.
 
-Files don't need to exist - runtime gracefully handles missing files (see DR-008).
+Files don't need to exist - runtime gracefully handles missing files.
 
 ### Agent Detection
 

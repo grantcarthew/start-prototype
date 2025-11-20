@@ -58,8 +58,6 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 - Description
 - Tags
 
-See [DR-040](../design/design-records/dr-040-substring-matching.md) for matching algorithm.
-
 ## Flags
 
 **-l, --local**
@@ -700,8 +698,6 @@ This command requires network access to:
 
 **Case-insensitive:** "commit" matches "Commit", "COMMIT", etc.
 
-See [DR-040](../design/design-records/dr-040-substring-matching.md) for complete algorithm.
-
 ### Installation Scope Best Practices
 
 **Global (`~/.config/start/`):**
@@ -734,15 +730,15 @@ git commit -m "Add project-specific assets"
 
 ### Multi-File Asset Handling
 
-Assets may have multiple files:
+Assets may consist of multiple files:
 
 ```
 pre-commit-review.toml       # Required (task definition)
 pre-commit-review.md         # Optional (documentation)
-pre-commit-review.meta.toml  # Metadata (not downloaded)
+pre-commit-review.meta.toml  # Metadata
 ```
 
-**All non-meta files downloaded** to cache.
+**All files downloaded** (including metadata) when installing an asset. This ensures full offline capability and metadata availability for updates.
 
 **Only .toml added to config** (references other files as needed).
 
@@ -766,5 +762,3 @@ If asset already exists in target config:
 - start-assets-info(1) - Preview asset details
 - start-config-task(1) - Manage local tasks
 - start-config-role(1) - Manage local roles
-- DR-040 - Substring matching algorithm
-- DR-041 - Asset command reorganization

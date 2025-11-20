@@ -28,7 +28,7 @@ Manages predefined workflow task configurations in config files. Tasks define re
 - **edit** - Modify existing task configuration
 - **remove** - Delete task from configuration
 
-**Note:** Per DR-017, tasks can be defined in both global and local configs, and are also loaded from asset library (`~/.config/start/assets/tasks/`). These commands manage user-defined tasks only (global or local config). To install tasks from the catalog, use `start assets add`. To update cached assets, use `start assets update`.
+**Note:** Tasks can be defined in both global and local configs, and are also loaded from asset library (`~/.config/start/assets/tasks/`). These commands manage user-defined tasks only (global or local config). To install tasks from the catalog, use `start assets add`. To update cached assets, use `start assets update`.
 
 ## Task Configuration Structure
 
@@ -1539,6 +1539,3 @@ See [UTD shell configuration](../design/unified-template-design.md#shell-configu
 - start-config-context(1) - Manage context documents
 - start-config-role(1) - Manage system prompts
 - start-assets-update(1) - Update asset library
-- DR-009 - Task structure and placeholders
-- DR-010 - Default task definitions
-- DR-017 - CLI command reorganization

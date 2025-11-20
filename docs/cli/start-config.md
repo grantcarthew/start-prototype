@@ -24,7 +24,7 @@ Manages `start` configuration files (global and local). Provides tools for viewi
 - **path** - Show config directory paths and files
 - **validate** - Check configuration syntax and semantics across all config files
 
-**Configuration hierarchy** (per DR-031):
+**Configuration hierarchy**:
 
 - **Global:** `~/.config/start/` - User-wide configuration files
   - `config.toml` - Settings
@@ -67,7 +67,7 @@ Local:  ./.start/
 Settings
 ────────
   default_agent = "claude"              (global)
-  verbosity = "normal"                  (global)
+  log_level = "normal"                  (global)
   required_only = false                 (local, overrides global)
 
 Agents (3)
@@ -135,7 +135,7 @@ Local:  (none)
 Settings
 ────────
   default_agent = "claude"
-  verbosity = "normal"
+  log_level = "normal"
 
 Agents (2)
 ──────────
@@ -939,7 +939,7 @@ default_agent = "claude"   # From global (not overridden)
 
 ### Agent Configuration Scope
 
-Per DR-004 (updated 2025-01-05), agents can be defined in **both global and local** configs:
+Agents can be defined in **both global and local** configs:
 
 - Global: `~/.config/start/agents.toml` - Personal agent configurations
 - Local: `./.start/agents.toml` - Team/project agent configurations (can be committed)
@@ -988,5 +988,3 @@ Validation checks if context files exist but:
 - start-config-role(1) - Manage roles
 - start-config-context(1) - Manage contexts
 - start-init(1) - Initialize configuration
-- DR-004 - Agent configuration scope
-- DR-001 - Configuration format (TOML)

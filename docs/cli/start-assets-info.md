@@ -31,8 +31,6 @@ Use this command to preview asset details before installation, or to inspect alr
 - Auto-displays if single match
 - Interactive selection if multiple matches
 
-See [DR-040](../design/design-records/dr-040-substring-matching.md) for matching algorithm.
-
 ## Arguments
 
 **\<query\>** (required)
@@ -598,8 +596,6 @@ Uses same algorithm as `start assets search` and `start assets add`.
 
 **Minimum length:** 3 characters
 
-See [DR-040](../design/design-records/dr-040-substring-matching.md).
-
 ### File Content Preview
 
 **With --show-content flag:**
@@ -636,5 +632,3 @@ See [DR-040](../design/design-records/dr-040-substring-matching.md).
 - start-assets-add(1) - Install asset
 - start-assets-update(1) - Update cached assets
 - start-show(1) - Display resolved configuration
-- DR-040 - Substring matching algorithm
-- DR-039 - Catalog index file
