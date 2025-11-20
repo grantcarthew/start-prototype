@@ -43,7 +43,8 @@ Agents are defined in the global config with the following fields:
 description = "Anthropic's Claude AI assistant via Claude Code CLI"
 url = "https://docs.claude.com/claude-code"
 models_url = "https://docs.anthropic.com/en/docs/about-claude/models"
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
+bin = "claude"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
 default_model = "sonnet"
 
   [agents.claude.models]
@@ -54,8 +55,11 @@ default_model = "sonnet"
 
 **Fields:**
 
+**bin** (required)
+: Binary name or path to execute (e.g., `claude` or `/usr/local/bin/claude`). Used for binary detection (`start doctor`) and the `{bin}` placeholder in command templates.
+
 **command** (required)
-: Command template to execute the agent. Should contain `{prompt}` placeholder to receive the composed prompt. Supports placeholders: `{model}`, `{role}`, `{role_file}`, `{prompt}`, `{date}`.
+: Command template to execute the agent. Should contain `{prompt}` placeholder. Supports placeholders: `{bin}`, `{model}`, `{role}`, `{role_file}`, `{prompt}`, `{date}`.
 
 **description** (optional)
 : Human-readable description of the agent. Displayed in `start config agent list` and help output.
@@ -194,25 +198,29 @@ Prompts for agent details and adds to `~/.config/start/agents.toml`:
    - Model documentation URL
    - Press enter to skip
 
-5. **Command template** (required)
+5. **Binary** (required)
+   - Binary name or path to execute (e.g., `claude`)
+   - Used for detection and `{bin}` placeholder
+
+6. **Command template** (required)
 
    - Should contain `{prompt}` placeholder (warns if missing)
    - Warns on unknown placeholders (typos)
-   - Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
+   - Valid placeholders: {bin}, {model}, {role}, {role_file}, {prompt}, {date}
 
-6. **Add models?** (yes/no)
+7. **Add models?** (yes/no)
 
    - If yes, loop to add multiple models
    - Each model: model name + full model identifier
    - Type "done" to finish adding models
 
-7. **Default model** (if models added)
+8. **Default model** (if models added)
 
    - Shows numbered list of added models
    - Select which to use as default
    - Can skip (uses first model)
 
-8. **Backup and save**
+9. **Backup and save**
    - Backs up existing config to `config.YYYY-MM-DD-HHMMSS.toml`
    - Writes new agent to config
    - Shows success message
@@ -228,7 +236,8 @@ Description (optional): My custom AI agent
 URL (optional): https://example.com/my-agent
 Models URL (optional): https://example.com/models
 
-Command template: my-agent --model {model} '{prompt}'
+Binary [my-agent]: my-agent
+Command template: {bin} --model {model} '{prompt}'
 ✓ Valid command template
 
 Add models? [y/N]: y
@@ -270,7 +279,8 @@ Description (optional):
 URL (optional):
 Models URL (optional):
 
-Command template: simple-agent '{prompt}'
+Binary [simple-agent]: simple-agent
+Command template: {bin} '{prompt}'
 ✓ Valid command template
 
 Add models? [y/N]: n
@@ -292,7 +302,8 @@ Use 'start --agent simple-agent' to test.
 description = "My custom AI agent"
 url = "https://example.com/my-agent"
 models_url = "https://example.com/models"
-command = "my-agent --model {model} '{prompt}'"
+bin = "my-agent"
+command = "{bin} --model {model} '{prompt}'"
 default_model = "fast"
 
   [agents.my-agent.models]
@@ -304,7 +315,8 @@ default_model = "fast"
 
 ```toml
 [agents.simple-agent]
-command = "simple-agent '{prompt}'"
+bin = "simple-agent"
+command = "{bin} '{prompt}'"
 ```
 
 **Exit codes:**
@@ -407,9 +419,10 @@ Agent configuration: claude (global)
 Description: Anthropic's Claude AI assistant via Claude Code CLI
 URL: https://docs.claude.com/claude-code
 Models URL: https://docs.anthropic.com/en/docs/about-claude/models
+Binary: claude
 
 Command template:
-  claude --model {model} --append-system-prompt '{role}' '{prompt}'
+  {bin} --model {model} --append-system-prompt '{role}' '{prompt}'
 
 Default model: sonnet
 Models:
@@ -428,8 +441,9 @@ start config agent show custom-agent local
 Agent configuration: custom-agent (local)
 ═══════════════════════════════════════════════════════════
 
+Binary: custom-agent
 Command template:
-  custom-agent '{prompt}'
+  {bin} '{prompt}'
 
 Default model: (first model in config)
 Models: (none)
@@ -441,8 +455,9 @@ Models: (none)
 Agent configuration: simple-agent (global)
 ═══════════════════════════════════════════════════════════
 
+Binary: simple-agent
 Command template:
-  simple-agent '{prompt}'
+  {bin} '{prompt}'
 ```
 
 **No agent configured:**
@@ -514,7 +529,7 @@ Validates agent configuration without executing it. Performs three checks:
 
 1. **Binary availability**
 
-   - Uses Go's `exec.LookPath()` to check if agent binary is in PATH
+   - Checks if the configured `bin` executable is discoverable
    - Reports: found (with path) or not found
 
 2. **Configuration validation**
@@ -748,15 +763,16 @@ Interactive prompts to edit specific agent. Shows current values as defaults - p
 1. **Description** - Current value shown in brackets
 2. **URL** - Current value shown in brackets
 3. **Models URL** - Current value shown in brackets
-4. **Command template** - Current value shown in brackets
+4. **Binary** - Current value shown in brackets
+5. **Command template** - Current value shown in brackets
    - Validates: should contain `{prompt}` placeholder (warns if missing)
    - Warns on unknown placeholders
-5. **Edit models?** - Show current models, ask to modify
+6. **Edit models?** - Show current models, ask to modify
    - Add new models
    - Remove existing models
    - Modify model values
-6. **Default model** - Select from available models
-7. **Backup and save** - Backs up to `config.YYYY-MM-DD-HHMMSS.toml`
+7. **Default model** - Select from available models
+8. **Backup and save** - Backs up to `config.YYYY-MM-DD-HHMMSS.toml`
 
 **Interactive flow (edit specific agent):**
 
@@ -768,7 +784,8 @@ Current configuration:
   Description: Anthropic's Claude AI assistant via Claude Code CLI
   URL: https://docs.claude.com/claude-code
   Models URL: https://docs.anthropic.com/en/docs/about-claude/models
-  Command: claude --model {model} --append-system-prompt '{role}' '{prompt}'
+  Binary: claude
+  Command: {bin} --model {model} --append-system-prompt '{role}' '{prompt}'
   Default model: sonnet
   Models: 3 (haiku, sonnet, opus)
 
@@ -777,7 +794,8 @@ Press enter to keep current value, or type new value:
 Description [Anthropic's Claude AI assistant via Claude Code CLI]:
 URL [https://docs.claude.com/claude-code]:
 Models URL [https://docs.anthropic.com/en/docs/about-claude/models]:
-Command template [claude --model {model} --append-system-prompt '{role}' '{prompt}']:
+Binary [claude]:
+Command template [{bin} --model {model} --append-system-prompt '{role}' '{prompt}']:
 
 Current models:
   haiku = claude-3-5-haiku-20241022
@@ -823,7 +841,8 @@ Current configuration:
   Description: (none)
   URL: (none)
   Models URL: (none)
-  Command: simple-agent '{prompt}'
+  Binary: simple-agent
+  Command: {bin} '{prompt}'
   Default model: (none - uses first model)
   Models: (none)
 
@@ -832,7 +851,8 @@ Press enter to keep current value, or type new value:
 Description []: Simple AI agent for testing
 URL []: https://example.com/simple-agent
 Models URL []:
-Command template [simple-agent '{prompt}']:
+Binary [simple-agent]:
+Command template [{bin} '{prompt}']:
 
 Current models: (none)
 
@@ -881,11 +901,11 @@ Command template [claude --model {model}]: claude --model {model} '{prompt}'
 ```
 Command template [claude '{prompt}']: claude --model {mdoel} '{prompt}'
 ⚠ Warning: Unknown placeholder {mdoel} (did you mean {model}?)
-  Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
+  Valid placeholders: {bin}, {model}, {role}, {role_file}, {prompt}, {date}
 
 Continue anyway? [y/N]: n
 
-Command template [claude '{prompt}']: claude --model {model} '{prompt}'
+Command template [claude '{prompt}']: {bin} --model {model} '{prompt}'
 ✓ Valid command template
 ```
 
@@ -1391,6 +1411,7 @@ See DR-004 for full rationale.
 
 Agent commands support these placeholders:
 
+- `{bin}` - Executable binary name or path (from `bin` field)
 - `{model}` - Resolved model name
 - `{role}` - The fully resolved role/system prompt content (inline).
 - `{role_file}` - File path to role content. Simple roles: original file path. UTD roles: temp file with evaluated content (auto-created and cleaned up).
@@ -1401,13 +1422,10 @@ Agent commands support these placeholders:
 
 ```toml
 # Placeholder in flag value
-command = "claude --model {model} '{prompt}'"
+command = "{bin} --model {model} '{prompt}'"
 
 # Multiple placeholders
-command = "claude --model {model} --append-system-prompt '{role}' '{prompt}'"
-
-# Environment variable (via env section, not shown here)
-command = "gemini --model {model} '{prompt}'"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
 ```
 
 See DR-007 for placeholder details.

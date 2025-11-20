@@ -487,9 +487,9 @@ $ start assets update
 
 Checking for updates...
 
-✓ tasks/git-workflow/pre-commit-review  (v1.0 → v1.1)
+✓ tasks/git-workflow/pre-commit-review  (a1b2c3 → d4e5f6)
 ✓ roles/general/code-reviewer           (up to date)
-✓ tasks/quality/commit-lint             (v2.3 → v2.4)
+✓ tasks/quality/commit-lint             (7890ab → cdef12)
 
 Updated 2 assets, 1 up to date.
 ```
@@ -501,9 +501,9 @@ $ start assets update "commit"
 
 Checking for updates to assets matching 'commit'...
 
-✓ tasks/git-workflow/commit-message     (v1.2 → v1.3)
+✓ tasks/git-workflow/commit-message     (123456 → 7890ab)
 ✓ tasks/git-workflow/pre-commit-review  (up to date)
-✓ tasks/git-workflow/post-commit-hook   (v1.0 → v1.1)
+✓ tasks/git-workflow/post-commit-hook   (abcdef → 123456)
 
 Updated 2 assets, 1 up to date.
 ```

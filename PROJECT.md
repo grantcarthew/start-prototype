@@ -18,6 +18,8 @@ As we fix issues, I will be needing you to ensure the docs/design/design-records
 
 This repository is not large yet. Before you do anything, run a `lsd --tree` to get a list of the documents.
 
+REPEAT: This is an interactive session. Do not change anything without approval from me!
+
 ## Objectives
 
 1. Review all documentation files (3 root docs + 17 CLI commands) for accuracy
@@ -40,7 +42,7 @@ This repository is not large yet. Before you do anything, run a `lsd --tree` to 
 
 ## Documents to Review
 
-Active document: `docs/cli/start-task.md`
+Active document: `docs/cli/start-assets-add.md`
 
 ### Root Documentation
 
@@ -52,17 +54,15 @@ Active document: `docs/cli/start-task.md`
 
 - [x] `docs/cli/start.md` - Main entry point, interactive sessions
 - [x] `docs/cli/start-prompt.md` - Prompt composition and execution
-- [ ] `docs/cli/start-task.md` - Task execution
+- [x] `docs/cli/start-task.md` - Task execution
 
 ### Asset Commands
 
-- [ ] `docs/cli/start-assets.md` - Asset management overview
+- [x] `docs/cli/start-assets.md` - Asset management overview
 - [ ] `docs/cli/start-assets-add.md` - Add assets from catalog
 - [ ] `docs/cli/start-assets-browse.md` - Browse catalog in browser
 - [ ] `docs/cli/start-assets-search.md` - Search catalog
 - [ ] `docs/cli/start-assets-info.md` - Show asset information
-- [ ] `docs/cli/start-assets-update.md` - Update assets
-- [ ] `docs/cli/start-assets-clean.md` - Clean asset cache
 
 ### Configuration Commands
 
@@ -352,3 +352,15 @@ Documentation review is complete when:
 - **Task lazy-loading details**: Updated `docs/tasks.md` to explicitly state tasks download to global cache and add to global/local config based on flags.
 - **Lazy-loading clarification**: Updated `docs/cli/start.md` to include contexts in asset types, simplify cache path, and clarify global vs local configuration targeting with `--local`.
 - **Local flag clarification**: Updated `docs/cli/start-prompt.md` to explicitly state that assets download to global cache but config entry goes to local scope when `--local` is used.
+- **Task discovery update**: Removed "embedded in binary" tasks reference; updated task discovery to include cache and GitHub catalog with correct precedence order (Local → Global → Cache → GitHub)
+- `docs/cli/start-task.md`: Updated Task Discovery section (lines 711-733)
+- **{model} placeholder scope**: Removed `{model}` from task prompt placeholder lists and examples (only available in agent commands)
+- `docs/cli/start-task.md`: Removed `{model}` from Execution Flow step 8 and Task Placeholders section
+- `docs/cli/start-config-task.md`: Removed `{model}` from Placeholders section and Invalid Template error example
+- **Role reference clarification**: Renamed "System Prompt File Location" to "Role Reference" in task docs to clarify tasks reference roles (which have files) rather than owning files directly
+- `docs/cli/start-task.md`: Renamed and updated section (lines 248-255)
+- **Quiet flag consistency**: Updated `--quiet` flag behavior for tasks to suppress output (like other commands) instead of being ignored
+- `docs/cli/start-task.md`: Updated Quiet Flag Behavior section and Flags description (lines 128-130, 188-195)
+- **Missing Asset Restoration (DR-042)**: Implemented logic to automatically restore missing asset files (prompts, role definitions) from the GitHub catalog if they are referenced in config but missing from disk.
+- `docs/design/design-records/dr-042-missing-asset-restoration.md`: Created new DR defining the restoration logic (intercept missing file -> check asset path -> download from catalog).
+- `docs/design/design-records/dr-033-asset-resolution-algorithm.md`: Updated to include "Recursive Resolution & Content Restoration" section, linking resolution to file restoration.

@@ -219,11 +219,11 @@ Review changes:
 ## Instructions
 focus on security
 
-## Changes
-```diff
-diff --git a/main.go b/main.go
-... (45 more lines) - Use --verbose to see full content
-─────────────────────────────────────────────────
+  ## Changes
+  ```diff
+  {command_output}
+  ```
+  ... (45 more lines) - Use --verbose to see full content─────────────────────────────────────────────────
 
 Final composed prompt (first 10 lines):
 ─────────────────────────────────────────────────
@@ -576,7 +576,7 @@ Description: Anthropic's Claude AI assistant via Claude Code CLI
 URL: https://docs.claude.com/claude-code
 
 Command template:
-  claude --model {model} --append-system-prompt '{role}' '{prompt}'
+  {bin} --model {model} --append-system-prompt '{role}' '{prompt}'
 
 Default model: claude-3-7-sonnet-20250219 (sonnet)
 
@@ -601,7 +601,7 @@ Source: global config
 Description: Google's Gemini AI via CLI
 
 Command template:
-  GEMINI_SYSTEM_MD='{role_file}' gemini --model {model} '{prompt}'
+  GEMINI_SYSTEM_MD='{role_file}' {bin} --model {model} '{prompt}'
 
 Default model: gemini-2.0-flash-exp (flash)
 

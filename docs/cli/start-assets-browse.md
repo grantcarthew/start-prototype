@@ -344,7 +344,7 @@ If browser-based browsing isn't suitable:
 **Terminal-based alternatives:**
 ```bash
 start assets search "keyword"    # Search by keyword
-start assets add                 # Interactive TUI browser (planned)
+start assets add                 # Interactive TUI browser
 ```
 
 **GitHub CLI:**

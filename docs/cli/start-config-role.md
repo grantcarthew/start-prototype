@@ -265,7 +265,7 @@ Command:
 
 Prompt template:
   You are a code reviewer.
-  Current commit: {command}
+  Current commit: {command_output}
 ```
 
 **No role configured:**
@@ -525,7 +525,7 @@ command = "git log -1 --format='%s'"
 prompt = """
 {file}
 
-Current commit: {command}
+Current commit: {command_output}
 """
 shell = "bash"
 command_timeout = 5
@@ -571,7 +571,7 @@ Continue anyway? [y/N]: y
 ```
 Prompt template: Invalid {unknown} text
 ⚠ Warning: Unknown placeholder {unknown}
-  Valid placeholders: {file}, {command}
+  Valid placeholders: {file}, {file_contents}, {command}, {command_output}
 
 Continue anyway? [y/N]: n
 
@@ -977,9 +977,9 @@ Command:
 
 Prompt template:
   You are a code reviewer.
-  Current commit: {command}
+  Current commit: {command_output}
   ✓ Valid template
-  ✓ Uses {command} placeholder
+  ✓ Uses {command_output} placeholder
 
 ✓ Role is configured correctly
 ```
@@ -1313,11 +1313,12 @@ Roles use UTD pattern for flexible content sourcing:
 file = "~/.config/start/roles/code-reviewer.md"
 ```
 
-**Command-based:**
+**Resulting config (command-based):**
+
 ```toml
 [roles.dynamic-reviewer]
 command = "git log -1 --format='%s'"
-prompt = "You are a code reviewer. Current commit: {command}"
+prompt = "You are a code reviewer. Current commit: {command_output}"
 ```
 
 **Inline prompt:**
@@ -1349,7 +1350,7 @@ command = "date"
 prompt = """
 {file}
 
-Current time: {command}
+Current time: {command_output}
 """
 ```
 

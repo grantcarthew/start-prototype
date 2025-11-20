@@ -248,8 +248,8 @@ Updated: 2025-01-12T00:00:00Z
 SHA: d4e5f6a7b8c9...
 
 Installation Status:
-  ✓ Cached (version 1.2.0 from 2025-01-05)
-  ⚠ Update available (version 1.3.0 from 2025-01-12)
+  ✓ Cached (SHA: d4e5f6a7... from 2025-01-05)
+  ⚠ Update available (SHA: e5f6a7b8... from 2025-01-12)
   ✓ Installed in global config
 
 Use 'start assets update code-reviewer' to update.
@@ -437,7 +437,7 @@ Select asset [1-5] (or 'q' to quit): q
 Cancelled.
 ```
 
-Exit code: 3
+Exit code: 1
 
 ## Use Cases
 
@@ -564,8 +564,8 @@ asset_repo = "grantcarthew/start"    # Default
 
 **Status checks:**
 1. **Cached** - File exists in `~/.config/start/assets/{type}/{category}/`
-2. **Global config** - Entry exists in `~/.config/start/{type}s.toml`
-3. **Local config** - Entry exists in `./.start/{type}s.toml`
+2. **Global config** - Entry exists in `~/.config/start/{type}.toml`
+3. **Local config** - Entry exists in `./.start/{type}.toml`
 
 **Independent checks:**
 - Asset can be cached but not configured

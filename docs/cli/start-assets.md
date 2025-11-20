@@ -19,13 +19,18 @@ start assets index             # Generate catalog index (contributors)
 
 Unified command suite for discovering, installing, and managing assets from the GitHub catalog. Provides semantic separation from `start config` commands: `start assets` is for shopping the catalog, while `start config` is for managing your configuration.
 
+> **Tip: Lazy Loading**
+> You don't typically need to run `start assets add` explicitly! If you try to run a task that isn't installed (e.g., `start task pre-commit-review`), the CLI will automatically search the catalog, find it, and prompt you to download it. Use `start assets` commands when you want to browse options or manage your cache.
+
 **Asset types:**
+
 - **tasks** - Predefined AI workflow tasks
 - **roles** - System prompts and personas
 - **agents** - AI agent configurations
 - **contexts** - Context document templates
 
 **Core principles:**
+
 - `start assets` commands **only search GitHub catalog** (not local/global/cache)
 - Discovery-first design (browse, search, preview, then install)
 - Type-agnostic operations (one command for all asset types)
@@ -58,6 +63,7 @@ start assets search <query>    # Minimum 3 characters
 ```
 
 **Examples:**
+
 ```bash
 start assets search "commit"
 start assets search "security"
@@ -76,6 +82,7 @@ start assets add <query>       # Search and install
 ```
 
 **Examples:**
+
 ```bash
 start assets add                              # Browse all assets
 start assets add "commit"                     # Search for 'commit'
@@ -93,6 +100,7 @@ start assets info <query>
 ```
 
 **Examples:**
+
 ```bash
 start assets info "pre-commit-review"
 start assets info "code-reviewer"
@@ -110,6 +118,7 @@ start assets update <query>    # Update matching assets
 ```
 
 **Examples:**
+
 ```bash
 start assets update                   # Update all
 start assets update "commit"          # Update matching 'commit'
@@ -133,17 +142,20 @@ start assets index
 ### Discovery Workflow
 
 **Browse visually in GitHub:**
+
 ```bash
 start assets browse
 ```
 
 **Search by keyword:**
+
 ```bash
 start assets search "commit"
 start assets search "security review"
 ```
 
 **Preview before installing:**
+
 ```bash
 start assets info "pre-commit-review"
 ```
@@ -151,18 +163,21 @@ start assets info "pre-commit-review"
 ### Installation Workflow
 
 **Interactive browsing:**
+
 ```bash
 start assets add
 # Navigate categories, select asset
 ```
 
 **Search and install:**
+
 ```bash
 start assets add "commit"
 # Select from matching results
 ```
 
 **Direct install:**
+
 ```bash
 start assets add git-workflow/pre-commit-review
 # Installs immediately
@@ -171,20 +186,18 @@ start assets add git-workflow/pre-commit-review
 ### Maintenance Workflow
 
 **Update all cached assets:**
+
 ```bash
 start assets update
 ```
 
 **Update specific assets:**
+
 ```bash
 start assets update git-workflow
 ```
 
-## Design References
 
-- [DR-039](../design/design-records/dr-039-catalog-index.md) - Catalog index file (CSV schema)
-- [DR-040](../design/design-records/dr-040-substring-matching.md) - Substring matching algorithm
-- [DR-041](../design/design-records/dr-041-asset-command-reorganization.md) - Asset command reorganization
 
 ## Examples
 
@@ -307,9 +320,9 @@ $ start assets update
 
 Checking for updates...
 
-✓ tasks/git-workflow/pre-commit-review  (v1.0 → v1.1)
+✓ tasks/git-workflow/pre-commit-review  (a1b2c3 → d4e5f6)
 ✓ roles/general/code-reviewer           (up to date)
-✓ tasks/quality/commit-lint             (v2.3 → v2.4)
+✓ tasks/quality/commit-lint             (7890ab → cdef12)
 
 Updated 2 assets, 1 up to date.
 ```
@@ -321,9 +334,9 @@ $ start assets update "commit"
 
 Checking for updates to assets matching 'commit'...
 
-✓ tasks/git-workflow/commit-message     (v1.2 → v1.3)
+✓ tasks/git-workflow/commit-message     (123456 → 7890ab)
 ✓ tasks/git-workflow/pre-commit-review  (up to date)
-✓ tasks/git-workflow/post-commit-hook   (v1.0 → v1.1)
+✓ tasks/git-workflow/post-commit-hook   (abcdef → 123456)
 
 Updated 2 assets, 1 up to date.
 ```
@@ -345,12 +358,14 @@ Updated 2 assets, 1 up to date.
 `start assets` commands only search the GitHub catalog, not your local/global configs or cache.
 
 **Rationale:**
+
 - Discovery is about exploring what's **available** in the catalog
 - Local/global configs are already known to you (`start config <type> list`)
 - Cache is a subset of GitHub catalog
 - Searching GitHub provides complete, fresh view
 
 **For local assets:**
+
 ```bash
 start config task list         # See your configured tasks
 start config role list         # See your configured roles
@@ -359,6 +374,7 @@ start config role list         # See your configured roles
 ### Cache Transparency
 
 Cache is automatically managed:
+
 - Populated when downloading from GitHub
 - Updated via `start assets update`
 - No manual inspection needed

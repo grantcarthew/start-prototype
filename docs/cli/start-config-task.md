@@ -361,8 +361,8 @@ Select [1-4]: 2
 Command: git diff --staged
 ✓ Valid command
 
-Prompt template: Review changes:\n\n## Instructions\n{instructions}\n\n## Changes\n```diff\n{command}\n```
-✓ Valid template (uses {instructions} and {command} placeholders)
+Prompt template: Review changes:\n\n## Instructions\n{instructions}\n\n## Changes\n```diff\n{command_output}\n```
+✓ Valid template (uses {instructions} and {command_output} placeholders)
 
 Advanced options? [y/N]: y
 
@@ -406,7 +406,7 @@ Review changes:
 
 ## Changes
 ```diff
-{command}
+{command_output}
 ```
 """
 
@@ -857,13 +857,13 @@ Task prompt:
 
     ## Changes
     ```diff
-    {command}
+    {command_output}
     ```
 
-  Placeholders found: {instructions}, {command}
+  Placeholders found: {instructions}, {command_output}
   ✓ Valid placeholder usage
   ✓ {instructions} - task-specific placeholder
-  ✓ {command} - matches task command field
+  ✓ {command_output} - output of command execution
 
 Required contexts:
   ✓ Auto-includes contexts where required = true
@@ -1105,7 +1105,7 @@ Exit code: 2
 ```
 Task prompt template [Help with: {instructions}]: Invalid {unknown} text
 ⚠ Warning: Unknown placeholder {unknown}
-  Valid placeholders: {file}, {command}, {instructions}, {model}, {date}
+  Valid placeholders: {file}, {command}, {instructions}, {date}
 
 Continue anyway? [y/N]: n
 
@@ -1472,7 +1472,7 @@ See [UTD documentation](../design/unified-template-design.md) for complete detai
 - `{command}` - Command string from task `command`
 - `{command_output}` - Output from task `command` execution
 - `{instructions}` - User's command-line arguments (or "None")
-- `{model}`, `{date}` - Global placeholders
+- `{date}` - Global placeholders
 
 ### Required Context Auto-Inclusion
 

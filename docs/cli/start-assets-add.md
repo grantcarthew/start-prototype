@@ -7,9 +7,9 @@ start assets add - Search and install asset from GitHub catalog
 ## Synopsis
 
 ```bash
-start assets add               # Interactive mode
-start assets add <query>       # Search mode
-start assets add <query> [-l|--local]
+start assets add [flags]                       # Interactive browsing
+start assets add <query> [flags]               # Search and install
+start assets add <path> [flags]                # Direct install by path
 ```
 
 ## Description
@@ -23,9 +23,9 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 
 **Interactive mode** (no query or < 3 characters):
 
-- Browse all asset types (roles, agents, contexts, tasks) and categories
-- Navigate through tree structure
-- Select asset to install
+- Step-by-step numbered selection
+- Browse by Asset Type → Category → Asset
+- Preview metadata before downloading
 
 **Search mode** (3+ character query):
 
@@ -37,14 +37,14 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 **Installation process:**
 
 1. Search GitHub catalog for matching assets
-2. Download asset files to cache (`~/.config/start/assets/`)
-3. Add configuration entry to `~/.config/start/` or `./.start/`
+2. Download all asset files (content + metadata) to cache (`~/.config/start/assets/`)
+3. Add configuration entry to the appropriate file (e.g., `tasks.toml`) in `~/.config/start/` or `./.start/`
 4. Report installation location and usage instructions
 
 ## Arguments
 
 **\<query\>** (optional)
-: Search query for finding assets. Minimum 3 characters for search mode.
+: Search query for finding assets.
 
 **Query behavior:**
 
@@ -65,12 +65,19 @@ See [DR-040](../design/design-records/dr-040-substring-matching.md) for matching
 **-l, --local**
 : Install to local project configuration (`./.start/`) instead of global (`~/.config/start/`).
 
+**-f, --force**
+: Force re-installation if asset already exists (skips confirmation prompts).
+
+**-c, --category <name>**
+: Filter interactive browsing to a specific category (e.g., "git-workflow").
+
 **Examples:**
 
 ```bash
 start assets add "pre-commit" --local    # Install to ./.start/
 start assets add "pre-commit" -l         # Short flag
 start assets add "go-expert"             # Install to ~/.config/start/
+start assets add --category git-workflow # Browse only git-workflow assets
 ```
 
 ## Behavior
@@ -119,33 +126,36 @@ start assets add "go-expert"             # Install to ~/.config/start/
 
 ### Interactive Mode (No Query)
 
-When no query is provided (or query is < 3 chars), `start assets add` launches an interactive terminal UI (TUI) for browsing the catalog.
+When no query is provided (or query is < 3 chars), `start assets add` launches a numbered selection interface for browsing the catalog.
 
 **Features:**
 
-- **Tree View**: Navigate asset types (roles, agents, contexts, tasks) and categories.
-- **Preview**: See descriptions, tags, and details in a side pane.
-- **Search**: Filter the list dynamically.
-- **Install**: Select an asset and press Enter to install.
+- **Categorized View**: Browse assets grouped by Type and Category.
+- **Details**: View asset descriptions and tags in the list.
+- **Confirmation**: Review metadata before downloading.
 
-**Controls:**
+**Interaction:**
 
-- `↑/↓`: Navigate list
-- `Enter`: Select/Install
-- `/`: Filter/Search
-- `Esc`/`q`: Quit
+- **Numbered Selection**: Type the number of your choice and press Enter.
+- **Navigation**: Select Type → Category to drill down, or `[view all]` to see everything.
+- **Cancellation**: Type `q` to quit at any time.
 
 ### Installation Locations
 
 **Global installation (default):**
 
-- Cache: `~/.config/start/assets/{type}/{category}/{name}.*`
-- Config: `~/.config/start/{type}.toml`
+- **Cache:** `~/.config/start/assets/{type}/{category}/{name}.*`
+- **Config:** `~/.config/start/{type}.toml`
 
 **Local installation (--local flag):**
 
-- Cache: `~/.config/start/assets/{type}/{category}/{name}.*` (shared)
-- Config: `./.start/{type}.toml`
+- **Cache:** `~/.config/start/assets/{type}/{category}/{name}.*` (always global/shared)
+- **Config:** `./.start/{type}.toml`
+
+**Agent Assets Note:**
+Installing an agent configuration (e.g., `claude-3-5-sonnet`) downloads the configuration file but **does not install the AI tool binary** (e.g., `claude` CLI). You must ensure the required binary is installed and discoverable on your system.
+
+**Note:** Asset content files (markdown, templates) are **always downloaded to the global cache**, even for local installations. This prevents duplication and saves disk space. Only the configuration definition is added to the local project scope.
 
 **Example:**
 
@@ -181,7 +191,7 @@ tasks/git-workflow/pre-commit-review.md         # Prompt or instructions
 tasks/git-workflow/pre-commit-review.meta.toml  # Metadata
 ```
 
-**All files downloaded** when installing an asset.
+**All files downloaded** (including metadata) when installing an asset. This ensures full offline capability and metadata availability.
 
 ## Output
 
@@ -199,7 +209,7 @@ tasks/git-workflow/pre-commit-review
 
 Downloading...
 ✓ Cached to ~/.config/start/assets/tasks/git-workflow/
-✓ Added to global config (tasks.toml)
+✓ Added to global config (~/.config/start/tasks.toml)
 
 Use 'start task pre-commit-review' to run.
 ```
@@ -231,7 +241,7 @@ Selected: tasks/git-workflow/pre-commit-review
 
 Downloading...
 ✓ Cached to ~/.config/start/assets/tasks/git-workflow/
-✓ Added to global config (tasks.toml)
+✓ Added to global config (~/.config/start/tasks.toml)
 
 Use 'start task pre-commit-review' to run.
 ```
@@ -305,6 +315,20 @@ Downloading...
 ✓ Config unchanged (already present)
 
 Use 'start task pre-commit-review' to run.
+```
+
+**Using --force:**
+
+```bash
+$ start assets add "pre-commit-review" --force
+
+Searching catalog...
+✓ Found 1 match
+✓ Reinstalling (forced)
+
+Downloading...
+✓ Updated cache
+✓ Updated config
 ```
 
 ### Network Error
@@ -498,7 +522,7 @@ Select asset [1-5] (or 'q' to quit): q
 Cancelled.
 ```
 
-Exit code: 3
+Exit code: 1
 
 ## Use Cases
 
@@ -511,6 +535,8 @@ start assets add "pre-commit-review"
 ```
 
 Auto-selects and installs immediately.
+
+**Tip:** You can also just run `start task pre-commit-review`. If it's not installed, `start` will offer to download it automatically.
 
 ### Exploration and Discovery
 
@@ -538,6 +564,8 @@ start assets add "pre-commit-review" --local
 ```
 
 Local config can be committed to version control.
+
+**Note:** When team members check out the repo and run a task, `start` will automatically detect any missing asset files (tasks, roles) referenced by the config and restore them from the catalog (Asset Restoration).
 
 ### Multi-Project Workflow
 

@@ -75,7 +75,7 @@ start task code-review "check error handling"
 All global flags from `start` command are supported. See `start --help` for a full list of global flags like `--agent`, `--role`, `--model`, `--directory`, `--verbose`, and `--debug`.
 
 **--quiet**, **-q**
-: Silently ignored for tasks. Unlike other commands, `start task` always shows a summary before execution to ensure the user sees what context is being used.
+: Suppress task summary and context list. Useful for scripting or when you only want the agent's output.
 
 **-l, --local**
 : When lazy-loading a new task from the catalog, this flag adds the task to the local config (`./.start/tasks.toml`) instead of the global config.
@@ -185,7 +185,7 @@ start task <name> [instructions]
    - Replace `{instructions}` with user's args (or "None")
    - Replace `{file}` with file path, `{file_contents}` with file contents
    - Replace `{command}` with command string, `{command_output}` with command output
-   - Replace global placeholders ({model}, {date})
+   - Replace global placeholders ({date})
    - Insert required context document prompts first
 9. Display task summary (unless verbose/debug)
 10. Execute agent command
@@ -631,7 +631,6 @@ Task prompt templates support these placeholders:
 
 **Global:**
 
-- `{model}` - Model name
 - `{date}` - Current timestamp (ISO 8601)
 
 ### Required Context Handling
@@ -652,12 +651,16 @@ Tasks automatically include all contexts where `required = true`.
 - Context prompts appear BEFORE task's prompt template
 - Example: environment, index, then task prompt
 
-### System Prompt File Location
+### Role Reference
 
-By convention, task system prompt files are stored in:
+Tasks do not define system prompts directly. Instead, they reference a **Role** which contains the system prompt.
 
-- Global: `~/.config/start/roles/*.md`
-- Local (per-project): `./.start/roles/*.md` or `./roles/*.md`
+- Tasks reference roles by name (e.g., `role = "code-reviewer"`)
+- Roles are resolved using the standard asset resolution (Local → Global → Cache → GitHub)
+- Role files are stored in:
+  - Global: `~/.config/start/roles/*.md`
+  - Local: `./.start/roles/*.md`
+  - Cache: `~/.config/start/assets/roles/*/*.md`
 
 Example task configuration with system prompt override:
 
@@ -736,15 +739,16 @@ Tasks are available from the GitHub asset catalog and automatically download on 
 
 Tasks are discovered from:
 
-1. Default tasks (embedded in binary)
+1. Local config: `./.start/tasks.toml` (highest priority)
 2. Global config: `~/.config/start/tasks.toml`
-3. Local config: `./.start/tasks.toml`
+3. Asset cache: `~/.config/start/assets/tasks/`
+4. GitHub catalog: `grantcarthew/start` (if `asset_download = true`)
 
 **Merge behavior:**
 
-- Local tasks override global tasks (same name)
-- All tasks from all sources combined
-- Alphabetically sorted in task list
+- Local tasks override global/cache/catalog tasks (same name)
+- First source with the task wins (resolution order)
+- All tasks from all sources combined for listing
 
 ### Instructions Handling
 
@@ -776,14 +780,12 @@ start task gdr check error handling
 
 ### Quiet Flag Behavior
 
-The `--quiet` flag is accepted but silently ignored for tasks. Tasks always display summary output before launching the agent.
+The `--quiet` flag suppresses the task summary and context list.
 
-**Rationale:**
+- **With `--quiet`**: Outputs only the agent's execution output (and task command output if part of the prompt).
+- **Without `--quiet`**: Displays task header, agent details, role source, and context summary before execution.
 
-- Tasks involve dynamic content (command output)
-- Users need visibility into what content is being analyzed
-- Summary is already concise
-- Use `--verbose` or `--debug` for more detail if needed
+Use `--quiet` when piping output or running in scripts.
 
 ## See Also
 

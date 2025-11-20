@@ -743,7 +743,8 @@ default_role = "code-reviewer"
 
 ```toml
 [agents.claude]
-command = "claude --model {model} ..."
+bin = "claude"
+command = "{bin} --model {model} ..."
 # ...
 ```
 
@@ -850,12 +851,13 @@ Repository structure:
 start/
 ├── assets/
 │   ├── agents/
-│   │   ├── claude.toml
-│   │   ├── gemini.toml
-│   │   ├── aichat.toml
-│   │   ├── opencode.toml
-│   │   ├── codex.toml
-│   │   └── aider.toml
+│   │   ├── anthropic/
+│   │   │   └── claude.toml
+│   │   ├── google/
+│   │   │   └── gemini.toml
+│   │   └── open/
+│   │       ├── aichat.toml
+│   │       └── opencode.toml
 │   ├── tasks/
 │   └── roles/
 ```

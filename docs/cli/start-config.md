@@ -646,7 +646,7 @@ Global: ~/.config/start/
       Command: broken-agent --model {model}
     ⚠ test-agent
       Unknown placeholder {mdoel} in command template
-      Valid placeholders: {model}, {role}, {role_file}, {prompt}, {date}
+      Valid placeholders: {bin}, {model}, {role}, {role_file}, {prompt}, {date}
   ✓ contexts.toml - 2 contexts configured
   ✓ roles.toml - (not present)
   ✓ tasks.toml - (not present)
@@ -968,6 +968,7 @@ Commands that modify configs create timestamped backups for each file:
 - `start config role new|edit|remove` (before write to roles.toml)
 - `start config context new|edit|remove` (before write to contexts.toml)
 - `start init` (when modifying existing config files)
+- `start assets add` (when adding to configuration)
 
 ### Context File Validation
 

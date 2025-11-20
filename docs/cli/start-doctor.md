@@ -458,14 +458,13 @@ Only run task if environment is healthy.
 
 ### Automatic Checks
 
-`start doctor` runs automatically in limited form:
+**No automatic checks:**
 
-- Asset age check runs on every `start` invocation
-- If assets > 30 days: "⚠ Assets outdated. Run 'start assets update'"
-- Non-blocking: warning only, doesn't prevent execution
-- Cached for 24 hours to avoid GitHub API rate limits
+Per DR-025, `start` does **not** run diagnostics, version checks, or asset age checks on startup. This ensures fast startup times and predictable behavior.
 
-Full `start doctor` command runs all checks manually.
+- No background network calls
+- No startup latency
+- User must explicitly run `start doctor` or `start assets update`
 
 ### Asset Age Thresholds
 

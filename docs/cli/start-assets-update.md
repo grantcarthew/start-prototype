@@ -525,7 +525,7 @@ Per [DR-025](../design/design-records/dr-025-no-automatic-checks.md), updates ar
 **File-referenced assets (automatic update):**
 ```toml
 [tasks.my-task]
-prompt_file = "~/.config/start/assets/tasks/my-category/my-task.toml"
+file = "~/.config/start/assets/tasks/my-category/my-task.toml"
 # After update, next run uses new content automatically
 ```
 

@@ -321,8 +321,8 @@ Select [1-4]: 2
 Command: git status --short
 ✓ Valid command
 
-Prompt template: Working tree status:\n{command}
-✓ Valid template (uses {command} placeholder)
+Prompt template: Working tree status:\n{command_output}
+✓ Valid template (uses {command_output} placeholder)
 
 Required context? [y/N]: n
 
@@ -396,7 +396,7 @@ required = true
 [contexts.git-status]
 description = "Current git working tree status"
 command = "git status --short"
-prompt = "Working tree status:\n{command}"
+prompt = "Working tree status:\n{command_output}"
 required = false
 shell = "bash"
 command_timeout = 5
@@ -713,9 +713,9 @@ Command:
 
 Prompt template:
   Working tree status:
-  {command}
+  {command_output}
   ✓ Valid template
-  ✓ Uses {command} placeholder
+  ✓ Uses {command_output} placeholder
 
 ✓ Context 'git-status' is configured correctly
 ```

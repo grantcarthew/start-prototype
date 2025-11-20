@@ -83,6 +83,21 @@ Resolution searches all sources (local → global → cache → GitHub) with exa
 
 Discovery searches GitHub only with substring matching for exploration.
 
+Recursive Resolution & Content Restoration:
+
+Asset resolution works in conjunction with file restoration (DR-042) to ensure dependencies are available:
+
+1. **Recursive Resolution (Config)**
+   - When a Task references a Role or Agent not found in the config, the Resolution Algorithm is invoked recursively.
+   - Example: `role = "reviewer"` missing? → Search catalog for "reviewer" → Download & Use.
+   - Allows lazy loading of entire dependency chains (Task → Role).
+
+2. **Content Restoration (Files)**
+   - When a resolved asset config references a file path (e.g., `prompt_file = ".../assets/..."`) that is missing from disk.
+   - The low-level file loader detects the missing file in the asset cache path.
+   - Automatically restores the file from the catalog (DR-042).
+   - Handles cases where config exists (e.g., shared in git) but content is missing.
+
 ## Why
 
 Clear priority order simplifies user mental model:
