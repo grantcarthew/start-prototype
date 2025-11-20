@@ -1454,6 +1454,7 @@ Context prompt templates support these placeholders:
 - `{file_contents}` - Content from `file` field (empty if file missing)
 - `{command}` - Command string from `command` field
 - `{command_output}` - Output from `command` execution (empty if command fails)
+- `{date}` - Current timestamp (ISO 8601)
 
 **Example:**
 

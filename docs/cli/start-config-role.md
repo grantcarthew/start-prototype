@@ -9,11 +9,11 @@ start config role - Manage role configuration
 ```bash
 start config role list
 start config role new [scope]
-start config role show [scope]
+start config role show [name] [scope]
 start config role edit [scope]
 start config role remove [scope]
 start config role default [name]
-start config role test
+start config role test <name>
 ```
 
 ## Description
@@ -154,10 +154,10 @@ Display current role configuration.
 **Synopsis:**
 
 ```bash
-start config role show          # Select scope interactively
-start config role show global   # Show global role only
-start config role show local    # Show local role only
-start config role show merged   # Show effective role (with override info)
+start config role show [name] [scope]          # Select role and scope interactively
+start config role show <name> global   # Show global role only
+start config role show <name> local    # Show local role only
+start config role show <name> merged   # Show effective role (with override info)
 ```
 
 **Behavior:**
@@ -886,7 +886,7 @@ Test role configuration and file availability.
 **Synopsis:**
 
 ```bash
-start config role test
+start config role test <name>
 ```
 
 **Behavior:**
@@ -1370,6 +1370,7 @@ Role templates support these placeholders:
 - `{file_contents}` - Content from `file` field (empty if file missing)
 - `{command}` - Command string from `command` field
 - `{command_output}` - Output from `command` execution (empty if command fails)
+- `{date}` - Current timestamp (ISO 8601)
 
 **Example:**
 

@@ -63,19 +63,12 @@ Search for assets in the GitHub catalog and install them to your configuration. 
 **-l, --local**
 : Install to local project configuration (`./.start/`) instead of global (`~/.config/start/`).
 
-**-f, --force**
-: Force re-installation if asset already exists (skips confirmation prompts).
-
-**-c, --category <name>**
-: Filter interactive browsing to a specific category (e.g., "git-workflow").
-
 **Examples:**
 
 ```bash
 start assets add "pre-commit" --local    # Install to ./.start/
 start assets add "pre-commit" -l         # Short flag
 start assets add "go-expert"             # Install to ~/.config/start/
-start assets add --category git-workflow # Browse only git-workflow assets
 ```
 
 ## Behavior
@@ -313,20 +306,6 @@ Downloading...
 ✓ Config unchanged (already present)
 
 Use 'start task pre-commit-review' to run.
-```
-
-**Using --force:**
-
-```bash
-$ start assets add "pre-commit-review" --force
-
-Searching catalog...
-✓ Found 1 match
-✓ Reinstalling (forced)
-
-Downloading...
-✓ Updated cache
-✓ Updated config
 ```
 
 ### Network Error

@@ -73,20 +73,13 @@ Ready to commit:
 
 ## Flags
 
-**--verify**, **-c**
+**--verify**
 : Verify the existing index against the file system without modifying it. Returns exit code 1 if out of sync. Useful for CI/CD pipelines.
-
-**--verbose**, **-v**
-: Show detailed processing information for each asset.
-
-**--help**, **-h**
-: Show help for the command.
 
 ## Exit Codes
 
 **0** - Success
 **1** - Verification failed (with --verify) or general error
-**2** - Invalid repository structure
 
 ## See Also
 

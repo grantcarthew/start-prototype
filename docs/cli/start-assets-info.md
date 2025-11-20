@@ -265,14 +265,6 @@ Use 'start --role code-reviewer' to use this role.
 
 **2** - Asset not found
 
-## Flags
-
-**--format** _format_
-: Output format. Options: `text` (default), `json`, `yaml`.
-
-**--show-content**
-: Display file contents in addition to metadata.
-
 ## Examples
 
 ### Show Task Info
@@ -360,71 +352,6 @@ Asset: pr-ready
 [... full details ...]
 ```
 
-### JSON Output
-
-```bash
-$ start assets info "pre-commit-review" --format json
-
-{
-  "name": "pre-commit-review",
-  "type": "tasks",
-  "category": "git-workflow",
-  "path": "tasks/git-workflow/pre-commit-review",
-  "description": "Review staged changes before committing",
-  "tags": ["git", "review", "quality", "pre-commit"],
-  "files": [
-    {
-      "name": "pre-commit-review.toml",
-      "size": 2150
-    },
-    {
-      "name": "pre-commit-review.md",
-      "size": 1340
-    }
-  ],
-  "created": "2025-01-10T00:00:00Z",
-  "updated": "2025-01-12T14:30:00Z",
-  "sha": "a1b2c3d4e5f6...",
-  "installation": {
-    "cached": true,
-    "global": true,
-    "local": false
-  }
-}
-```
-
-### Show File Contents
-
-```bash
-$ start assets info "commit-message" --show-content
-
-Asset: commit-message
-═══════════════════════════════════════════════════════════
-Type: tasks
-Category: git-workflow
-Path: tasks/git-workflow/commit-message
-
-[... metadata ...]
-
-File Contents:
-─────────────────────────────────────────────────
-commit-message.toml:
-─────────────────────────────────────────────────
-[task]
-name = "commit-message"
-description = "Generate conventional commit message"
-command = "git diff --staged"
-role = "commit-assistant"
-
-[task.prompt]
-template = """
-Generate a conventional commit message for these changes:
-
-{command_output}
-"""
-─────────────────────────────────────────────────
-```
-
 ### User Cancellation
 
 ```bash
@@ -485,16 +412,6 @@ start assets info "go-expert"
 ```
 
 Displays comprehensive metadata and usage instructions.
-
-### Scripting and Automation
-
-**Problem:** Need programmatic access to asset metadata.
-
-```bash
-start assets info "pre-commit" --format json > asset.json
-```
-
-JSON output for parsing in scripts.
 
 ## Comparison with Other Commands
 
@@ -608,40 +525,6 @@ Requires network to download catalog index and metadata.
 Uses same algorithm as `start assets search` and `start assets add`.
 
 **Minimum length:** 3 characters
-
-### File Content Preview
-
-**With --show-content flag:**
-
-- Downloads file contents from GitHub
-- Displays inline in terminal
-- Useful for previewing small files
-
-**Without flag (default):**
-
-- Only shows metadata
-- No file downloads
-- Faster and lighter
-
-### Output Formats
-
-**text (default):**
-
-- Human-readable
-- Formatted for terminal display
-- Uses box-drawing characters
-
-**json:**
-
-- Machine-parsable
-- Complete metadata structure
-- Suitable for scripting
-
-**yaml:**
-
-- Human and machine readable
-- Structured but readable
-- Alternative to JSON
 
 ## See Also
 

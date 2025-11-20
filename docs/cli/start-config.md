@@ -73,17 +73,17 @@ Settings
 Agents (3)
 ──────────
   claude                                (global)
-    Command: claude --model {model} --append-system-prompt '{role}' '{prompt}'
+    Command: {bin} --model {model} --append-system-prompt '{role}' '{prompt}'
     Default model: sonnet
     Models: haiku, sonnet, opus
 
   gemini                                (global)
-    Command: gemini --model {model} '{prompt}'
+    Command: {bin} --model {model} '{prompt}'
     Default model: flash
     Models: flash, pro-exp
 
   aichat                                (global)
-    Command: aichat --model {model} '{prompt}'
+    Command: {bin} --model {model} '{prompt}'
     Default model: gpt4-mini
     Models: gpt4-mini, gpt4, claude
 

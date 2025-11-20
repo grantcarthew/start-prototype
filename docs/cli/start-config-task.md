@@ -52,7 +52,7 @@ Review changes:
 
 ## Changes
 ```diff
-{command}
+{command_output}
 ```
 """
 
@@ -81,7 +81,7 @@ At least one required:
 
 - `file` - Path to prompt template file
 - `command` - Shell command for dynamic content
-- `prompt` - Template with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`, `{instructions}`
+- `prompt` - Template with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`, `{instructions}`, `{date}`
 
 **Additional Fields:**
 
@@ -720,10 +720,10 @@ Task prompt:
 
     ## Changes
     ```diff
-    {command}
+    {command_output}
     ```
   ✓ Valid template
-  ✓ Uses {instructions} and {command} placeholders
+  ✓ Uses {instructions} and {command_output} placeholders
 
 ✓ Task 'git-diff-review' is configured correctly
 ```

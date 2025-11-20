@@ -112,6 +112,7 @@ Configured agents:
 claude
   Anthropic's Claude AI assistant via Claude Code CLI
   https://docs.claude.com/claude-code
+  Command: {bin} --model {model} --append-system-prompt '{role}' '{prompt}'
   Default model: claude-3-7-sonnet-20250219 (sonnet)
   Models:
     - claude-3-5-haiku-20241022 (haiku)
@@ -122,6 +123,7 @@ claude
 gemini
   Google's Gemini AI via CLI
   https://github.com/example/gemini-cli
+  Command: {bin} --model {model} '{prompt}'
   Default model: gemini-2.0-flash-exp (flash)
   Models:
     - gemini-2.0-flash-exp (flash)
@@ -131,6 +133,7 @@ gemini
 aichat
   All-in-one multi-provider AI chat tool
   https://github.com/sigoden/aichat
+  Command: {bin} --model {model} '{prompt}'
   Default model: gpt-4o-mini (gpt4-mini)
   Models:
     - gpt-4o-mini (gpt4-mini)
@@ -142,7 +145,7 @@ aichat
 
 ```
 opencode
-  Command: opencode '{prompt}'
+  Command: {bin} '{prompt}'
   Default model: (first model in config)
 ```
 
