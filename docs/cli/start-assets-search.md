@@ -107,7 +107,7 @@ Suggestions:
 - Visit: https://github.com/grantcarthew/start/tree/main/assets
 ```
 
-Exit code: 1
+Exit code: 2
 
 ### Query Too Short
 
@@ -191,7 +191,9 @@ Use 'start assets browse' for full catalog exploration.
 
 **0** - Success (matches found and displayed)
 
-**1** - No matches found, query too short, or network error
+**1** - Network error or invalid query
+
+**2** - No matches found
 
 ## Flags
 
@@ -375,7 +377,7 @@ else
 fi
 ```
 
-Exit code indicates success/failure.
+Exit codes: 0 (Found), 1 (Error), 2 (Not found).
 
 ### Quick Reference
 

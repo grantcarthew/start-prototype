@@ -36,7 +36,7 @@ To install agents from the catalog, use `start assets add`.
 
 ## Agent Configuration Structure
 
-Agents are defined in the global config with the following fields:
+Agents are defined in the configuration with the following fields:
 
 ```toml
 [agents.claude]
@@ -56,7 +56,7 @@ default_model = "sonnet"
 **Fields:**
 
 **bin** (required)
-: Binary name or path to execute (e.g., `claude` or `/usr/local/bin/claude`). Used for binary detection (`start doctor`) and the `{bin}` placeholder in command templates.
+: Binary name or path to execute (e.g., `claude` or `/usr/local/bin/claude`). Used for binary detection (`start doctor`), the `{bin}` placeholder in command templates, and catalog index generation.
 
 **command** (required)
 : Command template to execute the agent. Should contain `{prompt}` placeholder. Supports placeholders: `{bin}`, `{model}`, `{role}`, `{role_file}`, `{prompt}`, `{date}`.
@@ -1371,7 +1371,7 @@ Agents can be defined in both global and local configs with merge behavior:
 **Local agents:** `./.start/agents.toml`
 
 - Team-standardized configurations (can be committed to git)
-- Manually edited (not managed by `start config agent` commands)
+- Managed by `start config agent ... local` commands or manually edited
 - Project-specific agent wrappers or custom tools
 
 **Merge behavior:**

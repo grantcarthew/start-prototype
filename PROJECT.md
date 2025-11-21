@@ -42,7 +42,7 @@ REPEAT: This is an interactive session. Do not change anything without approval 
 
 ## Documents to Review
 
-Active document: `docs/cli/start-assets-browse.md`
+Active document: `docs/cli/start-config-agent.md`
 
 ### Root Documentation
 
@@ -60,13 +60,13 @@ Active document: `docs/cli/start-assets-browse.md`
 
 - [x] `docs/cli/start-assets.md` - Asset management overview
 - [x] `docs/cli/start-assets-add.md` - Add assets from catalog
-- [ ] `docs/cli/start-assets-browse.md` - Browse catalog in browser
-- [ ] `docs/cli/start-assets-search.md` - Search catalog
-- [ ] `docs/cli/start-assets-info.md` - Show asset information
+- [x] `docs/cli/start-assets-browse.md` - Browse catalog in browser
+- [x] `docs/cli/start-assets-search.md` - Search catalog
+- [x] `docs/cli/start-assets-info.md` - Show asset information
 
 ### Configuration Commands
 
-- [ ] `docs/cli/start-config.md` - Configuration management overview
+- [x] `docs/cli/start-config.md` - Configuration management overview
 - [ ] `docs/cli/start-config-agent.md` - Agent configuration
 - [ ] `docs/cli/start-config-context.md` - Context configuration
 - [ ] `docs/cli/start-config-role.md` - Role configuration
@@ -364,3 +364,12 @@ Documentation review is complete when:
 - **Missing Asset Restoration (DR-042)**: Implemented logic to automatically restore missing asset files (prompts, role definitions) from the GitHub catalog if they are referenced in config but missing from disk.
 - `docs/design/design-records/dr-042-missing-asset-restoration.md`: Created new DR defining the restoration logic (intercept missing file -> check asset path -> download from catalog).
 - `docs/design/design-records/dr-033-asset-resolution-algorithm.md`: Updated to include "Recursive Resolution & Content Restoration" section, linking resolution to file restoration.
+- **start-assets-browse.md updates**: Added missing exit code and clarified browser interaction
+- `docs/cli/start-assets-browse.md`: Added `(or Ctrl+Click)` to browser failure output
+- `docs/cli/start-assets-browse.md`: Added Exit Code 1 for general errors
+- `docs/cli/start-assets-search.md`: Updated exit codes to distinguish between errors (1) and no matches (2)
+- `docs/cli/start-assets-search.md`: Updated scripting section to reflect new exit codes
+- `docs/cli/start-config-agent.md`: Removed incorrect "global config" qualifier from agent definition
+- `docs/cli/start-config-agent.md`: Updated bin field description to include index.csv usage
+- `docs/cli/start-config-agent.md`: Clarified local agent management (CLI supported)
+- `docs/design/design-records/dr-007-placeholders.md`: Clarified placeholder requirements ({prompt} recommended/warning, others recommended)

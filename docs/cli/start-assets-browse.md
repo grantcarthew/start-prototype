@@ -68,7 +68,7 @@ Error: Could not open browser
 
 URL: https://github.com/grantcarthew/start/tree/main/assets
 
-Copy and paste this URL into your browser to view the catalog.
+Copy and paste this URL into your browser (or Ctrl+Click) to view the catalog.
 ```
 
 The command exits with code 0 even if the browser fails to open, since the URL is displayed.
@@ -97,7 +97,7 @@ Opening GitHub catalog in browser...
 
 URL: https://github.com/grantcarthew/start/tree/main/assets
 
-Copy and paste this URL into your browser to view the catalog.
+Copy and paste this URL into your browser (or Ctrl+Click) to view the catalog.
 ```
 
 URL is displayed for manual access.
@@ -149,6 +149,8 @@ assets/
 ## Exit Codes
 
 **0** - Success (browser opened or URL displayed)
+
+**1** - General error (configuration loading failed)
 
 ## Use Cases
 
@@ -305,7 +307,7 @@ Opening GitHub catalog in browser...
 
 URL: https://github.com/grantcarthew/start/tree/main/assets
 
-Copy and paste this URL into your browser to view the catalog.
+Copy and paste this URL into your browser (or Ctrl+Click) to view the catalog.
 ```
 
 URL is displayed for manual access. Exit code is still 0.

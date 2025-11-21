@@ -138,18 +138,23 @@ Available in agent commands only:
 
 - Value: Binary name from agent's `bin` field
 - Example: `"claude"`, `"gemini"`
-- Required in agent commands (enforces DRY, prevents bin/command mismatch)
+- **Recommended** in agent command templates (allows path overriding via `bin` field)
+- If omitted: Command template must hardcode the binary name
 
 {model} - Currently selected model identifier:
 
 - Value: Full model identifier after name resolution
 - Example: `"claude-3-7-sonnet-20250219"`, `"gemini-2.0-flash-exp"`
+- **Recommended** in agent command templates (enables model switching via `--model`)
+- If omitted: Command template must hardcode the model or rely on tool default
 - Available in agent commands only (execution detail, not content concern)
 
 {prompt} - Assembled prompt text:
 
 - Value: Final prompt after context document inclusion and template processing
 - Contains: Required context prompts + optional context prompts + custom prompt (if using `start prompt`)
+- **Recommended** (validation warning if missing)
+- Without this, the agent receives no input from `start`
 
 {role} - Resolved role content (inline text):
 
