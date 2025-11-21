@@ -9,7 +9,6 @@ start config context - Manage context document configurations
 ```bash
 start config context list [scope]
 start config context new [scope]
-start config context new [scope]
 start config context show [name] [scope]
 start config context test <name>
 start config context edit [name] [scope]
@@ -52,7 +51,7 @@ required = true
 : Shell command to execute for dynamic content. Command string available via `{command}`, output available via `{command_output}`.
 
 **prompt** (optional)
-: Template text with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`.
+: Template text with placeholders: `{file}`, `{file_contents}`, `{command}`, `{command_output}`, `{date}`.
 
 **Context-Specific Fields:**
 

@@ -93,7 +93,7 @@ start config agent list merged   # Show merged view (global + local)
 
 **Behavior:**
 
-Lists all agents defined in `~/.config/start/agents.toml` with:
+Lists all agents defined in the selected scope(s) with:
 
 - Agent name
 - Description
@@ -177,7 +177,7 @@ start config agent new local    # Add to local config
 
 **Behavior:**
 
-Prompts for agent details and adds to `~/.config/start/agents.toml`:
+Prompts for agent details and adds to the selected configuration file:
 
 1. **Agent name** (required)
 
@@ -203,7 +203,7 @@ Prompts for agent details and adds to `~/.config/start/agents.toml`:
 
 5. **Binary** (required)
    - Binary name or path to execute (e.g., `claude`)
-   - Used for detection and `{bin}` placeholder
+   - Used for detection, `{bin}` placeholder, and catalog index generation
 
 6. **Command template** (required)
 
@@ -1336,7 +1336,7 @@ claude
 ### No Configuration File
 
 ```
-Error: No agent configuration found at ~/.config/start/agents.toml
+Error: No agent configuration found in [scope] config.
 
 Run 'start init' to create initial configuration.
 ```
