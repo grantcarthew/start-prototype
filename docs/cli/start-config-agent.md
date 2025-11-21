@@ -91,7 +91,7 @@ start config agent list local    # List local agents only
 start config agent list merged   # Show merged view (global + local)
 ```
 
-**Behavior:**
+**Behvior:**
 
 Lists all agents defined in the selected scope(s) with:
 
@@ -181,10 +181,10 @@ Prompts for agent details and adds to the selected configuration file:
 
 1. **Agent name** (required)
 
-   - Validation: lowercase alphanumeric with hyphens
-   - Pattern: `/^[a-z0-9]+(-[a-z0-9]+)*$/`
+   - Validation: alphanumeric with hyphens/underscores
+   - Pattern: `/^[a-zA-Z0-9]+([-_][a-zA-Z0-9]+)*$/`
    - Must be unique (not already exist)
-   - Examples: `claude`, `gemini`, `my-custom-agent`
+   - Examples: `claude`, `Gemini`, `My-Custom-Agent`
 
 2. **Description** (optional)
 
@@ -205,7 +205,7 @@ Prompts for agent details and adds to the selected configuration file:
    - Binary name or path to execute (e.g., `claude`)
    - Used for detection, `{bin}` placeholder, and catalog index generation
 
-6. **Command template** (required)
+6. **Command** (required)
 
    - Should contain `{prompt}` placeholder (warns if missing)
    - Warns on unknown placeholders (typos)
@@ -234,6 +234,11 @@ Prompts for agent details and adds to the selected configuration file:
 Add new agent
 ─────────────────────────────────────────────────
 
+Select scope:
+  1) global
+  2) local
+Scope [1-2]: 1
+
 Agent name: my-agent
 Description (optional): My custom AI agent
 URL (optional): https://example.com/my-agent
@@ -261,7 +266,7 @@ Select default model:
   [skip to use first model]
 Default: 1
 
-Backing up config to config.2025-01-04-143022.toml...
+Backing up config to agents.2025-01-04-143022.toml...
 ✓ Backup created
 
 Saving agent 'my-agent' to ~/.config/start/agents.toml...
@@ -277,6 +282,11 @@ Use 'start --agent my-agent' to test.
 Add new agent
 ─────────────────────────────────────────────────
 
+Select scope:
+  1) global
+  2) local
+Scope [1-2]: 1
+
 Agent name: simple-agent
 Description (optional):
 URL (optional):
@@ -288,7 +298,7 @@ Command template: {bin} '{prompt}'
 
 Add models? [y/N]: n
 
-Backing up config to config.2025-01-04-143105.toml...
+Backing up config to agents.2025-01-04-143105.toml...
 ✓ Backup created
 
 Saving agent 'simple-agent' to ~/.config/start/agents.toml...
@@ -333,9 +343,9 @@ command = "{bin} '{prompt}'"
 **Invalid agent name:**
 
 ```
-Agent name: My-Agent
-✗ Invalid agent name. Use lowercase alphanumeric with hyphens.
-  Examples: claude, gemini, my-agent
+Agent name: Invalid Name!
+✗ Invalid agent name. Use alphanumeric characters with hyphens or underscores.
+  Examples: claude, Gemini, my-agent
 
 Agent name: my-agent
 ✓ Valid name
@@ -824,7 +834,7 @@ Select default model:
 Current: sonnet [2]
 Default [2]: 4
 
-Backing up config to config.2025-01-04-144512.toml...
+Backing up config to agents.2025-01-04-144512.toml...
 ✓ Backup created
 
 Saving changes to ~/.config/start/agents.toml...
@@ -861,7 +871,7 @@ Current models: (none)
 
 Add models? [y/N]: n
 
-Backing up config to config.2025-01-04-144623.toml...
+Backing up config to agents.2025-01-04-144623.toml...
 ✓ Backup created
 
 Saving changes to ~/.config/start/agents.toml...
@@ -977,7 +987,7 @@ Select [1-4] (or 'q' to quit): 2
 
 Remove agent 'gemini'? [y/N]: y
 
-Backing up config to config.2025-01-04-150212.toml...
+Backing up config to agents.2025-01-04-150212.toml...
 ✓ Backup created
 
 Removing agent 'gemini' from ~/.config/start/agents.toml...
@@ -998,7 +1008,7 @@ Output:
 ```
 Remove agent 'gemini'? [y/N]: y
 
-Backing up config to config.2025-01-04-150245.toml...
+Backing up config to agents.2025-01-04-150245.toml...
 ✓ Backup created
 
 Removing agent 'gemini' from ~/.config/start/agents.toml...
@@ -1022,7 +1032,7 @@ Output:
 
 Remove agent 'claude'? [y/N]: y
 
-Backing up config to config.2025-01-04-150312.toml...
+Backing up config to agents.2025-01-04-150312.toml...
 ✓ Backup created
 
 Removing agent 'claude' from ~/.config/start/agents.toml...
@@ -1088,7 +1098,7 @@ Warning: 'claude' is the only configured agent.
 
 Remove agent 'claude'? [y/N]: y
 
-Backing up config to config.2025-01-04-150412.toml...
+Backing up config to agents.2025-01-04-150412.toml...
 ✓ Backup created
 
 Removing agent 'claude' from ~/.config/start/agents.toml...
@@ -1104,7 +1114,7 @@ Use 'start init' to set up agents automatically.
 ```
 Remove agent 'gemini'? [y/N]: y
 
-Backing up config to config.2025-01-04-150445.toml...
+Backing up config to agents.2025-01-04-150445.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/agents.toml

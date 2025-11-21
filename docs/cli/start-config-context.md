@@ -61,8 +61,8 @@ required = true
 **required** (optional, default: false)
 : Whether this document is required context.
 
-- `true` - Included by both `start` and `start prompt`
-- `false` - Included by `start`, excluded by `start prompt`
+- `true` - Included by both `start`, `start prompt`, and `start task`
+- `false` - Included by `start`, excluded by `start prompt` and `start task`
 
 **shell** (optional)
 : Override global shell for command execution.
@@ -240,8 +240,8 @@ Prompts for context details and adds to the selected config file:
    - Or inline prompt text
 
 6. **Required context?** (yes/no, default: no)
-   - `true` - Included by both `start` and `start prompt`
-   - `false` - Included by `start`, excluded by `start prompt`
+   - `true` - Included by both `start`, `start prompt`, and `start task`
+   - `false` - Included by `start`, excluded by `start prompt` and `start task`
 
 7. **Advanced options?** (yes/no, default: no)
    - Shell override
@@ -285,7 +285,7 @@ Required context? [y/N]: y
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-091523.toml...
+Backing up config to contexts.2025-01-06-091523.toml...
 ✓ Backup created
 
 Saving context 'environment' to ~/.config/start/contexts.toml...
@@ -331,7 +331,7 @@ Advanced options? [y/N]: y
 Shell override (or enter for default): bash
 Command timeout in seconds (or enter for default): 5
 
-Backing up config to config.2025-01-06-091645.toml...
+Backing up config to contexts.2025-01-06-091645.toml...
 ✓ Backup created
 
 Saving context 'git-status' to ./.start/contexts.toml...
@@ -371,7 +371,7 @@ Required context? [y/N]: y
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-091712.toml...
+Backing up config to contexts.2025-01-06-091712.toml...
 ✓ Backup created
 
 Saving context 'project-note' to ./.start/contexts.toml...
@@ -1005,7 +1005,7 @@ Required [yes]:
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-092312.toml...
+Backing up config to contexts.2025-01-06-092312.toml...
 ✓ Backup created
 
 Saving changes to ~/.config/start/contexts.toml...
@@ -1044,7 +1044,7 @@ Required [yes]:
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-092415.toml...
+Backing up config to contexts.2025-01-06-092415.toml...
 ✓ Backup created
 
 Saving changes to ~/.config/start/contexts.toml...
@@ -1132,7 +1132,7 @@ Select [1-6] (or 'q' to quit): 3
 
 Remove context 'readme' from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-093012.toml...
+Backing up config to contexts.2025-01-06-093012.toml...
 ✓ Backup created
 
 Removing context 'readme' from ~/.config/start/contexts.toml...
@@ -1153,7 +1153,7 @@ Context exists in global only:
 ```
 Remove context 'readme' from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-093045.toml...
+Backing up config to contexts.2025-01-06-093045.toml...
 ✓ Backup created
 
 Removing context 'readme' from ~/.config/start/contexts.toml...
@@ -1192,7 +1192,7 @@ Output:
 
 Remove context 'environment' from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-093123.toml...
+Backing up config to contexts.2025-01-06-093123.toml...
 ✓ Backup created
 
 Removing context 'environment' from ~/.config/start/contexts.toml...
@@ -1245,7 +1245,7 @@ Exit code: 1
 ```
 Remove context 'readme' from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-093156.toml...
+Backing up config to contexts.2025-01-06-093156.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/contexts.toml
@@ -1424,7 +1424,7 @@ prompt = "Read {file} for environment context."
 ```toml
 [contexts.git-status]
 command = "git status --short"
-prompt = "Working tree status:\n{command}"
+prompt = "Working tree status:\n{command_output}"
 ```
 
 **Inline prompt:**
@@ -1440,7 +1440,7 @@ prompt = "Important: This project uses Go 1.21"
 [contexts.project-state]
 file = "./PROJECT.md"
 command = "git log -5 --oneline"
-prompt = "{file}\n\nRecent commits:\n{command}"
+prompt = "{file_contents}\n\nRecent commits:\n{command_output}"
 ```
 
 See [UTD documentation](../design/unified-template-design.md) for complete details.

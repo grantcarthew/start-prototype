@@ -187,7 +187,7 @@ File:
   ✓ File exists (1,234 bytes)
 
 Prompt template:
-  {file}
+  {file_contents}
 
   Additional context: Focus on code quality.
 
@@ -231,7 +231,7 @@ File:
   ✓ File exists (1,234 bytes)
 
 Prompt template:
-  {file}
+  {file_contents}
 
   Additional context: Focus on code quality.
 ```
@@ -350,7 +350,7 @@ Use prompt template to frame file content? [y/N]: n
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-111234.toml...
+Backing up config to roles.2025-01-06-111234.toml...
 ✓ Backup created
 
 Saving role to ~/.config/start/roles.toml...
@@ -388,12 +388,12 @@ File path [./ROLE.md]:
 
 Use prompt template to frame file content? [y/N]: y
 
-Prompt template: {file}\n\nAdditional context: Focus on code quality.
-✓ Valid template (uses {file} placeholder)
+Prompt template: {file_contents}\n\nAdditional context: Focus on code quality.
+✓ Valid template (uses {file_contents} placeholder)
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-111345.toml...
+Backing up config to roles.2025-01-06-111345.toml...
 ✓ Backup created
 
 Saving role to ./.start/roles.toml...
@@ -434,7 +434,7 @@ Focus on security and performance.
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-111456.toml...
+Backing up config to roles.2025-01-06-111456.toml...
 ✓ Backup created
 
 Saving role to ~/.config/start/roles.toml...
@@ -471,15 +471,15 @@ Add command for dynamic content? [y/N]: y
 Command: git log -1 --format='%s'
 ✓ Valid command
 
-Prompt template: {file}\n\nCurrent commit: {command}
-✓ Valid template (uses {file} and {command})
+Prompt template: {file_contents}\n\nCurrent commit: {command}
+✓ Valid template (uses {file_contents} and {command})
 
 Advanced options? [y/N]: y
 
 Shell override (or enter for default): bash
 Command timeout in seconds (or enter for default): 5
 
-Backing up config to config.2025-01-06-111567.toml...
+Backing up config to roles.2025-01-06-111567.toml...
 ✓ Backup created
 
 Saving role to ./.start/roles.toml...
@@ -643,11 +643,11 @@ Scope [1-2]: 2
 
 Current configuration (local):
   File: ./ROLE.md
-  Prompt template: {file}\n\nFocus on code quality.
+  Prompt template: {file_contents}\n\nFocus on code quality.
 
 Remove role from local config? [y/N]: y
 
-Backing up config to config.2025-01-06-112012.toml...
+Backing up config to roles.2025-01-06-112012.toml...
 ✓ Backup created
 
 Removing [roles.project-default] from ./.start/roles.toml...
@@ -672,7 +672,7 @@ Current configuration (global):
 
 Remove role from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-112045.toml...
+Backing up config to roles.2025-01-06-112045.toml...
 ✓ Backup created
 
 Removing [roles.code-reviewer] from ~/.config/start/roles.toml...
@@ -700,7 +700,7 @@ Current configuration (local):
 
 Remove role from local config? [y/N]: y
 
-Backing up config to config.2025-01-06-112123.toml...
+Backing up config to roles.2025-01-06-112123.toml...
 ✓ Backup created
 
 Removing [roles.project-default] from ./.start/roles.toml...
@@ -747,7 +747,7 @@ Exit code: 1
 ```
 Remove role from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-112156.toml...
+Backing up config to roles.2025-01-06-112156.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/roles.toml
@@ -949,11 +949,11 @@ File:
   Modified: 2025-01-06 09:15:20
 
 Prompt template:
-  {file}
+  {file_contents}
 
   Additional context: Focus on code quality.
   ✓ Valid template
-  ✓ Uses {file} placeholder
+  ✓ Uses {file_contents} placeholder
 
 ✓ Role is configured correctly
 ```
@@ -1109,13 +1109,13 @@ Local configuration details:
     Modified: 2025-01-06 09:15:20
 
   Prompt field:
-    {file}
+    {file_contents}
 
     Additional context: Focus on code quality.
 
-  Placeholders found: {file}
+  Placeholders found: {file_contents}
   ✓ Valid placeholder usage
-  ✓ {file} placeholder matches UTD file field
+  ✓ {file_contents} placeholder matches UTD file field
 
 ✓ Role is configured correctly
 ```
@@ -1341,7 +1341,7 @@ Focus on security and performance.
 file = "./ROLE.md"
 prompt = """
 Role Definition:
-{file}
+{file_contents}
 
 Follow these instructions carefully.
 """
@@ -1354,7 +1354,7 @@ Follow these instructions carefully.
 file = "./ROLE.md"
 command = "date"
 prompt = """
-{file}
+{file_contents}
 
 Current time: {command_output}
 """

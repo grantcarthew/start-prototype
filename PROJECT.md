@@ -42,7 +42,7 @@ REPEAT: This is an interactive session. Do not change anything without approval 
 
 ## Documents to Review
 
-Active document: `docs/cli/start-config-agent.md`
+Active document: `docs/cli/start-config-context.md`
 
 ### Root Documentation
 
@@ -67,8 +67,8 @@ Active document: `docs/cli/start-config-agent.md`
 ### Configuration Commands
 
 - [x] `docs/cli/start-config.md` - Configuration management overview
-- [ ] `docs/cli/start-config-agent.md` - Agent configuration
-- [ ] `docs/cli/start-config-context.md` - Context configuration
+- [x] `docs/cli/start-config-agent.md` - Agent configuration
+- [x] `docs/cli/start-config-context.md` - Context configuration
 - [ ] `docs/cli/start-config-role.md` - Role configuration
 - [ ] `docs/cli/start-config-task.md` - Task configuration
 
@@ -373,3 +373,13 @@ Documentation review is complete when:
 - `docs/cli/start-config-agent.md`: Updated bin field description to include index.csv usage
 - `docs/cli/start-config-agent.md`: Clarified local agent management (CLI supported)
 - `docs/design/design-records/dr-007-placeholders.md`: Clarified placeholder requirements ({prompt} recommended/warning, others recommended)
+- **start-config-agent.md updates**:
+- Corrected backup filenames in examples (`config.YYYY...` → `agents.YYYY...`) for `new`, `edit`, `remove` commands
+- Added scope selection step to `new` command interactive flow
+- Verified `default` command correctly uses `config.YYYY...` backups (modifies settings)
+- **start-config-context.md updates**:
+- Corrected backup filenames in examples (`config.YYYY...` → `contexts.YYYY...`)
+- Updated UTD examples to use new placeholders (`{command_output}`, `{file_contents}`)
+- **start-config-role.md updates**:
+- Corrected backup filenames in examples (`config.YYYY...` → `roles.YYYY...`)
+- Updated UTD examples to use `{file_contents}` placeholder instead of `{file}` where content is included
