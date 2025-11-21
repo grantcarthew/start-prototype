@@ -33,9 +33,9 @@ Interactive wizard to create `start` configuration files. Detects installed AI a
 
 1. Asks for target location (global or local) unless `--local` or `--force` provided
 2. Checks for existing configuration at target location (prompts for backup unless `--force`)
-3. Fetches latest agent configurations from GitHub
+3. Fetches catalog index from GitHub
 4. Auto-detects installed agents
-5. Interactive mode: Prompts for additional agents and default agent selection
+5. Interactive mode: Prompts for additional agents (from catalog) and default agent selection
 6. Automatic mode (`--force`): Configures all detected agents, uses first as default
 7. Creates multi-file config at target location
 8. Adds default context document configuration
@@ -861,16 +861,14 @@ Repository structure:
 ```
 start/
 ├── assets/
+│   ├── index.csv
 │   ├── agents/
 │   │   ├── anthropic/
 │   │   │   └── claude.toml
-│   │   ├── google/
-│   │   │   └── gemini.toml
-│   │   └── open/
-│   │       ├── aichat.toml
-│   │       └── opencode.toml
+│   │   └── ...
 │   ├── tasks/
-│   └── roles/
+│   ├── roles/
+│   └── contexts/
 ```
 
 New agents added to repository become available immediately (no start release needed).

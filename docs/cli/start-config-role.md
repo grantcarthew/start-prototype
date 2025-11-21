@@ -76,7 +76,7 @@ Global and local `[roles.<name>]` sections are **combined**. If a role with the 
 
 ### start config role list
 
-Display all roles (configured and catalog).
+Display all configured roles.
 
 **Synopsis:**
 
@@ -86,11 +86,12 @@ start config role list
 
 **Behavior:**
 
-Lists roles from three sources:
+Lists roles from configured sources:
 
 1. **Global config** (`~/.config/start/roles.toml`) - Personal roles
 2. **Local config** (`./.start/roles.toml`) - Project-specific roles
-3. **Asset catalog** (`~/.config/start/assets/roles/`) - Available catalog roles
+
+**Note:** To see available roles in the catalog, use `start assets search role`.
 
 **Output:**
 
@@ -111,19 +112,6 @@ Local (1):
   project-specific
     Project-specific role definition
     File: ./ROLE.md
-
-Available catalog roles (4):
-  general/code-reviewer
-    Expert code reviewer focused on security
-
-  general/default
-    Balanced helpful assistant
-
-  languages/go-expert
-    Go programming language expert
-
-  specialized/rubber-duck
-    Socratic method questioning assistant
 ```
 
 **Exit codes:**
@@ -154,7 +142,7 @@ Display current role configuration.
 **Synopsis:**
 
 ```bash
-start config role show [name] [scope]          # Select role and scope interactively
+start config role show [name] [scope]  # Select role and scope interactively
 start config role show <name> global   # Show global role only
 start config role show <name> local    # Show local role only
 start config role show <name> merged   # Show effective role (with override info)
@@ -166,7 +154,7 @@ Displays role configuration from the selected scope(s) with:
 
 - Scope (global, local, or merged)
 - Source type (file, command, inline, or combination)
-- File path (if configured)
+- File (if configured)
 - Command (if configured)
 - Prompt template (if configured)
 - Shell and timeout overrides (if configured)
@@ -1399,25 +1387,23 @@ command_timeout = 5
 
 See [UTD shell configuration](../design/unified-template-design.md#shell-configuration) for supported shells.
 
-### Role Files Location
+### Role Content Files
 
-By convention, role definition files are stored in:
+Role configurations in `roles.toml` contain a `file` field that points to the Markdown content.
 
-**Global:** `~/.config/start/roles/*.md`
+**User Roles (Custom):**
+You create these files and store them wherever you prefer. The config just links to them.
 
-- Personal role definitions
-- Managed via `start assets update` (asset roles)
-- Can also be user-created
+- **Global Convention:** `~/.config/start/roles/*.md`
+  (Recommended for personal roles, but not enforced or created by the tool.)
+- **Local Convention:** `./.start/roles/*.md` or just `./ROLE.md`
+  (Stored within your project structure.)
 
-**Local (per-project):** `./.start/roles/*.md` or `./roles/*.md`
+**Asset Roles (Catalog):**
+Managed automatically by the `start` tool.
 
-- Project-specific role definitions
-- Manually created
-
-**Asset roles:** `~/.config/start/assets/roles/*.md`
-
-- Provided by `start` as defaults
-- Updated via `start assets update`
+- **Location:** `~/.config/start/assets/roles/`
+- **Management:** Downloaded via `start assets add` or lazy-loaded on demand. Updated via `start assets update`
 
 ### Agent Support
 

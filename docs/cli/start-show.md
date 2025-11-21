@@ -197,7 +197,7 @@ Does NOT execute the task or agent.
 
 **Output:**
 
-```
+`````
 Starting Task: git-diff-review (PREVIEW - NOT EXECUTING)
 ===============================================================================================
 Agent: claude (model: claude-3-7-sonnet-20250219)
@@ -230,7 +230,8 @@ focus on security
   {command_output}
   ```
 
-  ... (45 more lines) - Use --verbose to see full content─────────────────────────────────────────────────
+  ... (45 more lines) - Use --verbose to see full content
+─────────────────────────────────────────────────
 
 Final composed prompt (first 10 lines):
 ─────────────────────────────────────────────────
@@ -246,13 +247,11 @@ Command that would execute:
 ❯ claude --model claude-3-7-sonnet-20250219 --append-system-prompt '...' 'Read...'
 
 PREVIEW ONLY: Task not executed
-
-```
+`````
 
 **Error cases shown in preview:**
 
 ```
-
 Starting Task: broken-task (PREVIEW - NOT EXECUTING)
 ===============================================================================================
 
@@ -267,7 +266,6 @@ Executing task command...
   Error: nonexistent-command: command not found
 
 ⚠ This task will fail when executed due to command errors
-
 ```
 
 ### start show prompt

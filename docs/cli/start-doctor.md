@@ -53,11 +53,8 @@ Runs all diagnostic checks in order and reports results. Non-blocking - shows al
 
 **Exit codes:**
 
-- 0 - All checks passed (no errors)
-- 1 - Configuration errors (broken config)
-- 2 - Missing dependencies (agents not installed)
-- 3 - Asset issues (outdated or missing)
-- 4 - Multiple issues (combination of above)
+- 0 - All checks passed (no issues)
+- 1 - Issues found (errors or warnings)
 
 ## Output
 
@@ -84,10 +81,17 @@ Assets
   Run 'start assets update' to download latest assets.
 
 Configuration
-  ✓ Global config valid (~/.config/start/)
-  ✓ Local config valid (./.start/)
-  ✓ No TOML syntax errors
-  ✓ All required fields present
+  Global Config (~/.config/start/):
+    ✓ config.toml (valid)
+    ✓ agents.toml (valid)
+    ✓ tasks.toml (valid)
+    ✓ roles.toml (valid)
+    ✓ contexts.toml (valid)
+
+  Local Config (./.start/):
+    ✓ config.toml (valid)
+    ✓ tasks.toml (valid)
+
   ✓ Merge behavior correct
 
 Agents (3 configured)
@@ -131,6 +135,7 @@ Contexts (2 required, 1 optional)
 Environment
   ✓ Shell: /bin/bash
   ✓ Config directory: ~/.config/start/ (writable)
+  ✓ Asset directory: ~/.config/start/assets/ (writable)
   ✓ Working directory: /Users/grant/Projects/myapp
 
 Summary
@@ -229,7 +234,7 @@ Error: Agent 'aichat' binary not found
 Warning: Assets outdated (45 days old)
 ```
 
-Exit code 4 (multiple issues).
+Exit code 1.
 
 ### All Healthy
 
@@ -251,8 +256,8 @@ Assets
   ✓ Asset library up to date (updated 2 days ago)
 
 Configuration
-  ✓ Global config valid
-  ✓ Local config valid
+  ✓ Global config valid (5 files)
+  ✓ Local config valid (2 files)
 
 Agents (3 configured)
   ✓ claude - /usr/local/bin/claude
@@ -321,7 +326,7 @@ Comprehensive config validation.
 
 **What it checks:**
 
-- TOML syntax (parse errors)
+- TOML syntax (parse errors) in all files (config.toml, agents.toml, etc.)
 - Required fields present
 - Field types correct
 - Agent command templates valid
@@ -401,29 +406,16 @@ Verifies runtime environment.
 
 ## Exit Codes
 
-**0** - Healthy (all checks passed, warnings OK)
+**0** - Healthy (all checks passed)
 
-**1** - Configuration errors
+**1** - Issues found (any warning or error)
 
-- TOML syntax errors
-- Missing required fields
-- Invalid configuration values
+- Configuration errors
+- Missing dependencies
+- Asset issues
+- Environment issues
 
-**2** - Missing dependencies
-
-- Agent binaries not found
-- Required contexts missing
-- Shell not available
-
-**3** - Asset issues
-
-- Asset library missing
-- Asset directory empty or corrupted
-- Asset directory not writable
-
-**4** - Multiple issues (combination of above)
-
-**In quiet mode:** Exit code indicates severity. Check output for details.
+**In quiet mode:** Check exit code to determine if issues exist.
 
 ## Examples
 

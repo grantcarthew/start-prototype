@@ -55,6 +55,9 @@ Active document: `docs/cli/start-config-context.md`
 - [x] `docs/cli/start.md` - Main entry point, interactive sessions
 - [x] `docs/cli/start-prompt.md` - Prompt composition and execution
 - [x] `docs/cli/start-task.md` - Task execution
+- [x] `docs/cli/start-init.md` - Initialize configuration
+- [x] `docs/cli/start-doctor.md` - System diagnostic tool
+- [x] `docs/cli/start-show.md` - Show config/context details
 
 ### Asset Commands
 
@@ -63,6 +66,8 @@ Active document: `docs/cli/start-config-context.md`
 - [x] `docs/cli/start-assets-browse.md` - Browse catalog in browser
 - [x] `docs/cli/start-assets-search.md` - Search catalog
 - [x] `docs/cli/start-assets-info.md` - Show asset information
+- [x] `docs/cli/start-assets-index.md` - Manage catalog index
+- [ ] `docs/cli/start-assets-update.md` - Update assets
 
 ### Configuration Commands
 
@@ -383,3 +388,13 @@ Documentation review is complete when:
 - **start-config-role.md updates**:
 - Corrected backup filenames in examples (`config.YYYY...` → `roles.YYYY...`)
 - Updated UTD examples to use `{file_contents}` placeholder instead of `{file}` where content is included
+- Rewrote "Role Content Files" section to clarify User Roles (manual/linked) vs Asset Roles (managed)
+- **start-init.md updates**:
+- Updated "What init does" to accurately reflect catalog index fetching
+- Updated GitHub Repository Structure to include `index.csv` and `contexts/`
+- **start-config-task.md updates**:
+- Removed assets from `start config task list` output and description (configured tasks only)
+- Added note about using `start assets search` to find catalog tasks
+- Updated backup filenames to `tasks.YYYY...`
+- Removed `[asset]` label documentation
+- Verified alignment with UTD and config design

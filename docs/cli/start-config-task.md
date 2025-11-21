@@ -104,7 +104,7 @@ Display all configured tasks with their details.
 start config task list          # Select scope interactively
 start config task list global   # List global tasks only
 start config task list local    # List local tasks only
-start config task list merged   # Show merged view (assets + global + local)
+start config task list merged   # Show merged view (global + local)
 ```
 
 **Behavior:**
@@ -116,30 +116,15 @@ Lists all tasks defined in the selected scope(s) with:
 - Description
 - Role selection (yes/no)
 - Task prompt type (file, command, inline, or combination)
-- Source scope (asset, global, local, or override)
+- Source scope (global, local, or override)
+
+**Note:** To see available tasks in the catalog, use `start assets search task`.
 
 **Output (merged view):**
 
 ```
 Configured tasks (merged):
 ═══════════════════════════════════════════════════════════
-
-Asset tasks (4):
-  code-review (cr)
-    Review code for quality and best practices
-    Source: ~/.config/start/assets/tasks/code-review.toml
-
-  git-diff-review (gdr)
-    Review staged git changes
-    Source: ~/.config/start/assets/tasks/git-diff-review.toml
-
-  comment-tidy (ct)
-    Review and tidy code comments
-    Source: ~/.config/start/assets/tasks/comment-tidy.toml
-
-  doc-review (dr)
-    Review and improve documentation
-    Source: ~/.config/start/assets/tasks/doc-review.toml
 
 Global tasks (1):
   security-review (sr)
@@ -304,7 +289,7 @@ Prompt template: Help me with: {instructions}
 
 Advanced options? [y/N]: n
 
-Backing up config to config.2025-01-06-101234.toml...
+Backing up config to tasks.2025-01-06-101234.toml...
 ✓ Backup created
 
 Saving task 'quick-help' to ~/.config/start/tasks.toml...
@@ -369,7 +354,7 @@ Advanced options? [y/N]: y
 Shell override (or enter for default): bash
 Command timeout in seconds (or enter for default): 10
 
-Backing up config to config.2025-01-06-101345.toml...
+Backing up config to tasks.2025-01-06-101345.toml...
 ✓ Backup created
 
 Saving task 'git-diff-review' to ~/.config/start/tasks.toml...
@@ -1057,7 +1042,7 @@ Advanced options? [y/N]: y
 Shell [bash]:
 Timeout in seconds [10]: 15
 
-Backing up config to config.2025-01-06-102345.toml...
+Backing up config to tasks.2025-01-06-102345.toml...
 ✓ Backup created
 
 Saving changes to ~/.config/start/tasks.toml...
@@ -1160,7 +1145,7 @@ Select [1-4] (or 'q' to quit): 2
 
 Remove task 'quick-help' from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-103012.toml...
+Backing up config to tasks.2025-01-06-103012.toml...
 ✓ Backup created
 
 Removing task 'quick-help' from ~/.config/start/tasks.toml...
@@ -1181,7 +1166,7 @@ Task exists in global only:
 ```
 Remove task 'quick-help' from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-103045.toml...
+Backing up config to tasks.2025-01-06-103045.toml...
 ✓ Backup created
 
 Removing task 'quick-help' from ~/.config/start/tasks.toml...
@@ -1220,7 +1205,7 @@ Output:
 
 Remove task 'code-review' from local config? [y/N]: y
 
-Backing up config to config.2025-01-06-103123.toml...
+Backing up config to tasks.2025-01-06-103123.toml...
 ✓ Backup created
 
 Removing task 'code-review' from ./.start/tasks.toml...
@@ -1290,7 +1275,7 @@ Exit code: 1
 ```
 Remove task 'quick-help' from global config? [y/N]: y
 
-Backing up config to config.2025-01-06-103156.toml...
+Backing up config to tasks.2025-01-06-103156.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/tasks.toml
@@ -1432,7 +1417,6 @@ Tasks are discovered from three sources:
 
 In task lists, tasks are labeled by source:
 
-- `[asset]` - From `~/.config/start/assets/tasks/`
 - `[global]` - From `~/.config/start/tasks.toml`
 - `[local]` - From `./.start/tasks.toml`
 - `[local overrides asset]` - Local task overrides asset task
