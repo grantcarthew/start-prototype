@@ -42,7 +42,7 @@ REPEAT: This is an interactive session. Do not change anything without approval 
 
 ## Documents to Review
 
-Active document: `docs/cli/start-assets-add.md`
+Active document: `docs/cli/start-assets-browse.md`
 
 ### Root Documentation
 
@@ -59,7 +59,7 @@ Active document: `docs/cli/start-assets-add.md`
 ### Asset Commands
 
 - [x] `docs/cli/start-assets.md` - Asset management overview
-- [ ] `docs/cli/start-assets-add.md` - Add assets from catalog
+- [x] `docs/cli/start-assets-add.md` - Add assets from catalog
 - [ ] `docs/cli/start-assets-browse.md` - Browse catalog in browser
 - [ ] `docs/cli/start-assets-search.md` - Search catalog
 - [ ] `docs/cli/start-assets-info.md` - Show asset information

@@ -195,7 +195,7 @@ Use 'start assets browse' for full catalog exploration.
 
 ## Flags
 
-**--verbose**, **-v**
+**--verbose**
 : Show detailed metadata for each match (tags, size, dates).
 
 ## Examples

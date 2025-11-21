@@ -71,15 +71,10 @@ Ready to commit:
   git commit -m "Regenerate catalog index"
 ```
 
-## Flags
-
-**--verify**
-: Verify the existing index against the file system without modifying it. Returns exit code 1 if out of sync. Useful for CI/CD pipelines.
-
 ## Exit Codes
 
 **0** - Success
-**1** - Verification failed (with --verify) or general error
+**1** - General error
 
 ## See Also
 
