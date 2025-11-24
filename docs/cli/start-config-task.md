@@ -75,6 +75,12 @@ Optional field. If omitted, uses `default_role` setting or first role in config.
 
 - `role` - Role name (resolved via asset resolution algorithm: local config → global config → cache → GitHub catalog)
 
+**Agent Selection:**
+
+Optional field. If omitted, uses `default_agent` setting or first agent in config.
+
+- `agent` - Agent name (resolved via asset resolution algorithm)
+
 **Task Prompt (UTD):**
 
 At least one required:
@@ -224,7 +230,11 @@ Prompts for task details and adds to the selected config file:
    - Select role from available `[roles.<name>]` sections
    - Or skip to use `default_role` setting
 
-6. **Task prompt** (required)
+6. **Agent selection** (optional)
+   - Select agent from available `[agents.<name>]` sections
+   - Or skip to use `default_agent` setting
+
+7. **Task prompt** (required)
    - Configure UTD fields (file, command, prompt)
    - At least one UTD field required
 
@@ -314,6 +324,9 @@ Role file: ~/.config/start/roles/code-reviewer.md
 
 Role template: {file_contents}\n\nFocus on security and performance.
 ✓ Valid template (uses {file} placeholder)
+
+Select agent? [y/N]: n
+✓ Will use default agent
 
 Task prompt:
 
@@ -484,6 +497,7 @@ Displays task configuration from the selected scope with:
 - Task name and alias
 - Description (if configured)
 - Role selection (if configured)
+- Agent selection (if configured)
 - Task prompt (file, command, inline, or combination)
 - Shell and timeout overrides (if configured)
 
@@ -496,6 +510,7 @@ Task configuration: git-diff-review (global)
 Alias: gdr
 Description: Review staged git changes
 Role: code-reviewer
+Agent: claude (optional)
 
 Task prompt (command-based):
   Command: git diff --staged
@@ -767,7 +782,7 @@ Task prompt:
 
 ✗ Task 'invalid' has configuration errors
   At least one task prompt field required
-  Fix configuration: start config task edit invalid global
+  Fix configuration: start config task edit invalid
 ```
 
 **Verbose output:**
@@ -1071,7 +1086,7 @@ Exit code: 2
 ```
 Task prompt template [Help with: {instructions}]: Invalid {unknown} text
 ⚠ Warning: Unknown placeholder {unknown}
-  Valid placeholders: {file}, {command}, {instructions}, {date}
+  Valid placeholders: {file}, {file_contents}, {command}, {command_output}, {instructions}, {date}
 
 Continue anyway? [y/N]: n
 

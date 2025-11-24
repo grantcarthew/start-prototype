@@ -552,7 +552,7 @@ Validates agent configuration without executing it. Performs three checks:
    - Default model configured or first model available
    - TOML syntax valid
 
-3. **Dry-run command construction**
+3. **Preview command construction**
    - Builds command with placeholders resolved
    - Uses default model
    - Uses test prompt: "test"
@@ -574,7 +574,7 @@ Configuration:
   ✓ Default model: claude-3-7-sonnet-20250219 (sonnet)
   ✓ Models configured: 3 (haiku, sonnet, opus)
 
-Dry-run command:
+Preview command:
   ❯ claude --model claude-3-7-sonnet-20250219 --append-system-prompt '...' 'test'
 
 ✓ Agent 'claude' is configured correctly
@@ -595,7 +595,7 @@ Configuration:
     (did you mean {model}?)
   ✓ Default model: my-agent-v1 (default)
 
-Dry-run command:
+Preview command:
   ❯ my-agent --model {mdoel} '{prompt}'
 
 ⚠ Agent 'my-agent' has warnings (see above)
@@ -617,7 +617,7 @@ Configuration:
   ✓ Default model: gemini-2.0-flash-exp (flash)
   ✓ Models configured: 2 (flash, pro-exp)
 
-Dry-run command:
+Preview command:
   ❯ gemini --model gemini-2.0-flash-exp 'test'
 
 ✗ Agent 'gemini' is not available (binary not found)
@@ -675,13 +675,13 @@ Validating configuration...
       - sonnet: claude-3-7-sonnet-20250219
       - opus: claude-opus-4-20250514
 
-Building dry-run command...
+Building preview command...
   Model: claude-3-7-sonnet-20250219 (using default_model: sonnet)
   System prompt: (truncated to '...')
   Prompt: 'test'
   Date: 2025-01-04T14:35:12+10:00
 
-Dry-run command:
+Preview command:
   ❯ claude --model claude-3-7-sonnet-20250219 --append-system-prompt '...' 'test'
 
 ✓ Agent 'claude' is configured correctly

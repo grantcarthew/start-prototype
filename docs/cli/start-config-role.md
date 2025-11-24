@@ -153,7 +153,7 @@ start config role show <name> --local  # Show local role only
 
 Displays role configuration from the selected scope(s) with:
 
-- Scope (global, local, or merged)
+- Scope (merged or local)
 - Source type (file, command, inline, or combination)
 - File (if configured)
 - Command (if configured)
@@ -186,7 +186,7 @@ Global configuration (overridden):
   File: ~/.config/start/roles/default.md
 ```
 
-**Output (global only):**
+**Output (merged):**
 
 ```bash
 start config role show
@@ -345,7 +345,7 @@ Backing up config to roles.2025-01-06-111234.toml...
 Saving role to ~/.config/start/roles.toml...
 ✓ Role configured successfully
 
-Use 'start config role show global' to verify.
+Use 'start config role show' to verify.
 Use 'start config role test' to validate.
 ```
 
@@ -460,8 +460,8 @@ Add command for dynamic content? [y/N]: y
 Command: git log -1 --format='%s'
 ✓ Valid command
 
-Prompt template: {file_contents}\n\nCurrent commit: {command}
-✓ Valid template (uses {file_contents} and {command})
+Prompt template: {file_contents}\n\nCurrent commit: {command_output}
+✓ Valid template (uses {file_contents} and {command_output})
 
 Advanced options? [y/N]: y
 
@@ -559,7 +559,7 @@ Continue anyway? [y/N]: y
 ```
 Prompt template: Invalid {unknown} text
 ⚠ Warning: Unknown placeholder {unknown}
-  Valid placeholders: {file}, {file_contents}, {command}, {command_output}
+  Valid placeholders: {file}, {file_contents}, {command}, {command_output}, {date}
 
 Continue anyway? [y/N]: n
 
@@ -889,7 +889,7 @@ Validates effective role configuration (merged global + local). Performs checks:
 
 3. **Configuration validation**
    - At least one UTD field present (file, command, or prompt)
-   - Prompt template uses valid placeholders (`{file}`, `{command}`)
+   - Prompt template uses valid placeholders (`{file}`, `{file_contents}`, `{command}`, `{command_output}`, `{date}`)
    - Unknown placeholders detected (likely typos)
    - Shell and timeout settings valid
 
@@ -1042,7 +1042,7 @@ No role configured (global or local).
 
 Agents will run without roles.
 
-Configure: start config role edit global
+Configure: start config role edit
 ```
 
 Exit code: 1

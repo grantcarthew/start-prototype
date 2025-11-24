@@ -437,7 +437,7 @@ Context name: my-context
 Context name: environment
 ✗ Context 'environment' already exists in global config.
 
-Use 'start config context edit environment global' to modify existing context.
+Use 'start config context edit environment' to modify existing context.
 ```
 
 Exit code: 1
@@ -808,7 +808,7 @@ Configuration:
   At least one field required: file, command, or prompt
 
 ✗ Context 'invalid' has configuration errors
-  Fix configuration: start config context edit invalid global
+  Fix configuration: start config context edit invalid
 ```
 
 **Verbose output:**
