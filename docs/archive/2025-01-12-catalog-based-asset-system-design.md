@@ -1,3 +1,13 @@
+# ⚠️ ARCHIVED
+
+**This project documentation is currently archived.**
+
+- **Status:** Frozen / Archived
+- **Date:** 2025-11-24
+- **Note:** This repository represents a completed design phase. The implementation details and some specific documentation files (like `start-update.md`) may be deprecated or superseded by newer design records (e.g., DR-041). The implementation planning will be conducted in a separate workspace. This snapshot is preserved "as-is" for reference.
+
+---
+
 # Project: start - Catalog-Based Asset System Design
 
 **Status:** Design Phase - Catalog Architecture
