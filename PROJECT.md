@@ -42,7 +42,7 @@ REPEAT: This is an interactive session. Do not change anything without approval 
 
 ## Documents to Review
 
-Active document: `docs/cli/start-config-context.md`
+Active document: `docs/cli/start-assets-update.md`
 
 ### Root Documentation
 
@@ -112,6 +112,10 @@ Documentation review is complete when:
 
 ## Fixed
 
+- `docs/cli/start-assets-update.md`: Updated to reflect `index.csv` usage instead of Tree API (aligned with DR-034 and DR-037).
+- `docs/cli/start-assets-update.md`: Corrected Git SHA length in examples to 40 characters (was 42).
+- `docs/cli/start-assets-update.md`: Fixed legacy `prompt_file` reference to `file`.
+- `docs/cli/start-assets-update.md`: Updated examples to reflect `.toml` + `.md` asset structure.
 - `docs/cli/start.md`: Removed "alias" terminology from --model flag, clarified resolution as exact match → prefix match → passthrough
 - `docs/cli/start-prompt.md`: Updated --model flag to match start.md (removed "alias|name", added resolution order)
 - **Short flags added**: Added `-a` (--agent), `-r` (--role), `-m` (--model) short flags across all CLI docs
@@ -398,3 +402,11 @@ Documentation review is complete when:
 - Updated backup filenames to `tasks.YYYY...`
 - Removed `[asset]` label documentation
 - Verified alignment with UTD and config design
+- **Multi-file updates (config-context, config-role, config-task, config-agent)**:
+- Corrected backup filenames in descriptions (`config.YYYY...` → `contexts/roles/tasks/agents.YYYY...`)
+- Updated UTD prompt examples to use `{file_contents}` instead of `{file}` for roles
+- Updated UTD task example to use `{command_output}` instead of `{command}`
+- Fixed typo in `start-config-agent.md` (Behvior -> Behavior)
+- **Asset command updates**:
+- `start-assets-add.md`: Clarified multi-file asset description (prompt content vs documentation)
+- `start-assets-update.md`: Fixed legacy `prompt_file` reference to `file` and `.toml` to `.md` in example

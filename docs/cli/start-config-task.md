@@ -7,12 +7,12 @@ start config task - Manage task configurations
 ## Synopsis
 
 ```bash
-start config task list [scope]
-start config task new [scope]
-start config task show [name] [scope]
+start config task list [flags]
+start config task new [flags]
+start config task show [name] [flags]
 start config task test <name>
-start config task edit [name] [scope]
-start config task remove [name] [scope]
+start config task edit [name] [flags]
+start config task remove [name] [flags]
 ```
 
 ## Description
@@ -28,7 +28,7 @@ Manages predefined workflow task configurations in config files. Tasks define re
 - **edit** - Modify existing task configuration
 - **remove** - Delete task from configuration
 
-**Note:** Tasks can be defined in both global and local configs, and are also loaded from asset library (`~/.config/start/assets/tasks/`). These commands manage user-defined tasks only (global or local config). To install tasks from the catalog, use `start assets add`. To update cached assets, use `start assets update`.
+**Note:** Tasks can be defined in both global and local configs, and are also loaded from asset library (`~/.config/start/assets/tasks/`). Use the `--local` flag to manage tasks in the local configuration. Without flags, commands operate on the merged configuration or prompt interactively. To install tasks from the catalog, use `start assets add`. To update cached assets, use `start assets update`.
 
 ## Task Configuration Structure
 
@@ -101,10 +101,8 @@ Display all configured tasks with their details.
 **Synopsis:**
 
 ```bash
-start config task list          # Select scope interactively
-start config task list global   # List global tasks only
-start config task list local    # List local tasks only
-start config task list merged   # Show merged view (global + local)
+start config task list          # List merged tasks (global + local + assets)
+start config task list --local  # List local tasks only
 ```
 
 **Behavior:**
@@ -121,6 +119,10 @@ Lists all tasks defined in the selected scope(s) with:
 **Note:** To see available tasks in the catalog, use `start assets search task`.
 
 **Output (merged view):**
+
+```bash
+start config task list
+```
 
 ```
 Configured tasks (merged):
@@ -148,28 +150,10 @@ Overridden tasks (1):
     Source: ./.start/tasks.toml (overrides asset)
 ```
 
-**Output (global only):**
-
-```bash
-start config task list global
-```
-
-```
-Configured tasks (global):
-═══════════════════════════════════════════════════════════
-
-security-review (sr)
-  Security-focused code review
-  Role: custom (code-reviewer.md + template)
-  Task: command-based (git diff --staged)
-  Shell: bash
-  Timeout: 10 seconds
-```
-
 **Output (local only):**
 
 ```bash
-start config task list local
+start config task list --local
 ```
 
 ```
@@ -190,11 +174,11 @@ quick-help (qh)
 **No tasks configured:**
 
 ```
-No tasks configured in global config.
+No tasks configured.
 
-Create task: start config task new global
+Create task: start config task new
 Install from catalog: start assets add
-View asset tasks: start config task list merged
+View asset tasks: start config task list
 ```
 
 **Exit codes:**
@@ -210,18 +194,16 @@ Interactively add a new task to the configuration.
 **Synopsis:**
 
 ```bash
-start config task new          # Select scope interactively
-start config task new global   # Add to global config
-start config task new local    # Add to local config
+start config task new          # Add to global or local (interactive prompt)
+start config task new --local  # Add to local config
 ```
 
 **Behavior:**
 
 Prompts for task details and adds to the selected config file:
 
-1. **Select scope** (if not provided)
-   - global - Add to `~/.config/start/tasks.toml`
-   - local - Add to `./.start/tasks.toml`
+1. **Select scope** (if `--local` not specified)
+   - Prompts to choose Global or Local configuration
 
 2. **Task name** (required)
    - Validation: lowercase alphanumeric with hyphens
@@ -251,7 +233,7 @@ Prompts for task details and adds to the selected config file:
    - Command timeout
 
 8. **Backup and save**
-   - Backs up existing config to `config.YYYY-MM-DD-HHMMSS.toml`
+   - Backs up existing config to `tasks.YYYY-MM-DD-HHMMSS.toml`
    - Writes new task to config
    - Shows success message
 
@@ -330,7 +312,7 @@ Select [1-4]: 4
 Role file: ~/.config/start/roles/code-reviewer.md
 ✓ File exists
 
-Role template: {file}\n\nFocus on security and performance.
+Role template: {file_contents}\n\nFocus on security and performance.
 ✓ Valid template (uses {file} placeholder)
 
 Task prompt:
@@ -490,9 +472,8 @@ Display current task configuration.
 
 ```bash
 start config task show                 # Select task and scope interactively
-start config task show <name>          # Select scope for named task
-start config task show <name> global   # Show global task only
-start config task show <name> local    # Show local task only
+start config task show <name>          # Show effective configuration
+start config task show <name> --local  # Show local configuration only
 ```
 
 **Behavior:**
@@ -537,7 +518,7 @@ Prompt template:
 **Output (local task):**
 
 ```bash
-start config task show custom-task local
+start config task show custom-task --local
 ```
 
 ```
@@ -908,9 +889,8 @@ Edit task configuration interactively.
 
 ```bash
 start config task edit                  # Select task and scope
-start config task edit <name>           # Select scope for named task
-start config task edit <name> global    # Edit in global config
-start config task edit <name> local     # Edit in local config
+start config task edit <name>           # Edit effective/global task
+start config task edit <name> --local   # Edit in local config
 ```
 
 **Behavior:**
@@ -981,7 +961,7 @@ Interactive prompts to edit specific task. Shows current values as defaults - pr
 3. **Role selection changes** - Modify or remove
 4. **Task prompt changes** - Modify file, command, or prompt
 5. **Advanced options** - Shell, timeout
-6. **Backup and save** - Backs up to `config.YYYY-MM-DD-HHMMSS.toml`
+6. **Backup and save** - Backs up to `tasks.YYYY-MM-DD-HHMMSS.toml`
 
 **Interactive flow:**
 
@@ -1079,7 +1059,7 @@ Error: Task 'code-review' is from asset library.
 
 Asset tasks cannot be edited directly.
 To customize, create an override in global or local config:
-  start config task new global
+  start config task new
 
 Or remove from assets: Remove the file from ~/.config/start/assets/tasks/
 ```
@@ -1117,9 +1097,8 @@ Remove task from configuration.
 
 ```bash
 start config task remove                  # Select task and scope
-start config task remove <name>           # Select scope for named task
-start config task remove <name> global    # Remove from global config
-start config task remove <name> local     # Remove from local config
+start config task remove <name>           # Remove from effective scope (prompt if ambiguous)
+start config task remove <name> --local   # Remove from local config
 ```
 
 **Behavior:**
@@ -1194,7 +1173,7 @@ Remove task 'code-review' from local config? [y/N]: y
 **Removing local override (restores asset task):**
 
 ```bash
-start config task remove code-review local
+start config task remove code-review --local
 ```
 
 Output:
@@ -1213,7 +1192,7 @@ Removing task 'code-review' from ./.start/tasks.toml...
 ✓ Asset task 'code-review' is now active
 
 Use 'start task code-review' to run asset version.
-Use 'start config task list merged' to see all tasks.
+Use 'start config task list' to see all tasks.
 ```
 
 **Declining confirmation:**
@@ -1254,7 +1233,7 @@ Asset tasks cannot be removed via this command.
 To hide asset task, create empty override in local config,
 or remove from asset directory: ~/.config/start/assets/tasks/
 
-Use 'start config task list merged' to see all sources.
+Use 'start config task list' to see all sources.
 ```
 
 Exit code: 2
@@ -1262,10 +1241,10 @@ Exit code: 2
 **No tasks configured:**
 
 ```
-No tasks configured in global config.
+No tasks configured.
 
-Use 'start config task new global' to create a task.
-View asset tasks: start config task list merged
+Use 'start config task new' to create a task.
+View asset tasks: start config task list
 ```
 
 Exit code: 1
@@ -1288,6 +1267,9 @@ Exit code: 3
 
 These flags work on all `start config task` subcommands where applicable.
 
+**--local**, **-l**
+: Target local configuration (`./.start/tasks.toml`).
+
 **--help**, **-h**
 : Show help for the subcommand.
 
@@ -1305,7 +1287,7 @@ These flags work on all `start config task` subcommands where applicable.
 ### List All Tasks (Merged View)
 
 ```bash
-start config task list merged
+start config task list
 ```
 
 Show all tasks from assets, global, and local configs.
@@ -1313,20 +1295,19 @@ Show all tasks from assets, global, and local configs.
 ### List User Tasks Only
 
 ```bash
-start config task list global
-start config task list local
+start config task list --local
 ```
 
 ### Create Task in Global Config
 
 ```bash
-start config task new global
+start config task new
 ```
 
 ### Create Task in Local Config
 
 ```bash
-start config task new local
+start config task new --local
 ```
 
 ### Test Task
@@ -1340,13 +1321,13 @@ Verify task configuration, file availability, and command execution.
 ### Edit Task
 
 ```bash
-start config task edit git-diff-review global
+start config task edit git-diff-review
 ```
 
 ### Remove Task
 
 ```bash
-start config task remove quick-help global
+start config task remove quick-help
 ```
 
 ### Interactive Task Selection
@@ -1440,10 +1421,10 @@ agent = "claude"         # Optional: preferred agent
 file = "./prompts/diff-template.md"
 command = "git diff --staged"
 prompt = """
-{file}
+{file_contents}
 
 ## Changes
-{command}
+{command_output}
 
 ## Instructions
 {instructions}

@@ -713,7 +713,7 @@ Assets may consist of multiple files:
 
 ```
 pre-commit-review.toml       # Required (task definition)
-pre-commit-review.md         # Optional (documentation)
+pre-commit-review.md         # Optional (prompt content)
 pre-commit-review.meta.toml  # Metadata
 ```
 

@@ -7,11 +7,11 @@ start config role - Manage role configuration
 ## Synopsis
 
 ```bash
-start config role list
-start config role new [scope]
-start config role show [name] [scope]
-start config role edit [scope]
-start config role remove [scope]
+start config role list [flags]
+start config role new [flags]
+start config role show [name] [flags]
+start config role edit [flags]
+start config role remove [flags]
 start config role default [name]
 start config role test <name>
 ```
@@ -43,7 +43,7 @@ Roles are defined using the **[Unified Template Design (UTD)](../design/unified-
 description = "Expert code reviewer"
 file = "~/.config/start/roles/code-reviewer.md"
 prompt = """
-{file}
+{file_contents}
 
 Focus on security and performance.
 """
@@ -81,7 +81,8 @@ Display all configured roles.
 **Synopsis:**
 
 ```bash
-start config role list
+start config role list          # List merged roles
+start config role list --local  # List local roles only
 ```
 
 **Behavior:**
@@ -126,7 +127,8 @@ Interactively create a new custom role configuration.
 **Synopsis:**
 
 ```bash
-start config role new [scope]
+start config role new          # Create role (interactive scope selection)
+start config role new --local  # Create role in local config
 ```
 
 **Behavior:**
@@ -142,10 +144,9 @@ Display current role configuration.
 **Synopsis:**
 
 ```bash
-start config role show [name] [scope]  # Select role and scope interactively
-start config role show <name> global   # Show global role only
-start config role show <name> local    # Show local role only
-start config role show <name> merged   # Show effective role (with override info)
+start config role show [name] [flags]  # Select role and scope interactively
+start config role show <name>          # Show effective role (merged)
+start config role show <name> --local  # Show local role only
 ```
 
 **Behavior:**
@@ -188,8 +189,10 @@ Global configuration (overridden):
 **Output (global only):**
 
 ```bash
-start config role show global
+start config role show
 ```
+
+(Assuming global role is selected or shown if no local override)
 
 ```
 Role configuration (global):
@@ -206,7 +209,7 @@ Prompt: (file content only, no template)
 **Output (local only):**
 
 ```bash
-start config role show local
+start config role show --local
 ```
 
 ```
@@ -258,9 +261,9 @@ Prompt template:
 **No role configured:**
 
 ```
-No role configured in global config.
+No role configured.
 
-Configure: start config role edit global
+Configure: start config role edit
 ```
 
 **Exit codes:**
@@ -277,17 +280,15 @@ Edit or create role configuration interactively.
 
 ```bash
 start config role edit          # Select scope interactively
-start config role edit global   # Edit global role
-start config role edit local    # Edit local role
+start config role edit --local  # Edit local role
 ```
 
 **Behavior:**
 
 Prompts for role configuration and updates the selected config file:
 
-1. **Select scope** (if not provided)
-   - global - Edit `~/.config/start/roles.toml`
-   - local - Edit `./.start/roles.toml`
+1. **Select scope** (if `--local` not specified)
+   - Prompts to choose Global or Local configuration
 
 2. **Content source** (choose one or more)
    - File path (static role document)
@@ -304,7 +305,7 @@ Prompts for role configuration and updates the selected config file:
    - Command timeout
 
 5. **Backup and save**
-   - Backs up existing config to `config.YYYY-MM-DD-HHMMSS.toml`
+   - Backs up existing config to `roles.YYYY-MM-DD-HHMMSS.toml`
    - Writes role to config
    - Shows success message
 
@@ -487,7 +488,7 @@ file = "~/.config/start/roles/code-reviewer.md"
 [roles.project-default]
 file = "./ROLE.md"
 prompt = """
-{file}
+{file_contents}
 
 Additional context: Focus on code quality.
 """
@@ -510,7 +511,7 @@ Focus on security and performance.
 file = "./ROLE.md"
 command = "git log -1 --format='%s'"
 prompt = """
-{file}
+{file_contents}
 
 Current commit: {command_output}
 """
@@ -586,7 +587,7 @@ Exit code: 2
 **Backup failed:**
 
 ```
-Backing up config to config.2025-01-06-111234.toml...
+Backing up config to roles.2025-01-06-111234.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/roles.toml
@@ -603,8 +604,7 @@ Remove role configuration.
 
 ```bash
 start config role remove          # Select scope interactively
-start config role remove global   # Remove from global config
-start config role remove local    # Remove from local config
+start config role remove --local  # Remove from local config
 ```
 
 **Behavior:**
@@ -646,36 +646,32 @@ Global role will now be used (if configured).
 Use 'start config role show merged' to see effective configuration.
 ```
 
-**Direct scope removal:**
+**Remove from local config directly:**
 
 ```bash
-start config role remove global
+start config role remove --local
 ```
 
 Output:
 
 ```
-Current configuration (global):
-  File: ~/.config/start/roles/default.md
+Select role to remove from local config:
+  1) project-default
+  2) custom-role
 
-Remove role from global config? [y/N]: y
+Select [1-2]: 1
 
-Backing up config to roles.2025-01-06-112045.toml...
-✓ Backup created
+Current configuration (local):
+  File: ./ROLE.md
+  Prompt template: {file_contents}\n\nFocus on code quality.
 
-Removing [roles.code-reviewer] from ~/.config/start/roles.toml...
-✓ Role removed successfully
-⚠ No role configured
-
-Agents will run without roles.
-
-Configure: start config role edit global
+Remove role from local config? [y/N]: y
 ```
 
 **Removing local (reverts to global):**
 
 ```bash
-start config role remove local
+start config role remove --local
 ```
 
 Output:
@@ -723,9 +719,9 @@ Exit code: 0
 **No role configured:**
 
 ```
-Error: No role configured in global config.
+Error: No role configured.
 
-Configure: start config role edit global
+Configure: start config role edit
 ```
 
 Exit code: 1
@@ -1065,7 +1061,7 @@ Effective configuration:
   At least one field required: file, command, or prompt
 
 ✗ Role has configuration errors
-  Fix configuration: start config role edit global
+  Fix configuration: start config role edit
 ```
 
 **Verbose output:**
@@ -1149,6 +1145,9 @@ Exit code: 2 (configuration errors take precedence)
 
 These flags work on all `start config role` subcommands where applicable.
 
+**--local**, **-l**
+: Target local configuration (`./.start/roles.toml`).
+
 **--help**, **-h**
 : Show help for the subcommand.
 
@@ -1166,33 +1165,27 @@ These flags work on all `start config role` subcommands where applicable.
 ### Show Role (Merged View)
 
 ```bash
-start config role show merged
+start config role show
 ```
 
 Show effective role with override information.
 
-### Show Global Role Only
-
-```bash
-start config role show global
-```
-
 ### Show Local Role Only
 
 ```bash
-start config role show local
+start config role show --local
 ```
 
 ### Edit Global Role
 
 ```bash
-start config role edit global
+start config role edit
 ```
 
 ### Edit Local Role
 
 ```bash
-start config role edit local
+start config role edit --local
 ```
 
 ### Test Role
@@ -1206,13 +1199,13 @@ Verify role configuration, file availability, and command execution.
 ### Remove Local Role (Revert to Global)
 
 ```bash
-start config role remove local
+start config role remove --local
 ```
 
 ### Remove Global Role
 
 ```bash
-start config role remove global
+start config role remove
 ```
 
 ### Interactive Scope Selection

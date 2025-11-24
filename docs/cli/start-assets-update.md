@@ -13,17 +13,17 @@ start assets update <query>    # Update matching assets
 
 ## Description
 
-Check for updates to cached assets and download new versions from the GitHub catalog. Compares local asset SHAs with catalog SHAs to detect changes. Updates only the asset cache, never modifies user configuration files.
+Check for updates to cached assets and download new versions from the GitHub catalog. Compares local asset SHAs with the catalog index to detect changes. Updates only the asset cache, never modifies user configuration files.
 
 **Update process:**
 
-1. Fetch catalog tree from GitHub (contains SHAs for all files)
+1. Download catalog index (`index.csv`) from GitHub
 2. Find all cached assets (`.meta.toml` files in cache)
-3. Compare local SHA with catalog SHA for each asset
+3. Compare local SHA with index SHA for each asset
 4. Download and update assets with SHA mismatches
 5. Report update summary
 
-**Note:** While configuration files (`tasks.toml`) are not modified, assets are typically installed as file references (e.g., `prompt_file = "~/.config/start/assets/..."`). Updating the cached files **automatically updates the behavior** of these tasks without requiring config changes.
+**Note:** While configuration files (`tasks.toml`) are not modified, assets are typically installed as file references (e.g., `file = "~/.config/start/assets/..."`). Updating the cached files **automatically updates the behavior** of these tasks without requiring config changes.
 
 ## Arguments
 
@@ -45,10 +45,10 @@ Check for updates to cached assets and download new versions from the GitHub cat
 ### Update All Assets (No Query)
 
 ```
-1. Fetch GitHub catalog tree
+1. Download catalog index (index.csv)
 2. Find all .meta.toml files in cache
 3. For each cached asset:
-   - Compare local SHA with catalog SHA
+   - Compare local SHA with index SHA
    - If different → download new version
    - Update cache (files + metadata)
 4. Report results
@@ -57,10 +57,10 @@ Check for updates to cached assets and download new versions from the GitHub cat
 ### Selective Update (With Query)
 
 ```
-1. Fetch GitHub catalog tree
+1. Download catalog index (index.csv)
 2. Find cached assets matching query
 3. For each matching asset:
-   - Compare local SHA with catalog SHA
+   - Compare local SHA with index SHA
    - If different → download new version
    - Update cache
 4. Report results
@@ -91,7 +91,7 @@ Check for updates to cached assets and download new versions from the GitHub cat
 
 ```toml
 # .meta.toml file
-sha = "a1b2c3d4e5f6..."  # Git blob SHA
+sha = "a1b2c3d4e5f6789012345678901234567890abcd"  # Git blob SHA
 updated = "2025-01-12T14:30:00Z"
 ```
 
@@ -104,9 +104,9 @@ $ start assets update
 
 Checking for asset updates...
 
-✓ Fetched catalog (46 assets)
+✓ Loaded index (46 assets)
 
-Comparing cached assets with catalog...
+Comparing cached assets with index...
 
   ⬇ Updating tasks/git-workflow/pre-commit-review...
      SHA: a1b2c3d4... → b2c3d4e5...
@@ -131,9 +131,9 @@ $ start assets update
 
 Checking for asset updates...
 
-✓ Fetched catalog (46 assets)
+✓ Loaded index (46 assets)
 
-Comparing cached assets with catalog...
+Comparing cached assets with index...
 
 ✓ Update complete
   Updated: 0 assets
@@ -149,14 +149,14 @@ $ start assets update "commit"
 
 Checking for updates to assets matching 'commit'...
 
-✓ Fetched catalog (46 assets)
+✓ Loaded index (46 assets)
 
 Found 3 cached assets matching 'commit':
   - tasks/git-workflow/commit-message
   - tasks/git-workflow/pre-commit-review
   - tasks/git-workflow/post-commit-hook
 
-Comparing with catalog...
+Comparing with index...
 
   ⬇ Updating tasks/git-workflow/pre-commit-review...
      SHA: a1b2c3d4... → b2c3d4e5...
@@ -173,11 +173,11 @@ $ start assets update "git-workflow"
 
 Checking for updates to assets matching 'git-workflow'...
 
-✓ Fetched catalog (46 assets)
+✓ Loaded index (46 assets)
 
 Found 6 cached assets in git-workflow category
 
-Comparing with catalog...
+Comparing with index...
 
   ⬇ Updating tasks/git-workflow/pre-commit-review...
   ⬇ Updating tasks/git-workflow/commit-message...
@@ -224,9 +224,9 @@ $ start assets update
 
 Checking for asset updates...
 
-✓ Fetched catalog (46 assets)
+✓ Loaded index (46 assets)
 
-Comparing cached assets with catalog...
+Comparing cached assets with index...
 
   ⚠ tasks/custom/my-task not found in catalog (skipped)
 
@@ -268,7 +268,7 @@ $ start assets update
 
 Checking for asset updates...
 
-✓ Fetched catalog (46 assets)
+✓ Loaded index (46 assets)
 
 Comparing 12 cached assets...
 
@@ -290,7 +290,7 @@ Checking for updates to assets matching 'pre-commit-review'...
 Found 1 cached asset:
   - tasks/git-workflow/pre-commit-review
 
-Comparing with catalog...
+Comparing with index...
 
   ⬇ Updating tasks/git-workflow/pre-commit-review...
      SHA: a1b2c3d4... → b2c3d4e5...
@@ -309,7 +309,7 @@ Checking for updates to assets matching 'git-workflow'...
 
 Found 6 cached assets in git-workflow category
 
-Comparing with catalog...
+Comparing with index...
 
   ⬇ Updating tasks/git-workflow/pre-commit-review...
   ⬇ Updating tasks/git-workflow/commit-message...
@@ -326,7 +326,7 @@ $ start assets update --dry-run
 
 Checking for asset updates (DRY RUN)...
 
-✓ Fetched catalog (46 assets)
+✓ Loaded index (46 assets)
 
 Would update:
   ⬇ tasks/git-workflow/pre-commit-review
@@ -351,18 +351,18 @@ $ start assets update "pre-commit" --verbose
 
 Checking for updates to assets matching 'pre-commit'...
 
-Fetching catalog from GitHub...
-  URL: https://api.github.com/repos/grantcarthew/start/git/trees/main?recursive=1
-  ✓ Fetched 846 files
+Fetching catalog index from GitHub...
+  URL: https://raw.githubusercontent.com/grantcarthew/start/main/index.csv
+  ✓ Loaded index with 846 assets
 
 Loading cached metadata...
   Found: ~/.config/start/assets/tasks/git-workflow/pre-commit-review.meta.toml
   Local SHA: a1b2c3d4e5f6789012345678901234567890abcd
   Updated: 2025-01-10T12:00:00Z
 
-Finding in catalog...
+Finding in index...
   Path: assets/tasks/git-workflow/pre-commit-review.toml
-  Remote SHA: b2c3d4e5f6789012345678901234567890abcdef
+  Remote SHA: b2c3d4e5f6789012345678901234567890abcd
   Updated: 2025-01-12T14:30:00Z
 
 SHA mismatch detected:
@@ -536,7 +536,7 @@ Updates are **manual only**:
 
 ```toml
 [tasks.my-task]
-file = "~/.config/start/assets/tasks/my-category/my-task.toml"
+file = "~/.config/start/assets/tasks/my-category/my-task.md"
 # After update, next run uses new content automatically
 ```
 
@@ -550,7 +550,7 @@ Content copied from asset...
 # Update doesn't change this - you must manually update
 ```
 
-**Best practice:** Use `prompt_file` for auto-updates.
+**Best practice:** Use `file` for auto-updates.
 
 ### SHA-Based Versioning
 
@@ -584,7 +584,7 @@ Content copied from asset...
 
 Requires network access to:
 
-- Fetch catalog tree from GitHub
+- Fetch catalog index (`index.csv`) from GitHub
 - Download updated asset files
 
 **Offline:** Cannot check for or apply updates.
@@ -604,13 +604,13 @@ Requires network access to:
 
 **Typical update check:**
 
-- Fetch Tree API: ~100-200ms
+- Fetch Index: ~100-200ms
 - Compare SHAs: <10ms per asset
 - Download (if needed): ~50-100ms per file
 
 **Example (12 cached assets, 2 updates):**
 
-- Fetch tree: 150ms
+- Fetch index: 150ms
 - Compare 12 SHAs: 10ms
 - Download 2 assets: 200ms
 - **Total: ~360ms**

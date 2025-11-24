@@ -37,7 +37,7 @@ Execution commands (top-level):
 Configuration management (under `start config`):
 
 - `start config show` - view merged configuration
-- `start config edit [scope]` - edit config file
+- `start config edit [flags]` - edit config file
 - `start config path` - show config file paths
 - `start config validate` - validate configuration
 - `start config agent <sub>` - manage agents
@@ -201,7 +201,7 @@ Configuration management:
 
 ```bash
 start config show            # View merged configuration
-start config edit [scope]    # Edit config file
+start config edit [flags]    # Edit config file
 start config path            # Show config file paths
 start config validate        # Validate configuration
 
@@ -237,64 +237,64 @@ All config types follow consistent pattern:
 Agent management:
 
 ```bash
-start config agent list [scope]
-start config agent add [name] [scope]  # DEPRECATED - use 'start assets add'
-start config agent new [scope]
-start config agent show [name] [scope]
+start config agent list [flags]
+start config agent add [name] [flags]  # DEPRECATED - use 'start assets add'
+start config agent new [flags]
+start config agent show [name] [flags]
 start config agent test <name>
-start config agent edit [name] [scope]
-start config agent remove [name] [scope]
+start config agent edit [name] [flags]
+start config agent remove [name] [flags]
 start config agent default [name]
 ```
 
 Context management:
 
 ```bash
-start config context list [scope]
-start config context add [name] [scope]
-start config context new [scope]
-start config context show [name] [scope]
+start config context list [flags]
+start config context add [name] [flags]
+start config context new [flags]
+start config context show [name] [flags]
 start config context test <name>
-start config context edit [name] [scope]
-start config context remove [name] [scope]
+start config context edit [name] [flags]
+start config context remove [name] [flags]
 ```
 
 Task management:
 
 ```bash
-start config task list [scope]
-start config task add [name] [scope]  # DEPRECATED - use 'start assets add'
-start config task new [scope]
-start config task show [name] [scope]
+start config task list [flags]
+start config task add [name] [flags]  # DEPRECATED - use 'start assets add'
+start config task new [flags]
+start config task show [name] [flags]
 start config task test <name>
-start config task edit [name] [scope]
-start config task remove [name] [scope]
+start config task edit [name] [flags]
+start config task remove [name] [flags]
 ```
 
 Role management:
 
 ```bash
-start config role list [scope]
+start config role list [flags]
 start config role add [path]  # DEPRECATED - use 'start assets add'
-start config role new [scope]
-start config role show [scope]
+start config role new [flags]
+start config role show [flags]
 start config role test
-start config role edit [scope]
-start config role remove [scope]
+start config role edit [flags]
+start config role remove [flags]
 start config role default [name]
 ```
 
-## Scope
+## Scope Selection
 
-Scope parameter applies to configuration commands:
+Scope selection applies to configuration commands via flags:
 
-- `[scope]` is optional, defaults to global
-- Valid values: `global`, `local`
+- Default is interactive or merged view (depending on command)
+- `--local` flag targets local configuration
 - Examples:
-  - `start config agent list` - shows global agents
-  - `start config agent list local` - shows local agents
-  - `start config agent add claude global` - adds to global config
-  - `start config agent add claude local` - adds to local config
+  - `start config agent list` - shows merged agents
+  - `start config agent list --local` - shows local agents
+  - `start config agent new` - interactive scope selection
+  - `start config agent new --local` - adds to local config
 
 ## Usage Examples
 

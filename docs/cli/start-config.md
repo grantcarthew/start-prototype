@@ -8,7 +8,7 @@ start config - Manage configuration files
 
 ```bash
 start config show
-start config edit [scope]
+start config edit [flags]
 start config path
 start config validate
 ```
@@ -234,16 +234,13 @@ Open settings configuration file (config.toml) in editor. For editing other conf
 **Synopsis:**
 
 ```bash
-start config edit [scope]
+start config edit [flags]
 ```
 
-**Arguments:**
+**Flags:**
 
-**[scope]** (optional)
-: Which config.toml to edit. If omitted, edit will detect and ask.
-
-- `global` - Edit `~/.config/start/config.toml` (settings)
-- `local` - Edit `./.start/config.toml` (settings)
+**--local**, **-l**
+: Edit local configuration (`./.start/config.toml`). If omitted, prompts interactively or defaults to global if local doesn't exist.
 
 **Behavior:**
 
@@ -258,11 +255,10 @@ Opens the configuration file in your preferred editor:
 
 2. **Config selection:**
 
-   - With `global`: Edit `~/.config/start/config.toml`
-   - With `local`: Edit `./.start/config.toml`
-   - No scope, both exist: Ask which to edit
-   - No scope, only one exists: Edit that one
-   - No scope, neither exists: Ask which to create
+   - With `--local`: Edit `./.start/config.toml`
+   - No flag, both exist: Ask which to edit
+   - No flag, only global exists: Edit global
+   - No flag, neither exists: Ask which to create
 
 3. **After editing:**
    - Validates config syntax and semantics
@@ -291,16 +287,16 @@ Opening ~/.config/start/config.toml in vi...
 Set $EDITOR to use your preferred editor.
 ```
 
-**Edit specific config:**
+**Edit local config:**
 
 ```bash
-start config edit global
+start config edit --local
 ```
 
 Output:
 
 ```
-Opening ~/.config/start/config.toml in nvim...
+Opening ./.start/config.toml in nvim...
 ```
 
 (User's editor opens, they make changes and save)
@@ -309,7 +305,7 @@ Opening ~/.config/start/config.toml in nvim...
 Validating configuration...
 ✓ Configuration is valid
 
-Changes saved to ~/.config/start/config.toml
+Changes saved to ./.start/config.toml
 ```
 
 **Validation warnings after edit:**
@@ -339,7 +335,7 @@ Agent 'broken':
 **Config file doesn't exist:**
 
 ```bash
-start config edit local
+start config edit --local
 ```
 
 Output:
@@ -361,7 +357,7 @@ Opening ./.start/config.toml in nvim...
 **Editor not configured:**
 
 ```bash
-start config edit global
+start config edit
 ```
 
 (When `$VISUAL` and `$EDITOR` not set)
@@ -394,7 +390,7 @@ Opening ~/.config/start/config.toml in vi...
 **Directory not writable:**
 
 ```bash
-start config edit local
+start config edit --local
 ```
 
 Output:
@@ -411,7 +407,7 @@ Exit code: 2
 **Editor command failed:**
 
 ```bash
-start config edit global
+start config edit
 ```
 
 (When `$EDITOR="badeditor"`)
@@ -461,7 +457,7 @@ Local:  ./.start/ ✓
   contexts.toml ✓
   tasks.toml ✓
 
-Use 'start config edit [scope]' to edit settings.
+Use 'start config edit' to edit settings.
 Use specialized commands for other files (e.g., 'start config task edit').
 ```
 
@@ -479,7 +475,7 @@ Global: ~/.config/start/ ✓
 
 Local:  ./.start/ (not found)
 
-Use 'start config edit global' to edit global settings.
+Use 'start config edit' to edit global settings.
 Use 'start init --local' to create local config.
 ```
 
@@ -658,8 +654,8 @@ Local: ./.start/
 ✗ Configuration has errors
   Fix errors before using 'start'.
 
-  Use 'start config edit global' to fix global config.
-  Use 'start config edit local' to fix local config.
+  Use 'start config edit' to fix global config.
+  Use 'start config edit --local' to fix local config.
 ```
 
 **Output (duplicate agents with warnings):**
@@ -749,7 +745,7 @@ Line 23: expected '=' after key, found ']'
   25 | [agents.gemini]
 
 Fix the syntax error and run validation again.
-Use 'start config edit global' to edit the file.
+Use 'start config edit' to edit the file.
 ```
 
 Exit code: 2
@@ -783,15 +779,15 @@ See effective configuration after global + local merge.
 ### Edit Global Config
 
 ```bash
-start config edit global
+start config edit
 ```
 
-Open global config in your editor (uses `$EDITOR` or `vi`).
+Open global config in your editor (uses `$EDITOR` or `vi`). If local config also exists, prompts to select.
 
 ### Edit Local Config
 
 ```bash
-start config edit local
+start config edit --local
 ```
 
 Open local project config in your editor.

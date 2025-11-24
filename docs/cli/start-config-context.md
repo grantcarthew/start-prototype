@@ -7,12 +7,12 @@ start config context - Manage context document configurations
 ## Synopsis
 
 ```bash
-start config context list [scope]
-start config context new [scope]
-start config context show [name] [scope]
+start config context list [flags]
+start config context new [flags]
+start config context show [name] [flags]
 start config context test <name>
-start config context edit [name] [scope]
-start config context remove [name] [scope]
+start config context edit [name] [flags]
+start config context remove [name] [flags]
 ```
 
 ## Description
@@ -28,7 +28,7 @@ Manages context document configurations in config files. Context documents provi
 - **edit** - Modify existing context configuration
 - **remove** - Delete context from configuration
 
-**Note:** Context documents can be defined in both global and local configs. These commands manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
+**Note:** Context documents can be defined in both global and local configs. Use the `--local` flag to manage contexts in the local configuration. Without flags, commands operate on the merged configuration or prompt interactively.
 
 ## Context Configuration Structure
 
@@ -79,10 +79,8 @@ Display all configured contexts with their details.
 **Synopsis:**
 
 ```bash
-start config context list          # Select scope interactively
-start config context list global   # List global contexts only
-start config context list local    # List local contexts only
-start config context list merged   # Show merged view (global + local)
+start config context list          # List merged contexts (global + local)
+start config context list --local  # List local contexts only
 ```
 
 **Behavior:**
@@ -96,6 +94,10 @@ Lists all contexts defined in the selected scope(s) with:
 - Scope (global, local, or override)
 
 **Output (merged view):**
+
+```bash
+start config context list
+```
 
 ```
 Configured contexts (merged):
@@ -132,7 +134,7 @@ Optional contexts (2):
 **Output (global only):**
 
 ```bash
-start config context list global
+start config context list
 ```
 
 ```
@@ -160,7 +162,7 @@ Optional contexts (1):
 **Output (local only):**
 
 ```bash
-start config context list local
+start config context list --local
 ```
 
 ```
@@ -188,9 +190,9 @@ Optional contexts (2):
 **No contexts configured:**
 
 ```
-No contexts configured in global config.
+No contexts configured.
 
-Create contexts: start config context new global
+Create contexts: start config context new
 ```
 
 **Exit codes:**
@@ -206,18 +208,16 @@ Interactively add a new context to the configuration.
 **Synopsis:**
 
 ```bash
-start config context new          # Select scope interactively
-start config context new global   # Add to global config
-start config context new local    # Add to local config
+start config context new          # Add to global or local (interactive prompt)
+start config context new --local  # Add to local config
 ```
 
 **Behavior:**
 
 Prompts for context details and adds to the selected config file:
 
-1. **Select scope** (if not provided)
-   - global - Add to `~/.config/start/contexts.toml`
-   - local - Add to `./.start/contexts.toml`
+1. **Select scope** (if `--local` not specified)
+   - Prompts to choose Global or Local configuration
 
 2. **Context name** (required)
    - Validation: lowercase alphanumeric with hyphens
@@ -248,7 +248,7 @@ Prompts for context details and adds to the selected config file:
    - Command timeout
 
 8. **Backup and save**
-   - Backs up existing config to `config.YYYY-MM-DD-HHMMSS.toml`
+   - Backs up existing config to `contexts.YYYY-MM-DD-HHMMSS.toml`
    - Writes new context to config
    - Shows success message
 
@@ -488,7 +488,7 @@ Exit code: 2
 **Backup failed:**
 
 ```
-Backing up config to config.2025-01-06-091523.toml...
+Backing up config to contexts.2025-01-06-091523.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/contexts.toml
@@ -505,9 +505,8 @@ Display current context configuration.
 
 ```bash
 start config context show                 # Select context and scope interactively
-start config context show <name>          # Select scope for named context
-start config context show <name> global   # Show global context only
-start config context show <name> local    # Show local context only
+start config context show <name>          # Show effective configuration
+start config context show <name> --local  # Show local configuration only
 ```
 
 **Behavior:**
@@ -546,7 +545,7 @@ Prompt template:
 **Output (local context - command-based):**
 
 ```bash
-start config context show git-status local
+start config context show git-status --local
 ```
 
 ```
@@ -585,9 +584,9 @@ Prompt:
 **No context configured:**
 
 ```
-No context 'nonexistent' found in global config.
+No context 'nonexistent' found in configuration.
 
-Configure: start config context new global
+Configure: start config context new
 ```
 
 **Interactive selection:**
@@ -902,9 +901,8 @@ Edit context configuration interactively.
 
 ```bash
 start config context edit                  # Select context and scope
-start config context edit <name>           # Select scope for named context
-start config context edit <name> global    # Edit in global config
-start config context edit <name> local     # Edit in local config
+start config context edit <name>           # Edit effective/global context
+start config context edit <name> --local   # Edit in local config
 ```
 
 **Behavior:**
@@ -980,7 +978,7 @@ Interactive prompts to edit specific context. Shows current values as defaults -
 3. **Prompt template** - Current value shown in brackets
 4. **Required flag** - Current value shown
 5. **Advanced options** - Shell, timeout
-6. **Backup and save** - Backs up to `config.YYYY-MM-DD-HHMMSS.toml`
+6. **Backup and save** - Backs up to `contexts.YYYY-MM-DD-HHMMSS.toml`
 
 **Interactive flow:**
 
@@ -1102,9 +1100,8 @@ Remove context from configuration.
 
 ```bash
 start config context remove                  # Select context and scope
-start config context remove <name>           # Select scope for named context
-start config context remove <name> global    # Remove from global config
-start config context remove <name> local     # Remove from local config
+start config context remove <name>           # Remove from effective scope (prompt if ambiguous)
+start config context remove <name> --local   # Remove from local config
 ```
 
 **Behavior:**
@@ -1181,7 +1178,7 @@ Remove context 'environment' from global config? [y/N]: y
 **Removing required context (warning):**
 
 ```bash
-start config context remove environment global
+start config context remove environment
 ```
 
 Output:
@@ -1233,9 +1230,9 @@ Exit code: 2
 **No contexts configured:**
 
 ```
-No contexts configured in global config.
+No contexts configured.
 
-Use 'start config context new global' to create a context.
+Use 'start config context new' to create a context.
 ```
 
 Exit code: 1
@@ -1258,6 +1255,9 @@ Exit code: 3
 
 These flags work on all `start config context` subcommands where applicable.
 
+**--local**, **-l**
+: Target local configuration (`./.start/contexts.toml`).
+
 **--help**, **-h**
 : Show help for the subcommand.
 
@@ -1275,7 +1275,7 @@ These flags work on all `start config context` subcommands where applicable.
 ### List All Contexts (Merged View)
 
 ```bash
-start config context list merged
+start config context list
 ```
 
 Show all contexts from both global and local configs.
@@ -1283,19 +1283,19 @@ Show all contexts from both global and local configs.
 ### List Global Contexts Only
 
 ```bash
-start config context list global
+start config context list
 ```
 
 ### Create Context in Global Config
 
 ```bash
-start config context new global
+start config context new
 ```
 
 ### Create Context in Local Config
 
 ```bash
-start config context new local
+start config context new --local
 ```
 
 ### Test Context
@@ -1309,13 +1309,13 @@ Verify context configuration and file availability.
 ### Edit Context
 
 ```bash
-start config context edit environment global
+start config context edit environment
 ```
 
 ### Remove Context
 
 ```bash
-start config context remove readme global
+start config context remove readme
 ```
 
 ### Interactive Context Selection

@@ -7,13 +7,13 @@ start config agent - Manage AI agent configurations
 ## Synopsis
 
 ```bash
-start config agent list [scope]
-start config agent new [scope]
-start config agent show [name] [scope]
+start config agent list [flags]
+start config agent new [flags]
+start config agent show [name] [flags]
 start config agent test <name>
-start config agent edit [name] [scope]
-start config agent remove [name] [scope]
-start config agent default [name]
+start config agent edit [name] [flags]
+start config agent remove [name] [flags]
+start config agent default [name] [flags]
 ```
 
 ## Description
@@ -32,7 +32,7 @@ Manages AI agent configurations in both global (`~/.config/start/agents.toml`) a
 
 To install agents from the catalog, use `start assets add`.
 
-**Note:** Agents can be defined in both global and local configs. These commands can manage either scope using the `[scope]` argument. If scope is omitted, the command prompts interactively.
+**Note:** Agents can be defined in both global and local configs. Use the `--local` flag to manage agents in the local configuration. Without flags, commands operate on the merged configuration or prompt interactively.
 
 ## Agent Configuration Structure
 
@@ -85,13 +85,11 @@ Display all configured agents with their details.
 **Synopsis:**
 
 ```bash
-start config agent list          # Select scope interactively
-start config agent list global   # List global agents only
-start config agent list local    # List local agents only
-start config agent list merged   # Show merged view (global + local)
+start config agent list          # List merged agents (global + local)
+start config agent list --local  # List local agents only
 ```
 
-**Behvior:**
+**Behavior:**
 
 Lists all agents defined in the selected scope(s) with:
 
@@ -170,16 +168,18 @@ Interactively add a new agent to the configuration.
 **Synopsis:**
 
 ```bash
-start config agent new          # Select scope interactively
-start config agent new global   # Add to global config
-start config agent new local    # Add to local config
+start config agent new          # Add to global or local (interactive prompt)
+start config agent new --local  # Add to local config
 ```
 
 **Behavior:**
 
 Prompts for agent details and adds to the selected configuration file:
 
-1. **Agent name** (required)
+1. **Scope selection** (if `--local` not specified)
+   - Prompts to choose Global or Local configuration
+
+2. **Agent name** (required)
 
    - Validation: alphanumeric with hyphens/underscores
    - Pattern: `/^[a-zA-Z0-9]+([-_][a-zA-Z0-9]+)*$/`
@@ -224,7 +224,7 @@ Prompts for agent details and adds to the selected configuration file:
    - Can skip (uses first model)
 
 9. **Backup and save**
-   - Backs up existing config to `config.YYYY-MM-DD-HHMMSS.toml`
+   - Backs up existing config to `agents.YYYY-MM-DD-HHMMSS.toml`
    - Writes new agent to config
    - Shows success message
 
@@ -389,7 +389,7 @@ Command template: my-agent --model {model} '{prompt}'
 **Backup failed:**
 
 ```
-Backing up config to config.2025-01-04-143022.toml...
+Backing up config to agents.2025-01-04-143022.toml...
 ✗ Failed to backup config: permission denied
 
 Existing config preserved at: ~/.config/start/agents.toml
@@ -406,9 +406,8 @@ Display current agent configuration.
 
 ```bash
 start config agent show                 # Select agent and scope interactively
-start config agent show <name>          # Select scope for named agent
-start config agent show <name> global   # Show global agent only
-start config agent show <name> local    # Show local agent only
+start config agent show <name>          # Show effective configuration
+start config agent show <name> --local  # Show local configuration only
 ```
 
 **Behavior:**
@@ -447,7 +446,7 @@ Models:
 **Output (local agent):**
 
 ```bash
-start config agent show custom-agent local
+start config agent show custom-agent --local
 ```
 
 ```
@@ -476,9 +475,9 @@ Command template:
 **No agent configured:**
 
 ```
-No agent 'nonexistent' found in global config.
+No agent 'nonexistent' found in configuration.
 
-Configure: start config agent new global
+Configure: start config agent new
 ```
 
 **Interactive selection:**
@@ -737,9 +736,8 @@ Edit agent configuration interactively.
 
 ```bash
 start config agent edit                  # Select agent and scope
-start config agent edit <name>           # Select scope for named agent
-start config agent edit <name> global    # Edit in global config
-start config agent edit <name> local     # Edit in local config
+start config agent edit <name>           # Edit effective/global agent
+start config agent edit <name> --local   # Edit in local config
 ```
 
 **Behavior:**
@@ -785,7 +783,7 @@ Interactive prompts to edit specific agent. Shows current values as defaults - p
    - Remove existing models
    - Modify model values
 7. **Default model** - Select from available models
-8. **Backup and save** - Backs up to `config.YYYY-MM-DD-HHMMSS.toml`
+8. **Backup and save** - Backs up to `agents.YYYY-MM-DD-HHMMSS.toml`
 
 **Interactive flow (edit specific agent):**
 
@@ -963,9 +961,8 @@ Remove agent from configuration.
 
 ```bash
 start config agent remove                  # Select agent and scope
-start config agent remove <name>           # Select scope for named agent
-start config agent remove <name> global    # Remove from global config
-start config agent remove <name> local     # Remove from local config
+start config agent remove <name>           # Remove from effective scope (prompt if ambiguous)
+start config agent remove <name> --local   # Remove from local config
 ```
 
 **Behavior:**
@@ -1132,6 +1129,7 @@ Set default agent interactively or directly.
 ```bash
 start config agent default          # Select from list
 start config agent default <name>   # Set specific default
+start config agent default <name> --local # Set default in local config
 ```
 
 **Behavior:**
@@ -1285,6 +1283,9 @@ Exit code: 1
 
 These flags work on all `start config agent` subcommands where applicable.
 
+**--local**, **-l**
+: Target local configuration (`./.start/agents.toml`).
+
 **--help**, **-h**
 : Show help for the subcommand.
 
@@ -1346,7 +1347,7 @@ claude
 ### No Configuration File
 
 ```
-Error: No agent configuration found in [scope] config.
+Error: No agent configuration found.
 
 Run 'start init' to create initial configuration.
 ```
@@ -1381,7 +1382,7 @@ Agents can be defined in both global and local configs with merge behavior:
 **Local agents:** `./.start/agents.toml`
 
 - Team-standardized configurations (can be committed to git)
-- Managed by `start config agent ... local` commands or manually edited
+- Managed by `start config agent ... --local` commands or manually edited
 - Project-specific agent wrappers or custom tools
 
 **Merge behavior:**
