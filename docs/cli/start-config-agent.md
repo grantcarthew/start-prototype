@@ -186,44 +186,44 @@ Prompts for agent details and adds to the selected configuration file:
    - Must be unique (not already exist)
    - Examples: `claude`, `Gemini`, `My-Custom-Agent`
 
-2. **Description** (optional)
+3. **Description** (optional)
 
    - Human-readable description
    - Press enter to skip
 
-3. **URL** (optional)
+4. **URL** (optional)
 
    - Documentation or homepage URL
    - Press enter to skip
 
-4. **Models URL** (optional)
+5. **Models URL** (optional)
 
    - Model documentation URL
    - Press enter to skip
 
-5. **Binary** (required)
+6. **Binary** (required)
    - Binary name or path to execute (e.g., `claude`)
    - Used for detection, `{bin}` placeholder, and catalog index generation
 
-6. **Command** (required)
+7. **Command** (required)
 
    - Should contain `{prompt}` placeholder (warns if missing)
    - Warns on unknown placeholders (typos)
    - Valid placeholders: {bin}, {model}, {role}, {role_file}, {prompt}, {date}
 
-7. **Add models?** (yes/no)
+8. **Add models?** (yes/no)
 
    - If yes, loop to add multiple models
    - Each model: model name + full model identifier
    - Type "done" to finish adding models
 
-8. **Default model** (if models added)
+9. **Default model** (if models added)
 
    - Shows numbered list of added models
    - Select which to use as default
    - Can skip (uses first model)
 
-9. **Backup and save**
+10. **Backup and save**
    - Backs up existing config to `agents.YYYY-MM-DD-HHMMSS.toml`
    - Writes new agent to config
    - Shows success message

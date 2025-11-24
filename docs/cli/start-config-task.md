@@ -238,11 +238,11 @@ Prompts for task details and adds to the selected config file:
    - Configure UTD fields (file, command, prompt)
    - At least one UTD field required
 
-7. **Advanced options?** (yes/no, default: no)
+8. **Advanced options?** (yes/no, default: no)
    - Shell override
    - Command timeout
 
-8. **Backup and save**
+9. **Backup and save**
    - Backs up existing config to `tasks.YYYY-MM-DD-HHMMSS.toml`
    - Writes new task to config
    - Shows success message
