@@ -18,6 +18,7 @@ Each example contains both **global** and **local** configuration directories sh
 All examples use the same multi-file structure:
 
 **Global configuration** (`~/.config/start/`):
+
 - `config.toml` - Tool settings and defaults
 - `agents.toml` - AI agent configurations
 - `roles.toml` - Role (system prompt) definitions
@@ -25,6 +26,7 @@ All examples use the same multi-file structure:
 - `tasks.toml` - Task workflow definitions
 
 **Local configuration** (`./.start/`):
+
 - Same structure as global
 - Local configs merge with global configs
 - Local completely replaces global for same-named items
@@ -38,6 +40,7 @@ All examples use the same multi-file structure:
 **Use case:** Learning the basic structure and getting a working setup quickly.
 
 **Features:**
+
 - Single test agent (`smith`)
 - Basic role configuration
 - One required context
@@ -45,6 +48,7 @@ All examples use the same multi-file structure:
 - **Only global config** - local follows same structure
 
 **How to use:**
+
 ```bash
 # Copy to your global config
 mkdir -p ~/.config/start
@@ -64,6 +68,7 @@ start doctor
 **Use case:** Reference when configuring advanced features or understanding all options.
 
 **Features:**
+
 - ALL possible fields documented with comments
 - Multiple UTD pattern examples
 - Validation rules explained
@@ -72,6 +77,7 @@ start doctor
 - Shell and timeout overrides shown
 
 **How to use:**
+
 - Read for understanding all available options
 - Reference when adding advanced features
 - Copy specific sections as needed
@@ -85,6 +91,7 @@ start doctor
 **Use case:** Starting point for actual projects with real AI tools.
 
 **Features:**
+
 - Real agents: Claude, Gemini, aichat
 - Practical roles: code-reviewer, go-expert, security-auditor
 - Useful contexts: environment, project, architecture docs
@@ -92,6 +99,7 @@ start doctor
 - Project-specific overrides in local config
 
 **How to use:**
+
 ```bash
 # Copy to your global config
 cp -r examples/real-world/global/* ~/.config/start/
@@ -125,18 +133,21 @@ Configuration is split into 5 files per scope (global/local):
 ### Global vs Local
 
 **Global** (`~/.config/start/`):
+
 - Personal defaults across all projects
 - Installed AI agents and preferred models
 - Personal roles and contexts
 - Reusable tasks
 
 **Local** (`./.start/`):
+
 - Project-specific overrides
 - Project conventions and guidelines
 - Team-shared configurations (version controlled)
 - Project-specific tasks
 
 **Merge behavior:**
+
 - Local + global configs are combined
 - Same name in local **completely replaces** global (no field merging)
 - Different names are additive
@@ -175,15 +186,19 @@ Status: {command_output}
 ### Placeholders
 
 **Universal** (available everywhere):
+
 - `{date}` - Current timestamp
 
 **Agent commands only:**
+
 - `{bin}`, `{model}`, `{prompt}`, `{role}`, `{role_file}`
 
 **UTD pattern** (roles/contexts/tasks):
+
 - `{file}`, `{file_contents}`, `{command}`, `{command_output}`
 
 **Tasks only:**
+
 - `{instructions}` - User's command-line arguments
 
 ### Required vs Optional Contexts
@@ -395,6 +410,7 @@ Found a useful pattern? Consider contributing:
 3. Submit pull request
 
 Examples should be:
+
 - Clear and well-documented
 - Solve real problems
 - Follow existing patterns

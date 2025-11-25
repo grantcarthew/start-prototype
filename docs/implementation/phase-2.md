@@ -11,11 +11,13 @@
 Before starting this phase, review these documents:
 
 **Design Records:**
+
 - [DR-006: Cobra CLI](../design/design-records/dr-006-cobra-cli.md) - CLI command structure
 - [DR-007: Placeholders](../design/design-records/dr-007-placeholders.md) - Placeholder resolution system
 - [DR-013: Agent Templates](../design/design-records/dr-013-agent-templates.md) - Agent configuration structure
 
 **CLI Documentation:**
+
 - [start.md](../cli/start.md) - Main command and interactive mode
 
 ---

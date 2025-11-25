@@ -11,11 +11,13 @@
 Before starting this phase, review these documents:
 
 **Design Records:**
+
 - [DR-009: Task Structure](../design/design-records/dr-009-task-structure.md) - Task configuration and placeholders
 - [DR-019: Task Loading](../design/design-records/dr-019-task-loading.md) - Task loading and merging algorithm
 - [DR-029: Task Agent Field](../design/design-records/dr-029-task-agent-field.md) - Optional agent field
 
 **CLI Documentation:**
+
 - [start-task.md](../cli/start-task.md) - Task command specification
 
 ---

@@ -11,14 +11,17 @@
 Before starting this phase, review these documents:
 
 **Review All Design Documentation:**
+
 - [Design Records Index](../design/design-records/README.md) - Review all DRs for completeness
 - [Architecture](../architecture.md) - Verify implementation matches architecture
 - [Testing Strategy](../testing.md) - Ensure all testing criteria met
 
 **Review All CLI Documentation:**
+
 - All [CLI docs](../cli/) - Verify all commands match specifications
 
 **Key Areas for Polish:**
+
 - Error messages and user experience
 - Output formatting and colors
 - Performance optimization

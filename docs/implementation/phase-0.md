@@ -11,14 +11,17 @@
 Before starting this phase, review these documents:
 
 **Architecture & Design:**
+
 - [docs/architecture.md](../architecture.md) - Hexagonal architecture pattern, dependency injection
 - [docs/testing.md](../testing.md) - Testing strategy, smith agent concept
 
 **Design Records:**
+
 - [DR-001: TOML Format](../design/design-records/dr-001-toml-format.md) - Understanding TOML tags for structs
 - [DR-007: Placeholders](../design/design-records/dr-007-placeholders.md) - Placeholder system context
 
 **Reference:**
+
 - [Design Records Index](../design/design-records/README.md) - Overview of all design decisions
 - [examples/minimal/](../../examples/minimal/) - Target configuration structure for Phase 0
 

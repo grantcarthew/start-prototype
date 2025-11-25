@@ -11,6 +11,7 @@
 Before starting this phase, review these documents:
 
 **Design Records:**
+
 - [DR-024: Doctor Exit Codes](../design/design-records/dr-024-doctor-exit-codes.md) - Exit code system
 - [DR-025: No Automatic Checks](../design/design-records/dr-025-no-automatic-checks.md) - No auto checks or caching
 - [DR-028: Shell Completion](../design/design-records/dr-028-shell-completion.md) - Completion support
@@ -19,6 +20,7 @@ Before starting this phase, review these documents:
 - [DR-021: GitHub Version Check](../design/design-records/dr-021-github-version-check.md) - Version checking
 
 **CLI Documentation:**
+
 - [start-doctor.md](../cli/start-doctor.md) - Doctor command specification
 - [start-config.md](../cli/start-config.md) - Config management overview
 - [start-config-agent.md](../cli/start-config-agent.md) - Agent config commands

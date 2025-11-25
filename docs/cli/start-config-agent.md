@@ -224,9 +224,10 @@ Prompts for agent details and adds to the selected configuration file:
    - Can skip (uses first model)
 
 10. **Backup and save**
-   - Backs up existing config to `agents.YYYY-MM-DD-HHMMSS.toml`
-   - Writes new agent to config
-   - Shows success message
+
+- Backs up existing config to `agents.YYYY-MM-DD-HHMMSS.toml`
+- Writes new agent to config
+- Shows success message
 
 **Interactive flow:**
 

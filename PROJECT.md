@@ -22,6 +22,7 @@
 See [docs/design/design-records/README.md](docs/design/design-records/README.md) for the complete index of all Design Records (DR-001 through DR-041).
 
 **Key Design Records by Phase:**
+
 - **Configuration:** DR-001 (TOML), DR-002 (Config Merge), DR-003 (Named Documents), DR-004 (Agent Scope), DR-005 (Roles), DR-007 (Placeholders), DR-008 (File Handling), DR-012 (Context Required)
 - **CLI Design:** DR-006 (Cobra), DR-017 (CLI Organization), DR-024 (Doctor Exit Codes), DR-025 (No Auto Checks), DR-028 (Shell Completion), DR-030 (Prefix Matching), DR-038 (Flag Resolution), DR-041 (Asset Commands)
 - **Tasks:** DR-009 (Task Structure), DR-019 (Task Loading), DR-029 (Task Agent Field)
@@ -32,6 +33,7 @@ See [docs/design/design-records/README.md](docs/design/design-records/README.md)
 ### CLI Documentation
 
 Main commands:
+
 - [start.md](docs/cli/start.md) - Main command reference and interactive mode
 - [start-init.md](docs/cli/start-init.md) - Initialize configuration wizard
 - [start-task.md](docs/cli/start-task.md) - Task execution
@@ -40,6 +42,7 @@ Main commands:
 - [start-show.md](docs/cli/start-show.md) - Display configuration
 
 Asset management:
+
 - [start-assets.md](docs/cli/start-assets.md) - Asset management overview
 - [start-assets-add.md](docs/cli/start-assets-add.md) - Add assets from catalog
 - [start-assets-browse.md](docs/cli/start-assets-browse.md) - Browse available assets
@@ -49,6 +52,7 @@ Asset management:
 - [start-assets-update.md](docs/cli/start-assets-update.md) - Update cached assets
 
 Configuration:
+
 - [start-config.md](docs/cli/start-config.md) - Config management overview
 - [start-config-agent.md](docs/cli/start-config-agent.md) - Agent configuration
 - [start-config-role.md](docs/cli/start-config-role.md) - Role configuration

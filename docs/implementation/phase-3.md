@@ -11,12 +11,14 @@
 Before starting this phase, review these documents:
 
 **Design Records:**
+
 - [DR-005: Role Configuration](../design/design-records/dr-005-role-configuration.md) - Role config and selection precedence
 - [DR-003: Named Documents](../design/design-records/dr-003-named-documents.md) - Named document structure
 - [DR-012: Context Required](../design/design-records/dr-012-context-required.md) - Required field and document order
 - [DR-008: File Handling](../design/design-records/dr-008-file-handling.md) - Path resolution and missing files
 
 **Design Documents:**
+
 - [unified-template-design.md](../design/unified-template-design.md) - UTD pattern (file/command/prompt)
 
 ---
