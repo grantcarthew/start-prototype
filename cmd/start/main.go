@@ -2,8 +2,10 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/grantcarthew/start/internal/adapters"
+	"github.com/grantcarthew/start/internal/assets"
 	"github.com/grantcarthew/start/internal/cli"
 	"github.com/grantcarthew/start/internal/config"
 	"github.com/grantcarthew/start/internal/engine"
@@ -16,6 +18,7 @@ func main() {
 	fs := &adapters.RealFileSystem{}
 	runner := &adapters.RealRunner{}
 	commandRunner := adapters.NewRealCommandRunner()
+	githubClient := adapters.NewRealGitHubClient()
 
 	// Create config loader
 	configLoader := config.NewLoader(fs)
@@ -29,6 +32,14 @@ func main() {
 		workDir = "."
 	}
 
+	// Create cache
+	home, err := os.UserHomeDir()
+	if err != nil {
+		home = "."
+	}
+	cacheBase := filepath.Join(home, ".config", "start", "assets")
+	cache := adapters.NewFileCache(fs, cacheBase)
+
 	// Create engine components
 	placeholderResolver := engine.NewPlaceholderResolver()
 	utdProcessor := engine.NewUTDProcessor(fs, commandRunner, workDir)
@@ -38,6 +49,9 @@ func main() {
 	taskLoader := engine.NewTaskLoader(utdProcessor, placeholderResolver)
 	taskResolver := engine.NewTaskResolver()
 	executor := engine.NewExecutor(runner, placeholderResolver)
+
+	// Create asset resolver
+	assetResolver := assets.NewResolver(fs, cache, githubClient, configLoader)
 
 	// Create root command with dependencies
 	rootCmd := cli.NewRootCommand(
@@ -49,6 +63,7 @@ func main() {
 		contextLoader,
 		taskLoader,
 		taskResolver,
+		assetResolver,
 		version,
 	)
 

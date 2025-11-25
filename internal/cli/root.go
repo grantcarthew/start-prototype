@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/grantcarthew/start/internal/assets"
 	"github.com/grantcarthew/start/internal/config"
 	"github.com/grantcarthew/start/internal/engine"
 	"github.com/spf13/cobra"
@@ -19,6 +20,7 @@ type RootCommand struct {
 	contextLoader  *engine.ContextLoader
 	taskLoader     *engine.TaskLoader
 	taskResolver   *engine.TaskResolver
+	assetResolver  *assets.Resolver
 	version        string
 }
 
@@ -32,6 +34,7 @@ func NewRootCommand(
 	contextLoader *engine.ContextLoader,
 	taskLoader *engine.TaskLoader,
 	taskResolver *engine.TaskResolver,
+	assetResolver *assets.Resolver,
 	version string,
 ) *cobra.Command {
 	rc := &RootCommand{
@@ -43,6 +46,7 @@ func NewRootCommand(
 		contextLoader:  contextLoader,
 		taskLoader:     taskLoader,
 		taskResolver:   taskResolver,
+		assetResolver:  assetResolver,
 		version:        version,
 	}
 
@@ -72,6 +76,7 @@ func NewRootCommand(
 		taskLoader,
 		taskResolver,
 	))
+	cmd.AddCommand(NewAssetsCommand(assetResolver))
 
 	return cmd
 }
