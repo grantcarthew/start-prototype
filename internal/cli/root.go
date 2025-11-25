@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -120,9 +119,14 @@ func (rc *RootCommand) run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no prompt provided")
 	}
 
-	// Execute agent
-	ctx := context.Background()
-	if err := rc.executor.Execute(ctx, agent, modelID, prompt); err != nil {
+	// Get shell from settings (default to bash)
+	shell := cfg.Settings.Shell
+	if shell == "" {
+		shell = "bash"
+	}
+
+	// Execute agent (replaces current process, never returns on success)
+	if err := rc.executor.Execute(agent, modelID, prompt, shell); err != nil {
 		return fmt.Errorf("execution failed: %w", err)
 	}
 

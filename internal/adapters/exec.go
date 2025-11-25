@@ -1,31 +1,29 @@
 package adapters
 
 import (
-	"bytes"
-	"context"
+	"fmt"
+	"os"
 	"os/exec"
-	"time"
+	"syscall"
 )
 
-// RealRunner implements the Runner interface using os/exec
+// RealRunner implements the Runner interface using process replacement
 type RealRunner struct{}
 
-// Run executes a command with the given shell and returns stdout, stderr, and any error
-func (r *RealRunner) Run(ctx context.Context, shell, command string, timeout time.Duration) (string, string, error) {
-	// Create context with timeout
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
+// Exec replaces the current process with the command
+// This never returns on success - the process is replaced
+func (r *RealRunner) Exec(shell, command string) error {
+	// Find shell binary
+	shellPath, err := exec.LookPath(shell)
+	if err != nil {
+		return fmt.Errorf("shell not found: %w", err)
+	}
 
-	// Create command
-	cmd := exec.CommandContext(ctx, shell, "-c", command)
+	// Replace current process with shell running command
+	// Args: [0] = shell name, [1] = "-c", [2] = command
+	// Env: inherit current environment
+	err = syscall.Exec(shellPath, []string{shell, "-c", command}, os.Environ())
 
-	// Capture stdout and stderr
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	// Execute
-	err := cmd.Run()
-
-	return stdout.String(), stderr.String(), err
+	// Only reached if exec fails
+	return fmt.Errorf("exec failed: %w", err)
 }

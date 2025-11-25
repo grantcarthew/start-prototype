@@ -49,6 +49,7 @@ See [vision.md](../../vision.md) for the product vision and goals.
 | [DR-039](./dr-039-catalog-index.md) | Catalog Index File | Asset Management | 2025-01-13 |
 | [DR-040](./dr-040-substring-matching.md) | Substring Matching Algorithm for Asset Search | Asset Management | 2025-01-13 |
 | [DR-041](./dr-041-asset-command-reorganization.md) | Asset Command Reorganization | CLI Design | 2025-01-13 |
+| [DR-042](./dr-042-process-replacement.md) | Process Replacement Execution Model | Runtime Behavior | 2025-11-25 |
 
 ## By Category
 
@@ -119,11 +120,12 @@ How the tool and its content are distributed:
 - **[DR-013](./dr-013-agent-templates.md)** - Agent configurations as GitHub content
 - **[DR-020](./dr-020-version-injection.md)** - Binary version via ldflags at build time
 
-### Runtime Behavior (DR-008)
+### Runtime Behavior (DR-008, DR-042)
 
 How the tool behaves during execution:
 
 - **[DR-008](./dr-008-file-handling.md)** - Path resolution and missing file handling
+- **[DR-042](./dr-042-process-replacement.md)** - Process replacement execution model (syscall.Exec)
 
 ### Version Management (DR-020, DR-021)
 

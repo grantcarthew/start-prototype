@@ -1,34 +1,28 @@
 package mocks
 
 import (
-	"context"
 	"fmt"
-	"time"
 )
 
 // MockRunner is a mock implementation of the Runner interface
 type MockRunner struct {
-	Outputs      map[string]string // command -> output
 	CalledWith   []CallRecord
 	ShouldError  bool
 	ErrorMessage string
 }
 
-// CallRecord tracks a single call to Run
+// CallRecord tracks a single call to Exec
 type CallRecord struct {
 	Shell   string
 	Command string
-	Timeout time.Duration
 }
 
 func NewMockRunner() *MockRunner {
-	return &MockRunner{
-		Outputs: make(map[string]string),
-	}
+	return &MockRunner{}
 }
 
-// Run executes a mock command
-func (m *MockRunner) Run(ctx context.Context, shell, command string, timeout time.Duration) (string, string, error) {
+// Exec simulates process replacement (doesn't actually replace for testing)
+func (m *MockRunner) Exec(shell, command string) error {
 	// Record the call
 	if m.CalledWith == nil {
 		m.CalledWith = []CallRecord{}
@@ -36,21 +30,14 @@ func (m *MockRunner) Run(ctx context.Context, shell, command string, timeout tim
 	m.CalledWith = append(m.CalledWith, CallRecord{
 		Shell:   shell,
 		Command: command,
-		Timeout: timeout,
 	})
 
 	// Return error if configured
 	if m.ShouldError {
-		return "", "", fmt.Errorf("%s", m.ErrorMessage)
+		return fmt.Errorf("%s", m.ErrorMessage)
 	}
 
-	// Return configured output if available
-	if m.Outputs != nil {
-		if output, ok := m.Outputs[command]; ok {
-			return output, "", nil
-		}
-	}
-
-	// Default: return empty output
-	return "", "", nil
+	// In real implementation, this never returns on success
+	// For testing, we just return nil to simulate success
+	return nil
 }

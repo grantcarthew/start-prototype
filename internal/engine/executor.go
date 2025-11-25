@@ -1,10 +1,6 @@
 package engine
 
 import (
-	"context"
-	"fmt"
-	"time"
-
 	"github.com/grantcarthew/start/internal/domain"
 )
 
@@ -23,7 +19,8 @@ func NewExecutor(runner domain.Runner, resolver *PlaceholderResolver) *Executor 
 }
 
 // Execute runs an agent command with the given parameters
-func (e *Executor) Execute(ctx context.Context, agent domain.Agent, model, prompt string) error {
+// This function replaces the current process and never returns on success
+func (e *Executor) Execute(agent domain.Agent, model, prompt, shell string) error {
 	// Prepare placeholder values
 	values := map[string]string{
 		"bin":    agent.Bin,
@@ -34,20 +31,6 @@ func (e *Executor) Execute(ctx context.Context, agent domain.Agent, model, promp
 	// Resolve placeholders in command template
 	command := e.resolver.Resolve(agent.Command, values)
 
-	// Determine shell (default to bash)
-	shell := "bash"
-
-	// Execute command with 2 minute default timeout
-	timeout := 2 * time.Minute
-	stdout, stderr, err := e.runner.Run(ctx, shell, command, timeout)
-
-	// Print output to console
-	if stdout != "" {
-		fmt.Print(stdout)
-	}
-	if stderr != "" {
-		fmt.Print(stderr)
-	}
-
-	return err
+	// Replace process with agent (never returns on success)
+	return e.runner.Exec(shell, command)
 }

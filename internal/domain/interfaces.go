@@ -3,7 +3,6 @@ package domain
 import (
 	"context"
 	"os"
-	"time"
 )
 
 // FileSystem abstracts all file operations
@@ -17,9 +16,12 @@ type FileSystem interface {
 	Remove(path string) error
 }
 
-// Runner abstracts command execution
+// Runner abstracts command execution via process replacement
 type Runner interface {
-	Run(ctx context.Context, shell, command string, timeout time.Duration) (stdout, stderr string, err error)
+	// Exec replaces the current process with the command
+	// After successful exec, this function never returns
+	// Only returns on error (before exec)
+	Exec(shell, command string) error
 }
 
 // GitHubClient abstracts GitHub HTTP operations
