@@ -15,6 +15,7 @@ func main() {
 	// Create adapters (real implementations)
 	fs := &adapters.RealFileSystem{}
 	runner := &adapters.RealRunner{}
+	commandRunner := adapters.NewRealCommandRunner()
 
 	// Create config loader
 	configLoader := config.NewLoader(fs)
@@ -22,12 +23,30 @@ func main() {
 	// Create validator
 	validator := config.NewValidator()
 
+	// Get working directory
+	workDir, err := os.Getwd()
+	if err != nil {
+		workDir = "."
+	}
+
 	// Create engine components
 	placeholderResolver := engine.NewPlaceholderResolver()
+	utdProcessor := engine.NewUTDProcessor(fs, commandRunner, workDir)
+	roleSelector := engine.NewRoleSelector()
+	roleLoader := engine.NewRoleLoader(utdProcessor, fs)
+	contextLoader := engine.NewContextLoader(utdProcessor)
 	executor := engine.NewExecutor(runner, placeholderResolver)
 
 	// Create root command with dependencies
-	rootCmd := cli.NewRootCommand(configLoader, validator, executor, version)
+	rootCmd := cli.NewRootCommand(
+		configLoader,
+		validator,
+		executor,
+		roleSelector,
+		roleLoader,
+		contextLoader,
+		version,
+	)
 
 	// Execute
 	if err := rootCmd.Execute(); err != nil {

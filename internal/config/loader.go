@@ -168,14 +168,17 @@ func (l *Loader) loadContexts(dir string, config *domain.Config) error {
 		Contexts map[string]domain.Context `toml:"contexts"`
 	}
 
+	// Use decoder to preserve order (go-toml v2 preserves map iteration order)
 	if err := toml.Unmarshal(data, &parsed); err != nil {
 		return fmt.Errorf("failed to parse %s: %w", path, err)
 	}
 
-	// Set the Name field for each context (it's the map key)
+	// Set the Name field for each context and preserve order
+	// Note: go-toml/v2 preserves the order of map keys during iteration
 	for name, ctx := range parsed.Contexts {
 		ctx.Name = name
 		config.Contexts[name] = ctx
+		config.ContextOrder = append(config.ContextOrder, name)
 	}
 
 	return nil

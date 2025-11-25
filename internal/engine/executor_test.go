@@ -22,7 +22,17 @@ func TestExecutor_Execute_Success(t *testing.T) {
 		Command: "{bin} --model {model} '{prompt}'",
 	}
 
-	err := executor.Execute(agent, "test-model", "hello world", "bash")
+	params := engine.ExecuteParams{
+		Agent:        agent,
+		Model:        "test-model",
+		UserPrompt:   "hello world",
+		RoleContent:  "",
+		RoleFilePath: "",
+		Contexts:     []engine.LoadedContext{},
+		Shell:        "bash",
+	}
+
+	err := executor.Execute(params)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(mockRunner.CalledWith))
@@ -41,7 +51,15 @@ func TestExecutor_Execute_PlaceholderResolution(t *testing.T) {
 		Command: "{bin} --model {model} --prompt '{prompt}'",
 	}
 
-	err := executor.Execute(agent, "my-model", "test prompt", "bash")
+	params := engine.ExecuteParams{
+		Agent:      agent,
+		Model:      "my-model",
+		UserPrompt: "test prompt",
+		Contexts:   []engine.LoadedContext{},
+		Shell:      "bash",
+	}
+
+	err := executor.Execute(params)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(mockRunner.CalledWith))
@@ -63,7 +81,15 @@ func TestExecutor_Execute_Error(t *testing.T) {
 		Command: "{bin} --model {model} '{prompt}'",
 	}
 
-	err := executor.Execute(agent, "test-model", "hello", "bash")
+	params := engine.ExecuteParams{
+		Agent:      agent,
+		Model:      "test-model",
+		UserPrompt: "hello",
+		Contexts:   []engine.LoadedContext{},
+		Shell:      "bash",
+	}
+
+	err := executor.Execute(params)
 
 	assert.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "command failed"), "Error should contain 'command failed'")
@@ -80,7 +106,15 @@ func TestExecutor_Execute_DatePlaceholder(t *testing.T) {
 		Command: "{bin} --date {date} '{prompt}'",
 	}
 
-	err := executor.Execute(agent, "test-model", "hello", "bash")
+	params := engine.ExecuteParams{
+		Agent:      agent,
+		Model:      "test-model",
+		UserPrompt: "hello",
+		Contexts:   []engine.LoadedContext{},
+		Shell:      "bash",
+	}
+
+	err := executor.Execute(params)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(mockRunner.CalledWith))
@@ -99,7 +133,15 @@ func TestExecutor_Execute_CustomShell(t *testing.T) {
 		Command: "{bin} --model {model} '{prompt}'",
 	}
 
-	err := executor.Execute(agent, "test-model", "hello", "sh")
+	params := engine.ExecuteParams{
+		Agent:      agent,
+		Model:      "test-model",
+		UserPrompt: "hello",
+		Contexts:   []engine.LoadedContext{},
+		Shell:      "sh",
+	}
+
+	err := executor.Execute(params)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(mockRunner.CalledWith))

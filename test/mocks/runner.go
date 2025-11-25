@@ -41,3 +41,24 @@ func (m *MockRunner) Exec(shell, command string) error {
 	// For testing, we just return nil to simulate success
 	return nil
 }
+
+// MockCommandRunner is a mock implementation of the CommandRunner interface
+type MockCommandRunner struct {
+	output string
+	err    error
+}
+
+func NewMockCommandRunner() *MockCommandRunner {
+	return &MockCommandRunner{}
+}
+
+// SetOutput sets the output and error to return from Run
+func (m *MockCommandRunner) SetOutput(output string, err error) {
+	m.output = output
+	m.err = err
+}
+
+// Run simulates command execution with output capture
+func (m *MockCommandRunner) Run(shell, command string, timeoutSeconds int) (string, error) {
+	return m.output, m.err
+}

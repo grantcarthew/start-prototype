@@ -11,19 +11,33 @@ import (
 
 // RootCommand holds the dependencies for the root command
 type RootCommand struct {
-	configLoader *config.Loader
-	validator    *config.Validator
-	executor     *engine.Executor
-	version      string
+	configLoader   *config.Loader
+	validator      *config.Validator
+	executor       *engine.Executor
+	roleSelector   *engine.RoleSelector
+	roleLoader     *engine.RoleLoader
+	contextLoader  *engine.ContextLoader
+	version        string
 }
 
 // NewRootCommand creates the root command
-func NewRootCommand(configLoader *config.Loader, validator *config.Validator, executor *engine.Executor, version string) *cobra.Command {
+func NewRootCommand(
+	configLoader *config.Loader,
+	validator *config.Validator,
+	executor *engine.Executor,
+	roleSelector *engine.RoleSelector,
+	roleLoader *engine.RoleLoader,
+	contextLoader *engine.ContextLoader,
+	version string,
+) *cobra.Command {
 	rc := &RootCommand{
-		configLoader: configLoader,
-		validator:    validator,
-		executor:     executor,
-		version:      version,
+		configLoader:   configLoader,
+		validator:      validator,
+		executor:       executor,
+		roleSelector:   roleSelector,
+		roleLoader:     roleLoader,
+		contextLoader:  contextLoader,
+		version:        version,
 	}
 
 	cmd := &cobra.Command{
@@ -38,6 +52,7 @@ func NewRootCommand(configLoader *config.Loader, validator *config.Validator, ex
 	// Add persistent flags
 	cmd.PersistentFlags().StringP("agent", "a", "", "Agent to use")
 	cmd.PersistentFlags().StringP("model", "m", "", "Model to use")
+	cmd.PersistentFlags().StringP("role", "r", "", "Role to use")
 
 	// Add subcommands
 	cmd.AddCommand(NewConfigCommand(configLoader, validator))
@@ -69,8 +84,10 @@ func (rc *RootCommand) run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("config validation failed: %w", err)
 	}
 
-	// Get agent flag
+	// Get flags
 	agentFlag, _ := cmd.Flags().GetString("agent")
+	modelFlag, _ := cmd.Flags().GetString("model")
+	roleFlag, _ := cmd.Flags().GetString("role")
 
 	// Select agent
 	var agentName string
@@ -88,9 +105,6 @@ func (rc *RootCommand) run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("agent %q not found in configuration", agentName)
 	}
 	agent.Name = agentName
-
-	// Get model flag
-	modelFlag, _ := cmd.Flags().GetString("model")
 
 	// Select model
 	var modelID string
@@ -113,20 +127,62 @@ func (rc *RootCommand) run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no model specified and no default model for agent %q", agentName)
 	}
 
-	// Assemble prompt from arguments
-	prompt := strings.Join(args, " ")
-	if prompt == "" {
-		return fmt.Errorf("no prompt provided")
+	// Select role
+	selectionCtx := engine.SelectionContext{
+		RoleFlag:    roleFlag,
+		TaskRole:    "", // No task for root command
+		DefaultRole: cfg.Settings.DefaultRole,
+	}
+	role, err := rc.roleSelector.Select(selectionCtx, cfg.Roles)
+	if err != nil {
+		return fmt.Errorf("role selection failed: %w", err)
 	}
 
-	// Get shell from settings (default to bash)
+	// Get shell and timeout settings
 	shell := cfg.Settings.Shell
 	if shell == "" {
 		shell = "bash"
 	}
+	timeout := cfg.Settings.CommandTimeout
+	if timeout == 0 {
+		timeout = 30 // Default 30 seconds
+	}
+
+	// Load role
+	loadedRole, err := rc.roleLoader.LoadRole(role, shell, timeout)
+	if err != nil {
+		return fmt.Errorf("failed to load role: %w", err)
+	}
+	// Cleanup temp role file if needed (deferred)
+	defer rc.roleLoader.CleanupRole(loadedRole)
+
+	// Load contexts (interactive mode = all contexts)
+	contexts := rc.contextLoader.LoadContexts(
+		cfg.Contexts,
+		cfg.ContextOrder,
+		engine.CommandTypeInteractive,
+		shell,
+		timeout,
+	)
+
+	// Assemble prompt from arguments
+	userPrompt := strings.Join(args, " ")
+	if userPrompt == "" {
+		return fmt.Errorf("no prompt provided")
+	}
 
 	// Execute agent (replaces current process, never returns on success)
-	if err := rc.executor.Execute(agent, modelID, prompt, shell); err != nil {
+	execParams := engine.ExecuteParams{
+		Agent:        agent,
+		Model:        modelID,
+		UserPrompt:   userPrompt,
+		RoleContent:  loadedRole.Content,
+		RoleFilePath: loadedRole.FilePath,
+		Contexts:     contexts,
+		Shell:        shell,
+	}
+
+	if err := rc.executor.Execute(execParams); err != nil {
 		return fmt.Errorf("execution failed: %w", err)
 	}
 

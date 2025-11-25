@@ -5,12 +5,18 @@ import "github.com/grantcarthew/start/internal/domain"
 // Merge merges local config into global config
 // Local config takes precedence over global config
 func Merge(global, local domain.Config) domain.Config {
+	contexts, contextOrder := mergeContextsWithOrder(
+		global.Contexts, global.ContextOrder,
+		local.Contexts, local.ContextOrder,
+	)
+
 	result := domain.Config{
-		Settings: mergeSettings(global.Settings, local.Settings),
-		Agents:   mergeAgents(global.Agents, local.Agents),
-		Roles:    mergeRoles(global.Roles, local.Roles),
-		Contexts: mergeContexts(global.Contexts, local.Contexts),
-		Tasks:    mergeTasks(global.Tasks, local.Tasks),
+		Settings:     mergeSettings(global.Settings, local.Settings),
+		Agents:       mergeAgents(global.Agents, local.Agents),
+		Roles:        mergeRoles(global.Roles, local.Roles),
+		Contexts:     contexts,
+		ContextOrder: contextOrder,
+		Tasks:        mergeTasks(global.Tasks, local.Tasks),
 	}
 
 	return result
@@ -87,22 +93,42 @@ func mergeRoles(global, local map[string]domain.Role) map[string]domain.Role {
 	return result
 }
 
-// mergeContexts combines contexts from both configs
+// mergeContextsWithOrder combines contexts from both configs and preserves order
+// Global contexts come first (in order), then local contexts (in order)
 // Local context replaces global context with same name
-func mergeContexts(global, local map[string]domain.Context) map[string]domain.Context {
+func mergeContextsWithOrder(
+	globalContexts map[string]domain.Context, globalOrder []string,
+	localContexts map[string]domain.Context, localOrder []string,
+) (map[string]domain.Context, []string) {
 	result := make(map[string]domain.Context)
+	var order []string
+	seen := make(map[string]bool)
 
-	// Copy all global contexts
-	for name, ctx := range global {
-		result[name] = ctx
+	// Add global contexts in order
+	for _, name := range globalOrder {
+		if ctx, ok := globalContexts[name]; ok {
+			// Check if local overrides this context
+			if localCtx, localOk := localContexts[name]; localOk {
+				result[name] = localCtx
+			} else {
+				result[name] = ctx
+			}
+			order = append(order, name)
+			seen[name] = true
+		}
 	}
 
-	// Override/add local contexts
-	for name, ctx := range local {
-		result[name] = ctx
+	// Add local-only contexts in order (those not already in global)
+	for _, name := range localOrder {
+		if !seen[name] {
+			if ctx, ok := localContexts[name]; ok {
+				result[name] = ctx
+				order = append(order, name)
+			}
+		}
 	}
 
-	return result
+	return result, order
 }
 
 // mergeTasks combines tasks from both configs

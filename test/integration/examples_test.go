@@ -72,6 +72,7 @@ func loadExampleConfig(fs *adapters.RealFileSystem, dir string) (domain.Config, 
 				for name, ctx := range parsed.Contexts {
 					ctx.Name = name
 					cfg.Contexts[name] = ctx
+					cfg.ContextOrder = append(cfg.ContextOrder, name)
 				}
 			case "tasks.toml":
 				var parsed struct {

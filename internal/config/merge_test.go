@@ -132,6 +132,7 @@ func TestMergeContexts(t *testing.T) {
 				Required: true,
 			},
 		},
+		ContextOrder: []string{"environment"},
 	}
 
 	local := domain.Config{
@@ -142,6 +143,7 @@ func TestMergeContexts(t *testing.T) {
 				Required: true,
 			},
 		},
+		ContextOrder: []string{"agents"},
 	}
 
 	result := config.Merge(global, local)

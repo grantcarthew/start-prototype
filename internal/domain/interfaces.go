@@ -24,6 +24,13 @@ type Runner interface {
 	Exec(shell, command string) error
 }
 
+// CommandRunner abstracts command execution with output capture
+type CommandRunner interface {
+	// Run executes a command and returns stdout+stderr combined output
+	// Returns error if command fails or times out
+	Run(shell, command string, timeoutSeconds int) (string, error)
+}
+
 // GitHubClient abstracts GitHub HTTP operations
 type GitHubClient interface {
 	FetchIndex(ctx context.Context, repo, branch string) ([]byte, error)

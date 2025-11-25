@@ -46,12 +46,21 @@ default_model = "test"
 
 	settingsConfig := `[settings]
 default_agent = "smith"
+default_role = "test-role"
+`
+
+	rolesConfig := `[roles.test-role]
+description = "Test role"
+prompt = "You are a test assistant."
 `
 
 	err = os.WriteFile(filepath.Join(configDir, "agents.toml"), []byte(agentsConfig), 0644)
 	assert.NoError(t, err)
 
 	err = os.WriteFile(filepath.Join(configDir, "config.toml"), []byte(settingsConfig), 0644)
+	assert.NoError(t, err)
+
+	err = os.WriteFile(filepath.Join(configDir, "roles.toml"), []byte(rolesConfig), 0644)
 	assert.NoError(t, err)
 
 	// Set environment
@@ -65,7 +74,10 @@ default_agent = "smith"
 	startPath := filepath.Join("..", "..", "bin", "start")
 	cmd := exec.Command(startPath, "hello world")
 	cmd.Env = env
-	_, err = cmd.CombinedOutput()
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Logf("Command output: %s", string(output))
+	}
 	assert.NoError(t, err)
 
 	// Verify smith captured the correct args
@@ -132,12 +144,21 @@ default_model = "sonnet"
 
 	settingsConfig := `[settings]
 default_agent = "smith"
+default_role = "test-role"
+`
+
+	rolesConfig := `[roles.test-role]
+description = "Test role"
+prompt = "You are a test assistant."
 `
 
 	err = os.WriteFile(filepath.Join(configDir, "agents.toml"), []byte(agentsConfig), 0644)
 	assert.NoError(t, err)
 
 	err = os.WriteFile(filepath.Join(configDir, "config.toml"), []byte(settingsConfig), 0644)
+	assert.NoError(t, err)
+
+	err = os.WriteFile(filepath.Join(configDir, "roles.toml"), []byte(rolesConfig), 0644)
 	assert.NoError(t, err)
 
 	env := []string{

@@ -4,11 +4,12 @@ import "time"
 
 // Config represents the merged configuration
 type Config struct {
-	Settings Settings
-	Agents   map[string]Agent
-	Roles    map[string]Role
-	Contexts map[string]Context
-	Tasks    map[string]Task
+	Settings     Settings
+	Agents       map[string]Agent
+	Roles        map[string]Role
+	Contexts     map[string]Context
+	ContextOrder []string // Preserves TOML definition order
+	Tasks        map[string]Task
 }
 
 // Settings from config.toml [settings]
