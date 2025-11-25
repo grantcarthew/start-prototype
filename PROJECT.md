@@ -1,7 +1,7 @@
 # PROJECT: start - AI Agent CLI Implementation
 
 **Status:** Implementation Phase
-**Current Phase:** Phase 5 (Tasks)
+**Current Phase:** Phase 6 (Asset Catalog & Lazy Loading)
 **Started:** 2025-11-24
 **Last Updated:** 2025-11-25
 
@@ -176,7 +176,7 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 | 2 | Simple Agent Execution | ✅ Complete | 4-6h | [phase-2.md](docs/implementation/phase-2.md) |
 | 3 | Roles & Contexts | ✅ Complete | 5-7h | [phase-3.md](docs/implementation/phase-3.md) |
 | 4 | UTD Pattern Processing | ✅ Complete | 6-8h | [phase-4.md](docs/implementation/phase-4.md) |
-| 5 | Tasks | Not Started | 4-6h | [phase-5.md](docs/implementation/phase-5.md) |
+| 5 | Tasks | ✅ Complete | 4-6h | [phase-5.md](docs/implementation/phase-5.md) |
 | 6 | Asset Catalog & Lazy Loading | Not Started | 8-10h | [phase-6.md](docs/implementation/phase-6.md) |
 | 7 | Init & Asset Management | Not Started | 8-10h | [phase-7.md](docs/implementation/phase-7.md) |
 | 8 | Config Management & Doctor | Not Started | 6-8h | [phase-8.md](docs/implementation/phase-8.md) |
@@ -222,6 +222,14 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 - ✅ All tests passing (35 tests total)
 
 **Phase 5:** Task system with {instructions} placeholder and auto-contexts
+- ✅ TaskLoader (UTD processing with {instructions} placeholder)
+- ✅ TaskResolver (name/alias resolution with local override)
+- ✅ Task command (start task <name> [instructions])
+- ✅ Task listing (start task with no arguments)
+- ✅ Agent/role selection precedence (CLI flag → task field → default → first)
+- ✅ Auto-include required contexts only (CommandTypeTask)
+- ✅ {instructions} placeholder (defaults to "None" when empty)
+- ✅ 13 unit tests + 4 integration tests (43 tests total passing)
 
 **Phase 6:** GitHub catalog integration, asset resolution, lazy loading, caching
 
@@ -309,9 +317,9 @@ git tag phase-0-complete
 
 ### Current Status
 
-**Phase:** 5 (Tasks)
-**Last Completed:** Phase 4 (2025-11-25)
-**Next Milestone:** v0.1.0 (Phase 5 complete) - Core functionality
+**Phase:** 6 (Asset Catalog & Lazy Loading)
+**Last Completed:** Phase 5 (2025-11-25)
+**Next Milestone:** v0.1.0 (Phase 5 complete) - Core functionality ✅
 
 ### Phase Checklist
 
@@ -320,7 +328,7 @@ git tag phase-0-complete
 - [x] Phase 2: Simple Agent Execution
 - [x] Phase 3: Roles & Contexts
 - [x] Phase 4: UTD Pattern Processing
-- [ ] Phase 5: Tasks
+- [x] Phase 5: Tasks
 - [ ] Phase 6: Asset Catalog & Lazy Loading
 - [ ] Phase 7: Init & Asset Management
 - [ ] Phase 8: Config Management & Doctor
@@ -390,3 +398,4 @@ _Phase 1 Complete: Yes_
 _Phase 2 Complete: Yes_
 _Phase 3 Complete: Yes_
 _Phase 4 Complete: Yes_
+_Phase 5 Complete: Yes_

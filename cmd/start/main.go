@@ -35,6 +35,8 @@ func main() {
 	roleSelector := engine.NewRoleSelector()
 	roleLoader := engine.NewRoleLoader(utdProcessor, fs)
 	contextLoader := engine.NewContextLoader(utdProcessor)
+	taskLoader := engine.NewTaskLoader(utdProcessor, placeholderResolver)
+	taskResolver := engine.NewTaskResolver()
 	executor := engine.NewExecutor(runner, placeholderResolver)
 
 	// Create root command with dependencies
@@ -45,6 +47,8 @@ func main() {
 		roleSelector,
 		roleLoader,
 		contextLoader,
+		taskLoader,
+		taskResolver,
 		version,
 	)
 

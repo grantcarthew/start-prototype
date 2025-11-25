@@ -17,6 +17,8 @@ type RootCommand struct {
 	roleSelector   *engine.RoleSelector
 	roleLoader     *engine.RoleLoader
 	contextLoader  *engine.ContextLoader
+	taskLoader     *engine.TaskLoader
+	taskResolver   *engine.TaskResolver
 	version        string
 }
 
@@ -28,6 +30,8 @@ func NewRootCommand(
 	roleSelector *engine.RoleSelector,
 	roleLoader *engine.RoleLoader,
 	contextLoader *engine.ContextLoader,
+	taskLoader *engine.TaskLoader,
+	taskResolver *engine.TaskResolver,
 	version string,
 ) *cobra.Command {
 	rc := &RootCommand{
@@ -37,6 +41,8 @@ func NewRootCommand(
 		roleSelector:   roleSelector,
 		roleLoader:     roleLoader,
 		contextLoader:  contextLoader,
+		taskLoader:     taskLoader,
+		taskResolver:   taskResolver,
 		version:        version,
 	}
 
@@ -56,6 +62,16 @@ func NewRootCommand(
 
 	// Add subcommands
 	cmd.AddCommand(NewConfigCommand(configLoader, validator))
+	cmd.AddCommand(NewTaskCommand(
+		configLoader,
+		validator,
+		executor,
+		roleSelector,
+		roleLoader,
+		contextLoader,
+		taskLoader,
+		taskResolver,
+	))
 
 	return cmd
 }

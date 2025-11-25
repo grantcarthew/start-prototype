@@ -44,12 +44,15 @@ func (m *MockRunner) Exec(shell, command string) error {
 
 // MockCommandRunner is a mock implementation of the CommandRunner interface
 type MockCommandRunner struct {
-	output string
-	err    error
+	output  string
+	err     error
+	Outputs map[string]string // command -> output mapping
 }
 
 func NewMockCommandRunner() *MockCommandRunner {
-	return &MockCommandRunner{}
+	return &MockCommandRunner{
+		Outputs: make(map[string]string),
+	}
 }
 
 // SetOutput sets the output and error to return from Run
@@ -60,5 +63,10 @@ func (m *MockCommandRunner) SetOutput(output string, err error) {
 
 // Run simulates command execution with output capture
 func (m *MockCommandRunner) Run(shell, command string, timeoutSeconds int) (string, error) {
+	// Check if we have a specific output for this command
+	if output, ok := m.Outputs[command]; ok {
+		return output, nil
+	}
+	// Fall back to default output/error
 	return m.output, m.err
 }
