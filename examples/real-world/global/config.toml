@@ -1,0 +1,14 @@
+# Real-World Global Settings
+# ~/.config/start/config.toml
+#
+# Practical configuration for everyday use
+
+[settings]
+default_agent = "claude"
+default_role = "code-reviewer"
+log_level = "normal"
+shell = "bash"
+command_timeout = 30
+asset_download = true
+asset_repo = "grantcarthew/start"
+asset_path = "~/.config/start/assets"

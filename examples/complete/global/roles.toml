@@ -1,0 +1,203 @@
+# Complete Reference: Role Configuration
+# ~/.config/start/roles.toml
+#
+# This file shows ALL possible role fields and UTD patterns.
+# Roles use the Unified Template Design (UTD) pattern.
+
+# ============================================================================
+# Example 1: Simple role (file only)
+# ============================================================================
+[roles.file-only]
+description = "Role defined in a single file"
+# File path supports:
+#   - Tilde expansion: ~/path/to/file.md
+#   - Relative paths: ./ROLE.md (relative to working directory)
+#   - Absolute paths: /absolute/path/to/file.md
+file = "~/roles/file-only.md"
+# When used: File contents used directly as role content
+# {role} placeholder = file contents
+# {role_file} placeholder = original file path (no temp file created)
+
+# ============================================================================
+# Example 2: Inline role (prompt only)
+# ============================================================================
+[roles.inline]
+description = "Role defined inline without external file"
+prompt = """
+You are a helpful AI assistant.
+
+Guidelines:
+- Provide clear and concise answers
+- Use examples when helpful
+- Ask clarifying questions if needed
+
+Current date: {date}
+"""
+# When used: Prompt used directly as role content
+# {role} placeholder = prompt text (with {date} resolved)
+# {role_file} placeholder = temp file with prompt content
+
+# ============================================================================
+# Example 3: File with template framing (file + prompt)
+# ============================================================================
+[roles.file-with-template]
+description = "Role file with additional template framing"
+file = "~/roles/base-reviewer.md"
+prompt = """
+{file_contents}
+
+## Additional Instructions
+
+Review date: {date}
+
+Focus areas:
+- Security vulnerabilities
+- Performance issues
+- Code readability
+"""
+# When used: File contents injected into prompt template
+# {role} placeholder = fully resolved prompt (file + framing + date)
+# {role_file} placeholder = temp file with resolved content
+
+# ============================================================================
+# Example 4: Dynamic role with command (command only)
+# ============================================================================
+[roles.command-only]
+description = "Role generated dynamically from command"
+command = "echo 'You are an AI assistant. System: '$(uname -s)"
+# When used: Command output used directly as role content
+# {role} placeholder = command output
+# {role_file} placeholder = temp file with command output
+
+# ============================================================================
+# Example 5: File with command injection (file + command)
+# ============================================================================
+[roles.file-with-command]
+description = "Role file with dynamic command output injected"
+file = "~/roles/template-with-placeholder.md"
+command = "go version 2>/dev/null || echo 'Go not installed'"
+# File ~/roles/template-with-placeholder.md should contain:
+#   You are a Go expert.
+#   Environment: {command_output}
+# When used: Command output injected where {command_output} appears in file
+# {role} placeholder = file with {command_output} replaced
+# {role_file} placeholder = original file path (if no other UTD), or temp file
+
+# ============================================================================
+# Example 6: Command with template (command + prompt)
+# ============================================================================
+[roles.command-with-template]
+description = "Command output wrapped in template"
+command = "git log -1 --format='%s'"
+prompt = """
+You are a code reviewer.
+
+Last commit: {command_output}
+
+Review the changes with this context in mind.
+Date: {date}
+"""
+# When used: Command output injected into prompt template
+# {role} placeholder = prompt with {command_output} and {date} resolved
+# {role_file} placeholder = temp file with resolved content
+
+# ============================================================================
+# Example 7: Complete UTD (file + command + prompt)
+# ============================================================================
+[roles.complete-utd]
+description = "Complete UTD pattern with all three fields"
+file = "~/roles/base-role.md"
+command = "date '+%Y-%m-%d %H:%M:%S'"
+prompt = """
+Base Role:
+{file_contents}
+
+## Environment
+
+Current time: {command_output}
+System date: {date}
+
+## Additional Context
+
+Apply the role guidelines above with awareness of current date/time.
+"""
+# When used: All placeholders resolved in prompt template
+# {role} placeholder = fully resolved prompt
+# {role_file} placeholder = temp file with resolved content
+
+# ============================================================================
+# Example 8: Role with shell override
+# ============================================================================
+[roles.node-role]
+description = "Role using Node.js for dynamic content"
+shell = "node"
+command_timeout = 10
+command = "console.log('Node version:', process.version)"
+prompt = """
+You are a JavaScript expert.
+
+Environment: {command_output}
+
+Provide modern JavaScript solutions using current best practices.
+"""
+# shell and command_timeout override global settings for this role's command
+
+# ============================================================================
+# PLACEHOLDERS AVAILABLE IN ROLES
+# ============================================================================
+# Universal (available everywhere):
+#   {date} - Current timestamp (ISO 8601 with timezone)
+#
+# UTD pattern placeholders (roles/contexts/tasks):
+#   {file} - File path from 'file' field (absolute, ~ expanded)
+#   {file_contents} - Contents from 'file' field
+#   {command} - Command string from 'command' field
+#   {command_output} - Output from 'command' execution (stdout + stderr)
+#
+# NOT available in roles:
+#   {bin}, {model}, {prompt} - Only in agent commands
+#   {role}, {role_file} - Only in agent commands
+#   {instructions} - Only in tasks
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+# Required:
+#   - At least one of: file, command, or prompt (UTD requirement)
+#
+# Role names:
+#   - Pattern: /^[a-z0-9]+(-[a-z0-9]+)*$/
+#   - Examples: "assistant", "code-reviewer", "go-expert"
+#
+# Warnings:
+#   - file defined but not used in prompt (when prompt exists)
+#   - command defined but not used in prompt (when prompt exists)
+#   - prompt uses {file} or {file_contents} but file not defined
+#   - prompt uses {command} or {command_output} but command not defined
+#   - file not found (skips role with warning)
+#
+# Scope:
+#   - Can be defined in global AND local configs
+#   - Combined (global + local)
+#   - Local completely replaces global for same role name (no field merging)
+#
+# Role Selection Precedence:
+#   1. CLI --role flag (highest)
+#   2. Task role field
+#   3. default_role setting
+#   4. First role in config (TOML order)
+
+# ============================================================================
+# ADDITIONAL FIELDS
+# ============================================================================
+# description (string, optional)
+#   Human-readable description
+#   Displayed in role list and help output
+#
+# shell (string, optional)
+#   Override global shell for command execution
+#   Examples: "bash", "node", "python3"
+#
+# command_timeout (integer, optional)
+#   Override global timeout for command execution (seconds)
+#   Example: 60

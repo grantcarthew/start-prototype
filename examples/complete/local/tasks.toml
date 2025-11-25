@@ -1,0 +1,151 @@
+# Complete Reference: Local Task Configuration
+# ./.start/tasks.toml
+#
+# Local tasks are combined with global tasks.
+# Same task name in local completely replaces global (no field merging).
+
+# ============================================================================
+# Override global task (complete replacement)
+# ============================================================================
+[tasks.code-review]
+# This completely replaces global [tasks.code-review]
+# All fields from global are ignored - must redefine everything
+alias = "cr"
+description = "Project-specific code review with local conventions"
+role = "project-expert"
+command = "git diff --staged"
+prompt = """
+Review these changes according to our project conventions:
+
+{command_output}
+
+Focus: {instructions}
+
+Check against:
+- Project coding standards
+- Architectural patterns
+- Test coverage requirements
+"""
+
+# ============================================================================
+# Add new project-specific task
+# ============================================================================
+[tasks.check-design-records]
+alias = "cdr"
+description = "Check design record consistency"
+role = "project-expert"
+command = """
+echo "=== Design Records ==="
+ls -1 docs/design/design-records/dr-*.md | wc -l
+echo ""
+echo "=== Recent DRs ==="
+ls -t docs/design/design-records/dr-*.md | head -5
+"""
+prompt = """
+Design Record Analysis:
+
+{command_output}
+
+Task: {instructions}
+
+Review the design records for:
+- Completeness
+- Consistency
+- Missing decisions
+- Outdated decisions
+"""
+
+# ============================================================================
+# Project-specific task with multiple commands
+# ============================================================================
+[tasks.project-status-check]
+alias = "psc"
+description = "Comprehensive project status check"
+role = "project-expert"
+shell = "bash"
+command_timeout = 60
+command = """
+echo "=== Git Status ==="
+git status --short
+echo ""
+echo "=== Uncommitted Files ==="
+git diff --name-only
+echo ""
+echo "=== Recent Commits ==="
+git log -5 --oneline
+echo ""
+echo "=== Test Status ==="
+go test -short ./... 2>&1 | tail -10
+"""
+prompt = """
+Project Status Report:
+
+{command_output}
+
+Analysis requested: {instructions}
+
+Provide insights on:
+- Current work state
+- Potential issues
+- Next steps
+- Testing status
+"""
+
+# ============================================================================
+# Task specific to project tooling
+# ============================================================================
+[tasks.go-vet-check]
+alias = "gvc"
+description = "Run go vet and analyze results"
+role = "go-expert"
+agent = "go-agent"
+command = "go vet ./... 2>&1"
+prompt = """
+Go Vet Results:
+
+{command_output}
+
+Instructions: {instructions}
+
+Analyze the vet output and provide:
+- Explanation of each issue
+- Suggested fixes
+- Priority assessment
+"""
+
+# ============================================================================
+# MERGE BEHAVIOR
+# ============================================================================
+# Global + local tasks are combined
+# Same name in local COMPLETELY replaces global (no field merging)
+# Different names are additive
+#
+# Example:
+#   Global has: help, git-diff-review, doc-review
+#   Local has: code-review (override), check-design-records (new)
+#   Result: help, git-diff-review, doc-review, code-review (local), check-design-records
+
+# ============================================================================
+# ALIAS CONFLICTS
+# ============================================================================
+# Aliases must be unique across ALL tasks (global + local merged)
+# If conflict exists: First in TOML order wins (after merge)
+# Warning displayed about shadowed alias
+
+# ============================================================================
+# VALIDATION
+# ============================================================================
+# At execution time:
+#   - Task's role must exist (if specified)
+#   - Task's agent must exist (if specified)
+#   - Error with suggestions if not found
+#
+# Doctor check:
+#   - Validates all tasks
+#   - Reports undefined roles/agents
+#   - Exit code 1 if issues found
+#
+# Config validate:
+#   - Reports all validation errors
+#   - Shows missing references
+#   - Exit code 1 if issues found

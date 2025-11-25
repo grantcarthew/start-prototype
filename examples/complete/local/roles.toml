@@ -1,0 +1,63 @@
+# Complete Reference: Local Role Configuration
+# ./.start/roles.toml
+#
+# Local roles are combined with global roles.
+# Same role name in local completely replaces global (no field merging).
+
+# ============================================================================
+# Override global role (complete replacement)
+# ============================================================================
+[roles.code-reviewer]
+# This completely replaces global [roles.code-reviewer]
+# All fields from global are ignored
+description = "Project-specific code reviewer"
+file = "./ROLE.md"
+# When ROLE.md exists in project root with project-specific guidelines
+
+# ============================================================================
+# Add new project-specific role
+# ============================================================================
+[roles.project-expert]
+description = "Expert in this specific project's architecture"
+prompt = """
+You are an expert in this project's architecture and patterns.
+
+Project specifics:
+- Uses hexagonal architecture
+- Go 1.23+ required
+- Test-first development
+- Interface-based dependency injection
+
+Current date: {date}
+
+Provide guidance that aligns with these project conventions.
+"""
+
+# ============================================================================
+# Project-specific role with dynamic content
+# ============================================================================
+[roles.go-project-expert]
+description = "Go expert with project context"
+file = "./docs/go-style-guide.md"
+command = "go version"
+prompt = """
+Go Style Guide:
+{file_contents}
+
+Go Environment: {command_output}
+Date: {date}
+
+Apply these project-specific Go conventions in all responses.
+"""
+
+# ============================================================================
+# MERGE BEHAVIOR
+# ============================================================================
+# Global + local roles are combined
+# Same name in local COMPLETELY replaces global (no field merging)
+# Different names are additive
+#
+# Example:
+#   Global has: file-only, inline, file-with-template
+#   Local has: code-reviewer (override), project-expert (new)
+#   Result: file-only, inline, file-with-template, code-reviewer (local), project-expert

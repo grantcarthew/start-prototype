@@ -1,0 +1,41 @@
+# Complete Reference: Local Agent Configuration
+# ./.start/agents.toml
+#
+# Local agents are combined with global agents.
+# Same agent name in local completely replaces global (no field merging).
+
+# ============================================================================
+# Override global agent (complete replacement)
+# ============================================================================
+[agents.smith]
+# This completely replaces the global [agents.smith] configuration
+# All fields from global are ignored - must redefine everything
+bin = "smith"
+description = "Project-specific Smith configuration"
+command = "{bin} --model {model} --project-mode '{prompt}'"
+default_model = "project"
+
+  [agents.smith.models]
+  project = "project-specific-model"
+  dev = "development-model"
+
+# ============================================================================
+# Add new project-specific agent
+# ============================================================================
+[agents.project-agent]
+bin = "project-agent"
+description = "Custom agent for this project only"
+command = "{bin} --mode {model} --input '{prompt}'"
+default_model = "standard"
+
+  [agents.project-agent.models]
+  standard = "project-agent-v1"
+
+# ============================================================================
+# MERGE BEHAVIOR
+# ============================================================================
+# Global + local agents are combined
+# Same name in local COMPLETELY replaces global (no field merging)
+# Different names are additive
+#
+# Result: All global agents + local agents, with local overriding global for same name

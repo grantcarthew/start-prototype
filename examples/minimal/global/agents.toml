@@ -1,0 +1,11 @@
+# Minimal Agent Configuration
+# Location: ~/.config/start/agents.toml
+
+[agents.smith]
+bin = "smith"
+description = "Smith test agent for development and testing"
+command = "{bin} --model {model} '{prompt}'"
+default_model = "test"
+
+  [agents.smith.models]
+  test = "test-model"

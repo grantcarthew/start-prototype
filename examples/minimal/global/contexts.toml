@@ -1,0 +1,7 @@
+# Minimal Context Configuration
+# Location: ~/.config/start/contexts.toml
+
+[contexts.environment]
+description = "User environment information"
+prompt = "Current date: {date}"
+required = true

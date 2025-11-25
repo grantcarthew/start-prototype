@@ -1,0 +1,91 @@
+# Complete Reference: Local Context Configuration
+# ./.start/contexts.toml
+#
+# Local contexts are combined with global contexts.
+# Same context name in local completely replaces global (no field merging).
+# Context order: global contexts (in order), then local contexts (in order).
+
+# ============================================================================
+# Add project-specific required context
+# ============================================================================
+[contexts.agents]
+description = "Repository agent instructions and conventions"
+file = "./AGENTS.md"
+prompt = "Read {file} for repository-specific agent instructions and conventions."
+required = true
+# Will appear after all global required contexts
+
+# ============================================================================
+# Add project-specific optional context
+# ============================================================================
+[contexts.project]
+description = "Project overview and current work"
+file = "./PROJECT.md"
+prompt = "Read {file}. Respond with the project title and shortest possible summary of work required."
+required = false
+# Included in 'start' only, not in 'start prompt' or 'start task'
+
+# ============================================================================
+# Add dynamic project context
+# ============================================================================
+[contexts.design-records]
+description = "Design decisions for this project"
+file = "./docs/design/design-records/README.md"
+command = "ls -1 ./docs/design/design-records/*.md | wc -l"
+prompt = """
+Design Records:
+{file_contents}
+
+Total design records: {command_output}
+
+Use these design decisions as constraints and guidelines.
+"""
+required = false
+
+# ============================================================================
+# Override global context (complete replacement)
+# ============================================================================
+[contexts.project-note]
+# If this name also exists in global contexts.toml, this completely replaces it
+description = "Project-specific important note"
+prompt = """
+CRITICAL PROJECT NOTE:
+
+This project requires:
+- All commits must be signed
+- All PRs must pass CI checks
+- Code coverage must be ≥ 80%
+
+Date: {date}
+"""
+required = true
+
+# ============================================================================
+# MERGE BEHAVIOR
+# ============================================================================
+# Global + local contexts are combined
+# Same name in local COMPLETELY replaces global (no field merging)
+# Different names are additive
+#
+# Order in prompt:
+#   1. Global contexts (in their definition order)
+#   2. Local contexts (in their definition order)
+#
+# Example:
+#   Global: environment, project-note, git-status
+#   Local: agents, project, project-note (override)
+#   Result order: environment, project-note (local), git-status, agents, project
+#
+# To change order: rearrange definitions in config files
+
+# ============================================================================
+# INCLUSION BY COMMAND
+# ============================================================================
+# start (interactive):
+#   - All contexts (required = true AND false)
+#
+# start prompt (one-off):
+#   - Only required = true contexts
+#
+# start task (task execution):
+#   - Only required = true contexts (automatic)

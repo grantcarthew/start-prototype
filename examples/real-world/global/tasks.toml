@@ -1,0 +1,111 @@
+# Real-World Task Configuration
+# ~/.config/start/tasks.toml
+#
+# Practical tasks for common development workflows
+
+[tasks.git-diff-review]
+alias = "gdr"
+description = "Review staged git changes"
+role = "code-reviewer"
+command = "git diff --staged"
+prompt = """
+Review these staged changes:
+
+## Instructions
+{instructions}
+
+## Staged Changes
+```diff
+{command_output}
+```
+
+Provide a thorough code review focusing on:
+- Code quality and style
+- Potential bugs or issues
+- Security considerations
+- Performance implications
+- Test coverage needs
+"""
+
+[tasks.commit-message]
+alias = "cm"
+description = "Generate conventional commit message"
+role = "code-reviewer"
+command = "git diff --staged"
+prompt = """
+Generate a conventional commit message for these changes:
+
+{command_output}
+
+Format:
+```
+type(scope): subject
+
+body
+
+footer
+```
+
+Types: feat, fix, docs, style, refactor, test, chore
+Keep subject under 50 chars, body wrapped at 72 chars.
+
+Additional context: {instructions}
+"""
+
+[tasks.code-review]
+alias = "cr"
+description = "General code review"
+role = "code-reviewer"
+prompt = """
+Review the code with focus on:
+
+{instructions}
+
+Provide specific, actionable feedback on:
+- Code quality
+- Best practices
+- Potential improvements
+- Security concerns
+"""
+
+[tasks.security-scan]
+alias = "sec"
+description = "Security-focused code review"
+role = "security-auditor"
+command = "git diff --staged"
+prompt = """
+Security Review:
+
+{command_output}
+
+Focus: {instructions}
+
+Analyze for:
+- OWASP Top 10 vulnerabilities
+- Input validation issues
+- Authentication/authorization flaws
+- Sensitive data exposure
+- Security misconfigurations
+"""
+
+[tasks.explain]
+alias = "ex"
+description = "Explain code or concepts"
+role = "general-assistant"
+prompt = """
+Explain the following:
+
+{instructions}
+
+Provide a clear explanation with:
+- Core concepts
+- Practical examples
+- Common use cases
+- Best practices
+"""
+
+[tasks.help]
+alias = "h"
+description = "General help and assistance"
+role = "general-assistant"
+prompt = "Help me with: {instructions}"

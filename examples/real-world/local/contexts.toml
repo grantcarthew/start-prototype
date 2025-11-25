@@ -1,0 +1,28 @@
+# Real-World Local Context Configuration
+# ./.start/contexts.toml
+#
+# Project-specific contexts
+
+[contexts.agents]
+description = "Repository agent instructions"
+file = "./AGENTS.md"
+prompt = "Read {file} for repository context and agent instructions."
+required = true
+
+[contexts.project]
+description = "Project overview and current work"
+file = "./PROJECT.md"
+prompt = "Read {file}. Respond with project title and summary of work required."
+required = false
+
+[contexts.architecture]
+description = "Project architecture documentation"
+file = "./docs/architecture.md"
+prompt = """
+Architecture Documentation:
+
+{file_contents}
+
+Use this to understand the system design and component interactions.
+"""
+required = false

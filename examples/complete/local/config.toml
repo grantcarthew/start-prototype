@@ -1,0 +1,19 @@
+# Complete Reference: Local Settings Override
+# ./.start/config.toml
+#
+# Local settings override global settings.
+# Only specify fields you want to override.
+# Omitted fields use global values.
+
+[settings]
+
+# Override log level for this project
+# This project needs verbose logging for debugging
+log_level = "verbose"
+
+# Override command timeout for this project
+# This project has long-running analysis commands
+command_timeout = 120
+
+# All other settings (default_agent, default_role, shell, asset_download, etc.)
+# will use values from global config.toml

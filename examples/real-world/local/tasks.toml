@@ -1,0 +1,85 @@
+# Real-World Local Task Configuration
+# ./.start/tasks.toml
+#
+# Project-specific tasks
+
+[tasks.go-review]
+alias = "gor"
+description = "Review Go code changes"
+role = "go-expert"
+command = "git diff --staged -- '*.go'"
+prompt = """
+Review these Go code changes:
+
+{command_output}
+
+Focus: {instructions}
+
+Check for:
+- Go idioms and best practices
+- Error handling patterns
+- Interface design
+- Concurrency correctness
+- Test coverage
+"""
+
+[tasks.test]
+alias = "t"
+description = "Run tests and analyze failures"
+role = "go-expert"
+shell = "bash"
+command_timeout = 120
+command = "go test -v ./... 2>&1"
+prompt = """
+Test Results:
+
+{command_output}
+
+Analysis requested: {instructions}
+
+For any failures:
+- Explain the cause
+- Suggest fixes
+- Identify patterns
+"""
+
+[tasks.design-record]
+alias = "dr"
+description = "Review or create design record"
+role = "project-expert"
+command = "ls -1 docs/design/design-records/*.md | tail -5"
+prompt = """
+Recent Design Records:
+{command_output}
+
+Task: {instructions}
+
+For new design records, follow the existing format and numbering.
+For reviews, check for completeness and consistency.
+"""
+
+[tasks.commit-review]
+alias = "comr"
+description = "Review commit before pushing"
+role = "code-reviewer"
+command = """
+echo "=== Commit ==="
+git log -1 --format='%B'
+echo ""
+echo "=== Changes ==="
+git show --stat
+"""
+prompt = """
+Pre-push review:
+
+{command_output}
+
+Instructions: {instructions}
+
+Verify:
+- Commit message quality
+- Change scope appropriate
+- No debug code
+- No secrets
+- Tests included
+"""

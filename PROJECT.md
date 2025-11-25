@@ -14,6 +14,56 @@
 
 ---
 
+## Documentation Index
+
+### Design Records
+
+See [docs/design/design-records/README.md](docs/design/design-records/README.md) for the complete index of all Design Records (DR-001 through DR-041).
+
+**Key Design Records by Phase:**
+- **Configuration:** DR-001 (TOML), DR-002 (Config Merge), DR-003 (Named Documents), DR-004 (Agent Scope), DR-005 (Roles), DR-007 (Placeholders), DR-008 (File Handling), DR-012 (Context Required)
+- **CLI Design:** DR-006 (Cobra), DR-017 (CLI Organization), DR-024 (Doctor Exit Codes), DR-025 (No Auto Checks), DR-028 (Shell Completion), DR-030 (Prefix Matching), DR-038 (Flag Resolution), DR-041 (Asset Commands)
+- **Tasks:** DR-009 (Task Structure), DR-019 (Task Loading), DR-029 (Task Agent Field)
+- **Asset Management:** DR-031 (Catalog Architecture), DR-032 (Metadata Schema), DR-033 (Resolution Algorithm), DR-034 (GitHub API), DR-035 (Interactive Browsing), DR-036 (Cache), DR-037 (Updates), DR-039 (Index), DR-040 (Substring Matching)
+- **Build & Distribution:** DR-020 (Version Injection), DR-021 (GitHub Version Check), DR-022 (Asset Branch Strategy)
+- **Runtime Behavior:** DR-008 (File Handling), DR-026 (Offline Behavior), DR-027 (Security Trust Model)
+
+### CLI Documentation
+
+Main commands:
+- [start.md](docs/cli/start.md) - Main command reference and interactive mode
+- [start-init.md](docs/cli/start-init.md) - Initialize configuration wizard
+- [start-task.md](docs/cli/start-task.md) - Task execution
+- [start-prompt.md](docs/cli/start-prompt.md) - Direct prompt execution
+- [start-doctor.md](docs/cli/start-doctor.md) - System health diagnostics
+- [start-show.md](docs/cli/start-show.md) - Display configuration
+
+Asset management:
+- [start-assets.md](docs/cli/start-assets.md) - Asset management overview
+- [start-assets-add.md](docs/cli/start-assets-add.md) - Add assets from catalog
+- [start-assets-browse.md](docs/cli/start-assets-browse.md) - Browse available assets
+- [start-assets-search.md](docs/cli/start-assets-search.md) - Search catalog
+- [start-assets-info.md](docs/cli/start-assets-info.md) - View asset details
+- [start-assets-index.md](docs/cli/start-assets-index.md) - List cached assets
+- [start-assets-update.md](docs/cli/start-assets-update.md) - Update cached assets
+
+Configuration:
+- [start-config.md](docs/cli/start-config.md) - Config management overview
+- [start-config-agent.md](docs/cli/start-config-agent.md) - Agent configuration
+- [start-config-role.md](docs/cli/start-config-role.md) - Role configuration
+- [start-config-context.md](docs/cli/start-config-context.md) - Context configuration
+- [start-config-task.md](docs/cli/start-config-task.md) - Task configuration
+
+### Architecture & Design Documents
+
+- [docs/architecture.md](docs/architecture.md) - System architecture (Hexagonal pattern)
+- [docs/testing.md](docs/testing.md) - Testing strategy and smith agent
+- [docs/design/unified-template-design.md](docs/design/unified-template-design.md) - UTD pattern (file/command/prompt)
+- [docs/config.md](docs/config.md) - Complete configuration reference
+- [examples/](examples/) - Configuration examples (minimal, complete, real-world)
+
+---
+
 ## Overview
 
 `start` is a command-line orchestrator for AI agents that manages prompt composition, context injection, and workflow automation. It wraps various AI CLI tools (Claude, Gemini, GPT, etc.) with configurable roles, reusable tasks, and project-aware context documents.

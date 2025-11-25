@@ -1,0 +1,7 @@
+# Minimal Task Configuration
+# Location: ~/.config/start/tasks.toml
+
+[tasks.help]
+alias = "h"
+description = "General help task"
+prompt = "Help me with: {instructions}"

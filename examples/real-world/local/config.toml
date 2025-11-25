@@ -1,0 +1,11 @@
+# Real-World Local Settings
+# ./.start/config.toml
+#
+# Project-specific overrides
+
+[settings]
+# Use verbose logging for this project
+log_level = "verbose"
+
+# Longer timeout for complex build/test commands
+command_timeout = 60

@@ -1,0 +1,220 @@
+# Complete Reference: Context Configuration
+# ~/.config/start/contexts.toml
+#
+# This file shows ALL possible context fields and UTD patterns.
+# Contexts use the Unified Template Design (UTD) pattern.
+# Order matters: contexts appear in prompt in definition order.
+
+# ============================================================================
+# Example 1: Simple file context (required)
+# ============================================================================
+[contexts.environment]
+description = "User environment and tool configuration"
+file = "~/reference/ENVIRONMENT.md"
+prompt = "Read {file} for environment context."
+# required field controls inclusion:
+#   true = included in: start, start prompt, start task
+#   false = included in: start only (excluded from start prompt and start task)
+required = true
+# When used: Instructs AI to read the file
+# Useful for AI agents with file access (like Claude Code)
+
+# ============================================================================
+# Example 2: Inline context (required)
+# ============================================================================
+[contexts.project-note]
+description = "Important project note"
+prompt = """
+IMPORTANT: This project uses Go 1.23 and requires all code to follow standard Go conventions.
+
+Current date: {date}
+"""
+required = true
+# When used: Prompt text included directly in final prompt
+
+# ============================================================================
+# Example 3: Command output context (optional)
+# ============================================================================
+[contexts.git-status]
+description = "Current git working tree status"
+command = "git status --short"
+prompt = """
+Working tree status:
+{command_output}
+"""
+required = false
+# When used: Git status output injected into prompt
+# Only included in full sessions (start), not in tasks or one-off prompts
+
+# ============================================================================
+# Example 4: File with contents injection
+# ============================================================================
+[contexts.project-readme]
+description = "Project README documentation"
+file = "./README.md"
+prompt = """
+Project Documentation:
+
+{file_contents}
+
+Use this as context for understanding the project structure and goals.
+"""
+required = false
+# When used: README contents injected directly into prompt
+# Useful for AI agents without file access
+
+# ============================================================================
+# Example 5: File with command (file + command)
+# ============================================================================
+[contexts.project-state]
+description = "Project documentation with recent commits"
+file = "./PROJECT.md"
+command = "git log -5 --oneline"
+# If PROJECT.md contains {command_output}, git log output will be injected there
+# If not, warning issued and command ignored
+required = false
+
+# ============================================================================
+# Example 6: File with template (file + prompt)
+# ============================================================================
+[contexts.agents-doc]
+description = "Repository agent instructions"
+file = "./AGENTS.md"
+prompt = """
+Repository Instructions:
+
+{file_contents}
+
+These instructions apply to all AI interactions with this repository.
+Date: {date}
+"""
+required = true
+
+# ============================================================================
+# Example 7: Command with template (command + prompt)
+# ============================================================================
+[contexts.recent-changes]
+description = "Recent git activity"
+command = "git log -10 --oneline --graph"
+prompt = """
+Recent commit history:
+
+{command_output}
+
+Consider this context when reviewing or modifying code.
+"""
+required = false
+
+# ============================================================================
+# Example 8: Complete UTD (file + command + prompt)
+# ============================================================================
+[contexts.full-state]
+description = "Complete project state"
+file = "./PROJECT.md"
+command = "git status --short && echo '---' && git log -3 --oneline"
+prompt = """
+## Project Documentation
+
+{file_contents}
+
+## Current State
+
+{command_output}
+
+Use this complete context to understand both the project goals and current state.
+Date: {date}
+"""
+required = false
+
+# ============================================================================
+# Example 9: Context with shell override
+# ============================================================================
+[contexts.package-info]
+description = "Node.js package information"
+shell = "node"
+command_timeout = 10
+command = """
+const pkg = require('./package.json');
+console.log(`${pkg.name}@${pkg.version}`);
+console.log(`Dependencies: ${Object.keys(pkg.dependencies || {}).length}`);
+"""
+prompt = "Package details: {command_output}"
+required = false
+# shell and command_timeout override global settings for this context's command
+
+# ============================================================================
+# PLACEHOLDERS AVAILABLE IN CONTEXTS
+# ============================================================================
+# Universal (available everywhere):
+#   {date} - Current timestamp (ISO 8601 with timezone)
+#
+# UTD pattern placeholders (roles/contexts/tasks):
+#   {file} - File path from 'file' field (absolute, ~ expanded)
+#   {file_contents} - Contents from 'file' field
+#   {command} - Command string from 'command' field
+#   {command_output} - Output from 'command' execution (stdout + stderr)
+#
+# NOT available in contexts:
+#   {bin}, {model}, {prompt} - Only in agent commands
+#   {role}, {role_file} - Only in agent commands
+#   {instructions} - Only in tasks
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+# Required:
+#   - At least one of: file, command, or prompt (UTD requirement)
+#
+# Context names:
+#   - Pattern: /^[a-z0-9]+(-[a-z0-9]+)*$/
+#   - Examples: "environment", "project", "git-status"
+#
+# Warnings:
+#   - file defined but not used in prompt (when prompt exists)
+#   - command defined but not used in prompt (when prompt exists)
+#   - prompt uses {file} or {file_contents} but file not defined
+#   - prompt uses {command} or {command_output} but command not defined
+#   - file not found (skips context with warning if required = true, silent if false)
+#
+# Scope:
+#   - Can be defined in global AND local configs
+#   - Combined (global + local)
+#   - If same name in both: local completely replaces global (no field merging)
+#
+# Document Order:
+#   - Contexts appear in prompt in DEFINITION ORDER (not alphabetical)
+#   - Global contexts first (in their definition order)
+#   - Then local contexts (in their definition order)
+#   - Rearrange config file to change prompt order
+
+# ============================================================================
+# ADDITIONAL FIELDS
+# ============================================================================
+# description (string, optional)
+#   Human-readable description
+#   Displayed in config show and validation output
+#
+# required (boolean, optional, default: false)
+#   Controls inclusion by command:
+#     true: Included in start, start prompt, start task
+#     false: Included in start only
+#
+# shell (string, optional)
+#   Override global shell for command execution
+#   Examples: "bash", "node", "python3"
+#
+# command_timeout (integer, optional)
+#   Override global timeout for command execution (seconds)
+#   Example: 60
+
+# ============================================================================
+# INCLUSION BY COMMAND
+# ============================================================================
+# start (interactive session):
+#   - Includes ALL contexts (required = true AND required = false)
+#
+# start prompt (one-off query):
+#   - Includes ONLY required = true contexts
+#
+# start task (task execution):
+#   - Includes ONLY required = true contexts (automatically)

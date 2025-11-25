@@ -1,0 +1,332 @@
+# Complete Reference: Task Configuration
+# ~/.config/start/tasks.toml
+#
+# This file shows ALL possible task fields and patterns.
+# Tasks use the Unified Template Design (UTD) pattern for prompts.
+# Tasks automatically include all contexts where required = true.
+
+# ============================================================================
+# Example 1: Simple task (prompt only, default role/agent)
+# ============================================================================
+[tasks.help]
+alias = "h"
+description = "General help with instructions"
+prompt = "Help me with: {instructions}"
+# Uses default_agent and default_role from settings
+# {instructions} = command-line arguments after task name
+# {instructions} = "None" if no arguments provided
+
+# ============================================================================
+# Example 2: Task with specific role
+# ============================================================================
+[tasks.code-review]
+alias = "cr"
+description = "Code quality review"
+role = "code-reviewer"
+# role must reference a [roles.<name>] section
+# Precedence: CLI --role flag > task role > default_role > first role
+prompt = """
+Review the code with focus on:
+
+{instructions}
+
+Provide specific, actionable feedback.
+"""
+
+# ============================================================================
+# Example 3: Task with role and agent
+# ============================================================================
+[tasks.go-review]
+alias = "gor"
+description = "Go-specific code review"
+role = "go-expert"
+agent = "go-agent"
+# Both role and agent can be specified
+# Precedence for agent: CLI --agent > task agent > default_agent > first agent
+# Precedence for role: CLI --role > task role > default_role > first role
+prompt = "Review this Go code: {instructions}"
+
+# ============================================================================
+# Example 4: Task with command (UTD pattern)
+# ============================================================================
+[tasks.git-diff-review]
+alias = "gdr"
+description = "Review staged git changes"
+role = "code-reviewer"
+command = "git diff --staged"
+prompt = """
+Review these staged changes:
+
+## Instructions
+{instructions}
+
+## Changes
+```diff
+{command_output}
+```
+
+Provide a thorough review focusing on:
+- Code quality and style
+- Potential bugs or issues
+- Security considerations
+"""
+
+# ============================================================================
+# Example 5: Task with file template
+# ============================================================================
+[tasks.doc-review]
+alias = "dr"
+description = "Review documentation"
+role = "documentation-writer"
+file = "./README.md"
+prompt = """
+Review this documentation:
+
+{file_contents}
+
+Improvements needed: {instructions}
+
+Provide specific suggestions for clarity, accuracy, and completeness.
+"""
+
+# ============================================================================
+# Example 6: Task with file + command (UTD pattern)
+# ============================================================================
+[tasks.project-status]
+alias = "ps"
+description = "Project status review"
+file = "./PROJECT.md"
+command = "git status --short && echo '---' && git log -5 --oneline"
+prompt = """
+## Project Documentation
+{file_contents}
+
+## Current State
+{command_output}
+
+## Instructions
+{instructions}
+
+Analyze the project state and provide insights.
+"""
+
+# ============================================================================
+# Example 7: Complete UTD task
+# ============================================================================
+[tasks.comprehensive-review]
+alias = "comp"
+description = "Comprehensive codebase review"
+role = "code-reviewer"
+agent = "advanced-agent"
+file = "./docs/review-checklist.md"
+command = """
+echo "=== Recent Changes ==="
+git log -10 --oneline
+echo ""
+echo "=== Modified Files ==="
+git diff --name-only HEAD~5..HEAD
+"""
+prompt = """
+# Comprehensive Review
+
+## Review Checklist
+{file_contents}
+
+## Recent Activity
+{command_output}
+
+## Special Instructions
+{instructions}
+
+## Current Date
+{date}
+
+Conduct a thorough review following the checklist and considering recent changes.
+"""
+
+# ============================================================================
+# Example 8: Task with shell override
+# ============================================================================
+[tasks.api-check]
+alias = "api"
+description = "Check API endpoints and routes"
+role = "code-reviewer"
+shell = "bash"
+command_timeout = 60
+command = """
+echo "=== Routes ==="
+grep -r "router\." src/ | head -20
+echo ""
+echo "=== Recent API Changes ==="
+git log --oneline --grep="api" -10
+"""
+prompt = """
+API Endpoint Review:
+
+{command_output}
+
+Focus: {instructions}
+
+Review the API structure for:
+- RESTful compliance
+- Naming conventions
+- Security considerations
+- Missing endpoints
+"""
+
+# ============================================================================
+# Example 9: Task with Python analysis
+# ============================================================================
+[tasks.python-check]
+alias = "py"
+description = "Analyze Python project structure"
+shell = "python3"
+command_timeout = 30
+command = """
+import os
+import json
+
+py_files = [f for f in os.listdir('.') if f.endswith('.py')]
+dirs = [d for d in os.listdir('.') if os.path.isdir(d) and not d.startswith('.')]
+
+result = {
+    'python_files': len(py_files),
+    'directories': len(dirs),
+    'files': py_files[:10]
+}
+
+print(json.dumps(result, indent=2))
+"""
+prompt = """
+Python Project Analysis:
+
+{command_output}
+
+Task: {instructions}
+
+Analyze the project structure and provide recommendations.
+"""
+
+# ============================================================================
+# PLACEHOLDERS AVAILABLE IN TASKS
+# ============================================================================
+# Task-specific (only in tasks):
+#   {instructions} - User's command-line arguments (or "None" if empty)
+#
+# Universal (available everywhere):
+#   {date} - Current timestamp (ISO 8601 with timezone)
+#
+# UTD pattern placeholders (roles/contexts/tasks):
+#   {file} - File path from task's 'file' field (absolute, ~ expanded)
+#   {file_contents} - Contents from task's 'file' field
+#   {command} - Command string from task's 'command' field
+#   {command_output} - Output from task's 'command' execution
+#
+# NOT available in task prompts:
+#   {bin}, {model} - Only in agent commands
+#   {role}, {role_file} - Only in agent commands
+#   {prompt} - Only in agent commands
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+# Required:
+#   - At least one of: file, command, or prompt (UTD requirement for task prompt)
+#
+# Task names:
+#   - Pattern: /^[a-z0-9]+(-[a-z0-9]+)*$/
+#   - Examples: "help", "code-review", "git-diff-review"
+#
+# Alias:
+#   - Same pattern as task names
+#   - Must be unique across all tasks (global + local merged)
+#   - Optional field
+#
+# References:
+#   - role field must reference existing [roles.<name>]
+#   - agent field must reference existing [agents.<name>]
+#   - Validated at execution time and by doctor/validate
+#
+# Warnings:
+#   - file defined but not used in prompt
+#   - command defined but not used in prompt
+#   - prompt uses {file} or {file_contents} but file not defined
+#   - prompt uses {command} or {command_output} but command not defined
+#   - role references non-existent role
+#   - agent references non-existent agent
+#
+# Scope:
+#   - Can be defined in global AND local configs
+#   - Combined (global + local)
+#   - Local completely replaces global for same task name (no field merging)
+
+# ============================================================================
+# ADDITIONAL FIELDS
+# ============================================================================
+# alias (string, optional)
+#   Short name for quick access
+#   Must be unique across all tasks
+#   Examples: "h", "cr", "gdr"
+#
+# description (string, optional)
+#   Human-readable help text
+#   Displayed in task list and help output
+#
+# role (string, optional)
+#   Name reference to [roles.<name>]
+#   If omitted: uses default_role or first role
+#
+# agent (string, optional)
+#   Name reference to [agents.<name>]
+#   If omitted: uses default_agent or first agent
+#
+# shell (string, optional)
+#   Override global shell for command execution
+#   Examples: "bash", "node", "python3"
+#
+# command_timeout (integer, optional)
+#   Override global timeout for command execution (seconds)
+#   Example: 60
+
+# ============================================================================
+# CONTEXT INCLUSION
+# ============================================================================
+# Tasks automatically include ALL contexts where required = true
+# No per-task context configuration needed
+# Ensures critical context (ENVIRONMENT.md, AGENTS.md, etc.) always present
+# Optional contexts (required = false) are excluded from tasks
+
+# ============================================================================
+# EXECUTION FLOW
+# ============================================================================
+# When: start task <name> [arguments]
+#
+# 1. Select role (precedence: --role flag > task role > default_role > first)
+# 2. Select agent (precedence: --agent > task agent > default_agent > first)
+# 3. Load required contexts (all where required = true)
+# 4. Execute task command (if defined)
+# 5. Build task prompt (resolve {instructions}, {file_contents}, {command_output}, {date})
+# 6. Assemble final prompt (required contexts + task prompt)
+# 7. Resolve role (UTD processing)
+# 8. Execute agent command
+# 9. Cleanup temp files
+
+# ============================================================================
+# USAGE EXAMPLES
+# ============================================================================
+# Basic:
+#   start task help "explain Go interfaces"
+#   start task h "what is a closure"
+#
+# With alias:
+#   start task cr "focus on security"
+#   start task gdr "check for bugs"
+#
+# With overrides:
+#   start task code-review --role security-auditor
+#   start task go-review --agent gemini
+#   start task gdr --role go-expert --agent claude --model opus
+#
+# Empty instructions:
+#   start task help
+#   # {instructions} = "None"

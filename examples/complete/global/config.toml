@@ -1,0 +1,59 @@
+# Complete Reference: Global Settings
+# ~/.config/start/config.toml
+#
+# This file shows ALL possible settings fields with documentation.
+
+[settings]
+
+# default_agent (string, optional)
+# Which agent to use when --agent flag not provided
+# Must reference an agent defined in agents.toml
+# If omitted or invalid, falls back to first agent in config (TOML order)
+default_agent = "smith"
+
+# default_role (string, optional)
+# Which role to use when --role flag not provided and task doesn't specify
+# Must reference a role defined in roles.toml
+# If omitted or invalid, falls back to first role in config (TOML order)
+default_role = "assistant"
+
+# log_level (string, optional)
+# Output verbosity level
+# Valid values: "quiet", "normal", "verbose", "debug"
+# Can be overridden by CLI flags: --quiet, --verbose, --debug
+# Default: "normal"
+log_level = "normal"
+
+# shell (string, optional)
+# Default shell for executing commands in UTD pattern
+# Can be overridden by field-specific shell in roles/contexts/tasks
+# Auto-detects bash or sh if not specified
+# Supported: bash, sh, zsh, fish, node, python, python3, ruby, perl, etc.
+# Default: Auto-detected ("bash" or "sh")
+shell = "bash"
+
+# command_timeout (integer, optional)
+# Default timeout in seconds for command execution
+# Can be overridden by field-specific command_timeout
+# Commands exceeding timeout are killed with warning
+# Default: 30 seconds
+command_timeout = 30
+
+# asset_download (boolean, optional)
+# Enable automatic download of assets from GitHub catalog when not found locally
+# Can be overridden by --asset-download CLI flag
+# When false, only uses local and cached assets
+# Default: true
+asset_download = true
+
+# asset_repo (string, optional)
+# GitHub repository for asset catalog
+# Format: "owner/repo"
+# Default: "grantcarthew/start"
+asset_repo = "grantcarthew/start"
+
+# asset_path (string, optional)
+# Local directory for caching downloaded assets
+# Supports tilde expansion
+# Default: "~/.config/start/assets"
+asset_path = "~/.config/start/assets"

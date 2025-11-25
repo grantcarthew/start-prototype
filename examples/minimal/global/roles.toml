@@ -1,0 +1,6 @@
+# Minimal Role Configuration
+# Location: ~/.config/start/roles.toml
+
+[roles.assistant]
+description = "General purpose AI assistant"
+prompt = "You are a helpful AI assistant. Provide clear and concise answers."

@@ -1,0 +1,16 @@
+# Real-World Local Agent Configuration
+# ./.start/agents.toml
+#
+# Project may not need local agent configs
+# Include this file only if you need project-specific agent overrides
+
+# Example: Override global Claude config for this project
+# [agents.claude]
+# bin = "claude"
+# description = "Project-specific Claude configuration"
+# command = "{bin} --model {model} --project-context ./PROJECT.md --append-system-prompt '{role}' '{prompt}'"
+# default_model = "opus"
+#
+#   [agents.claude.models]
+#   opus = "claude-opus-4-20250514"
+#   sonnet = "claude-3-7-sonnet-20250219"

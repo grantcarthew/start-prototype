@@ -1,0 +1,12 @@
+# Minimal Configuration
+# Location: ~/.config/start/config.toml
+#
+# This is the global configuration used across all projects.
+# For project-specific overrides, create ./.start/config.toml
+
+[settings]
+default_agent = "smith"
+default_role = "assistant"
+log_level = "normal"
+shell = "bash"
+command_timeout = 30

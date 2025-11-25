@@ -2,6 +2,8 @@
 
 Complete reference for `start` configuration files.
 
+**💡 For working examples, see [examples/](../examples/)** - minimal, complete reference, and real-world configurations.
+
 ## Overview
 
 `start` uses [TOML](https://toml.io/) configuration files with a two-tier hierarchy:

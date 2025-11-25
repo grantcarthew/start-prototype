@@ -1,0 +1,28 @@
+# Real-World Context Configuration
+# ~/.config/start/contexts.toml
+#
+# Practical contexts for development workflows
+
+[contexts.environment]
+description = "User environment and tool configuration"
+file = "~/reference/ENVIRONMENT.md"
+prompt = "Read {file} for environment context including user info, tools, and preferences."
+required = true
+
+[contexts.index]
+description = "Documentation and reference index"
+file = "~/reference/INDEX.csv"
+prompt = "Documentation index: {file}"
+required = true
+
+[contexts.readme]
+description = "Project README for overview"
+file = "README.md"
+prompt = """
+Project Overview:
+
+{file_contents}
+
+Use this for understanding the project purpose and structure.
+"""
+required = false

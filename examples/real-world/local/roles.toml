@@ -1,0 +1,26 @@
+# Real-World Local Role Configuration
+# ./.start/roles.toml
+#
+# Project-specific roles
+
+[roles.project-expert]
+description = "Expert in this specific project"
+file = "./ROLE.md"
+# ROLE.md should contain project-specific guidelines and context
+
+[roles.go-expert]
+description = "Go expert with project conventions"
+prompt = """
+You are a Go programming expert familiar with this project's conventions.
+
+This project uses:
+- Hexagonal architecture pattern
+- Interface-based dependency injection
+- Test-first development
+- Table-driven tests
+- Go 1.23+ features
+
+Current date: {date}
+
+Provide guidance aligned with these project standards.
+"""

@@ -1,0 +1,123 @@
+# Complete Reference: Agent Configuration
+# ~/.config/start/agents.toml
+#
+# This file shows ALL possible agent fields and patterns.
+
+# ============================================================================
+# Example 1: Complete agent with inline role support
+# ============================================================================
+[agents.smith]
+
+# bin (string, REQUIRED)
+# Binary path or name to execute
+# Used for agent detection during `start init`
+# Referenced via {bin} placeholder in command template
+# Can be: binary name ("smith"), relative path ("./bin/agent"), or absolute path
+bin = "smith"
+
+# command (string, REQUIRED)
+# Command template to execute the agent
+# MUST contain {bin} and {model} placeholders (required)
+# SHOULD contain {prompt} placeholder (warns if missing)
+# Can contain: {role}, {role_file}, {date}
+# Use single quotes around placeholders to prevent shell expansion
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
+
+# description (string, optional)
+# Human-readable description of the agent
+# Displayed in `start config agent list` and help output
+description = "Smith test agent for development and testing"
+
+# url (string, optional)
+# Documentation or homepage URL for the agent tool
+# Helps users find installation and usage information
+url = "https://github.com/example/smith"
+
+# models_url (string, optional)
+# URL to model documentation
+# Helps users understand available models and capabilities
+models_url = "https://github.com/example/smith/models"
+
+# default_model (string, optional)
+# Model name to use when --model flag not provided
+# Must be a key in the [agents.smith.models] table below
+# If omitted, uses first model in models table (TOML order)
+default_model = "test"
+
+  # models (table, REQUIRED)
+  # Model name mappings: user-friendly name -> full model identifier
+  # Names are user-defined (not hardcoded)
+  # Pattern: lowercase, alphanumeric, hyphens only
+  # At least one model required
+  [agents.smith.models]
+  test = "test-model-v1"
+  fast = "test-model-fast"
+  advanced = "test-model-advanced"
+
+# ============================================================================
+# Example 2: Agent with file-based role support (like Gemini)
+# ============================================================================
+[agents.file-agent]
+bin = "file-agent"
+description = "Agent that requires file-based system prompts"
+url = "https://github.com/example/file-agent"
+# Uses {role_file} placeholder for file-based role
+# Environment variable pattern for passing file path
+command = "AGENT_SYSTEM_MD='{role_file}' {bin} --model {model} '{prompt}'"
+default_model = "standard"
+
+  [agents.file-agent.models]
+  standard = "file-agent-model-1.0"
+
+# ============================================================================
+# Example 3: Agent with environment variables for role
+# ============================================================================
+[agents.env-agent]
+bin = "env-agent"
+description = "Agent using environment variables"
+# Multiple environment variables using standard shell syntax
+# {role} contains inline role content
+command = "AGENT_ROLE='{role}' AGENT_DATE='{date}' {bin} --model {model} '{prompt}'"
+default_model = "default"
+
+  [agents.env-agent.models]
+  default = "env-agent-v1"
+  premium = "env-agent-v2-premium"
+
+# ============================================================================
+# Example 4: Minimal agent (only required fields)
+# ============================================================================
+[agents.minimal]
+bin = "minimal"
+command = "{bin} --model {model} '{prompt}'"
+# No description, url, default_model - all optional
+
+  [agents.minimal.models]
+  only-model = "minimal-model-v1"
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+# Required fields:
+#   - bin: Must be present
+#   - command: Must be present
+#   - command must contain {bin} placeholder (error if missing)
+#   - command must contain {model} placeholder (error if missing)
+#   - [agents.<name>.models] table with at least one model
+#
+# Warnings:
+#   - command missing {prompt} placeholder (prompt won't be passed to agent)
+#   - default_model not in models table (falls back to first model)
+#   - Unknown placeholders in command (suggests corrections)
+#
+# Agent names:
+#   - Pattern: /^[a-z0-9]+(-[a-z0-9]+)*$/
+#   - Examples: "smith", "my-agent", "gpt4-mini"
+#
+# Model names:
+#   - Same pattern as agent names
+#   - User-defined, not hardcoded
+#
+# Scope:
+#   - Can be defined in global AND local configs
+#   - Local completely overrides global for same agent name (no field merging)
