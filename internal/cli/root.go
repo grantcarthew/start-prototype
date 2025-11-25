@@ -141,7 +141,7 @@ func (rc *RootCommand) run(cmd *cobra.Command, args []string) error {
 	// Get shell and timeout settings
 	shell := cfg.Settings.Shell
 	if shell == "" {
-		shell = "bash"
+		shell = engine.DetectShell()
 	}
 	timeout := cfg.Settings.CommandTimeout
 	if timeout == 0 {

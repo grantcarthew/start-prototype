@@ -1,7 +1,7 @@
 # PROJECT: start - AI Agent CLI Implementation
 
 **Status:** Implementation Phase
-**Current Phase:** Phase 4 (UTD Pattern Processing)
+**Current Phase:** Phase 5 (Tasks)
 **Started:** 2025-11-24
 **Last Updated:** 2025-11-25
 
@@ -175,7 +175,7 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 | 1 | Config Loading & Validation | ✅ Complete | 4-6h | [phase-1.md](docs/implementation/phase-1.md) |
 | 2 | Simple Agent Execution | ✅ Complete | 4-6h | [phase-2.md](docs/implementation/phase-2.md) |
 | 3 | Roles & Contexts | ✅ Complete | 5-7h | [phase-3.md](docs/implementation/phase-3.md) |
-| 4 | UTD Pattern Processing | Not Started | 6-8h | [phase-4.md](docs/implementation/phase-4.md) |
+| 4 | UTD Pattern Processing | ✅ Complete | 6-8h | [phase-4.md](docs/implementation/phase-4.md) |
 | 5 | Tasks | Not Started | 4-6h | [phase-5.md](docs/implementation/phase-5.md) |
 | 6 | Asset Catalog & Lazy Loading | Not Started | 8-10h | [phase-6.md](docs/implementation/phase-6.md) |
 | 7 | Init & Asset Management | Not Started | 8-10h | [phase-7.md](docs/implementation/phase-7.md) |
@@ -212,7 +212,14 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 - ✅ Context order preservation (ContextOrder field)
 - ✅ 9 UTD unit tests + updated executor/integration tests (34 tests passing)
 
-**Phase 4:** UTD pattern (file/command/prompt), dynamic content generation
+**Phase 4:** UTD pattern processing (completed with Phase 3, shell auto-detection added)
+- ✅ UTD file/command/prompt parsing (completed in Phase 3)
+- ✅ Command execution with shell integration (completed in Phase 3)
+- ✅ UTD placeholders ({file}, {file_contents}, {command_output}) (completed in Phase 3)
+- ✅ Shell configuration and timeouts (completed in Phase 3)
+- ✅ Temporary file handling (completed in Phase 3)
+- ✅ Shell auto-detection (DetectShell function - bash if available, otherwise sh)
+- ✅ All tests passing (35 tests total)
 
 **Phase 5:** Task system with {instructions} placeholder and auto-contexts
 
@@ -302,9 +309,9 @@ git tag phase-0-complete
 
 ### Current Status
 
-**Phase:** 4 (UTD Pattern Processing)
-**Last Completed:** Phase 3 (2025-11-25)
-**Next Milestone:** v0.0.1 (Phase 2-3 complete) - ✅ ACHIEVED
+**Phase:** 5 (Tasks)
+**Last Completed:** Phase 4 (2025-11-25)
+**Next Milestone:** v0.1.0 (Phase 5 complete) - Core functionality
 
 ### Phase Checklist
 
@@ -312,7 +319,7 @@ git tag phase-0-complete
 - [x] Phase 1: Config Loading & Validation
 - [x] Phase 2: Simple Agent Execution
 - [x] Phase 3: Roles & Contexts
-- [ ] Phase 4: UTD Pattern Processing
+- [x] Phase 4: UTD Pattern Processing
 - [ ] Phase 5: Tasks
 - [ ] Phase 6: Asset Catalog & Lazy Loading
 - [ ] Phase 7: Init & Asset Management
@@ -382,3 +389,4 @@ _Phase 0 Complete: Yes_
 _Phase 1 Complete: Yes_
 _Phase 2 Complete: Yes_
 _Phase 3 Complete: Yes_
+_Phase 4 Complete: Yes_

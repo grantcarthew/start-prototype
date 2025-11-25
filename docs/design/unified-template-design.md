@@ -523,14 +523,6 @@ Commands execute in:
 - Directory specified by `--directory` flag
 - Project root (if detected)
 
-### Environment Variables
-
-Commands inherit the current shell environment plus:
-
-- `START_AGENT` - Current agent name
-- `START_MODEL` - Current model
-- `START_TASK` - Current task name (if running task)
-
 ### Error Handling
 
 - File not found and prompt uses `{file}` or `{file_contents}` → Warning, skip entire section
