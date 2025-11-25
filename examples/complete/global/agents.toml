@@ -121,3 +121,26 @@ command = "{bin} --model {model} '{prompt}'"
 # Scope:
 #   - Can be defined in global AND local configs
 #   - Local completely overrides global for same agent name (no field merging)
+
+# ============================================================================
+# Additional agents referenced by tasks
+# ============================================================================
+[agents.advanced-agent]
+bin = "smith"
+description = "Advanced AI agent for comprehensive reviews"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
+default_model = "advanced"
+
+  [agents.advanced-agent.models]
+  advanced = "advanced-model-v2"
+  fast = "advanced-model-fast"
+
+[agents.go-agent]
+bin = "smith"
+description = "Specialized agent for Go programming tasks"
+command = "{bin} --model {model} --append-system-prompt '{role}' '{prompt}'"
+default_model = "go-expert"
+
+  [agents.go-agent.models]
+  go-expert = "go-expert-model-v1"
+  standard = "standard-model-v1"

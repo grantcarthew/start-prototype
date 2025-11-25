@@ -153,13 +153,13 @@ description = "Check API endpoints and routes"
 role = "code-reviewer"
 shell = "bash"
 command_timeout = 60
-command = """
+command = '''
 echo "=== Routes ==="
 grep -r "router\." src/ | head -20
 echo ""
 echo "=== Recent API Changes ==="
 git log --oneline --grep="api" -10
-"""
+'''
 prompt = """
 API Endpoint Review:
 

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+start --ai gemini "
+Read the AGENTS.md document for overall context.
+Read the PROJECT.md document for existing work being done.
+Read the instuctions in the ~/reference/tasks/review-code.md document.
+Start a full code review and record the results as instructed.
+"
