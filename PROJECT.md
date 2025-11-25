@@ -173,7 +173,7 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 |-------|------|--------|--------|------|
 | 0 | Foundation & Smith | ✅ Complete | 2-3h | [phase-0.md](docs/implementation/phase-0.md) |
 | 1 | Config Loading & Validation | ✅ Complete | 4-6h | [phase-1.md](docs/implementation/phase-1.md) |
-| 2 | Simple Agent Execution | Not Started | 4-6h | [phase-2.md](docs/implementation/phase-2.md) |
+| 2 | Simple Agent Execution | ✅ Complete | 4-6h | [phase-2.md](docs/implementation/phase-2.md) |
 | 3 | Roles & Contexts | Not Started | 5-7h | [phase-3.md](docs/implementation/phase-3.md) |
 | 4 | UTD Pattern Processing | Not Started | 6-8h | [phase-4.md](docs/implementation/phase-4.md) |
 | 5 | Tasks | Not Started | 4-6h | [phase-5.md](docs/implementation/phase-5.md) |
@@ -195,6 +195,11 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 - ✅ Fixed example configs (minimal, complete, real-world)
 
 **Phase 2:** Basic agent execution with simple placeholder resolution
+- ✅ RealRunner adapter (os/exec wrapper)
+- ✅ Placeholder resolver ({bin}, {model}, {prompt}, {date})
+- ✅ Executor (command construction and execution)
+- ✅ Root command RunE (agent/model selection, execution)
+- ✅ 14 unit tests + 2 integration tests (all passing)
 
 **Phase 3:** Role system prompts and context document loading
 
@@ -288,15 +293,15 @@ git tag phase-0-complete
 
 ### Current Status
 
-**Phase:** 2 (Simple Agent Execution)
-**Last Completed:** Phase 1 (2025-11-25)
+**Phase:** 3 (Roles & Contexts)
+**Last Completed:** Phase 2 (2025-11-25)
 **Next Milestone:** v0.0.1 (Phase 2-3 complete)
 
 ### Phase Checklist
 
 - [x] Phase 0: Foundation & Smith
 - [x] Phase 1: Config Loading & Validation
-- [ ] Phase 2: Simple Agent Execution
+- [x] Phase 2: Simple Agent Execution
 - [ ] Phase 3: Roles & Contexts
 - [ ] Phase 4: UTD Pattern Processing
 - [ ] Phase 5: Tasks
@@ -366,3 +371,4 @@ _Document Status: In Progress_
 _Last Updated: 2025-11-25_
 _Phase 0 Complete: Yes_
 _Phase 1 Complete: Yes_
+_Phase 2 Complete: Yes_

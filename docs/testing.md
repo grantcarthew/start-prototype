@@ -249,6 +249,47 @@ cat /tmp/smith-test/prompt.md
 
 Test each component in isolation using mocked dependencies.
 
+### Assertion Library
+
+We use a minimal internal assertion library (`test/assert/assert.go`) instead of external dependencies or verbose stdlib assertions.
+
+**Rationale:**
+- Zero external dependencies (stays in stdlib)
+- Cleaner, more readable tests
+- ~60-70% token reduction vs stdlib (important for AI agent workflows)
+- Full control - tailored to our needs
+- Uses `t.Helper()` for correct line numbers
+
+**Available helpers:**
+
+```go
+assert.NoError(t, err)                    // Fatal if error
+assert.Error(t, err)                      // Fatal if no error
+assert.Equal(t, expected, actual)         // Compare values (generic)
+assert.NotEqual(t, expected, actual)      // Values must differ
+assert.Contains(t, str, substr)           // String contains check
+assert.NotContains(t, str, substr)        // String doesn't contain
+assert.True(t, condition, msg)            // Boolean assertion
+assert.False(t, condition, msg)           // Inverse boolean
+assert.Len(t, expected, v)                // Length check
+```
+
+**Token comparison:**
+
+```go
+// Stdlib (verbose): ~85 tokens
+if err != nil {
+    t.Fatalf("Execute() error = %v, want nil", err)
+}
+if len(mockRunner.CalledWith) != 1 {
+    t.Fatalf("Runner called %d times, want 1", len(mockRunner.CalledWith))
+}
+
+// Assert library: ~30 tokens (65% reduction)
+assert.NoError(t, err)
+assert.Equal(t, 1, len(mockRunner.CalledWith))
+```
+
 ### Example: Config Loader
 
 ```go
@@ -259,8 +300,8 @@ import (
     "testing"
 
     "github.com/grantcarthew/start/internal/config"
+    "github.com/grantcarthew/start/test/assert"
     "github.com/grantcarthew/start/test/mocks"
-    "github.com/stretchr/testify/assert"
 )
 
 func TestLoadGlobal(t *testing.T) {
@@ -305,7 +346,7 @@ func TestLoadGlobal_MissingFiles(t *testing.T) {
 
     // Should not error, just return empty config
     assert.NoError(t, err)
-    assert.Empty(t, cfg.Agents)
+    assert.Equal(t, 0, len(cfg.Agents))
 }
 ```
 
@@ -321,8 +362,8 @@ import (
 
     "github.com/grantcarthew/start/internal/domain"
     "github.com/grantcarthew/start/internal/engine"
+    "github.com/grantcarthew/start/test/assert"
     "github.com/grantcarthew/start/test/mocks"
-    "github.com/stretchr/testify/assert"
 )
 
 func TestPromptAssembly_WithContexts(t *testing.T) {
@@ -398,14 +439,15 @@ func TestPromptAssembly_MissingFile(t *testing.T) {
 package engine_test
 
 import (
+    "regexp"
     "testing"
 
     "github.com/grantcarthew/start/internal/engine"
-    "github.com/stretchr/testify/assert"
+    "github.com/grantcarthew/start/test/assert"
 )
 
 func TestPlaceholderResolution_Basic(t *testing.T) {
-    resolver := engine.NewPlaceholderResolver(nil, nil)
+    resolver := engine.NewPlaceholderResolver()
 
     template := "Model: {model}, Prompt: {prompt}"
     values := map[string]string{
@@ -419,7 +461,7 @@ func TestPlaceholderResolution_Basic(t *testing.T) {
 }
 
 func TestPlaceholderResolution_MissingValue(t *testing.T) {
-    resolver := engine.NewPlaceholderResolver(nil, nil)
+    resolver := engine.NewPlaceholderResolver()
 
     template := "Model: {model}, Missing: {missing}"
     values := map[string]string{
@@ -428,19 +470,20 @@ func TestPlaceholderResolution_MissingValue(t *testing.T) {
 
     result := resolver.Resolve(template, values)
 
-    // Missing placeholder left as-is (or replaced with empty string)
+    // Missing placeholder left as-is
     assert.Contains(t, result, "Model: claude-3-7-sonnet-20250219")
 }
 
 func TestPlaceholderResolution_Date(t *testing.T) {
-    resolver := engine.NewPlaceholderResolver(nil, nil)
+    resolver := engine.NewPlaceholderResolver()
 
     template := "Date: {date}"
 
     result := resolver.Resolve(template, map[string]string{})
 
     // Should contain ISO 8601 format date
-    assert.Regexp(t, `\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}`, result)
+    matched, _ := regexp.MatchString(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}`, result)
+    assert.True(t, matched, "Result should contain ISO 8601 timestamp")
 }
 ```
 
@@ -517,9 +560,6 @@ import (
     "path/filepath"
     "strings"
     "testing"
-
-    "github.com/stretchr/testify/assert"
-    "github.com/stretchr/testify/require"
 )
 
 func TestTaskExecution(t *testing.T) {
@@ -544,26 +584,56 @@ func TestTaskExecution(t *testing.T) {
     cmd.Env = env
     output, err := cmd.CombinedOutput()
 
-    require.NoError(t, err, "Command failed: %s", output)
+    if err != nil {
+        t.Fatalf("Command failed: %v\nOutput: %s", err, output)
+    }
 
     // Verify smith captured the correct args
     argsPath := filepath.Join(outputDir, "args.txt")
     args, err := os.ReadFile(argsPath)
-    require.NoError(t, err, "Failed to read args.txt")
+    if err != nil {
+        t.Fatalf("Failed to read args.txt: %v", err)
+    }
 
     argsLines := strings.Split(string(args), "\n")
-    assert.Contains(t, argsLines, "smith")
-    assert.Contains(t, argsLines, "--model")
-    assert.Contains(t, argsLines, "test-model")
+    hasSmith := false
+    hasModel := false
+    hasTestModel := false
+    for _, line := range argsLines {
+        if strings.Contains(line, "smith") {
+            hasSmith = true
+        }
+        if line == "--model" {
+            hasModel = true
+        }
+        if line == "test-model" {
+            hasTestModel = true
+        }
+    }
+    if !hasSmith {
+        t.Error("Args should contain smith")
+    }
+    if !hasModel {
+        t.Error("Args should contain --model flag")
+    }
+    if !hasTestModel {
+        t.Error("Args should contain test-model")
+    }
 
     // Verify prompt contains expected content
     promptPath := filepath.Join(outputDir, "prompt.md")
     prompt, err := os.ReadFile(promptPath)
-    require.NoError(t, err, "Failed to read prompt.md")
+    if err != nil {
+        t.Fatalf("Failed to read prompt.md: %v", err)
+    }
 
     promptStr := string(prompt)
-    assert.Contains(t, promptStr, "check security", "Instructions not in prompt")
-    assert.Contains(t, promptStr, "ENVIRONMENT.md", "Context not in prompt")
+    if !strings.Contains(promptStr, "check security") {
+        t.Error("Instructions not in prompt")
+    }
+    if !strings.Contains(promptStr, "ENVIRONMENT.md") {
+        t.Error("Context not in prompt")
+    }
 }
 
 func TestTaskExecution_WithAlias(t *testing.T) {
