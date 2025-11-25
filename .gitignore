@@ -70,3 +70,7 @@ release/
 __debug_bin
 debug
 *.pprof
+
+# Project-specific
+bin/
+test/output/
