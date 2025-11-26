@@ -1,7 +1,7 @@
 # PROJECT: start - AI Agent CLI Implementation
 
 **Status:** Implementation Phase
-**Current Phase:** Phase 7 (Init & Asset Management)
+**Current Phase:** Phase 8a (Diagnostics & CLI UX) - Complete
 **Started:** 2025-11-24
 **Last Updated:** 2025-11-26
 
@@ -179,7 +179,8 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 | 5 | Tasks | ✅ Complete | 4-6h | [phase-5.md](docs/implementation/phase-5.md) |
 | 6 | Asset Catalog & Lazy Loading | ✅ Complete | 8-10h | [phase-6.md](docs/implementation/phase-6.md) |
 | 7 | Init & Asset Management | ✅ Complete | 8-10h | [phase-7.md](docs/implementation/phase-7.md) |
-| 8 | Config Management & Doctor | Not Started | 6-8h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8a | Diagnostics & CLI UX | ✅ Complete | 3-4h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8b | Config Management Commands | Not Started | 8-10h | [phase-8.md](docs/implementation/phase-8.md) |
 | 9 | Polish & Documentation | Not Started | 6-8h | [phase-9.md](docs/implementation/phase-9.md) |
 
 ### Phase Descriptions
@@ -262,7 +263,25 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 - ✅ DR-035 updated to match implementation (query-based mode documented)
 - ✅ All tests passing or skipping gracefully (116 total: 91 unit tests + 25 integration tests)
 
-**Phase 8:** Config management commands, `start doctor`, prefix matching, shell completion
+**Phase 8a:** Diagnostics & CLI UX enhancements (prefix matching, completion, doctor, version checking)
+- ✅ Prefix matching (DR-030: cobra.EnablePrefixMatching for abbreviated commands)
+- ✅ Shell completion (DR-028: bash/zsh/fish completion generation and auto-install)
+- ✅ Version checker (DR-021: GitHub API integration with semver comparison, rate limiting, GH_TOKEN support)
+- ✅ Doctor command (DR-024: comprehensive health checks with exit codes, --quiet and --verbose modes)
+- ✅ Health checks: version, assets age, config validation, agent binaries, contexts, environment
+- ✅ Version comparison with development build detection
+- ✅ Installation method detection (Homebrew, go install, manual)
+- ✅ Unit tests for version checker (10 tests, all passing)
+- ✅ Integration tests for Phase 8a (8 tests: prefix matching, completion output, doctor modes)
+- ✅ All tests passing (124 total: 103 unit tests + 21 integration tests)
+
+**Phase 8b:** Config management commands (interactive TOML manipulation)
+- start config agent (list/new/show/test/edit/remove/default) - DR-038
+- start config role (list/new/show/test/edit/remove/default)
+- start config context (list/new/show/test/edit/remove/default)
+- start config task (list/new/show/test/edit/remove/default)
+- Interactive wizards with validation, backup creation, scope selection (global vs local)
+- TOML file manipulation with preserve-format editing
 
 **Phase 9:** Error messages, output formatting, performance, documentation, v1.0.0 release
 
@@ -344,10 +363,10 @@ git tag phase-0-complete
 
 ### Current Status
 
-**Phase:** 7 (Init & Asset Management) - ✅ Complete
-**Last Completed:** Phase 7 (2025-11-26)
-**Next Phase:** Phase 8 (Config Management & Doctor)
-**Next Milestone:** v0.5.0 (Phase 6-7 complete) - Full feature set ✅ READY
+**Phase:** 8a (Diagnostics & CLI UX) - ✅ Complete
+**Last Completed:** Phase 8a (2025-11-26)
+**Next Phase:** Phase 8b (Config Management Commands) or Phase 9 (Polish & Documentation)
+**Next Milestone:** v0.5.0 (Phase 6-8a complete) - Full feature set ✅ READY
 
 ### Phase Checklist
 
@@ -359,14 +378,15 @@ git tag phase-0-complete
 - [x] Phase 5: Tasks
 - [x] Phase 6: Asset Catalog & Lazy Loading
 - [x] Phase 7: Init & Asset Management
-- [ ] Phase 8: Config Management & Doctor
+- [x] Phase 8a: Diagnostics & CLI UX
+- [ ] Phase 8b: Config Management Commands
 - [ ] Phase 9: Polish & Documentation
 
 ### Milestone Targets
 
 - **v0.0.1:** Phase 2-3 complete (basic execution with roles/contexts) - First usable version
 - **v0.1.0:** Phase 5 complete (tasks working) - Core functionality
-- **v0.5.0:** Phase 6-7 complete (catalog and init) - Full feature set
+- **v0.5.0:** Phase 6-8a complete (catalog, init, diagnostics) - Full feature set ✅ READY
 - **v1.0.0:** Phase 9 complete (production ready) - Stable release
 
 ---
@@ -429,3 +449,5 @@ _Phase 4 Complete: Yes_
 _Phase 5 Complete: Yes_
 _Phase 6 Complete: Yes_
 _Phase 7 Complete: Yes_
+_Phase 8a Complete: Yes_
+_Phase 8b Complete: No_

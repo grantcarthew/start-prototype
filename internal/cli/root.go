@@ -78,6 +78,11 @@ func NewRootCommand(
 		taskResolver,
 	))
 	cmd.AddCommand(NewAssetsCommand(assetResolver))
+	cmd.AddCommand(NewCompletionCommand())
+	cmd.AddCommand(NewDoctorCommand(configLoader, validator, version))
+
+	// Enable prefix matching globally (DR-030)
+	cobra.EnablePrefixMatching = true
 
 	return cmd
 }
