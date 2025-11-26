@@ -325,6 +325,225 @@ func TestPhase8_CompletionFishOutput(t *testing.T) {
 	}
 }
 
+// TestPhase8c_ConfigRoleList tests role list command
+func TestPhase8c_ConfigRoleList(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name         string
+		args         []string
+		expectOutput string
+	}{
+		{
+			name:         "role list help",
+			args:         []string{"config", "role", "list", "--help"},
+			expectOutput: "List all roles",
+		},
+		{
+			name:         "role list",
+			args:         []string{"config", "role", "list"},
+			expectOutput: "No roles configured.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil && !strings.Contains(string(output), "failed to load") {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+
+			if !strings.Contains(string(output), tt.expectOutput) {
+				t.Errorf("Output does not contain expected string %q\nGot: %s", tt.expectOutput, output)
+			}
+		})
+	}
+}
+
+// TestPhase8c_ConfigRoleShow tests role show command
+func TestPhase8c_ConfigRoleShow(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "role show help",
+			args:        []string{"config", "role", "show", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "role show nonexistent",
+			args:        []string{"config", "role", "show", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8c_ConfigRoleTest tests role test command
+func TestPhase8c_ConfigRoleTest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "role test help",
+			args:        []string{"config", "role", "test", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "role test nonexistent",
+			args:        []string{"config", "role", "test", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8c_ConfigRoleDefault tests role default command
+func TestPhase8c_ConfigRoleDefault(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name         string
+		args         []string
+		expectOutput string
+	}{
+		{
+			name:         "role default help",
+			args:         []string{"config", "role", "default", "--help"},
+			expectOutput: "default role",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil && !strings.Contains(string(output), "failed to") {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+
+			if !strings.Contains(string(output), tt.expectOutput) {
+				t.Errorf("Output does not contain expected string %q\nGot: %s", tt.expectOutput, output)
+			}
+		})
+	}
+}
+
+// TestPhase8c_ConfigRoleEdit tests role edit command
+func TestPhase8c_ConfigRoleEdit(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "role", "edit", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Edit") {
+		t.Errorf("Output does not contain expected string 'Edit'\nGot: %s", output)
+	}
+}
+
+// TestPhase8c_ConfigRoleRemove tests role remove command
+func TestPhase8c_ConfigRoleRemove(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "role", "remove", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Remove") {
+		t.Errorf("Output does not contain expected string 'Remove'\nGot: %s", output)
+	}
+}
+
+// TestPhase8c_ConfigRoleNew tests role new command
+func TestPhase8c_ConfigRoleNew(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "role", "new", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Interactive wizard") {
+		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	}
+}
+
 // getBinaryPath returns the path to the test binary
 func getBinaryPath(t *testing.T) string {
 	t.Helper()

@@ -1,7 +1,7 @@
 # PROJECT: start - AI Agent CLI Implementation
 
 **Status:** Implementation Phase
-**Current Phase:** Phase 8a (Diagnostics & CLI UX) - Complete
+**Current Phase:** Phase 8c (Role Config Commands) - Complete
 **Started:** 2025-11-24
 **Last Updated:** 2025-11-26
 
@@ -181,7 +181,7 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 | 7 | Init & Asset Management | ✅ Complete | 8-10h | [phase-7.md](docs/implementation/phase-7.md) |
 | 8a | Diagnostics & CLI UX | ✅ Complete | 3-4h | [phase-8.md](docs/implementation/phase-8.md) |
 | 8b | Agent Config Commands | ✅ Complete | 6-8h | [phase-8.md](docs/implementation/phase-8.md) |
-| 8c | Role Config Commands | Not Started | 4-5h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8c | Role Config Commands | ✅ Complete | 4-5h | [phase-8.md](docs/implementation/phase-8.md) |
 | 8d | Context Config Commands | Not Started | 4-5h | [phase-8.md](docs/implementation/phase-8.md) |
 | 8e | Task Config Commands | Not Started | 5-6h | [phase-8.md](docs/implementation/phase-8.md) |
 | 9 | Polish & Documentation | Not Started | 6-8h | [phase-9.md](docs/implementation/phase-9.md) |
@@ -278,13 +278,20 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 - ✅ Integration tests for Phase 8a (8 tests: prefix matching, completion output, doctor modes)
 - ✅ All tests passing (124 total: 103 unit tests + 21 integration tests)
 
-**Phase 8b:** Config management commands (interactive TOML manipulation)
-- start config agent (list/new/show/test/edit/remove/default) - DR-038
-- start config role (list/new/show/test/edit/remove/default)
-- start config context (list/new/show/test/edit/remove/default)
-- start config task (list/new/show/test/edit/remove/default)
-- Interactive wizards with validation, backup creation, scope selection (global vs local)
-- TOML file manipulation with preserve-format editing
+**Phase 8b:** Agent config management commands (interactive TOML manipulation)
+- ✅ start config agent (list/new/show/test/edit/remove/default) - DR-038
+- ✅ ReadAgentsFile/WriteAgentsFile TOML helper methods
+- ✅ Interactive wizards with validation, backup creation, scope selection (global vs local)
+- ✅ TOML file manipulation for agents.toml
+- ✅ Unit tests + integration tests (all passing)
+
+**Phase 8c:** Role config management commands (same pattern as 8b)
+- ✅ start config role (list/new/show/test/edit/remove/default)
+- ✅ ReadRolesFile/WriteRolesFile TOML helper methods
+- ✅ Interactive role creation wizard supporting all UTD patterns (file/command/prompt/combination)
+- ✅ Role validation with file checking and command testing
+- ✅ Global/local scope selection with merge support
+- ✅ 2 unit tests + 7 integration tests (all passing, 124 total tests)
 
 **Phase 9:** Error messages, output formatting, performance, documentation, v1.0.0 release
 
@@ -366,9 +373,9 @@ git tag phase-0-complete
 
 ### Current Status
 
-**Phase:** 8c (Role Config Commands) - Ready to Start
-**Last Completed:** Phase 8b (2025-11-26)
-**Next Phase:** Phase 8c (Role Config Commands)
+**Phase:** 8d (Context Config Commands) - Ready to Start
+**Last Completed:** Phase 8c (2025-11-26)
+**Next Phase:** Phase 8d (Context Config Commands)
 **Next Milestone:** v0.5.0 (Phase 6-8a complete) - Full feature set ✅ READY
 
 ### Phase Checklist
@@ -383,7 +390,7 @@ git tag phase-0-complete
 - [x] Phase 7: Init & Asset Management
 - [x] Phase 8a: Diagnostics & CLI UX
 - [x] Phase 8b: Agent Config Commands
-- [ ] Phase 8c: Role Config Commands
+- [x] Phase 8c: Role Config Commands
 - [ ] Phase 8d: Context Config Commands
 - [ ] Phase 8e: Task Config Commands
 - [ ] Phase 9: Polish & Documentation
@@ -456,4 +463,5 @@ _Phase 5 Complete: Yes_
 _Phase 6 Complete: Yes_
 _Phase 7 Complete: Yes_
 _Phase 8a Complete: Yes_
-_Phase 8b Complete: No_
+_Phase 8b Complete: Yes_
+_Phase 8c Complete: Yes_

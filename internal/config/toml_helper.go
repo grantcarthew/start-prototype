@@ -148,3 +148,58 @@ func (h *TOMLHelper) GetConfigPath(dir string) string {
 func (h *TOMLHelper) GetFS() domain.FileSystem {
 	return h.fs
 }
+
+// ReadRolesFile reads the roles.toml file from a directory
+func (h *TOMLHelper) ReadRolesFile(dir string) (map[string]domain.Role, error) {
+	path := filepath.Join(dir, "roles.toml")
+	data, err := h.fs.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return make(map[string]domain.Role), nil
+		}
+		return nil, fmt.Errorf("failed to read roles file: %w", err)
+	}
+
+	var parsed struct {
+		Roles map[string]domain.Role `toml:"roles"`
+	}
+
+	if err := toml.Unmarshal(data, &parsed); err != nil {
+		return nil, fmt.Errorf("failed to parse roles file: %w", err)
+	}
+
+	if parsed.Roles == nil {
+		return make(map[string]domain.Role), nil
+	}
+
+	return parsed.Roles, nil
+}
+
+// WriteRolesFile writes roles to the roles.toml file
+func (h *TOMLHelper) WriteRolesFile(dir string, roles map[string]domain.Role) error {
+	// Ensure directory exists
+	if err := h.fs.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Prepare structure for marshaling
+	tomlData := struct {
+		Roles map[string]domain.Role `toml:"roles"`
+	}{
+		Roles: roles,
+	}
+
+	// Marshal to TOML
+	data, err := toml.Marshal(tomlData)
+	if err != nil {
+		return fmt.Errorf("failed to marshal roles: %w", err)
+	}
+
+	// Write file
+	path := filepath.Join(dir, "roles.toml")
+	if err := h.fs.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("failed to write roles file: %w", err)
+	}
+
+	return nil
+}
