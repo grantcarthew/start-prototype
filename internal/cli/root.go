@@ -65,6 +65,7 @@ func NewRootCommand(
 	cmd.PersistentFlags().StringP("role", "r", "", "Role to use")
 
 	// Add subcommands
+	cmd.AddCommand(NewInitCommand(assetResolver))
 	cmd.AddCommand(NewConfigCommand(configLoader, validator))
 	cmd.AddCommand(NewTaskCommand(
 		configLoader,

@@ -55,9 +55,9 @@ Confirmation workflow:
 Non-interactive mode:
 
 - --yes flag skips confirmation prompts (for automation)
-- --category flag skips category selection
+- Query-based mode allows direct search without interactive navigation
 - --local flag adds to local config instead of global
-- Direct installation: start assets add <path>
+- Substring search enables finding assets by partial name, description, or tags
 
 ## Why
 
@@ -107,9 +107,9 @@ Accept:
 
 - No fancy TUI in v1 (no arrow key navigation, no fuzzy search, no multi-select, but can add in v2 if users request)
 - Category navigation adds step (extra prompt compared to flat list, but better organization for large catalogs)
-- No inline search in TUI (can't filter by keyword while browsing, use start assets search or --category flag instead)
+- No inline search in TUI (can't filter by keyword while browsing, use start assets search or query-based mode instead)
 - Numbered input only (typing numbers instead of arrow keys, but works everywhere)
-- Manual category selection (can't auto-detect user intent, but --category flag available)
+- Manual category selection in interactive mode (can't auto-detect user intent, use query-based mode for targeted search)
 
 Gain:
 
@@ -119,7 +119,7 @@ Gain:
 - Flexible modes (interactive browsing or direct installation with --yes for automation)
 - Category organization (easier to scan, better for large catalogs, scales well)
 - Confirmation before changes (user sees metadata before installing, can cancel anytime)
-- Non-interactive support (automation-friendly with --yes, --category, and direct path installation)
+- Non-interactive support (automation-friendly with --yes flag and query-based search)
 
 ## Alternatives
 
@@ -281,21 +281,21 @@ Navigation flow:
    - Add to config (global or local based on --local flag)
    - Display success message with usage hint
 
-Non-interactive mode:
+Query-based mode:
+
+Syntax: start assets add <query>
+
+- Uses substring matching (per DR-040: minimum 3 characters)
+- Searches name, description, tags fields
+- Single match: auto-select and proceed to confirmation
+- Multiple matches: grouped numbered selection (type → category)
+- Shows confirmation prompt (unless --yes)
+- Downloads and adds to config
 
 Flags:
 
 - --yes, -y: Skip confirmation prompts (for automation)
-- --category <cat>: Filter by category (skip category selection step)
 - --local: Add to local config instead of global
-
-Direct installation:
-
-- Syntax: start assets add <path>
-- Example: start assets add git-workflow/pre-commit-review
-- Skips category and asset selection steps
-- Shows confirmation prompt (unless --yes provided)
-- Downloads and adds to config
 
 Error handling:
 
@@ -364,15 +364,17 @@ Downloading...
 Try it: start task pre-commit-review
 ```
 
-Category filtering (skip category selection):
+Query-based filtering (skip interactive navigation):
 
 ```bash
-$ start assets add --category git-workflow
+$ start assets add "workflow"
 
-Fetching catalog from GitHub...
-✓ Found 4 assets in git-workflow
+Searching catalog...
 
-git-workflow tasks:
+Found 6 matches:
+
+tasks/
+  git-workflow/
   1. pre-commit-review - Review staged changes before commit
   2. pr-ready - Complete PR preparation checklist
   3. commit-message - Generate conventional commit message
@@ -391,32 +393,42 @@ Downloading...
 ✓ Added to global config as 'pre-commit-review'
 ```
 
-Direct installation:
+Query-based search and install:
 
 ```bash
-$ start assets add git-workflow/pre-commit-review
+$ start assets add "pre-commit-review"
 
-Found asset: pre-commit-review
+Searching catalog...
+
+Found 1 match (exact):
+  tasks/git-workflow/pre-commit-review
+
+Selected: pre-commit-review
 Description: Review staged changes before commit
 Tags: git, review, quality, pre-commit
 
 Download and add to config? [Y/n] y
 
 Downloading...
-✓ Cached to ~/.cache/start/tasks/git-workflow/
+✓ Cached to ~/.config/start/assets/tasks/git-workflow/
 ✓ Added to global config as 'pre-commit-review'
+
+Try it: start task pre-commit-review
 ```
 
 Non-interactive mode for automation:
 
 ```bash
-$ start assets add git-workflow/pre-commit-review --yes
+$ start assets add "commit-review" --yes
 
-✓ Downloaded and cached pre-commit-review
-✓ Added to global config
+Searching catalog...
 
-$ echo $?
-0
+Found 1 match (exact):
+  tasks/git-workflow/pre-commit-review
+
+Downloading...
+✓ Cached to ~/.config/start/assets/tasks/git-workflow/
+✓ Added to global config as 'pre-commit-review'
 ```
 
 Add to local config:
@@ -461,20 +473,19 @@ To resolve:
 - Add custom task manually
 ```
 
-Error handling - no assets found:
+Error handling - no matches found:
 
 ```bash
-$ start assets add --category nonexistent
+$ start assets add "nonexistent"
 
-Error: No tasks found in category 'nonexistent'
+Searching catalog...
 
-Available categories:
-  - git-workflow
-  - code-quality
-  - security
-  - debugging
+No matches found for 'nonexistent'
 
-Try: start assets add --category git-workflow
+Suggestions:
+- Check spelling
+- Try a shorter or different query
+- Use 'start assets browse' to view catalog
 ```
 
 Error handling - user cancels:
