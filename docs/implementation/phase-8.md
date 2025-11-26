@@ -1,8 +1,48 @@
 # Phase 8: Config Management & Doctor
 
-**Status:** Not Started
+**Status:** Phase 8a Complete, Phase 8b In Progress
 **Dependencies:** Phase 7
-**Estimated Effort:** 6-8 hours
+**Estimated Effort:** 30-35 hours total (split into sub-phases)
+
+---
+
+## Phase Breakdown
+
+This phase is split into focused sub-phases:
+
+### Phase 8a: Diagnostics & CLI UX ✅ **COMPLETE**
+- Prefix matching (DR-030)
+- Shell completion (DR-028)
+- Version checker (DR-021)
+- Doctor command (DR-024)
+- **Effort:** 3-4 hours
+- **Status:** ✅ Complete (2025-11-26)
+
+### Phase 8b: Agent Config Commands ✅ **COMPLETE**
+- `start config agent list/new/show/test/edit/remove/default`
+- TOML backup/manipulation helpers
+- Interactive wizards with validation
+- Complete with unit + integration tests
+- **Effort:** 6-8 hours (actual: ~7 hours)
+- **Status:** ✅ Complete (2025-11-26)
+
+### Phase 8c: Role Config Commands 🔄 **NEXT**
+- `start config role list/new/show/test/edit/remove/default`
+- Reuse helper functions from 8b
+- **Effort:** 4-5 hours
+- **Status:** Not Started
+
+### Phase 8d: Context Config Commands
+- `start config context list/new/show/test/edit/remove`
+- Similar to roles
+- **Effort:** 4-5 hours
+- **Status:** Not Started
+
+### Phase 8e: Task Config Commands
+- `start config task list/new/show/test/edit/remove`
+- Most complex (includes role/agent selection)
+- **Effort:** 5-6 hours
+- **Status:** Not Started
 
 ---
 
@@ -30,29 +70,36 @@ Before starting this phase, review these documents:
 
 ---
 
-## Goal
+## Phase 8b Deliverables
 
-Configuration tooling and diagnostics.
+- [ ] TOML backup helper (timestamped backups)
+- [ ] TOML manipulation helpers (read/write with preservation)
+- [ ] `start config agent list` - Display all configured agents
+- [ ] `start config agent new` - Interactive agent creation wizard
+- [ ] `start config agent show <name>` - Display agent configuration
+- [ ] `start config agent test <name>` - Validate agent configuration
+- [ ] `start config agent edit <name>` - Interactive agent editing
+- [ ] `start config agent remove <name>` - Remove agent with confirmation
+- [ ] `start config agent default <name>` - Set/show default agent
+- [ ] Unit tests for all agent commands
+- [ ] Integration tests for agent commands
 
 ---
 
-## Deliverables
+## Phase 8b Testing Criteria
 
-- [ ] `start config agent/role/task/context` commands
-- [ ] `start doctor` with health checks
-- [ ] Prefix matching
-- [ ] Shell completion
-- [ ] Version checking
-
----
-
-## Testing Criteria
-
-- [ ] All config commands work
-- [ ] Prefix matching works
-- [ ] Doctor identifies issues
-- [ ] Shell completion works
-- [ ] Version checking works
+- [ ] Agent list shows all agents from global and local configs
+- [ ] Agent new wizard creates valid agent configs
+- [ ] Agent show displays correct configuration details
+- [ ] Agent test validates binary availability and command templates
+- [ ] Agent edit wizard modifies existing configs correctly
+- [ ] Agent remove creates backups and deletes correctly
+- [ ] Agent default sets default_agent in settings
+- [ ] All commands handle missing configs gracefully
+- [ ] Backup files are created before modifications
+- [ ] Interactive prompts work correctly
+- [ ] --local flag targets local config
+- [ ] Validation catches invalid configurations
 
 ---
 

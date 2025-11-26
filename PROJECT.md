@@ -180,7 +180,10 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 | 6 | Asset Catalog & Lazy Loading | ✅ Complete | 8-10h | [phase-6.md](docs/implementation/phase-6.md) |
 | 7 | Init & Asset Management | ✅ Complete | 8-10h | [phase-7.md](docs/implementation/phase-7.md) |
 | 8a | Diagnostics & CLI UX | ✅ Complete | 3-4h | [phase-8.md](docs/implementation/phase-8.md) |
-| 8b | Config Management Commands | Not Started | 8-10h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8b | Agent Config Commands | ✅ Complete | 6-8h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8c | Role Config Commands | Not Started | 4-5h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8d | Context Config Commands | Not Started | 4-5h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8e | Task Config Commands | Not Started | 5-6h | [phase-8.md](docs/implementation/phase-8.md) |
 | 9 | Polish & Documentation | Not Started | 6-8h | [phase-9.md](docs/implementation/phase-9.md) |
 
 ### Phase Descriptions
@@ -363,9 +366,9 @@ git tag phase-0-complete
 
 ### Current Status
 
-**Phase:** 8a (Diagnostics & CLI UX) - ✅ Complete
-**Last Completed:** Phase 8a (2025-11-26)
-**Next Phase:** Phase 8b (Config Management Commands) or Phase 9 (Polish & Documentation)
+**Phase:** 8c (Role Config Commands) - Ready to Start
+**Last Completed:** Phase 8b (2025-11-26)
+**Next Phase:** Phase 8c (Role Config Commands)
 **Next Milestone:** v0.5.0 (Phase 6-8a complete) - Full feature set ✅ READY
 
 ### Phase Checklist
@@ -379,7 +382,10 @@ git tag phase-0-complete
 - [x] Phase 6: Asset Catalog & Lazy Loading
 - [x] Phase 7: Init & Asset Management
 - [x] Phase 8a: Diagnostics & CLI UX
-- [ ] Phase 8b: Config Management Commands
+- [x] Phase 8b: Agent Config Commands
+- [ ] Phase 8c: Role Config Commands
+- [ ] Phase 8d: Context Config Commands
+- [ ] Phase 8e: Task Config Commands
 - [ ] Phase 9: Polish & Documentation
 
 ### Milestone Targets

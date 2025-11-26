@@ -21,6 +21,11 @@ func NewLoader(fs domain.FileSystem) *Loader {
 	}
 }
 
+// GetFS returns the filesystem used by this loader
+func (l *Loader) GetFS() domain.FileSystem {
+	return l.fs
+}
+
 // LoadGlobal loads configuration from global directory (~/.config/start/)
 func (l *Loader) LoadGlobal() (domain.Config, error) {
 	homeDir, err := os.UserHomeDir()
