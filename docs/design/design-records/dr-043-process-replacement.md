@@ -1,4 +1,4 @@
-# DR-042: Process Replacement Execution Model
+# DR-043: Process Replacement Execution Model
 
 - Date: 2025-11-25
 - Status: Accepted

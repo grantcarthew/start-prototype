@@ -49,7 +49,8 @@ See [vision.md](../../vision.md) for the product vision and goals.
 | [DR-039](./dr-039-catalog-index.md) | Catalog Index File | Asset Management | 2025-01-13 |
 | [DR-040](./dr-040-substring-matching.md) | Substring Matching Algorithm for Asset Search | Asset Management | 2025-01-13 |
 | [DR-041](./dr-041-asset-command-reorganization.md) | Asset Command Reorganization | CLI Design | 2025-01-13 |
-| [DR-042](./dr-042-process-replacement.md) | Process Replacement Execution Model | Runtime Behavior | 2025-11-25 |
+| [DR-042](./dr-042-missing-asset-restoration.md) | Missing Asset Restoration | Asset Management | 2025-01-18 |
+| [DR-043](./dr-043-process-replacement.md) | Process Replacement Execution Model | Runtime Behavior | 2025-11-25 |
 
 ## By Category
 
@@ -88,7 +89,7 @@ Task configuration and loading:
 - **[DR-019](./dr-019-task-loading.md)** - Task loading now includes cache resolution
 - **[DR-029](./dr-029-task-agent-field.md)** - Optional agent field for task-specific agent preference
 
-### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023, DR-026, DR-027, DR-031 to DR-040)
+### Asset Management (DR-011, DR-013 to DR-016, DR-018, DR-022, DR-023, DR-026, DR-027, DR-031 to DR-040, DR-042)
 
 Asset distribution and updates:
 
@@ -111,6 +112,7 @@ Asset distribution and updates:
 - **[DR-037](./dr-037-asset-updates.md)** - Asset Update Mechanism
 - **[DR-039](./dr-039-catalog-index.md)** - Catalog Index File
 - **[DR-040](./dr-040-substring-matching.md)** - Substring Matching Algorithm for Asset Search
+- **[DR-042](./dr-042-missing-asset-restoration.md)** - Missing Asset Restoration
 
 ### Build & Distribution (DR-011, DR-013, DR-020)
 
@@ -120,12 +122,12 @@ How the tool and its content are distributed:
 - **[DR-013](./dr-013-agent-templates.md)** - Agent configurations as GitHub content
 - **[DR-020](./dr-020-version-injection.md)** - Binary version via ldflags at build time
 
-### Runtime Behavior (DR-008, DR-042)
+### Runtime Behavior (DR-008, DR-043)
 
 How the tool behaves during execution:
 
 - **[DR-008](./dr-008-file-handling.md)** - Path resolution and missing file handling
-- **[DR-042](./dr-042-process-replacement.md)** - Process replacement execution model (syscall.Exec)
+- **[DR-043](./dr-043-process-replacement.md)** - Process replacement execution model (syscall.Exec)
 
 ### Version Management (DR-020, DR-021)
 
