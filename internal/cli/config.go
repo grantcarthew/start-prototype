@@ -22,6 +22,7 @@ func NewConfigCommand(configLoader *config.Loader, validator *config.Validator) 
 	cmd.AddCommand(NewConfigAgentCommand(configLoader, validator))
 	cmd.AddCommand(NewConfigRoleCommand(configLoader, validator))
 	cmd.AddCommand(NewConfigContextCommand(configLoader, validator))
+	cmd.AddCommand(NewConfigTaskCommand(configLoader, validator))
 
 	return cmd
 }

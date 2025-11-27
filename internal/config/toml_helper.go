@@ -258,3 +258,58 @@ func (h *TOMLHelper) WriteContextsFile(dir string, contexts map[string]domain.Co
 
 	return nil
 }
+
+// ReadTasksFile reads the tasks.toml file from a directory
+func (h *TOMLHelper) ReadTasksFile(dir string) (map[string]domain.Task, error) {
+	path := filepath.Join(dir, "tasks.toml")
+	data, err := h.fs.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return make(map[string]domain.Task), nil
+		}
+		return nil, fmt.Errorf("failed to read tasks file: %w", err)
+	}
+
+	var parsed struct {
+		Tasks map[string]domain.Task `toml:"tasks"`
+	}
+
+	if err := toml.Unmarshal(data, &parsed); err != nil {
+		return nil, fmt.Errorf("failed to parse tasks file: %w", err)
+	}
+
+	if parsed.Tasks == nil {
+		return make(map[string]domain.Task), nil
+	}
+
+	return parsed.Tasks, nil
+}
+
+// WriteTasksFile writes tasks to the tasks.toml file
+func (h *TOMLHelper) WriteTasksFile(dir string, tasks map[string]domain.Task) error {
+	// Ensure directory exists
+	if err := h.fs.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Prepare structure for marshaling
+	tomlData := struct {
+		Tasks map[string]domain.Task `toml:"tasks"`
+	}{
+		Tasks: tasks,
+	}
+
+	// Marshal to TOML
+	data, err := toml.Marshal(tomlData)
+	if err != nil {
+		return fmt.Errorf("failed to marshal tasks: %w", err)
+	}
+
+	// Write file
+	path := filepath.Join(dir, "tasks.toml")
+	if err := h.fs.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("failed to write tasks file: %w", err)
+	}
+
+	return nil
+}

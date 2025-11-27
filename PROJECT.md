@@ -1,7 +1,7 @@
 # PROJECT: start - AI Agent CLI Implementation
 
 **Status:** Implementation Phase
-**Current Phase:** Phase 8d (Context Config Commands) - Complete
+**Current Phase:** Phase 8e (Task Config Commands) - Complete
 **Started:** 2025-11-24
 **Last Updated:** 2025-11-27
 
@@ -183,7 +183,7 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 | 8b | Agent Config Commands | ✅ Complete | 6-8h | [phase-8.md](docs/implementation/phase-8.md) |
 | 8c | Role Config Commands | ✅ Complete | 4-5h | [phase-8.md](docs/implementation/phase-8.md) |
 | 8d | Context Config Commands | ✅ Complete | 4-5h | [phase-8.md](docs/implementation/phase-8.md) |
-| 8e | Task Config Commands | Not Started | 5-6h | [phase-8.md](docs/implementation/phase-8.md) |
+| 8e | Task Config Commands | ✅ Complete | 5-6h | [phase-8.md](docs/implementation/phase-8.md) |
 | 9 | Polish & Documentation | Not Started | 6-8h | [phase-9.md](docs/implementation/phase-9.md) |
 
 ### Phase Descriptions
@@ -302,6 +302,16 @@ See [docs/testing.md](docs/testing.md) for complete testing strategy.
 - ✅ Required/optional context flag support
 - ✅ All unit tests passing
 
+**Phase 8e:** Task config management commands (most complex - includes role/agent selection)
+- ✅ start config task (list/new/show/test/edit/remove)
+- ✅ ReadTasksFile/WriteTasksFile TOML helper methods
+- ✅ Interactive task creation wizard supporting all UTD patterns (file/command/prompt/combination)
+- ✅ Task validation with file checking and command testing
+- ✅ Role and agent selection during creation/editing
+- ✅ Alias field support with uniqueness validation
+- ✅ Global/local scope selection with merge support
+- ✅ All unit tests passing
+
 **Phase 9:** Error messages, output formatting, performance, documentation, v1.0.0 release
 
 ---
@@ -382,9 +392,9 @@ git tag phase-0-complete
 
 ### Current Status
 
-**Phase:** 8e (Task Config Commands) - Ready to Start
-**Last Completed:** Phase 8d (2025-11-27)
-**Next Phase:** Phase 8e (Task Config Commands)
+**Phase:** 9 (Polish & Documentation) - Ready to Start
+**Last Completed:** Phase 8e (2025-11-27)
+**Next Phase:** Phase 9 (Polish & Documentation)
 **Next Milestone:** v0.5.0 (Phase 6-8a complete) - Full feature set ✅ READY
 
 ### Phase Checklist
@@ -401,7 +411,7 @@ git tag phase-0-complete
 - [x] Phase 8b: Agent Config Commands
 - [x] Phase 8c: Role Config Commands
 - [x] Phase 8d: Context Config Commands
-- [ ] Phase 8e: Task Config Commands
+- [x] Phase 8e: Task Config Commands
 - [ ] Phase 9: Polish & Documentation
 
 ### Milestone Targets
@@ -475,3 +485,4 @@ _Phase 8a Complete: Yes_
 _Phase 8b Complete: Yes_
 _Phase 8c Complete: Yes_
 _Phase 8d Complete: Yes_
+_Phase 8e Complete: Yes_
