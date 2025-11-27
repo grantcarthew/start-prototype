@@ -544,6 +544,585 @@ func TestPhase8c_ConfigRoleNew(t *testing.T) {
 	}
 }
 
+// TestPhase8b_ConfigAgentList tests agent list command
+func TestPhase8b_ConfigAgentList(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name         string
+		args         []string
+		expectOutput string
+	}{
+		{
+			name:         "agent list help",
+			args:         []string{"config", "agent", "list", "--help"},
+			expectOutput: "List all agents",
+		},
+		{
+			name:         "agent list",
+			args:         []string{"config", "agent", "list"},
+			expectOutput: "No agents configured.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil && !strings.Contains(string(output), "failed to load") {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+
+			if !strings.Contains(string(output), tt.expectOutput) {
+				t.Errorf("Output does not contain expected string %q\nGot: %s", tt.expectOutput, output)
+			}
+		})
+	}
+}
+
+// TestPhase8b_ConfigAgentShow tests agent show command
+func TestPhase8b_ConfigAgentShow(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "agent show help",
+			args:        []string{"config", "agent", "show", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "agent show nonexistent",
+			args:        []string{"config", "agent", "show", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8b_ConfigAgentTest tests agent test command
+func TestPhase8b_ConfigAgentTest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "agent test help",
+			args:        []string{"config", "agent", "test", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "agent test nonexistent",
+			args:        []string{"config", "agent", "test", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8b_ConfigAgentDefault tests agent default command
+func TestPhase8b_ConfigAgentDefault(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name string
+		args []string
+	}{
+		{
+			name: "agent default help",
+			args: []string{"config", "agent", "default", "--help"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil && !strings.Contains(string(output), "failed to load") {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8b_ConfigAgentEdit tests agent edit command help
+func TestPhase8b_ConfigAgentEdit(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "agent", "edit", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Interactive wizard") {
+		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	}
+}
+
+// TestPhase8b_ConfigAgentRemove tests agent remove command help
+func TestPhase8b_ConfigAgentRemove(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "agent", "remove", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Remove") {
+		t.Errorf("Output does not contain expected string 'Remove'\nGot: %s", output)
+	}
+}
+
+// TestPhase8b_ConfigAgentNew tests agent new command help
+func TestPhase8b_ConfigAgentNew(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "agent", "new", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Interactive wizard") {
+		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	}
+}
+
+// TestPhase8d_ConfigContextList tests context list command
+func TestPhase8d_ConfigContextList(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name         string
+		args         []string
+		expectOutput string
+	}{
+		{
+			name:         "context list help",
+			args:         []string{"config", "context", "list", "--help"},
+			expectOutput: "List all context",
+		},
+		{
+			name:         "context list",
+			args:         []string{"config", "context", "list"},
+			expectOutput: "No contexts configured.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil && !strings.Contains(string(output), "failed to load") {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+
+			if !strings.Contains(string(output), tt.expectOutput) {
+				t.Errorf("Output does not contain expected string %q\nGot: %s", tt.expectOutput, output)
+			}
+		})
+	}
+}
+
+// TestPhase8d_ConfigContextShow tests context show command
+func TestPhase8d_ConfigContextShow(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "context show help",
+			args:        []string{"config", "context", "show", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "context show nonexistent",
+			args:        []string{"config", "context", "show", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8d_ConfigContextTest tests context test command
+func TestPhase8d_ConfigContextTest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "context test help",
+			args:        []string{"config", "context", "test", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "context test nonexistent",
+			args:        []string{"config", "context", "test", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8d_ConfigContextEdit tests context edit command help
+func TestPhase8d_ConfigContextEdit(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "context", "edit", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Interactive wizard") {
+		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	}
+}
+
+// TestPhase8d_ConfigContextRemove tests context remove command help
+func TestPhase8d_ConfigContextRemove(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "context", "remove", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Remove") {
+		t.Errorf("Output does not contain expected string 'Remove'\nGot: %s", output)
+	}
+}
+
+// TestPhase8d_ConfigContextNew tests context new command help
+func TestPhase8d_ConfigContextNew(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "context", "new", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Interactive wizard") {
+		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	}
+}
+
+// TestPhase8e_ConfigTaskList tests task list command
+func TestPhase8e_ConfigTaskList(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name         string
+		args         []string
+		expectOutput string
+	}{
+		{
+			name:         "task list help",
+			args:         []string{"config", "task", "list", "--help"},
+			expectOutput: "List all tasks",
+		},
+		{
+			name:         "task list",
+			args:         []string{"config", "task", "list"},
+			expectOutput: "No tasks configured.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil && !strings.Contains(string(output), "failed to load") {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+
+			if !strings.Contains(string(output), tt.expectOutput) {
+				t.Errorf("Output does not contain expected string %q\nGot: %s", tt.expectOutput, output)
+			}
+		})
+	}
+}
+
+// TestPhase8e_ConfigTaskShow tests task show command
+func TestPhase8e_ConfigTaskShow(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "task show help",
+			args:        []string{"config", "task", "show", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "task show nonexistent",
+			args:        []string{"config", "task", "show", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8e_ConfigTaskTest tests task test command
+func TestPhase8e_ConfigTaskTest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "task test help",
+			args:        []string{"config", "task", "test", "--help"},
+			expectError: false,
+		},
+		{
+			name:        "task test nonexistent",
+			args:        []string{"config", "task", "test", "nonexistent"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binary, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but command succeeded\nOutput: %s", output)
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("Command failed: %v\nOutput: %s", err, output)
+			}
+		})
+	}
+}
+
+// TestPhase8e_ConfigTaskEdit tests task edit command help
+func TestPhase8e_ConfigTaskEdit(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "task", "edit", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Interactive wizard") {
+		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	}
+}
+
+// TestPhase8e_ConfigTaskRemove tests task remove command help
+func TestPhase8e_ConfigTaskRemove(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "task", "remove", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Remove") {
+		t.Errorf("Output does not contain expected string 'Remove'\nGot: %s", output)
+	}
+}
+
+// TestPhase8e_ConfigTaskNew tests task new command help
+func TestPhase8e_ConfigTaskNew(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	binary := getBinaryPath(t)
+
+	cmd := exec.Command(binary, "config", "task", "new", "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Command failed: %v\nOutput: %s", err, output)
+	}
+
+	if !strings.Contains(string(output), "Interactive wizard") {
+		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	}
+}
+
 // getBinaryPath returns the path to the test binary
 func getBinaryPath(t *testing.T) string {
 	t.Helper()
