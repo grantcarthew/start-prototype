@@ -1,2 +1,2 @@
-type,category,name,description,tags,sha,size,created,updated
-tasks,docs,review-docs,Full documentation reconciliation and lint detection,documentation;review;reconciliation;lint;ddd;quality,a8cfb656d5ee113653b8cbbc7e4f26a86a9f070c,318,2025-11-14T03:04:52Z,2025-11-14T03:39:52Z
+type,category,name,description,tags,bin,sha,size,created,updated
+tasks,docs,review-docs,Full documentation reconciliation and lint detection,documentation;review;reconciliation;lint;ddd;quality,,a8cfb656d5ee113653b8cbbc7e4f26a86a9f070c,318,2025-11-14T03:04:52Z,2025-11-14T03:39:52Z

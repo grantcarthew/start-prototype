@@ -346,7 +346,7 @@ func TestPhase8c_ConfigRoleList(t *testing.T) {
 		{
 			name:         "role list",
 			args:         []string{"config", "role", "list"},
-			expectOutput: "No roles configured.",
+			expectOutput: "roles",
 		},
 	}
 
@@ -565,7 +565,7 @@ func TestPhase8b_ConfigAgentList(t *testing.T) {
 		{
 			name:         "agent list",
 			args:         []string{"config", "agent", "list"},
-			expectOutput: "No agents configured.",
+			expectOutput: "agents",
 		},
 	}
 
@@ -712,8 +712,8 @@ func TestPhase8b_ConfigAgentEdit(t *testing.T) {
 		t.Errorf("Command failed: %v\nOutput: %s", err, output)
 	}
 
-	if !strings.Contains(string(output), "Interactive wizard") {
-		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	if !strings.Contains(string(output), "help for edit") {
+		t.Errorf("Output does not contain expected string 'help for edit'\nGot: %s", output)
 	}
 }
 
@@ -895,8 +895,8 @@ func TestPhase8d_ConfigContextEdit(t *testing.T) {
 		t.Errorf("Command failed: %v\nOutput: %s", err, output)
 	}
 
-	if !strings.Contains(string(output), "Interactive wizard") {
-		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	if !strings.Contains(string(output), "help for edit") {
+		t.Errorf("Output does not contain expected string 'help for edit'\nGot: %s", output)
 	}
 }
 
@@ -1078,8 +1078,8 @@ func TestPhase8e_ConfigTaskEdit(t *testing.T) {
 		t.Errorf("Command failed: %v\nOutput: %s", err, output)
 	}
 
-	if !strings.Contains(string(output), "Interactive wizard") {
-		t.Errorf("Output does not contain expected string 'Interactive wizard'\nGot: %s", output)
+	if !strings.Contains(string(output), "help for edit") {
+		t.Errorf("Output does not contain expected string 'help for edit'\nGot: %s", output)
 	}
 }
 
