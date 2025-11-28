@@ -284,6 +284,48 @@ start config role remove [flags]
 start config role default [name]
 ```
 
+## Edit Command Pattern
+
+The `edit` command provides two modes of operation:
+
+**Direct File Editing** (no name argument):
+
+- `start config edit` → opens config.toml in editor
+- `start config context edit` → opens contexts.toml in editor
+- `start config agent edit` → opens agents.toml in editor
+- `start config role edit` → opens roles.toml in editor
+- `start config task edit` → opens tasks.toml in editor
+
+When no item name is provided, the command opens the entire TOML file for direct editing. This allows users to:
+- Make bulk changes across multiple items
+- Edit complex configurations that are difficult in interactive mode
+- Copy/paste configurations
+- Use their preferred editor with syntax highlighting
+
+**Interactive Editing** (with name argument):
+
+- `start config context edit <name>` → interactive wizard to edit specific context
+- `start config agent edit <name>` → interactive wizard to edit specific agent
+- `start config role edit <name>` → interactive wizard to edit specific role
+- `start config task edit <name>` → interactive wizard to edit specific task
+
+When an item name is provided, the command launches an interactive wizard with prompts for each field.
+
+**Scope Selection**:
+
+All edit commands support the `--local` flag:
+- `start config context edit --local` → edits local contexts.toml
+- `start config context edit mycontext --local` → edits specific context in local config
+
+Without `--local`, the command prompts to select global or local when both exist.
+
+**Editor Detection**:
+
+File editing mode uses environment variables in priority order:
+1. `$VISUAL` - preferred full-screen editor
+2. `$EDITOR` - fallback editor
+3. `vi` - default if neither set
+
 ## Scope Selection
 
 Scope selection applies to configuration commands via flags:
@@ -371,3 +413,4 @@ This is a design-phase reorganization (no existing users):
 
 - 2025-01-10: Added `start assets` command suite per DR-041 (unified asset management)
 - 2025-01-10: Deprecated `start config [type] add` commands in favor of `start assets add`
+- 2025-11-28: Added "Edit Command Pattern" section documenting dual-mode behavior (file vs interactive editing)

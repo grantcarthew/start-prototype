@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -16,11 +17,16 @@ func NewConfigContextEditCommand(configLoader *config.Loader) *cobra.Command {
 	var localOnly bool
 
 	cmd := &cobra.Command{
-		Use:   "edit <name>",
-		Short: "Edit context configuration interactively",
-		Long:  "Interactive wizard to modify an existing context document configuration",
-		Args:  cobra.ExactArgs(1),
+		Use:   "edit [name]",
+		Short: "Edit context configuration",
+		Long:  "Edit contexts.toml file directly, or use interactive wizard when context name is provided",
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// If no name provided, open file in editor
+			if len(args) == 0 {
+				return openFileInEditor(configLoader, "contexts", localOnly)
+			}
+
 			contextName := args[0]
 			prompter := NewPromptHelper()
 			tomlHelper := config.NewTOMLHelper(configLoader.GetFS())
@@ -344,4 +350,105 @@ func NewConfigContextEditCommand(configLoader *config.Loader) *cobra.Command {
 	cmd.Flags().BoolVarP(&localOnly, "local", "l", false, "Edit in local config only")
 
 	return cmd
+}
+
+// openFileInEditor opens a TOML file in the user's editor
+func openFileInEditor(configLoader *config.Loader, fileType string, localOnly bool) error {
+	tomlHelper := config.NewTOMLHelper(configLoader.GetFS())
+
+	workDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get working directory: %w", err)
+	}
+
+	// Get config directories
+	globalDir, err := tomlHelper.GetGlobalDir()
+	if err != nil {
+		return err
+	}
+	localDir := tomlHelper.GetLocalDir(workDir)
+
+	// Get file paths based on type
+	var globalPath, localPath string
+	fileName := fileType + ".toml"
+	globalPath = filepath.Join(globalDir, fileName)
+	localPath = filepath.Join(localDir, fileName)
+
+	// Determine which file to edit
+	var configPath string
+	if localOnly {
+		configPath = localPath
+		// Create directory if needed
+		if err := os.MkdirAll(localDir, 0755); err != nil {
+			return fmt.Errorf("failed to create local config directory: %w", err)
+		}
+	} else {
+		// Check which files exist
+		globalExists := fileExists(globalPath)
+		localExists := fileExists(localPath)
+
+		if globalExists && localExists {
+			// Both exist - ask which to edit
+			prompter := NewPromptHelper()
+			choice, err := prompter.AskChoice("Select config to edit:", []string{"global", "local"})
+			if err != nil {
+				return err
+			}
+			if choice == "global" {
+				configPath = globalPath
+			} else {
+				configPath = localPath
+			}
+		} else if globalExists {
+			configPath = globalPath
+		} else if localExists {
+			configPath = localPath
+		} else {
+			// Neither exists - ask which to create
+			prompter := NewPromptHelper()
+			choice, err := prompter.AskChoice("No "+fileType+".toml found. Create:", []string{"global", "local"})
+			if err != nil {
+				return err
+			}
+			if choice == "global" {
+				configPath = globalPath
+				if err := os.MkdirAll(globalDir, 0755); err != nil {
+					return fmt.Errorf("failed to create global config directory: %w", err)
+				}
+			} else {
+				configPath = localPath
+				if err := os.MkdirAll(localDir, 0755); err != nil {
+					return fmt.Errorf("failed to create local config directory: %w", err)
+				}
+			}
+		}
+	}
+
+	// Detect editor
+	editor := os.Getenv("VISUAL")
+	if editor == "" {
+		editor = os.Getenv("EDITOR")
+		if editor == "" {
+			editor = "vi"
+			fmt.Println("No $VISUAL or $EDITOR set, using vi")
+		}
+	}
+
+	// Open editor
+	fmt.Printf("Opening %s in %s...\n", configPath, editor)
+	fmt.Println()
+
+	editorCmd := exec.Command(editor, configPath)
+	editorCmd.Stdin = os.Stdin
+	editorCmd.Stdout = os.Stdout
+	editorCmd.Stderr = os.Stderr
+
+	if err := editorCmd.Run(); err != nil {
+		return fmt.Errorf("editor failed: %w", err)
+	}
+
+	fmt.Println()
+	fmt.Printf("Saved %s\n", configPath)
+
+	return nil
 }

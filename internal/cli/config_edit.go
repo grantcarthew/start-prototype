@@ -17,42 +17,11 @@ func NewConfigEditCommand(configLoader *config.Loader, validator *config.Validat
 	var localFlag bool
 
 	cmd := &cobra.Command{
-		Use:   "edit [type]",
+		Use:   "edit",
 		Short: "Edit configuration file",
-		Long:  "Open configuration file in editor. Type can be: config (default), agent, role, context, task",
-		Args:  cobra.MaximumNArgs(1),
+		Long:  "Open settings configuration file (config.toml) in editor. For editing other config files, use: 'start config agent edit', 'start config context edit', etc.",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Determine which file type to edit
-			fileType := "config"
-			if len(args) > 0 {
-				fileType = args[0]
-			}
-
-			// Validate file type
-			validTypes := []string{"config", "agent", "agents", "role", "roles", "context", "contexts", "task", "tasks"}
-			isValid := false
-			for _, t := range validTypes {
-				if fileType == t {
-					isValid = true
-					break
-				}
-			}
-			if !isValid {
-				return fmt.Errorf("invalid type '%s'. Must be one of: config, agent, role, context, task", fileType)
-			}
-
-			// Normalize plural forms
-			switch fileType {
-			case "agents":
-				fileType = "agent"
-			case "roles":
-				fileType = "role"
-			case "contexts":
-				fileType = "context"
-			case "tasks":
-				fileType = "task"
-			}
-
 			tomlHelper := config.NewTOMLHelper(configLoader.GetFS())
 
 			workDir, err := os.Getwd()
@@ -67,25 +36,8 @@ func NewConfigEditCommand(configLoader *config.Loader, validator *config.Validat
 			}
 			localDir := tomlHelper.GetLocalDir(workDir)
 
-			// Get the appropriate file path based on type
-			var globalPath, localPath string
-			switch fileType {
-			case "config":
-				globalPath = tomlHelper.GetConfigPath(globalDir)
-				localPath = tomlHelper.GetConfigPath(localDir)
-			case "agent":
-				globalPath = globalDir + "/agents.toml"
-				localPath = localDir + "/agents.toml"
-			case "role":
-				globalPath = globalDir + "/roles.toml"
-				localPath = localDir + "/roles.toml"
-			case "context":
-				globalPath = globalDir + "/contexts.toml"
-				localPath = localDir + "/contexts.toml"
-			case "task":
-				globalPath = globalDir + "/tasks.toml"
-				localPath = localDir + "/tasks.toml"
-			}
+			globalPath := tomlHelper.GetConfigPath(globalDir)
+			localPath := tomlHelper.GetConfigPath(localDir)
 
 			// Check which configs exist
 			globalExists := fileExists(globalPath)
@@ -158,11 +110,7 @@ func NewConfigEditCommand(configLoader *config.Loader, validator *config.Validat
 			}
 
 			// Show opening message
-			fileTypeDisplay := fileType
-			if fileType != "config" {
-				fileTypeDisplay = fileType + "s"
-			}
-			fmt.Printf("Opening %s (%s) in %s...\n", configPath, fileTypeDisplay, editor)
+			fmt.Printf("Opening %s in %s...\n", configPath, editor)
 			if showEditorMessage {
 				fmt.Println("Set $EDITOR to use your preferred editor.")
 			}
@@ -178,39 +126,36 @@ func NewConfigEditCommand(configLoader *config.Loader, validator *config.Validat
 				return fmt.Errorf("editor failed: %w", err)
 			}
 
-			// Validate the config after editing (only for full config, not individual files)
-			if fileType == "config" {
-				fmt.Println()
-				fmt.Println("Validating configuration...")
+			// Validate the config after editing
+			fmt.Println()
+			fmt.Println("Validating configuration...")
 
-				// Load and validate the edited config
-				var cfg domain.Config
-				if scope == "global" {
-					cfg, err = configLoader.LoadGlobal()
-				} else {
-					cfg, err = configLoader.LoadLocal(workDir)
-				}
-
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "\n⚠ Configuration has errors:\n%v\n\n", err)
-					fmt.Fprintf(os.Stderr, "Use 'start config edit%s' to fix the errors.\n",
-						map[bool]string{true: " --local", false: ""}[scope == "local"])
-					return nil // Don't return error, file is already saved
-				}
-
-				// Run validation
-				if err := validator.Validate(cfg); err != nil {
-					fmt.Printf("\n⚠ Warnings found:\n\n%v\n\n", err)
-					fmt.Printf("Changes saved to %s\n", configPath)
-					fmt.Println()
-					fmt.Println("Note: Warnings don't prevent using start, but may affect functionality.")
-					return nil
-				}
-
-				fmt.Println("✓ Configuration is valid")
-				fmt.Println()
+			// Load and validate the edited config
+			var cfg domain.Config
+			if scope == "global" {
+				cfg, err = configLoader.LoadGlobal()
+			} else {
+				cfg, err = configLoader.LoadLocal(workDir)
 			}
 
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "\n⚠ Configuration has errors:\n%v\n\n", err)
+				fmt.Fprintf(os.Stderr, "Use 'start config edit%s' to fix the errors.\n",
+					map[bool]string{true: " --local", false: ""}[scope == "local"])
+				return nil // Don't return error, file is already saved
+			}
+
+			// Run validation
+			if err := validator.Validate(cfg); err != nil {
+				fmt.Printf("\n⚠ Warnings found:\n\n%v\n\n", err)
+				fmt.Printf("Changes saved to %s\n", configPath)
+				fmt.Println()
+				fmt.Println("Note: Warnings don't prevent using start, but may affect functionality.")
+				return nil
+			}
+
+			fmt.Println("✓ Configuration is valid")
+			fmt.Println()
 			fmt.Printf("Changes saved to %s\n", configPath)
 
 			return nil
