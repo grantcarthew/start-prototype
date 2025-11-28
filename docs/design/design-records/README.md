@@ -51,6 +51,7 @@ See [vision.md](../../vision.md) for the product vision and goals.
 | [DR-041](./dr-041-asset-command-reorganization.md) | Asset Command Reorganization | CLI Design | 2025-01-13 |
 | [DR-042](./dr-042-missing-asset-restoration.md) | Missing Asset Restoration | Asset Management | 2025-01-18 |
 | [DR-043](./dr-043-process-replacement.md) | Process Replacement Execution Model | Runtime Behavior | 2025-11-25 |
+| [DR-044](./dr-044-shell-quote-escaping.md) | Shell Quote Escaping for Placeholder Substitution | Runtime Behavior | 2025-11-28 |
 
 ## By Category
 
@@ -122,12 +123,13 @@ How the tool and its content are distributed:
 - **[DR-013](./dr-013-agent-templates.md)** - Agent configurations as GitHub content
 - **[DR-020](./dr-020-version-injection.md)** - Binary version via ldflags at build time
 
-### Runtime Behavior (DR-008, DR-043)
+### Runtime Behavior (DR-008, DR-043, DR-044)
 
 How the tool behaves during execution:
 
 - **[DR-008](./dr-008-file-handling.md)** - Path resolution and missing file handling
 - **[DR-043](./dr-043-process-replacement.md)** - Process replacement execution model (syscall.Exec)
+- **[DR-044](./dr-044-shell-quote-escaping.md)** - Shell quote escaping for placeholder substitution
 
 ### Version Management (DR-020, DR-021)
 
