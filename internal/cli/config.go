@@ -19,6 +19,7 @@ func NewConfigCommand(configLoader *config.Loader, validator *config.Validator) 
 
 	// Add subcommands
 	cmd.AddCommand(NewConfigShowCommand(configLoader, validator))
+	cmd.AddCommand(NewConfigEditCommand(configLoader, validator))
 	cmd.AddCommand(NewConfigAgentCommand(configLoader, validator))
 	cmd.AddCommand(NewConfigRoleCommand(configLoader, validator))
 	cmd.AddCommand(NewConfigContextCommand(configLoader, validator))

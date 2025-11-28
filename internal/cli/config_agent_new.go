@@ -120,6 +120,15 @@ func NewConfigAgentNewCommand(configLoader *config.Loader) *cobra.Command {
 			// Command template
 			fmt.Println("\nCommand template")
 			fmt.Println("Available placeholders: {bin}, {model}, {role}, {role_file}, {prompt}, {date}")
+			fmt.Println()
+			fmt.Println("Example for Claude:")
+			fmt.Println(`  {bin} --model {model} --append-system-prompt '{role}' '{prompt}'`)
+			fmt.Println()
+			fmt.Println("Example for Gemini (file-based role):")
+			fmt.Println(`  GEMINI_SYSTEM_MD="{role_file}" {bin} --model {model} --prompt-interactive '{prompt}'`)
+			fmt.Println()
+			fmt.Println("Important: Use single quotes around '{role}' and '{prompt}' for bash safety")
+			fmt.Println()
 			command, err := prompter.Ask("Command: ")
 			if err != nil {
 				return err

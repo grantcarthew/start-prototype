@@ -51,7 +51,7 @@ func NewRootCommand(
 	}
 
 	cmd := &cobra.Command{
-		Use:     "start [prompt]",
+		Use:     "start [flags]",
 		Short:   "AI agent CLI orchestrator",
 		Long:    "start is a command-line orchestrator for AI agents that manages prompt composition, context injection, and workflow automation.",
 		Version: version,
@@ -192,11 +192,8 @@ func (rc *RootCommand) run(cmd *cobra.Command, args []string) error {
 		timeout,
 	)
 
-	// Assemble prompt from arguments
+	// Assemble prompt from arguments (empty is valid for interactive sessions)
 	userPrompt := strings.Join(args, " ")
-	if userPrompt == "" {
-		return fmt.Errorf("no prompt provided")
-	}
 
 	// Execute agent (replaces current process, never returns on success)
 	execParams := engine.ExecuteParams{
