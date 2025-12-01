@@ -1,5 +1,20 @@
 # start - AI Agent CLI Orchestrator
 
+> **PROTOTYPE STATUS - NOT ACTIVELY DEVELOPED**
+>
+> This is a research prototype that validated the core concepts for an AI agent CLI orchestrator. Development has moved to a **CUE-based implementation** that addresses fundamental limitations discovered during this prototype phase.
+>
+> **Key Findings:**
+> - TOML's lack of table ordering and limited validation made it unsuitable for context injection requirements
+> - Custom GitHub-based asset distribution added unnecessary complexity
+> - The CUE version uses native package registry and built-in validation
+>
+> **Current Status:** This prototype contains 44 Design Records documenting the research and design decisions. It remains valuable as reference documentation for the architectural exploration, but no new development will occur here.
+>
+> **Active Development:** [github.com/grantcarthew/start](https://github.com/grantcarthew/start) (CUE-based)
+
+---
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go)](https://go.dev)
 
